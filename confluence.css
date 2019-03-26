@@ -1,0 +1,9 @@
+h2,h3 {
+    color:maroon;
+    font-family:sans-serif;
+}
+
+p,li,a {
+    color:navy;
+    font-family:sans-serif;
+}
