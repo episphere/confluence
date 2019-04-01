@@ -7,6 +7,8 @@ confluence=function(){
     document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd
     confluence.div=document.getElementById('confluenceDiv')
     if(confluence.div){
+        if(location.origin.match('localhost')){loginBoxAppDev.parentElement.hidden=false}
+        if(location.origin.match('episphere')){loginBoxAppProd.parentElement.hidden=false}
         confluence.UI()
     }
     
@@ -93,7 +95,29 @@ confluence.UI=function(){
 }
 
 confluence.UIdo=function(){
-    confluence.getFileInfo(419308975889)
+    confluence.div.innerHTML=' loadind ...'
+    confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
+        confluence.div.innerHTML=''
+        // find subfolders:
+        confluence.dir={};
+        ['USRT','PLCO','PBCS','AHS'].forEach(function(fld,i){
+            let y = x.item_collection.entries.filter(function(xi){
+                return (xi.name==fld)
+            })[0]
+            confluence.dir[fld]={id:y.id}
+            let div = document.createElement('div')
+            div.innerHTML=` loading ${fld} ...`
+            confluence.div.appendChild(div)
+            confluence.dir[fld].div=div
+            // find data folders
+            confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
+                div.innerHTML=`<h3>${i+1}. ${fld}</h3>`
+                4
+            })
+
+        })
+        //debugger
+    })
 
     //debugger
 }
@@ -110,7 +134,7 @@ confluence.searchParms=function(){
     return parms
 }
 
-confluence.getFileInfo=function(id,fun){
+/*confluence.getFileInfo=function(id,fun){
     fun=fun||console.log
     fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
@@ -119,14 +143,33 @@ confluence.getFileInfo=function(id,fun){
         }
     }).then(x=>x.json().then(fun))
 }
-confluence.getFile=function(id,fun){
-    fun=fun||console.log
-    fetch(`https://api.box.com/2.0/files/${id}/content`,{
+*/
+
+
+confluence.getFileInfo=async function(id){
+    return (await fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+confluence.parms.access_token
         }
-    }).then(x=>x.text().then(fun))
+    })).json()
+}
+confluence.getFile=async function(id){
+    return (await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+        method:'GET',
+        headers:{
+            Authorization:"Bearer "+confluence.parms.access_token
+        }
+    })).text()
+}
+
+confluence.getFolderInfo=async function(id){
+    return (await fetch('https://api.box.com/2.0/folders/'+id,{
+        method:'GET',
+        headers:{
+            Authorization:"Bearer "+confluence.parms.access_token
+        }
+    })).json()
 }
 
 // https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.ini.client_id}&redirect_uri=${location.origin}${location.pathname}&state=${cohort.parms.stateIni}`

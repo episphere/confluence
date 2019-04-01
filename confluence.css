@@ -3,7 +3,13 @@ h2,h3 {
     font-family:sans-serif;
 }
 
-p,li,a,div {
+p,li,div {
     color:navy;
     font-family:sans-serif;
+}
+
+a {
+    color:green;
+    font-family:sans-serif;
+    background-color:yellow;
 }
