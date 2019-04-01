@@ -111,8 +111,32 @@ confluence.UIdo=function(){
             confluence.dir[fld].div=div
             // find data folders
             confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
-                div.innerHTML=`<h3>${i+1}. ${fld}</h3>`
-                4
+                confluence.dir[fld].dir={}
+                div.innerHTML=`<h3>${i+1}. ${fld}</h3>`;
+                ['Survival and Treatment Data',
+                 'Risk Factor Data',
+                 'Pathology Data',
+                 'Core Data'].forEach(function(dtFld,j){
+                     let y = x.item_collection.entries.filter(xi=>(xi.name==dtFld))[0]
+                     let divDt = document.createElement('div')
+                     divDt.innerHTML=` loading ${dtFld} ...`
+                     div.appendChild(divDt)
+                     confluence.dir[fld].dir[dtFld]={
+                         id:y.id,
+                         div:divDt
+                     }
+                     confluence.getFolderInfo(confluence.dir[fld].dir[dtFld].id).then(x=>{
+                         divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld}`
+                         let divDtFiles = document.createElement('div')
+                         divDt.appendChild(divDtFiles)
+                         x.item_collection.entries.filter(xi=>(x.item_collection.entries[0].name.match('.txt'))).forEach(fl=>{
+                             let li = document.createElement('li')
+                             divDtFiles.appendChild(li)
+                             li.innerHTML=`<span style="font-size:small">${fl.name}</span>`
+                         })
+                         4
+                     })
+                 })
             })
 
         })
