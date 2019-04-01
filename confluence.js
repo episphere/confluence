@@ -129,10 +129,22 @@ confluence.UIdo=function(){
                          divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld}`
                          let divDtFiles = document.createElement('div')
                          divDt.appendChild(divDtFiles)
-                         x.item_collection.entries.filter(xi=>(x.item_collection.entries[0].name.match('.txt'))).forEach(fl=>{
+                         let txtFiles=x.item_collection.entries.filter(xi=>(x.item_collection.entries[0].name.match('.txt')))
+                         confluence.dir[fld].dir[dtFld].files={}
+                         txtFiles.forEach(fl=>{
                              let li = document.createElement('li')
                              divDtFiles.appendChild(li)
-                             li.innerHTML=`<span style="font-size:small">${fl.name}</span>`
+                             li.innerHTML=`<span style="font-size:small">${fl.name} </span>`
+                             let bt = document.createElement('button')
+                             bt.textContent="display"
+                             li.appendChild(bt)
+                             let divFile = document.createElement('div')
+                             li.appendChild(divFile)
+                             fl.div=divFile
+                             confluence.dir[fld].dir[dtFld].files[fl.name]=fl
+                             bt.onclick=function(){
+                                 confluence.plotFile(fl)
+                             }
                          })
                          4
                      })
@@ -144,6 +156,10 @@ confluence.UIdo=function(){
     })
 
     //debugger
+}
+
+confluence.plotFile=function(fl){
+    4
 }
 
 confluence.searchParms=function(){
