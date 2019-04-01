@@ -53,7 +53,12 @@ confluence.UI=function(){
         let clt={}
         if(location.origin.match('localhost')){
             clt = confluence.iniAppDev
+        }else if(location.origin.match('episphere')){
+            clt = confluence.iniAppProd
+        }else if(location.origin.match('observablehq')){
+            clt = confluence.iniObs
         }
+        confluence.client=clt
         var data = `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`;
         var xhr = new XMLHttpRequest();
         xhr.addEventListener("readystatechange", function () {
