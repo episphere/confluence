@@ -135,17 +135,28 @@ confluence.UIdo=function(){
                              let li = document.createElement('li')
                              divDtFiles.appendChild(li)
                              li.innerHTML=`<span style="font-size:small">${fl.name} </span>`
-                             let bt = document.createElement('button')
-                             bt.textContent="display"
-                             li.appendChild(bt)
+                             let btDisplay = document.createElement('button')
+                             btDisplay.textContent="display"
+                             li.appendChild(btDisplay)
+                             let btDelete = document.createElement('button')
+                             btDelete.hidden=true
+                             btDelete.textContent="delete plot"
+                             li.appendChild(btDelete)
                              let divFile = document.createElement('div')
                              li.appendChild(divFile)
                              fl.div=divFile
                              fl.study=dtFld
                              fl.group=fld
                              confluence.dir[fld].dir[dtFld].files[fl.name]=fl
-                             bt.onclick=function(){
+                             btDisplay.onclick=function(){
                                  confluence.displayFile(fl)
+                                 btDelete.hidden=false
+                                 btDisplay.hidden=true
+                             }
+                             btDelete.onclick=function(){
+                                 divFile.innerHTML=''
+                                 btDelete.hidden=true
+                                 btDisplay.hidden=false
                              }
                          })
                          4
