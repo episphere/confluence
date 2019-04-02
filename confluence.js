@@ -134,7 +134,7 @@ confluence.UIdo=function(){
                          txtFiles.forEach(fl=>{
                              let li = document.createElement('li')
                              divDtFiles.appendChild(li)
-                             li.innerHTML=`<span style="font-size:small">${fl.name} </span>`
+                             li.innerHTML=`${fl.name} `
                              let btDisplay = document.createElement('button')
                              btDisplay.textContent="display"
                              li.appendChild(btDisplay)
@@ -201,7 +201,7 @@ confluence.displayFile=async function(fl){
 }
 
 confluence.plotFile=function(fl){
-    let h=`<p style="font-size:x-small">Using data from file #${fl.id}, version #${fl.file_version.id}, originally created by ${fl.info.created_by.name} at ${fl.info.created_at}, last modified by ${fl.info.modified_by.name} at ${fl.info.modified_at} (${fl.info.sequence_id} modifications).<p>`
+    let h=`<p style="font-size:x-small;color:gray">Using data from file #${fl.id}, version #${fl.file_version.id}, originally created by ${fl.info.created_by.name} at ${fl.info.created_at}, last modified by ${fl.info.modified_by.name} at ${fl.info.modified_at} (${fl.info.sequence_id} modifications).<p>`
     h +='<p><select id="distParm"></select></p>'
     h +='<div id="plotlyDiv"></div>'
     fl.div.innerHTML=h
