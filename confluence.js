@@ -225,7 +225,8 @@ confluence.plotlyFile=function(fl,parm,div){
     }
     var layout = {
         title: `${fl.group}/${fl.study}`,
-        xaxis: {title:`${parm}`}
+        xaxis: {title:`${parm}`},
+        yaxis: {title:'count'}
     };
     Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
