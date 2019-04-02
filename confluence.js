@@ -185,6 +185,7 @@ confluence.displayFile=async function(fl){
     let unique=function(arr){
         let u={}
         arr.forEach(v=>{
+            if(v=='888'){v=undefined} // 888 undefined code
             if(!u[v]){u[v]=0}
             u[v]++
         })
@@ -223,10 +224,14 @@ confluence.plotlyFile=function(fl,parm,div){
         x:Object.keys(fl.uni[parm]),
         y:Object.keys(fl.uni[parm]).map(k=>fl.uni[parm][k])
     }
+    var unCount=` (${trace.y.reduce((a,b)=>a+b)} total)`
+    if(trace.x.indexOf('undefined')){
+        unCount = `(${trace.y[trace.x.indexOf('undefined')]}/${trace.y.reduce((a,b)=>a+b)} undefined)`
+    }
     var layout = {
         title: `${fl.group}/${fl.study}`,
         xaxis: {title:`${parm}`},
-        yaxis: {title:'count'}
+        yaxis: {title:`count ${unCount}`}
     };
     Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
