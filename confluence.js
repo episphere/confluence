@@ -141,6 +141,8 @@ confluence.UIdo=function(){
                              let divFile = document.createElement('div')
                              li.appendChild(divFile)
                              fl.div=divFile
+                             fl.study=dtFld
+                             fl.group=fld
                              confluence.dir[fld].dir[dtFld].files[fl.name]=fl
                              bt.onclick=function(){
                                  confluence.displayFile(fl)
@@ -211,7 +213,8 @@ confluence.plotlyFile=function(fl,parm,div){
         y:Object.keys(fl.uni[parm]).map(k=>fl.uni[parm][k])
     }
     var layout = {
-        title: `${parm}`
+        title: `${fl.group}/${fl.study}`,
+        xaxis: {title:`${parm}`}
     };
     Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
