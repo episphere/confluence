@@ -175,6 +175,10 @@ confluence.displayFile=async function(fl){
     fl.div.innerHTML='<span style="color:orange;font-size:small">processing ...</span>'
     let txt = await confluence.getFile(fl.id)
     let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
+    // trailing blank
+    if((txt.split(/\n+/).slice(-1).length==1)&&(txt.slice(-1)[0].length)){
+        dt.pop()
+    }
     let tab={}
     hh=dt[0].forEach((h,j)=>{ // headers
         tab[h]=[]
@@ -225,7 +229,7 @@ confluence.plotlyFile=function(fl,parm,div){
         y:Object.keys(fl.uni[parm]).map(k=>fl.uni[parm][k])
     }
     var unCount=` (${trace.y.reduce((a,b)=>a+b)} total)`
-    if(trace.x.indexOf('undefined')){
+    if(trace.x.indexOf('undefined')>-1){
         unCount = `(${trace.y[trace.x.indexOf('undefined')]}/${trace.y.reduce((a,b)=>a+b)} undefined)`
     }
     var layout = {
