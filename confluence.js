@@ -143,7 +143,7 @@ confluence.UIdo=function(){
                              fl.div=divFile
                              confluence.dir[fld].dir[dtFld].files[fl.name]=fl
                              bt.onclick=function(){
-                                 confluence.plotFile(fl)
+                                 confluence.displayFile(fl)
                              }
                          })
                          4
@@ -158,8 +158,62 @@ confluence.UIdo=function(){
     //debugger
 }
 
+confluence.displayFile=async function(fl){
+    fl.div.innerHTML='<span style="color:orange;font-size:small">processing ...</span>'
+    let txt = await confluence.getFile(fl.id)
+    let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
+    let tab={}
+    hh=dt[0].forEach((h,j)=>{ // headers
+        tab[h]=[]
+        dt.slice(1).forEach((vv,i)=>{
+            tab[h][i]=vv[j]
+        })
+    })
+    let unique=function(arr){
+        let u={}
+        arr.forEach(v=>{
+            if(!u[v]){u[v]=0}
+            u[v]++
+        })
+        return u
+    }
+    fl.tab=tab
+    fl.uni={}
+    Object.keys(tab).forEach(k=>{
+        fl.uni[k]=unique(tab[k])
+    })
+    fl.info = await confluence.getFileInfo(fl.id)
+    fl.div.innerHTML='<span style="color:green;font-size:small">processing ... done</span>'
+    confluence.plotFile(fl)
+}
+
 confluence.plotFile=function(fl){
-    4
+    let h=`<p style="font-size:x-small">Using data from file #${fl.id}, version #${fl.file_version.id}, originally created by ${fl.info.created_by.name} at ${fl.info.created_at}, last modified by ${fl.info.modified_by.name} at ${fl.info.modified_at} (${fl.info.sequence_id} modifications).<p>`
+    h +='<p><select id="distParm"></select></p>'
+    h +='<div id="plotlyDiv"></div>'
+    fl.div.innerHTML=h
+    let sel1 = fl.div.querySelector('#distParm')
+    Object.keys(fl.uni).sort().forEach(k=>{
+        let op = document.createElement('option')
+        op.value=op.textContent=k
+        sel1.appendChild(op)  
+    })
+    sel1.onchange=function(){
+        confluence.plotlyFile(fl,sel1.value,fl.div.querySelector('#plotlyDiv'))
+    }
+    confluence.plotlyFile(fl,sel1.value,fl.div.querySelector('#plotlyDiv'))
+}
+
+confluence.plotlyFile=function(fl,parm,div){
+    var trace = {
+        type:'bar',
+        x:Object.keys(fl.uni[parm]),
+        y:Object.keys(fl.uni[parm]).map(k=>fl.uni[parm][k])
+    }
+    var layout = {
+        title: `${parm}`
+    };
+    Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
 
 confluence.searchParms=function(){
@@ -204,12 +258,19 @@ confluence.getFile=async function(id){
 }
 
 confluence.getFolderInfo=async function(id){
-    return (await fetch('https://api.box.com/2.0/folders/'+id,{
+    var r = (await fetch('https://api.box.com/2.0/folders/'+id,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+confluence.parms.access_token
         }
-    })).json()
+    }))
+    if(r.statusText=="Unauthorized"){
+        delete localStorage.parms
+        alert('session expired, reloading')
+        location.search=''
+    }else{
+        return r.json()
+    }
 }
 
 // https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.ini.client_id}&redirect_uri=${location.origin}${location.pathname}&state=${cohort.parms.stateIni}`
