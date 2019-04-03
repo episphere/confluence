@@ -11,6 +11,21 @@ confluence=function(){
         if(location.origin.match('episphere')){loginBoxAppProd.parentElement.hidden=false}
         confluence.UI()
     }
+    // index.html events
+    if(typeof(hideSummary)){
+        hideSummary.onclick=function(){
+            if(this.textContent=="[-]"){
+                this.textContent="[+]"
+                this.style.color="green"
+                confluence.div.hidden=true
+            }else{
+                this.textContent="[-]"
+                this.style.color="orange"
+                confluence.div.hidden=false
+            }
+            //debugger
+        }
+    }
     
 }
 
