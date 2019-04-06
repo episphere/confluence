@@ -63,7 +63,7 @@ confluence.loginAppProd=function(){
 }
 
 
-confluence.UI=function(){
+confluence.UI=async function(){
     let parms=confluence.searchParms()
     if(parms.code){
         //exchange code for authorization token
@@ -93,7 +93,7 @@ confluence.UI=function(){
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)
             if(confluence.parms.access_token){
-                confluence.UIdo() // <---- ready to go with an authenticated token
+                await confluence.UIdo() // <---- ready to go with an authenticated token
             }else{
                 alert('access token not found, please contact system administrator')
             }
@@ -109,9 +109,9 @@ confluence.UI=function(){
 
 }
 
-confluence.UIdo=function(){
+confluence.UIdo=async function(){
     confluence.div.innerHTML=' loadind ...'
-    confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
+    await confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
         confluence.div.innerHTML=''
         // show what is hidden
         summaryHead.hidden=false
@@ -119,7 +119,7 @@ confluence.UIdo=function(){
         individualReportsHeader.hidden=false
         // find subfolders:
         confluence.dir={};
-        ['USRT','PLCO','PBCS','AHS'].forEach(function(fld,i){
+        ['USRT','PLCO','PBCS','AHS'].forEach(async function(fld,i){
             let y = x.item_collection.entries.filter(function(xi){
                 return (xi.name==fld)
             })[0]
@@ -128,14 +128,17 @@ confluence.UIdo=function(){
             div.innerHTML=` loading ${fld} ...`
             confluence.div.appendChild(div)
             confluence.dir[fld].div=div
+            //if(Object.keys(confluence.dir).length==4){
+            //    setTimeout(confluence.summary,1000)
+            //}
             // find data folders
-            confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
+            await confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
                 confluence.dir[fld].dir={}
                 div.innerHTML=`<h3>${i+1}. ${fld} <span>[-]</span></h3>`;
                 ['Survival and Treatment Data',
                  'Risk Factor Data',
                  'Pathology Data',
-                 'Core Data'].forEach(function(dtFld,j){
+                 'Core Data'].forEach(async function(dtFld,j){
                      let y = x.item_collection.entries.filter(xi=>(xi.name==dtFld))[0]
                      let divDt = document.createElement('div')
                      divDt.innerHTML=` loading ${dtFld} ...`
@@ -144,7 +147,8 @@ confluence.UIdo=function(){
                          id:y.id,
                          div:divDt
                      }
-                     confluence.getFolderInfo(confluence.dir[fld].dir[dtFld].id).then(x=>{
+                     //console.log(confluence.dir)
+                     await confluence.getFolderInfo(confluence.dir[fld].dir[dtFld].id).then(x=>{
                          divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld} <span>[-]</span></h4>`
                          let divDtFiles = document.createElement('div')
                          divDt.appendChild(divDtFiles)
@@ -156,6 +160,7 @@ confluence.UIdo=function(){
                              li.innerHTML=`${fl.name} `
                              let btDisplay = document.createElement('button')
                              btDisplay.textContent="display"
+                             btDisplay.className="btDisplay"
                              li.appendChild(btDisplay)
                              let btDelete = document.createElement('button')
                              btDelete.hidden=true
@@ -177,10 +182,15 @@ confluence.UIdo=function(){
                                  btDelete.hidden=true
                                  btDisplay.hidden=false
                              }
+                             if(document.querySelectorAll('.btDisplay').length==16){
+                                 confluence.summary()
+                             }
                          })
-                         4
+                         
                      })
+
                  })
+
             })
 
         })
@@ -194,11 +204,15 @@ confluence.summary=async function(){ // summary plots
     // load status for each study
     let dt={}
     Object.keys(confluence.dir).sort().forEach(async k=>{
-        let txt = await confluence.getFile(confluence.dir["AHS"].dir["Core Data"].files[Object.keys(confluence.dir["AHS"].dir["Core Data"].files)[0]].id)
+        let txt = await confluence.getFile(confluence.dir[k].dir["Core Data"].files[Object.keys(confluence.dir[k].dir["Core Data"].files)[0]].id)
         dt[k] = confluence.txt2dt(txt)
-        summaryStatus.innerHTML=`<p>loading ${k} status ...</p>`
+        summaryReports.innerHTML=`<p>loading ${k} Core Data ...</p>`
         caseCount.textContent=parseInt(caseCount.textContent)+dt[k].tab.study.length
-        // add study to 
+        // add study to left side menu
+        let divK = document.createElement('div')
+        divK.id=`div${k}`
+        divK.innerHTML=`<input type="radio"> ${k}`
+        document.getElementById('study').appendChild(divK)
         let kk = Object.keys(dt)
         partnerCount.textContent=kk.length
 
@@ -207,9 +221,14 @@ confluence.summary=async function(){ // summary plots
         }
     })
     let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
-    h +='<table><tr>'
-    h += '<td id="summaryStatus" style="vertical-align:top"><p>loading status ...</p></td>'
-    h += '<td id="summaryReports" style="vertical-align:top"></td>'
+    h += '<table><tr>'
+    h += '<td id="summaryStatus" style="vertical-align:top">'
+    h += '<h4>Status:</h4>'
+    h += '<div id="status"></div>'
+    h += '<h4>Study:</h4>'
+    h += '<div id="study"></div>'
+    h += '</td>'
+    h += '<td id="summaryReports" style="vertical-align:top"><p>loading status ...</p></td>'
     h += '</hr><table>'
     summaryDiv.innerHTML=h 
 }
