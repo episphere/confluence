@@ -12,8 +12,8 @@ confluence=function(){
         confluence.UI()
     }
     // index.html events
-    if(typeof(hideSummary)){
-        hideSummary.onclick=function(){
+    if(typeof(hideIndividualReports)){
+        hideIndividualReports.onclick=function(){
             if(this.textContent=="[-]"){
                 this.textContent="[+]"
                 this.style.color="green"
@@ -113,6 +113,10 @@ confluence.UIdo=function(){
     confluence.div.innerHTML=' loadind ...'
     confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
         confluence.div.innerHTML=''
+        // show what is hidden
+        summaryHead.hidden=false
+        summaryDiv.hidden=false
+        individualReportsHeader.hidden=false
         // find subfolders:
         confluence.dir={};
         ['USRT','PLCO','PBCS','AHS'].forEach(function(fld,i){
@@ -127,7 +131,7 @@ confluence.UIdo=function(){
             // find data folders
             confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
                 confluence.dir[fld].dir={}
-                div.innerHTML=`<h3>${i+1}. ${fld}</h3>`;
+                div.innerHTML=`<h3>${i+1}. ${fld} <span>[-]</span></h3>`;
                 ['Survival and Treatment Data',
                  'Risk Factor Data',
                  'Pathology Data',
@@ -141,7 +145,7 @@ confluence.UIdo=function(){
                          div:divDt
                      }
                      confluence.getFolderInfo(confluence.dir[fld].dir[dtFld].id).then(x=>{
-                         divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld}`
+                         divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld} <span>[-]</span></h4>`
                          let divDtFiles = document.createElement('div')
                          divDt.appendChild(divDtFiles)
                          let txtFiles=x.item_collection.entries.filter(xi=>(x.item_collection.entries[0].name.match('.txt')))
@@ -186,6 +190,72 @@ confluence.UIdo=function(){
     //debugger
 }
 
+confluence.summary=async function(){ // summary plots 
+    // load status for each study
+    let dt={}
+    Object.keys(confluence.dir).sort().forEach(async k=>{
+        let txt = await confluence.getFile(confluence.dir["AHS"].dir["Core Data"].files[Object.keys(confluence.dir["AHS"].dir["Core Data"].files)[0]].id)
+        dt[k] = confluence.txt2dt(txt)
+        summaryStatus.innerHTML=`<p>loading ${k} status ...</p>`
+        caseCount.textContent=parseInt(caseCount.textContent)+dt[k].tab.study.length
+        // add study to 
+        let kk = Object.keys(dt)
+        partnerCount.textContent=kk.length
+
+        if(kk.length==4){
+            //debugger
+        }
+    })
+    let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
+    h +='<table><tr>'
+    h += '<td id="summaryStatus" style="vertical-align:top"><p>loading status ...</p></td>'
+    h += '<td id="summaryReports" style="vertical-align:top"></td>'
+    h += '</hr><table>'
+    summaryDiv.innerHTML=h 
+}
+
+confluence.unique=function(arr){
+    let u={}
+    arr.forEach(v=>{
+        if(v=='888'||v=='777'){v=undefined} // 888 undefined code
+        if(!u[v]){u[v]=0}
+        u[v]++
+    })
+    return u
+}
+
+confluence.txt2dt=function(txt){
+    let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
+    // trailing blank
+    if((txt.split(/\n+/).slice(-1).length==1)&&(txt.slice(-1)[0].length)){
+        dt.pop()
+    }
+    let tab={}
+    hh=dt[0].forEach((h,j)=>{ // headers
+        tab[h]=[]
+        dt.slice(1).forEach((vv,i)=>{
+            tab[h][i]=vv[j]
+        })
+    })
+    let unique=function(arr){
+        let u={}
+        arr.forEach(v=>{
+            if(v=='888'||v=='777'){v=undefined} // 888 undefined code
+            if(!u[v]){u[v]=0}
+            u[v]++
+        })
+        return u
+    }
+    let uni={}
+    Object.keys(tab).forEach(k=>{
+        uni[k]=unique(tab[k])
+    })
+    return {
+        tab:tab,
+        uni:uni
+    }
+}
+
 confluence.displayFile=async function(fl){
     fl.div.innerHTML='<span style="color:orange;font-size:small">processing ...</span>'
     let txt = await confluence.getFile(fl.id)
@@ -204,7 +274,7 @@ confluence.displayFile=async function(fl){
     let unique=function(arr){
         let u={}
         arr.forEach(v=>{
-            if(v=='888'){v=undefined} // 888 undefined code
+            if(v=='888'||v=='777'){v=undefined} // 888 undefined code
             if(!u[v]){u[v]=0}
             u[v]++
         })
