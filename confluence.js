@@ -203,23 +203,6 @@ confluence.UIdo=async function(){
 confluence.summary=async function(){ // summary plots 
     // load status for each study
     let dt={}
-    Object.keys(confluence.dir).sort().forEach(async k=>{
-        let txt = await confluence.getFile(confluence.dir[k].dir["Core Data"].files[Object.keys(confluence.dir[k].dir["Core Data"].files)[0]].id)
-        dt[k] = confluence.txt2dt(txt)
-        summaryReports.innerHTML=`<p>loading ${k} Core Data ...</p>`
-        caseCount.textContent=parseInt(caseCount.textContent)+dt[k].tab.study.length
-        // add study to left side menu
-        let divK = document.createElement('div')
-        divK.id=`div${k}`
-        divK.innerHTML=`<input type="radio"> ${k}`
-        document.getElementById('study').appendChild(divK)
-        let kk = Object.keys(dt)
-        partnerCount.textContent=kk.length
-
-        if(kk.length==4){
-            //debugger
-        }
-    })
     let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
     h += '<table><tr>'
     h += '<td id="summaryStatus" style="vertical-align:top">'
@@ -231,6 +214,32 @@ confluence.summary=async function(){ // summary plots
     h += '<td id="summaryReports" style="vertical-align:top"><p>loading status ...</p></td>'
     h += '</hr><table>'
     summaryDiv.innerHTML=h 
+    Object.keys(confluence.dir).sort().forEach(async k=>{
+        let txt = await confluence.getFile(confluence.dir[k].dir["Core Data"].files[Object.keys(confluence.dir[k].dir["Core Data"].files)[0]].id)
+        dt[k] = confluence.txt2dt(txt)
+        summaryReports.innerHTML=`<p>loading ${k} Core Data ...</p>`
+        caseCount.textContent=parseInt(caseCount.textContent)+dt[k].tab.study.length
+        // add study to left side menu
+        let divK = document.createElement('div')
+        divK.id=`div${k}`
+        divK.innerHTML=`<input type="radio" checked=true> ${k}`
+        document.getElementById('study').appendChild(divK)
+        let kk = Object.keys(dt)
+        partnerCount.textContent=kk.length
+
+        if(kk.length==4){
+            // studies listed
+            [0,1,2].forEach(s=>{
+                let divS = document.createElement('div')
+                divS.id=`status${s}`
+                divS.innerHTML=`<input type="radio" checked=true> ${s}`
+                document.getElementById('status').appendChild(divS)
+            })
+            summaryReports.innerHTML='<span style="color:red">... ploting under development ...</span>'
+            
+        }
+    })
+
 }
 
 confluence.unique=function(arr){
