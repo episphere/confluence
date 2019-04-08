@@ -384,7 +384,9 @@ confluence.summary=async function(){ // summary plots
              .x(d3.scaleLinear().domain([20,100]))
              .elasticY(true)
              .xAxisLabel('age')
-             .yAxisLabel('count')
+             .yAxisLabel(function(){
+                 return `count (${C_barAge.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
+             })
 
             dc.renderAll();
             C_pieStatus.render()
