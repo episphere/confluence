@@ -506,7 +506,7 @@ confluence.plotlyFile=function(fl,parm,div){
     if(trace.x.indexOf('undefined')>-1){
         let total = trace.y.reduce((a,b)=>a+b)
         let ud = trace.y[trace.x.indexOf('undefined')]
-        unCount = `(${total-ud}) ${ud} undefined`
+        unCount = `(${total-ud}) (${ud} undefined)`
     }
     if(trace.x.length>1){
         if(trace.x.slice(-1)[0]=="undefined"){
