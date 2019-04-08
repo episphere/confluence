@@ -406,7 +406,7 @@ confluence.summary=async function(){ // summary plots
 confluence.unique=function(arr){
     let u={}
     arr.forEach(v=>{
-        if(v=='888'||v=='777'){v=undefined} // 888 undefined code
+        if(v=='888'||v=='777'||v==""){v=undefined} // 888 undefined code
         if(!u[v]){u[v]=0}
         u[v]++
     })
@@ -509,7 +509,7 @@ confluence.plotlyFile=function(fl,parm,div){
         unCount = `(${total-ud}) (${ud} undefined)`
     }
     if(trace.x.length>1){
-        if(trace.x.slice(-1)[0]=="undefined"){
+        if(trace.x.slice(-1)[0]=="undefined"||trace.x.slice(-1)[0]==""){
             trace.x.pop()
             trace.y.pop()
         }
