@@ -115,6 +115,7 @@ confluence.UIdo=async function(){
         confluence.div.innerHTML=''
         // show what is hidden
         summaryHead.hidden=false
+        confluenceStatistics.hidden=false
         summaryDiv.hidden=false
         individualReportsHeader.hidden=false
         // find subfolders:
@@ -203,11 +204,9 @@ confluence.UIdo=async function(){
 confluence.summary=async function(){ // summary plots 
     // load status for each study
     let dt={}
-    let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
-    h += '<table><tr>'
+    //let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
+    let h = '<table id="statusStudyTable"><tr>'
     h += '<td id="summaryStatus" style="vertical-align:top">'
-    h += '<h4>Status:</h4>'
-    h += '<div id="status"></div>'
     h += '<h4>Study:</h4>'
     h += '<div id="study"></div>'
     h += '</td>'
@@ -226,17 +225,177 @@ confluence.summary=async function(){ // summary plots
         document.getElementById('study').appendChild(divK)
         let kk = Object.keys(dt)
         partnerCount.textContent=kk.length
-
         if(kk.length==4){
-            // studies listed
-            [0,1,2].forEach(s=>{
-                let divS = document.createElement('div')
-                divS.id=`status${s}`
-                divS.innerHTML=`<input type="radio" checked=true> ${s}`
-                document.getElementById('status').appendChild(divS)
-            })
-            summaryReports.innerHTML='<span style="color:red">... ploting under development ...</span>'
             
+            summaryReports.innerHTML='<span style="color:red">... ploting under development ...</span>'
+            confluence.dt=dt
+
+
+            //////////
+            confluence.coreData=[]
+            Object.keys(dt).forEach(k=>{
+                kk=Object.keys(dt[k].tab)
+                dt[k].tab.study.map((s,i)=>{
+                    let r={} // row as an object
+                    kk.forEach(ki=>{
+                        r[ki]=dt[k].tab[ki][i]
+                    })
+                    r.ageInt=parseInt(r.ageInt)
+                    confluence.coreData.push(r)
+                })
+
+            })
+            let h ='<div id="dcPlot">'
+                h += '<table><tr><td>'
+                h += '   <h3>Status</h3>'
+                h += '    <div id="pieStatus"></div>'
+                h += '    <h3>Study</h3>'
+                h += '    <div id="rowStudy"></div>'
+                h += '</td><td>'
+                h += '    <h3>Age</h3>'
+                h += '    <div id="barAge"></div>'
+                h += '</td></tr></table>'
+                h += '</div>'
+                summaryDiv.innerHTML=h
+            // reduce reset
+
+
+
+
+            // DC starts here
+            let dd = confluence.coreData
+            valUnique=function(k,v){
+                var u={}
+                dd.forEach(d=>{
+                    u[d[k]]=v
+                })
+                return u
+            } 
+
+            dc.config.defaultColors(d3.schemeCategory10)
+            let cf=crossfilter(dd)
+
+            // Status Pie Chard
+            C_pieStatus = dc.pieChart("#pieStatus");
+            let status = cf.dimension(function(d){return d.status});
+
+            status_reduce=valUnique('status',0)
+            count_study=valUnique('study',0)
+            let G_status = status.group().reduce(
+                // reduce in
+                function(p,v){
+                    count_study[v.study]+=1
+                    status_reduce[v.status]+=1
+                    return status_reduce[v.status]
+                },
+                //reduce out
+                function(p,v){
+                    count_study[v.study]-=1
+                    status_reduce[v.status]-=1
+                    return status_reduce[v.status]
+                },
+                // ini
+                function(p){return 0}
+            )
+
+
+            //let G_status = status.group().reduceCount()
+
+            C_pieStatus
+                .width(350)
+                .height(200)
+                .radius(200)
+                .innerRadius(60)
+                .dimension(status)
+                .group(G_status)
+                .label(function(c){
+                    return `status=${c.key} (${c.value})`
+                 })
+                //.colors(d3.scaleLinear().domain([-4,3,4]).range(['blue','cyan','gray']))
+                .colors(d3.scaleOrdinal().domain(['0','1','2','3','4']).range(['#009688','orange','green','red','gray']))
+                .colorAccessor(function(c,i){
+                    if(count_status[c.key]>0){
+                        return i
+                    }else{
+                        return 4
+                    }
+                })
+
+            // Study braChard
+            let C_rowStudy = dc.rowChart("#rowStudy");
+            let study = cf.dimension(function(d){return d.study});
+            //let G_study = study.group().reduceCount()
+
+            study_reduce=valUnique('study',0)
+            count_status=valUnique('status',0)
+            let G_study = study.group().reduce(
+                // reduce in
+                function(p,v){
+                    count_status[v.status]+=1
+                    study_reduce[v.study]+=1
+                    return study_reduce[v.study]
+                },
+                //reduce out
+                function(p,v){
+                    count_status[v.status]-=1
+                    study_reduce[v.study]-=1
+                    return study_reduce[v.study]
+                },
+                // ini
+                function(p){return 0}
+            )
+
+
+            //clickStatus = valUnique('status',true)
+            C_rowStudy
+             .width(450)
+             .height(200)
+             .dimension(study)
+             .group(G_study)
+             .elasticX(true)
+             .colors(d3.scaleLinear().domain([-4,3,4]).range(['blue','cyan','gray']))
+             .colorAccessor(function(c,i){
+                 //console.log(i)
+                 if(count_study[c.key]>0){
+                     return i
+                 }else{
+                     return 4
+                 }
+                 //debugger
+             })
+             .ordering(c=>-dt[c.key].tab.study.length)
+             .label(function(c){
+                    return `${c.key} (${c.value})`
+                 })
+
+
+             //.yAxisLabel('count')
+             //
+
+            let C_barAge = dc.barChart("#barAge");
+            let age = cf.dimension(function(d){return d.ageInt});
+            let G_age = age.group().reduceCount()
+
+            C_barAge
+             .width(500)
+             .height(500)
+             .dimension(age)
+             .group(G_age)
+             .x(d3.scaleLinear().domain([20,100]))
+             .elasticY(true)
+             .xAxisLabel('age')
+             .yAxisLabel('count')
+
+            dc.renderAll();
+            C_pieStatus.render()
+
+            CC={
+                C_pieStatus:C_pieStatus,
+                C_rowStudy:C_rowStudy,
+                C_barAge:C_barAge
+            }
+            //////////
+
         }
     })
 
