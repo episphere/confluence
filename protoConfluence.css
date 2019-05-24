@@ -1,0 +1,22 @@
+h2,h3 {
+    color:maroon;
+    font-family:sans-serif;
+}
+
+h4 {
+    color:gray;
+    font-family:sans-serif;
+}
+
+p,li,div {
+    color:navy;
+    font-family:sans-serif;
+}
+
+button {
+    color:blue
+}
+
+.statistics {
+    color:blue
+}
