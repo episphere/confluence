@@ -1,27 +1,40 @@
-<link rel="stylesheet" href="static/css/confluence.css">
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="static/js/d3.min.js"></script>
-<script src="static/js/crossfilter.min.js"></script>
-<script src="static/js/dc.min.js"></script>
-<script src="confluence.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="shortcut icon" href="static/images/favicon.ico">
+        <link rel="stylesheet" href="static/css/confluence.css">
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="static/js/d3.min.js"></script>
+        <script src="static/js/crossfilter.min.js"></script>
+        <script src="static/js/dc.min.js"></script>
+        <script src="confluence.js"></script>
+        <title>Confluence Data Commons</title>
+        <h2>Confluence</h2>
+    </head>
+    <body>
+        <p>
+            Reports can be assembled automatically, using only data that you have access to.
+            The reports can include a wide range of interactive graphics and tables.
+        </p>
+        <h3 hidden=true id="summaryHead">Summary Counts</h3>
+        <div id="confluenceStatistics" hidden=true>
+            Studies: <span id="partnerCount" class="statistics">...</span>; 
+            Cases: <span id="caseCount" class="statistics">0</span></div>
+        <div hidden=true id="summaryDiv">
+            processing ...
+        </div>
+        <hr>
+        <h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" class="individual-report-collapse">[-]</span></h3>
+        
+        <div id="confluenceDiv">
+            <li hidden=true><a href="#" id="loginBoxObs">Login Observable</a></li>
+            <li hidden=true><a href="#" id="loginBoxAppDev">Login Dev</a></li>
+            <li hidden=true><a href="#" id="loginBoxAppProd">Login</a></li>
+        </div>
+        <hr>
+    </body>
+</html>
 
-<h2>Confluence</h2>
-<p> 
-Reports can be assembled automatically, using only data that you have access to. 
-The reports can include a wide range of interactive graphics and tables.
-</p>
-<h3 hidden=true id="summaryHead">Summary Counts</h3>
-<div id="confluenceStatistics" hidden=true>Studies: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>
-<div hidden=true id="summaryDiv">
-processing ...
-</div>
-<hr>
-<h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" style="color:orange">[-]</span></h3>
 
-<div id="confluenceDiv">
-    <li hidden=true><a href="#" id="loginBoxObs">Login Observable</a></li>
-    <li hidden=true><a href="#" id="loginBoxAppDev">Login Dev</a></li>
-    <li hidden=true><a href="#" id="loginBoxAppProd">Login</a></li>
-</div>
-<hr>
 

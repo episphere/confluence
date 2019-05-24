@@ -53,7 +53,7 @@ confluence.loginObs=function(){
 }
 
 confluence.loginAppDev=function(){
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppDev.client_id}&redirect_uri=http://localhost:8000/confluence&state=${confluence.iniAppDev.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppDev.client_id}&redirect_uri=http://localhost:8000?state=${confluence.iniAppDev.stateIni}`
     //debugger
 }
 
@@ -112,6 +112,7 @@ confluence.UI=async function(){
 confluence.UIdo=async function(){
     confluence.div.innerHTML=' loadind ...'
     await confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
+        const studyFolderEntries = x.item_collection.entries;
         confluence.div.innerHTML=''
         // show what is hidden
         summaryHead.hidden=false
@@ -120,100 +121,99 @@ confluence.UIdo=async function(){
         individualReportsHeader.hidden=false
         // find subfolders:
         confluence.dir={};
-        ['USRT','PLCO','PBCS','AHS'].forEach(async function(fld,i){
-            let y = x.item_collection.entries.filter(function(xi){
-                return (xi.name==fld)
-            })[0]
-            confluence.dir[fld]={id:y.id}
+        studyFolderEntries.forEach(async function(fld,i){ // Loop through Study folder
+            const studyFolderName = fld.name;
+            const studyFolderId = fld.id;
+
+            confluence.dir[studyFolderName]={id:studyFolderId}
             let div = document.createElement('div')
-            div.innerHTML=` loading ${fld} ...`
+            div.innerHTML=` loading ${studyFolderName} ...`
             confluence.div.appendChild(div)
-            confluence.dir[fld].div=div
-            //if(Object.keys(confluence.dir).length==4){
-            //    setTimeout(confluence.summary,1000)
-            //}
-            // find data folders
-            await confluence.getFolderInfo(confluence.dir[fld].id).then(x=>{
-                confluence.dir[fld].dir={}
-                div.innerHTML=`<h3>${i+1}. ${fld} <span>[-]</span></h3>`;
-                ['Survival and Treatment Data',
-                 'Risk Factor Data',
-                 'Pathology Data',
-                 'Core Data'].forEach(async function(dtFld,j){
-                     let y = x.item_collection.entries.filter(xi=>(xi.name==dtFld))[0]
-                     let divDt = document.createElement('div')
-                     divDt.innerHTML=` loading ${dtFld} ...`
-                     div.appendChild(divDt)
-                     confluence.dir[fld].dir[dtFld]={
-                         id:y.id,
-                         div:divDt
-                     }
-                     //console.log(confluence.dir)
-                     await confluence.getFolderInfo(confluence.dir[fld].dir[dtFld].id).then(x=>{
-                         divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dtFld} <span>[-]</span></h4>`
-                         let divDtFiles = document.createElement('div')
-                         divDt.appendChild(divDtFiles)
-                         let txtFiles=x.item_collection.entries.filter(xi=>(x.item_collection.entries[0].name.match('.txt')))
-                         confluence.dir[fld].dir[dtFld].files={}
-                         txtFiles.forEach(fl=>{
-                             let li = document.createElement('li')
-                             divDtFiles.appendChild(li)
-                             li.innerHTML=`${fl.name} `
-                             let btDisplay = document.createElement('button')
-                             btDisplay.textContent="display"
-                             btDisplay.className="btDisplay"
-                             li.appendChild(btDisplay)
-                             let btDelete = document.createElement('button')
-                             btDelete.hidden=true
-                             btDelete.textContent="delete plot"
-                             li.appendChild(btDelete)
-                             let divFile = document.createElement('div')
-                             li.appendChild(divFile)
-                             fl.div=divFile
-                             fl.study=dtFld
-                             fl.group=fld
-                             confluence.dir[fld].dir[dtFld].files[fl.name]=fl
-                             btDisplay.onclick=function(){
-                                 confluence.displayFile(fl)
-                                 btDelete.hidden=false
-                                 btDisplay.hidden=true
-                             }
-                             btDelete.onclick=function(){
-                                 divFile.innerHTML=''
-                                 btDelete.hidden=true
-                                 btDisplay.hidden=false
-                             }
-                             if(document.querySelectorAll('.btDisplay').length==16){
-                                 confluence.summary()
-                             }
-                         })
-                         
-                     })
+            confluence.dir[studyFolderName].div=div
+            
 
-                 })
+            await confluence.getFolderInfo(studyFolderId).then(x=>{
+                const dataFolderEntries = x.item_collection.entries;
+                if (dataFolderEntries.length === 0) return; // No data exists
+                confluence.dir[studyFolderName].dir={}
+                div.innerHTML=`<h3>${i+1}. ${studyFolderName} <span>[-]</span></h3>`;
 
-            })
+                dataFolderEntries.forEach(async function(dtFld,j){ // Loop through data folder
+                    const dataFolderName = dtFld.name;
+                    const dataFolderId = dtFld.id;
+                    
+                    let divDt = document.createElement('div')
+                    divDt.innerHTML=` loading ${dataFolderName} ...`
+                    div.appendChild(divDt)
+                    confluence.dir[studyFolderName].dir[dataFolderName]={
+                        id:dataFolderId,
+                        div:divDt
+                    }
+                    //console.log(confluence.dir)
+                    await confluence.getFolderInfo(dataFolderId).then(x=>{
+                        const fileEntries = x.item_collection.entries;
+                        divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dataFolderName} <span>[-]</span></h4>`
+                        let divDtFiles = document.createElement('div')
+                        divDt.appendChild(divDtFiles)
+                        
+                        confluence.dir[studyFolderName].dir[dataFolderName].files={}
 
-        })
-        //debugger
-    })
-
-    //debugger
-}
+                        fileEntries.forEach(fl=>{ // Loop through file entries
+                            if(fl.type !== "file") return;
+                            if(fl.name.indexOf(".txt") === -1) return;
+                            let li = document.createElement('li')
+                            divDtFiles.appendChild(li)
+                            li.innerHTML=`${fl.name} `
+                            let btDisplay = document.createElement('button')
+                            btDisplay.textContent="display"
+                            btDisplay.className="btDisplay"
+                            li.appendChild(btDisplay)
+                            let btDelete = document.createElement('button')
+                            btDelete.hidden=true
+                            btDelete.textContent="delete plot"
+                            li.appendChild(btDelete)
+                            let divFile = document.createElement('div')
+                            li.appendChild(divFile)
+                            fl.div=divFile
+                            fl.study=dataFolderName
+                            fl.group=studyFolderName
+                            confluence.dir[studyFolderName].dir[dataFolderName].files[fl.name]=fl
+                            btDisplay.onclick=function(){
+                                confluence.displayFile(fl)
+                                btDelete.hidden=false
+                                btDisplay.hidden=true
+                            };
+                            btDelete.onclick=function(){
+                                divFile.innerHTML=''
+                                btDelete.hidden=true
+                                btDisplay.hidden=false
+                            };
+                            if(document.querySelectorAll('.btDisplay').length==16){
+                                confluence.summary()
+                            };
+                        }); 
+                    });
+                });
+            });
+        });
+    });
+};
 
 confluence.summary=async function(){ // summary plots 
-    // load status for each study
     let dt={}
-    //let h = '<div id="confluenceStatistics">Partners: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>' 
-    let h = '<table id="statusStudyTable"><tr>'
-    h += '<td id="summaryStatus" style="vertical-align:top">'
-    h += '<h4>Study:</h4>'
-    h += '<div id="study"></div>'
-    h += '</td>'
-    h += '<td id="summaryReports" style="vertical-align:top"><p>loading status ...</p></td>'
-    h += '</hr><table>'
+    
+    let h = `<table id="statusStudyTable"><tr>
+                <td id="summaryStatus" style="vertical-align:top">
+                <h4>Study:</h4>
+                <div id="study"></div>
+                </td>
+                <td id="summaryReports" style="vertical-align:top"><p>loading status ...</p></td>
+            </hr>
+            <table>`
     summaryDiv.innerHTML=h 
+
     Object.keys(confluence.dir).sort().forEach(async k=>{
+        if(confluence.dir[k].dir === undefined || confluence.dir[k].dir["Core Data"] === undefined) return;
         let txt = await confluence.getFile(confluence.dir[k].dir["Core Data"].files[Object.keys(confluence.dir[k].dir["Core Data"].files)[0]].id)
         dt[k] = confluence.txt2dt(txt)
         summaryReports.innerHTML=`<p>loading ${k} Core Data ...</p>`
@@ -245,23 +245,24 @@ confluence.summary=async function(){ // summary plots
                 })
 
             })
-            let h ='<div id="dcPlot">'
-                h += '<table><tr><td>'
-                h += '   <h3>Status</h3>'
-                h += '    <div id="pieStatus"></div>'
-                h += '    <h3>Study</h3>'
-                h += '    <div id="rowStudy"></div>'
-                h += '</td><td>'
-                h += '    <h3>Age</h3>'
-                h += '    <div id="barAge"></div>'
-                h += '</td></tr></table>'
-                h += '</div>'
-                summaryDiv.innerHTML=h
-            // reduce reset
-
-
-
-
+            let h =`<div id="dcPlot">
+                        <table>
+                            <tr>
+                                <td>
+                                    <h3>Status</h3>
+                                    <div id="pieStatus"></div>
+                                    <h3>Study</h3>
+                                    <div id="rowStudy"></div>
+                                </td>
+                                <td>
+                                    <h3>Age</h3>
+                                    <div id="barAge"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>`;
+            
+            summaryDiv.innerHTML=h
             // DC starts here
             let dd = confluence.coreData
             valUnique=function(k,v){
