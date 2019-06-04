@@ -83,6 +83,18 @@ body {
     height: 1px;
 }
 
+.header-item {
+    white-space: nowrap;
+}
+
+.header-launch-data-txt {
+    color: #fff;
+}
+
+.header-launch-data-btn {
+    background-color: #2D87B1;
+}
+
 .cdc-apps-menu-grid {
     text-align: center;
     white-space: nowrap;
@@ -155,4 +167,19 @@ span.icon {
 .back-to-top {
     text-decoration: none !important;
     color: #4d4d4d !important;
+}
+
+.grid
+{
+  width: 100%
+}
+
+.grid-elements
+{
+  white-space: nowrap;
+  margin: 0 auto 0 auto;
+}
+
+.grid-border {
+    border-left: 0.5px solid #fff;
 }
