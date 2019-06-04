@@ -1,40 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <link rel="shortcut icon" href="static/images/favicon.ico">
-        <link rel="stylesheet" href="static/css/confluence.css">
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        <script src="static/js/d3.min.js"></script>
-        <script src="static/js/crossfilter.min.js"></script>
-        <script src="static/js/dc.min.js"></script>
-        <script src="confluence.js"></script>
-        <title>Confluence Data Commons</title>
-        <h2>Confluence</h2>
-    </head>
-    <body>
-        <p>
-            Reports can be assembled automatically, using only data that you have access to.
-            The reports can include a wide range of interactive graphics and tables.
-        </p>
-        <h3 hidden=true id="summaryHead">Summary Counts</h3>
-        <div id="confluenceStatistics" hidden=true>
-            Studies: <span id="partnerCount" class="statistics">...</span>; 
-            Cases: <span id="caseCount" class="statistics">0</span></div>
-        <div hidden=true id="summaryDiv">
-            processing ...
+
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/confluence.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="static/js/d3.min.js"></script>
+    <script src="static/js/crossfilter.min.js"></script>
+    <script src="static/js/dc.min.js"></script>
+    <script src="confluence.js"></script>
+    <title>Confluence Data Commons</title>
+</head>
+
+<body>
+    <div id="page">
+        <div id="header" class="header header-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 logo site-info">
+                        <a href="/" title="Home" rel="home" id="logo">
+                            <img src="" alt="NCI Confluence Data Commons" class="banner-logo">
+                        </a>
+                        <div id="name-and-slogan">
+                            <div id="site-name">
+                                <strong>
+                                    <a href="#" title="Home" rel="home"><span>NCI Confluence Data Commons</span></a>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 search">
+                        <div class="region region-header">
+                            <div id="block-menu-menu-secondary-menu" class="block block-menu">
+                                <div class="inner">
+                                    <div class="content">
+                                        <ul class="menu">
+                                            <li class="menu-item" alt="CCG Web Site"><a href="#" title="CCG Web Site" class="" target="_blank">CCG Web Site</a></li>|
+                                            <li class="menu-item" alt="Contact Us"><a href="#" title="Contact Us">Contact Us</a></li>
+                                            <li class="menu-item last" alt="Launch Data Portal"><a href="#" title="Launch Data Portal" style="color: #fff" target="_blank">Launch Data Portal</a></li>
+                                            <div class="dropdown menu-item">
+                                                <a href="#" title="Toggle for CDC Family of Applications" class="dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="hidden-md hidden-sm" data-translate="">CDC Apps</span>
+                                                </a>
+                                                <div class="dropdown-menu" role="menu">
+                                                    <table class="cdc-apps-menu-grid" role="presentation">
+                                                        <caption class="element-invisible">CDC Apps</caption>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="#" title="Data Portal" target="_blank">
+                                                                        <span class="icon">
+                                                                            <img alt="CDC Data Portal" src="static/images/cdc-apps-data-portal-blue.svg" width="21" height="21">
+                                                                        </span>
+                                                                        <p>Data Portal</p>
+                                                                    </a>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="/" title="Website" target="_blank">
+                                                                        <span class="icon">
+                                                                            <img alt="CDC Website" src="static/images/cdc-apps-website-blue.svg" width="21" height="21">
+                                                                        </span>
+                                                                        <p>Website</p>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="#" title="API" target="_blank">
+                                                                        
+                                                                        <p>API</p>
+                                                                    </a>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="#" title="Data Transfer Tool" target="_blank">
+                                                                        
+                                                                        <p>Data Transfer Tool</p>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="#" title="Documentation" target="_blank" class="ext">
+                                                                        
+                                                                        <p>Documentation</p>
+                                                                    </a>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="#" title="Data Submission Portal" target="_blank" class="ext">
+                                                                        
+                                                                        <p>Data Submission Portal</p>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <hr>
-        <h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" class="individual-report-collapse">[-]</span></h3>
         
-        <div id="confluenceDiv">
-            <li hidden=true><a href="#" id="loginBoxObs">Login Observable</a></li>
-            <li hidden=true><a href="#" id="loginBoxAppDev">Login Dev</a></li>
-            <li hidden=true><a href="#" id="loginBoxAppProd">Login</a></li>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggler">
+                    <div class="navbar-nav mr-auto">
+                        <div class="nav-item active">
+                            <a class="nav-link nav-menu-links" href="#">Confluence</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">About the Data</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">Analyze Data</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">Access Data</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">Submit Data</a>
+                        </div>    
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">For Developers</a>
+                        </div>    
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">Support</a>
+                        </div>    
+                        <div class="nav-item">
+                            <a class="nav-link nav-menu-links" href="#">News</a>
+                        </div>    
+                    </ul>
+                </div>
+            </div>
+        </nav>    
+        
+        <div id="maincontainer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-wrapper">
+                        <p>
+                            Reports can be assembled automatically, using only data that you have access to.
+                            The reports can include a wide range of interactive graphics and tables.
+                        </p>
+                        </br>
+                        <h3 hidden=true id="summaryHead">Summary Counts</h3>
+                        <div id="confluenceStatistics" hidden=true>
+                            Studies: <span id="partnerCount" class="statistics">...</span>;
+                            Cases: <span id="caseCount" class="statistics">0</span>
+                        </div>
+                        <div hidden=true id="summaryDiv">processing ...</div>
+                        <h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" class="individual-report-collapse">[-]</span></h3>
+                
+                        <div id="confluenceDiv">
+                            <li hidden=true><a href="#" id="loginBoxObs">Login Observable</a></li>
+                            <li hidden=true><a href="#" id="loginBoxAppDev">Login Dev</a></li>
+                            <li hidden=true><a href="#" id="loginBoxAppProd">Login</a></li>
+                        </div>
+                        <div class="content">
+                            <p><a class="back-to-top" href="#maincontainer">Back to top</br><i class="fas fa-caret-up"></i></a></p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
         </div>
-        <hr>
-    </body>
+        <div id="footer">                
+            <div class="row footer-content">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-wrapper">
+                    <ul class="menu">
+                        <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/">DCEG Home</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/about/contact-dceg">Contact DCEG</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://www.cancer.gov/global/web/policies">Policies</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://www.cancer.gov/global/web/policies/accessibility">Accessibility</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://www.cancer.gov/global/viewing-files">Viewing files</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://www.cancer.gov/global/web/policies/foia">FOIA</a></li>|
+                        <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/about/sitemap">DCEG Sitemap</a></li>
+                    </ul>
+                    <p class="menu">
+                        <a class="footer-links" href="http://www.hhs.gov/">U.S. Department of Health and Human Services</a> &nbsp;|&nbsp; 
+                        <a class="footer-links" href="http://www.nih.gov/">National Institutes of Health</a> &nbsp;|&nbsp; 
+                        <a class="footer-links" href="http://www.cancer.gov/">National Cancer Institute</a> &nbsp;|&nbsp; 
+                        <a class="footer-links" href="http://www.usa.gov/">USA.gov</a>
+                    </p>
+                    <p class="menu footer-tagline">NIH…Turning Discovery Into Health<sup>®</sup></p>
+                </div>
+                
+            </div>
+                    
+        </div>
+    </div>
+</body>
+
 </html>
-
-
-

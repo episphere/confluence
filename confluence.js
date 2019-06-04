@@ -6,6 +6,7 @@ confluence=function(){
     document.getElementById('loginBoxAppDev').onclick=confluence.loginAppDev
     document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd
     confluence.div=document.getElementById('confluenceDiv')
+    summaryDiv=document.getElementById('summaryDiv');
     if(confluence.div){
         if(location.origin.match('localhost')){loginBoxAppDev.parentElement.hidden=false}
         if(location.origin.match('episphere')){loginBoxAppProd.parentElement.hidden=false}

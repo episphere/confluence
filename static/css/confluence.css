@@ -8,8 +8,12 @@ h4 {
     font-family:sans-serif;
 }
 
+a {
+    text-decoration: none;
+}
+
 p,li,div {
-    color:navy;
+    color: navy;
     font-family:sans-serif;
 }
 
@@ -23,4 +27,132 @@ button {
 
 .individual-report-collapse {
     color:#ffa500
+}
+
+body {
+    min-height: 100%;
+    margin: 0;
+    height: auto;
+    background: #046380;
+    line-height: 1.8em;
+    font-size: 62.5%;
+}
+
+.header-wrapper {
+    padding-top: 15px;
+    background-color: #fff;
+    padding-bottom: 15px;
+    border-top: 6px solid #255C97;
+}
+
+.navbar {
+    border-radius: 0;
+    border: 0;
+    background-color: #574F4F !important;
+    font-size: 13px;
+    margin-bottom: 0;
+    min-height: 40px !important;
+}
+
+#maincontainer {
+    background: #f5f5f5
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.content-wrapper {
+    padding-top: 15px;
+    background-color: #fff;
+    padding-bottom: 15px;
+}
+
+.content {
+    text-align: center;
+    margin-bottom: -41px;
+}
+
+.element-invisible {
+    position: absolute !important;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    overflow: hidden;
+    height: 1px;
+}
+
+.cdc-apps-menu-grid {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.menu-item {
+    display: inline;
+    padding: 0.375em 9px;
+}
+
+.nav-menu-item {
+    font-size: 1rem;
+    display: inline-block !important;
+}
+
+.nav-menu-links {
+    text-decoration: none;
+    color:#fff !important;
+}
+
+.navbar {
+    text-align: justify;
+    display: inline-block !important;
+    width: 100%;
+}
+
+.nav-menu-links:hover {
+    text-decoration: none;
+    color:#fff;
+}
+
+span.icon {
+    display: block;
+    height: inherit;
+    margin: 0;
+    overflow: hidden;
+    padding: 3px 0;
+    float: none;
+}
+
+.last {
+    background-color: #0b7983;
+}
+
+#footer {
+    border-top: 0 solid #2d2d2d;
+    font-size: 0.9em;
+}
+
+.footer-content {
+    text-align:center;
+    border-top: 1px solid #574F4F;
+}
+
+.footer-links {
+    color: #4d4d4d;
+    text-decoration: underline;
+}
+
+.footer-links:hover {
+    text-decoration: none;
+    color: #4d4d4d;
+}
+
+.footer-tagline {
+    color: black;
+    font-size: 1.1rem
+}
+
+.back-to-top {
+    text-decoration: none !important;
+    color: #4d4d4d !important;
 }
