@@ -1,6 +1,7 @@
 console.log('confluence.js loaded')
 import { template as navBarMenuItems } from './src/navBarMenuItems.js';
 import { template as homePage } from './src/homePage.js';
+import { footerTemplate } from './src/footer.js';
 
 const confluence=function(){
     let authenticationLinks = document.getElementById('authenticationLinks');
@@ -12,6 +13,8 @@ const confluence=function(){
     document.getElementById('loginBoxAppDev').onclick=confluence.loginAppDev;
     document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd;
     document.getElementById('logOutBtn').addEventListener('click', logOut);
+    const footer = document.getElementById('footer');
+    footer.innerHTML = footerTemplate();
     
     confluence.div=document.getElementById('confluenceDiv');
     
