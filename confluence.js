@@ -24,7 +24,8 @@ const confluence=function(){
         
         if(localStorage.parms !== undefined) {
             navBarOptions.innerHTML = navBarMenuItems();
-            document.getElementById('homePage').addEventListener('click', () => {
+            const homePageElement = document.getElementById('homePage');
+            homePageElement.addEventListener('click', () => {
                 summaryDiv.innerHTML = '';
                 confluenceDiv.innerHTML = homePage();
             });
@@ -33,7 +34,8 @@ const confluence=function(){
                 if(parms.access_token){
                     await generateViz() // <---- ready to go with an authenticated token
                 }
-            })
+            });
+            homePageElement.click();
             logOutBtn.hidden = false
         }
         storeAccessToken();
