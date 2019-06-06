@@ -28,11 +28,15 @@ const confluence=function(){
                 summaryDiv.innerHTML = '';
                 confluenceDiv.innerHTML = homePage();
             });
-            document.getElementById('dataExploration').addEventListener('click', () => {
-                confluence.UI();
+            document.getElementById('dataExploration').addEventListener('click', async () => {
+                const parms=JSON.parse(localStorage.parms)
+                if(parms.access_token){
+                    await generateViz() // <---- ready to go with an authenticated token
+                }
             })
             logOutBtn.hidden = false
         }
+        storeAccessToken();
     }
     // index.html events
     if(typeof(hideIndividualReports)){
@@ -86,7 +90,7 @@ confluence.loginAppProd=function(){
 }
 
 
-confluence.UI=async function(){
+let storeAccessToken = async function(){
     let parms=confluence.searchParms()
     if(parms.code){
         //exchange code for authorization token
@@ -115,24 +119,16 @@ confluence.UI=async function(){
     }else{
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)
-            if(confluence.parms.access_token){
-                await confluence.UIdo() // <---- ready to go with an authenticated token
-            }else{
+            if(confluence.parms.access_token === undefined){
                 alert('access token not found, please contact system administrator')
             }
-
         }else{
-            // there is nothing to do yet
             console.log('not logged in yet')
         }
-        
-        //debugger
-
     }
-
 }
 
-confluence.UIdo=async function(){
+let generateViz = async function(){
     confluence.div.innerHTML=' loadind ...'
     await confluence.getFolderItems(68819242325).then(x=>{ // BCAC root is 68819242325
         const studyFolderEntries = x.entries;
