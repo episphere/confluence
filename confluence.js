@@ -3,16 +3,18 @@ import { template as navBarMenuItems } from './src/navBarMenuItems.js';
 import { template as homePage } from './src/homePage.js';
 
 const confluence=function(){
-    console.log(`ini at ${Date()}`)
-    document.getElementById('loginBoxObs').onclick=confluence.loginObs
-    document.getElementById('loginBoxAppDev').onclick=confluence.loginAppDev
-    document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd
-    document.getElementById('logOutBtn').addEventListener('click', logOut);
-    let navBarOptions = document.getElementById('navBarOptions');
-    
-    confluence.div=document.getElementById('confluenceDiv')
-    let confluenceDiv=document.getElementById('confluenceDiv');
     let authenticationLinks = document.getElementById('authenticationLinks');
+    let confluenceDiv=document.getElementById('confluenceDiv');
+    let summaryDiv = document.getElementById('summaryDiv');
+    let navBarOptions = document.getElementById('navBarOptions');
+
+    document.getElementById('loginBoxObs').onclick=confluence.loginObs;
+    document.getElementById('loginBoxAppDev').onclick=confluence.loginAppDev;
+    document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd;
+    document.getElementById('logOutBtn').addEventListener('click', logOut);
+    
+    confluence.div=document.getElementById('confluenceDiv');
+    
     if(authenticationLinks){
         if(localStorage.parms === undefined){
             confluenceDiv.innerHTML = homePage();
@@ -22,9 +24,15 @@ const confluence=function(){
         
         if(localStorage.parms !== undefined) {
             navBarOptions.innerHTML = navBarMenuItems();
+            document.getElementById('homePage').addEventListener('click', () => {
+                summaryDiv.innerHTML = '';
+                confluenceDiv.innerHTML = homePage();
+            });
+            document.getElementById('dataExploration').addEventListener('click', () => {
+                confluence.UI();
+            })
             logOutBtn.hidden = false
         }
-        confluence.UI()
     }
     // index.html events
     if(typeof(hideIndividualReports)){
