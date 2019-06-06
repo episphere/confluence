@@ -1,15 +1,29 @@
 console.log('confluence.js loaded')
+import { template as navBarMenuItems } from './src/navBarMenuItems.js';
+import { template as homePage } from './src/homePage.js';
 
-confluence=function(){
+const confluence=function(){
     console.log(`ini at ${Date()}`)
     document.getElementById('loginBoxObs').onclick=confluence.loginObs
     document.getElementById('loginBoxAppDev').onclick=confluence.loginAppDev
     document.getElementById('loginBoxAppProd').onclick=confluence.loginAppProd
+    document.getElementById('logOutBtn').addEventListener('click', logOut);
+    let navBarOptions = document.getElementById('navBarOptions');
+    
     confluence.div=document.getElementById('confluenceDiv')
-    summaryDiv=document.getElementById('summaryDiv');
-    if(confluence.div){
-        if(location.origin.match('localhost')){loginBoxAppDev.parentElement.hidden=false}
-        if(location.origin.match('episphere')){loginBoxAppProd.parentElement.hidden=false}
+    let confluenceDiv=document.getElementById('confluenceDiv');
+    let authenticationLinks = document.getElementById('authenticationLinks');
+    if(authenticationLinks){
+        if(localStorage.parms === undefined){
+            confluenceDiv.innerHTML = homePage();
+            if(location.origin.match('localhost')) loginBoxAppDev.hidden=false;
+            if(location.origin.match('episphere')) loginBoxAppProd.hidden=false;
+        }
+        
+        if(localStorage.parms !== undefined) {
+            navBarOptions.innerHTML = navBarMenuItems();
+            logOutBtn.hidden = false
+        }
         confluence.UI()
     }
     // index.html events
@@ -112,8 +126,8 @@ confluence.UI=async function(){
 
 confluence.UIdo=async function(){
     confluence.div.innerHTML=' loadind ...'
-    await confluence.getFolderInfo(68819242325).then(x=>{ // BCAC root is 68819242325
-        const studyFolderEntries = x.item_collection.entries;
+    await confluence.getFolderItems(68819242325).then(x=>{ // BCAC root is 68819242325
+        const studyFolderEntries = x.entries;
         confluence.div.innerHTML=''
         // show what is hidden
         summaryHead.hidden=false
@@ -133,8 +147,8 @@ confluence.UIdo=async function(){
             confluence.dir[studyFolderName].div=div
             
 
-            await confluence.getFolderInfo(studyFolderId).then(x=>{
-                const dataFolderEntries = x.item_collection.entries;
+            await confluence.getFolderItems(studyFolderId).then(x=>{
+                const dataFolderEntries = x.entries;
                 if (dataFolderEntries.length === 0) return; // No data exists
                 confluence.dir[studyFolderName].dir={}
                 div.innerHTML=`<h3>${i+1}. ${studyFolderName} <span>[-]</span></h3>`;
@@ -151,8 +165,8 @@ confluence.UIdo=async function(){
                         div:divDt
                     }
                     //console.log(confluence.dir)
-                    await confluence.getFolderInfo(dataFolderId).then(x=>{
-                        const fileEntries = x.item_collection.entries;
+                    await confluence.getFolderItems(dataFolderId).then(x=>{
+                        const fileEntries = x.entries;
                         divDt.innerHTML=`<h4>${i+1}.${j+1}. ${dataFolderName} <span>[-]</span></h4>`
                         let divDtFiles = document.createElement('div')
                         divDt.appendChild(divDtFiles)
@@ -266,7 +280,7 @@ confluence.summary=async function(){ // summary plots
             summaryDiv.innerHTML=h
             // DC starts here
             let dd = confluence.coreData
-            valUnique=function(k,v){
+            let valUnique=function(k,v){
                 var u={}
                 dd.forEach(d=>{
                     u[d[k]]=v
@@ -278,11 +292,11 @@ confluence.summary=async function(){ // summary plots
             let cf=crossfilter(dd)
 
             // Status Pie Chard
-            C_pieStatus = dc.pieChart("#pieStatus");
+            let C_pieStatus = dc.pieChart("#pieStatus");
             let status = cf.dimension(function(d){return d.status});
 
-            status_reduce=valUnique('status',0)
-            count_study=valUnique('study',0)
+            let status_reduce=valUnique('status',0)
+            let count_study=valUnique('study',0)
             let G_status = status.group().reduce(
                 // reduce in
                 function(p,v){
@@ -328,8 +342,8 @@ confluence.summary=async function(){ // summary plots
             let study = cf.dimension(function(d){return d.study});
             //let G_study = study.group().reduceCount()
 
-            study_reduce=valUnique('study',0)
-            count_status=valUnique('status',0)
+            let study_reduce=valUnique('study',0)
+            let count_status=valUnique('status',0)
             let G_study = study.group().reduce(
                 // reduce in
                 function(p,v){
@@ -393,7 +407,7 @@ confluence.summary=async function(){ // summary plots
             dc.renderAll();
             C_pieStatus.render()
 
-            CC={
+            let CC={
                 C_pieStatus:C_pieStatus,
                 C_rowStudy:C_rowStudy,
                 C_barAge:C_barAge
@@ -422,7 +436,7 @@ confluence.txt2dt=function(txt){
         dt.pop()
     }
     let tab={}
-    hh=dt[0].forEach((h,j)=>{ // headers
+    let hh=dt[0].forEach((h,j)=>{ // headers
         tab[h]=[]
         dt.slice(1).forEach((vv,i)=>{
             tab[h][i]=vv[j]
@@ -456,7 +470,7 @@ confluence.displayFile=async function(fl){
         dt.pop()
     }
     let tab={}
-    hh=dt[0].forEach((h,j)=>{ // headers
+    let hh=dt[0].forEach((h,j)=>{ // headers
         tab[h]=[]
         dt.slice(1).forEach((vv,i)=>{
             tab[h][i]=vv[j]
@@ -566,8 +580,8 @@ confluence.getFile=async function(id){
     })).text()
 }
 
-confluence.getFolderInfo=async function(id){
-    var r = (await fetch('https://api.box.com/2.0/folders/'+id,{
+confluence.getFolderItems=async function(id){
+    var r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
         method:'GET',
         headers:{
             Authorization:"Bearer "+confluence.parms.access_token
@@ -584,5 +598,9 @@ confluence.getFolderInfo=async function(id){
 
 // https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.ini.client_id}&redirect_uri=${location.origin}${location.pathname}&state=${cohort.parms.stateIni}`
 
+const logOut = () => {
+    delete localStorage.parms;
+    location.reload();
+}
 
 window.onload=confluence

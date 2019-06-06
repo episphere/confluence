@@ -100,8 +100,8 @@ body {
     background-color: #24618d;
 }
 
-.header-launch-data-btn:focus {
-    background-color: #20567c;
+.header-launch-data-btn:hover {
+    background-color: #0f293b;
 }
 
 .cdc-apps-menu-grid {
@@ -190,5 +190,18 @@ span.icon {
 }
 
 .grid-border {
-    border-left: 0.5px solid #fff;
+    border-left: 1px solid #7b7474;
+}
+
+.expand-collapse-header {
+    text-align: center;
+}
+
+.login-btn {
+    text-align: right;
+}
+
+.authentication-link {
+    align-content: center;
+    height: 100%;
 }
