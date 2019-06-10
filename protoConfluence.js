@@ -53,12 +53,12 @@ confluence.loginObs=function(){
 }
 
 confluence.loginAppDev=function(){
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppDev.client_id}&redirect_uri=http://localhost:8000/confluence&state=${confluence.iniAppDev.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppDev.client_id}&redirect_uri=http://localhost:8000/confluence/proto.html&state=${confluence.iniAppDev.stateIni}`
     //debugger
 }
 
 confluence.loginAppProd=function(){
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${confluence.iniAppProd.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence/proto.html&state=${confluence.iniAppProd.stateIni}`
     //debugger
 }
 
