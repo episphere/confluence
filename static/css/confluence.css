@@ -65,7 +65,11 @@ body {
 }
 
 .navbar a:hover {
-    background-color: #494343;
+    background-color: #2f2a2a;
+}
+
+.active {
+    background-color: #2f2a2a;
 }
 
 .collapse {

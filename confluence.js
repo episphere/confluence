@@ -34,13 +34,19 @@ const confluence=function(){
             const dataSummaryElement = document.getElementById('dataSummary');
             
             dataExplorationElement.addEventListener('click', async () => {
+                removeActiveClass('nav-menu-links');
+                dataExplorationElement.classList.add('active');
                 await generateViz();
             });
             dataSubmissionElement.addEventListener('click', () => {
+                removeActiveClass('nav-menu-links');
+                dataSubmissionElement.classList.add('active');
                 summaryDiv.innerHTML = '';
                 confluenceDiv.innerHTML = dataSubmission();
             });
             dataSummaryElement.addEventListener('click', () => {
+                removeActiveClass('nav-menu-links');
+                dataSummaryElement.classList.add('active');
                 summaryDiv.innerHTML = '';
                 confluenceDiv.innerHTML = dataSummary();
             });
@@ -598,7 +604,12 @@ confluence.getFolderItems=async function(id){
     }
 }
 
-// https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${confluence.ini.client_id}&redirect_uri=${location.origin}${location.pathname}&state=${cohort.parms.stateIni}`
+const removeActiveClass = (className) => {
+    let fileIconElement = document.getElementsByClassName(className);
+    Array.from(fileIconElement).forEach(elm => {
+        elm.classList.remove('active');
+    });
+}
 
 const logOut = () => {
     delete localStorage.parms;
