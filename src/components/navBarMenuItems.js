@@ -1,12 +1,8 @@
-export function template() {
+const template = () => {
     return `
         <div class="grid-border"></div>
-        <div class="nav-item active grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage">Confluence</a>
-        </div>
-        <div class="grid-border"></div>
         <div class="nav-item grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Platform Summary">Data Platform Summary</a>
+            <a class="nav-link nav-menu-links" href="#" title="Data Platform Summary" id="dataSummary">Data Platform Summary</a>
         </div>
         <div class="grid-border"></div>
         <div class="nav-item grid-elements">
@@ -19,3 +15,5 @@ export function template() {
         <div class="grid-border"></div>
     `;
 }
+
+export default template;

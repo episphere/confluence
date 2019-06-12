@@ -1,7 +1,9 @@
-console.log('confluence.js loaded')
-import { template as navBarMenuItems } from './src/navBarMenuItems.js';
-import { template as homePage } from './src/homePage.js';
-import { footerTemplate } from './src/footer.js';
+import template from './src/components/navBarMenuItems.js';
+import { template as homePage } from './src/Pages/homePage.js';
+import { template as dataSubmission } from './src/Pages/dataSubmission.js';
+import { template as dataSummary } from './src/Pages/dataSummary.js';
+import { footerTemplate } from './src/components/footer.js';
+import { checkAccessTokenValidity } from './src/manageAuthentication/manageLogin.js';
 
 const confluence=function(){
     let authenticationLinks = document.getElementById('authenticationLinks');
@@ -26,26 +28,30 @@ const confluence=function(){
         }
         
         if(localStorage.parms !== undefined) {
-            navBarOptions.innerHTML = navBarMenuItems();
-            const homePageElement = document.getElementById('homePage');
-            homePageElement.addEventListener('click', () => {
+            navBarOptions.innerHTML = template();
+            const dataExplorationElement = document.getElementById('dataExploration');
+            const dataSubmissionElement = document.getElementById('dataSubmission');
+            const dataSummaryElement = document.getElementById('dataSummary');
+            
+            dataExplorationElement.addEventListener('click', async () => {
+                await generateViz();
+            });
+            dataSubmissionElement.addEventListener('click', () => {
                 summaryDiv.innerHTML = '';
-                confluenceDiv.innerHTML = homePage();
+                confluenceDiv.innerHTML = dataSubmission();
             });
-            document.getElementById('dataExploration').addEventListener('click', async () => {
-                const parms=JSON.parse(localStorage.parms)
-                if(parms.access_token){
-                    await generateViz() // <---- ready to go with an authenticated token
-                }
+            dataSummaryElement.addEventListener('click', () => {
+                summaryDiv.innerHTML = '';
+                confluenceDiv.innerHTML = dataSummary();
             });
-            homePageElement.click();
+            dataSummaryElement.click();
             logOutBtn.hidden = false
         }
         storeAccessToken();
     }
     // index.html events
     if(typeof(hideIndividualReports)){
-        hideIndividualReports.onclick=function(){
+        document.getElementById('hideIndividualReports').addEventListener('click',function(){
             if(this.textContent=="[-]"){
                 this.textContent="[+]"
                 this.style.color="green"
@@ -56,7 +62,7 @@ const confluence=function(){
                 confluence.div.hidden=false
             }
             //debugger
-        }
+        })
     }
     
 }
@@ -549,7 +555,6 @@ confluence.plotlyFile=function(fl,parm,div){
 }
 
 confluence.searchParms=function(){
-    //localStorage.parms='{}' // clear cached parms
     let parms={}
     if(location.search.length>3){
         location.search.slice(1).split('&').forEach(function(pp){
@@ -559,18 +564,6 @@ confluence.searchParms=function(){
     }
     return parms
 }
-
-/*confluence.getFileInfo=function(id,fun){
-    fun=fun||console.log
-    fetch('https://api.box.com/2.0/files/'+id,{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+confluence.parms.access_token
-        }
-    }).then(x=>x.json().then(fun))
-}
-*/
-
 
 confluence.getFileInfo=async function(id){
     return (await fetch('https://api.box.com/2.0/files/'+id,{
@@ -612,4 +605,10 @@ const logOut = () => {
     location.reload();
 }
 
-window.onload=confluence
+window.onload=async function(){
+    if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        await checkAccessTokenValidity(access_token);
+    }
+    confluence();
+}
