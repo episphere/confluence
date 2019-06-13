@@ -13,5 +13,6 @@ export const config = {
         client_id:'1n44fu5yu1l547f2n2fgcw7vhps7kvuw',
         server_id:'2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd',
         stateIni:Math.random().toString().slice(2)
-    }
+    },
+    BCACFolderId : 68819242325
 }

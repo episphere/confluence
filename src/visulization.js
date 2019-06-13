@@ -1,9 +1,10 @@
 import { getFolderItems, getFile, getFileInfo } from './shared.js';
+import { config } from './config.js';
 
 export const generateViz = async function(access_token){
     let confluenceDiv=document.getElementById('confluenceDiv');
     confluenceDiv.innerHTML=' loadind ...'
-    await getFolderItems(68819242325, access_token).then(x=>{ // BCAC root is 68819242325
+    await getFolderItems(config.BCACFolderId, access_token).then(x=>{ // BCAC root is 68819242325
         const studyFolderEntries = x.entries;
         confluenceDiv.innerHTML=''
         // show what is hidden
@@ -96,13 +97,16 @@ const summary=async function(directory, access_token){ // summary plots
     
     let h = `<table id="statusStudyTable"><tr>
                 <td id="summaryStatus" style="vertical-align:top">
-                <h4>Study:</h4>
-                <div id="study"></div>
+                    <h4>Study:</h4>
+                    <div id="study"></div>
                 </td>
-                <td id="summaryReports" style="vertical-align:top"><p>loading status ...</p></td>
+                <td id="summaryReports" style="vertical-align:top">
+                    <p>loading status ...</p>
+                </td>
             </hr>
             <table>`
     summaryDiv.innerHTML=h 
+    let summaryReports = document.getElementById('summaryReports');
 
     Object.keys(directory).sort().forEach(async k=>{
         if(directory[k].dir === undefined || directory[k].dir["Core Data"] === undefined) return;
@@ -188,9 +192,6 @@ const summary=async function(directory, access_token){ // summary plots
                 function(p){return 0}
             )
 
-
-            //let G_status = status.group().reduceCount()
-
             C_pieStatus
                 .width(350)
                 .height(200)
@@ -253,11 +254,7 @@ const summary=async function(directory, access_token){ // summary plots
              .ordering(c=>-dt[c.key].tab.study.length)
              .label(function(c){
                     return `${c.key} (${c.value})`
-                 })
-
-
-             //.yAxisLabel('count')
-             //
+                })
 
             let C_barAge = dc.barChart("#barAge");
             let age = cf.dimension(function(d){return d.ageInt});

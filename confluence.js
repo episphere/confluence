@@ -1,7 +1,7 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage } from './src/Pages/homePage.js';
 import { template as dataSubmission } from './src/Pages/dataSubmission.js';
-import { template as dataSummary } from './src/Pages/dataSummary.js';
+import { template as dataSummary, getSummary, countSpecificStudy } from './src/Pages/dataSummary.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { generateViz } from './src/visulization.js';
@@ -48,7 +48,10 @@ const confluence=function(){
             removeActiveClass('nav-menu-links');
             dataSummaryElement.classList.add('active');
             summaryDiv.innerHTML = '';
-            confluenceDiv.innerHTML = dataSummary();
+            confluenceDiv.innerHTML = dataSummary(access_token);
+            getSummary(access_token);
+            let consortiaOption = document.getElementById('consortiaOption');
+            consortiaOption.addEventListener('change', () => countSpecificStudy(consortiaOption.value));
         });
         dataSummaryElement.click();
         logOutBtn.hidden = false
