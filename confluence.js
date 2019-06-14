@@ -51,7 +51,10 @@ const confluence=function(){
             confluenceDiv.innerHTML = dataSummary(access_token);
             getSummary(access_token);
             let consortiaOption = document.getElementById('consortiaOption');
-            consortiaOption.addEventListener('change', () => countSpecificStudy(consortiaOption.value));
+            consortiaOption.addEventListener('change', () => {
+                if(consortiaOption.value === "") return;
+                countSpecificStudy(consortiaOption.value, access_token)
+            });
         });
         dataSummaryElement.click();
         logOutBtn.hidden = false

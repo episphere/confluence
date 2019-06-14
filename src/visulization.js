@@ -294,7 +294,7 @@ const unique=function(arr){
     return u
 }
 
-const txt2dt=function(txt){
+export const txt2dt=function(txt){
     let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
     // trailing blank
     if((txt.split(/\n+/).slice(-1).length==1)&&(txt.slice(-1)[0].length)){
@@ -320,7 +320,7 @@ const txt2dt=function(txt){
 
 const displayFile=async function(fl, access_token){
     fl.div.innerHTML='<span style="color:orange;font-size:small">processing ...</span>'
-    let txt = await getFile(fl.id, access_token)
+    let txt = await getFile(fl.id, access_token);
     let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
     // trailing blank
     if((txt.split(/\n+/).slice(-1).length==1)&&(txt.slice(-1)[0].length)){

@@ -10,7 +10,7 @@ export const getFolderItems = async function(id, access_token){
     if(r.statusText=="Unauthorized"){
         delete localStorage.parms
         alert('session expired, reloading')
-        location.search=''
+        location.reload();
     }else{
         return r.json()
     }
