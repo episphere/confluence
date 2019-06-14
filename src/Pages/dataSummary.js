@@ -7,12 +7,11 @@ const nonStudyFolder = ['users', 'protocols', 'consents'];
 export function template() {
     return `
         <div class="row main-summary-row">
-            <div id="dataSummaryDiv" hidden=true></div>
             <div class="col main-summary-col">
                 <div class="row summary-inner-row">
                     <div class="col">
                         <span class="data-summary-label">Consortia</span></br>
-                        <span><i class="fas fa-3x fa-layer-group"></i></span>
+                        <span><i class="fas fa-4x fa-layer-group"></i></span>
                         <span class="data-summary-count" id="consortiaCount">1</span></br>
                         <select class="select" id="consortiaOption" hidden=true>
                             <option disabled selected> -- select a consortia -- </option>
@@ -21,7 +20,7 @@ export function template() {
                     </div>
                     <div class="col">
                         <span class="data-summary-label">Studies</span></br>
-                        <span><i class="fas fa-3x fa-university"></i></span>
+                        <span><i class="fas fa-4x fa-university"></i></span>
                         <span class="data-summary-count" id="studyCount">0</span></br>
                         <div id="studyDropDown"></div>
                         
@@ -31,13 +30,13 @@ export function template() {
                 <div class="row summary-inner-row">
                     <div class="col">
                         <span class="data-summary-label">Data</span></br>
-                        <span><i class="fas fa-3x fa-database"></i></span>
+                        <span><i class="fas fa-4x fa-database"></i></span>
                         <span class="data-summary-count" id="dataCount">0</span></br>
                         <div id="dataDropDown"></div>
                     </div>
                     <div class="col">
                         <span class="data-summary-label">Cases</span></br>
-                        <span><i class="fas fa-3x fa-users"></i></span>
+                        <span><i class="fas fa-4x fa-users"></i></span>
                         <span class="data-summary-count" id="caseCountSummary">0</span>
                     </div>
                 </div>
@@ -91,13 +90,14 @@ export async function getSummary(access_token) {
                             dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName] = {};
                             dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = {};
                             dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = parseInt(fileId);
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].data = {};
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = {};
                             let txt = await getFile(fileId, access_token);
                             let dt=txt2dt(txt);
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].data = dt;
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = dt.tab.BCAC_ID.length;
                             let caseCountElement = document.getElementById('caseCountSummary');
                             caseCountElement.textContent = parseInt(caseCountElement.textContent) + dt.tab.BCAC_ID.length;
-                            document.getElementById('dataSummaryDiv').setAttribute('data-data-summary', JSON.stringify(dataObject));
+                            if(localStorage.data_summary) delete localStorage.data_summary;
+                            localStorage.data_summary = JSON.stringify(dataObject);
                             document.getElementById('consortiaOption').hidden = false;
                         });
                     });
@@ -109,7 +109,7 @@ export async function getSummary(access_token) {
 }
 
 export const countSpecificStudy = folderId => {
-    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         if(dataObject[consortia].id === folderId){
             let studyDropDown = document.getElementById('studyDropDown');
@@ -125,7 +125,7 @@ export const countSpecificStudy = folderId => {
 };
 
 const countSpecificData = async folderId => {
-    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         const studyEntries = dataObject[consortia].studyEntries;
         for(let study in studyEntries){
@@ -137,8 +137,8 @@ const countSpecificData = async folderId => {
                 for(let data in dataEntries){
                     const fileEntries = dataEntries[data].fileEntries;
                     for(let file in fileEntries){
-                        const caseData = fileEntries[file].data.tab;
-                        caseCounter += caseData.BCAC_ID.length;
+                        const caseData = fileEntries[file].cases;
+                        caseCounter += caseData;
                     };
                 };
                 document.getElementById('caseCountSummary').textContent = caseCounter;
@@ -156,7 +156,7 @@ const countSpecificData = async folderId => {
 };
 
 const countSpecificCases = async folderId => {
-    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         const studyEntries = dataObject[consortia].studyEntries;
         for(let study in studyEntries){
@@ -167,8 +167,8 @@ const countSpecificCases = async folderId => {
                     const fileEntries = dataEntries[data].fileEntries;
                     let caseCounter = 0;
                     for(let file in fileEntries){
-                        const caseData = fileEntries[file].data.tab;
-                        caseCounter += caseData.BCAC_ID.length;
+                        const caseData = fileEntries[file].cases;
+                        caseCounter += caseData;
                     };
                     document.getElementById('caseCountSummary').textContent = caseCounter;
                 };
