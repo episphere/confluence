@@ -14,7 +14,7 @@ export function template() {
                         <span class="data-summary-label">Consortia</span></br>
                         <span><i class="fas fa-3x fa-layer-group"></i></span>
                         <span class="data-summary-count" id="consortiaCount">1</span></br>
-                        <select class="select" id="consortiaOption">
+                        <select class="select" id="consortiaOption" hidden=true>
                             <option disabled selected> -- select a consortia -- </option>
                             <option value="${config.BCACFolderId}">BCAC</option>
                         </select>
@@ -98,6 +98,7 @@ export async function getSummary(access_token) {
                             let caseCountElement = document.getElementById('caseCountSummary');
                             caseCountElement.textContent = parseInt(caseCountElement.textContent) + dt.tab.BCAC_ID.length;
                             document.getElementById('dataSummaryDiv').setAttribute('data-data-summary', JSON.stringify(dataObject));
+                            document.getElementById('consortiaOption').hidden = false;
                         });
                     });
                 });
