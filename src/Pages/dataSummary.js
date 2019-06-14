@@ -109,7 +109,6 @@ export async function getSummary(access_token) {
 
 export const countSpecificStudy = folderId => {
     let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
-    console.log(dataObject);
     for(let consortia in dataObject){
         if(dataObject[consortia].id === folderId){
             let studyDropDown = document.getElementById('studyDropDown');
