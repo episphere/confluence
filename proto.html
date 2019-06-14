@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="protoConfluence.css">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="static/js/d3.min.js"></script>
+<script src="static/js/crossfilter.min.js"></script>
+<script src="static/js/dc.min.js"></script>
+<script src="protoConfluence.js"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dc/3.0.12/dc.min.js"></script>
+!-->
+<h2>Confluence</h2>
+<p> 
+Reports can be assembled automatically, using only data that you have access to. 
+The reports can include a wide range of interactive graphics and tables.
+</p>
+<h3 hidden=true id="summaryHead">Summary Counts</h3>
+<div id="confluenceStatistics" hidden=true>Studies: <span id="partnerCount" class="statistics">...</span>; Cases: <span id="caseCount" class="statistics">0</span></div>
+<div hidden=true id="summaryDiv">
+processing ...
+</div>
+<hr>
+<h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" style="color:orange">[-]</span></h3>
+
+<div id="confluenceDiv">
+    <li hidden=true><a href="#" id="loginBoxObs">Login Observable</a></li>
+    <li hidden=true><a href="#" id="loginBoxAppDev">Login Dev</a></li>
+    <li hidden=true><a href="#" id="loginBoxAppProd">Login</a></li>
+</div>
+<hr>
+
