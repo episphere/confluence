@@ -53,7 +53,7 @@ const confluence=function(){
             let consortiaOption = document.getElementById('consortiaOption');
             consortiaOption.addEventListener('change', () => {
                 if(consortiaOption.value === "") return;
-                countSpecificStudy(consortiaOption.value, access_token)
+                countSpecificStudy(parseInt(consortiaOption.value));
             });
         });
         dataSummaryElement.click();

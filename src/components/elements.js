@@ -1,21 +1,23 @@
 export const studyDropDownTemplate = (entries) => {
-    return `
-        <select id="studyOptions" class="select">
+    let template = '';
+    template += `<select id="studyOptions" class="select">
             <option disabled selected> -- select a study -- </option>
-            ${entries.map((value) => `
-                <option value="${value.id}">${value.name}</option>
-            `.trim()).join('')}
-        </select>
-    `;
+        `;
+    for(let studyName in entries){
+        template += `<option value="${entries[studyName].id}">${studyName}</option>`
+    }
+    template += '</select>';
+    return template;
 }
 
 export const dataDropDownTemplate = (entries) => {
-    return `
-        <select id="dataOptions" class="select">
+    let template = '';
+    template += `<select id="dataOptions" class="select">
             <option disabled selected> -- select a data -- </option>
-            ${entries.map((value) => `
-                <option value="${value.id}">${value.name}</option>
-            `.trim()).join('')}
-        </select>
-    `;
+        `;
+    for(let dataName in entries){
+        template += `<option value="${entries[dataName].id}">${dataName}</option>`
+    }
+    template += '</select>';
+    return template;
 }

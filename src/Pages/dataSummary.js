@@ -7,6 +7,7 @@ const nonStudyFolder = ['users', 'protocols', 'consents'];
 export function template() {
     return `
         <div class="row main-summary-row">
+            <div id="dataSummaryDiv" hidden=true></div>
             <div class="col main-summary-col">
                 <div class="row summary-inner-row">
                     <div class="col">
@@ -37,7 +38,7 @@ export function template() {
                     <div class="col">
                         <span class="data-summary-label">Cases</span></br>
                         <span><i class="fas fa-3x fa-users"></i></span>
-                        <span class="data-summary-count" id="caseCount">0</span>
+                        <span class="data-summary-count" id="caseCountSummary">0</span>
                     </div>
                 </div>
             </div>
@@ -50,22 +51,21 @@ export function template() {
 export async function getSummary(access_token) {
     await getFolderItems(config.BCACFolderId, access_token).then(consortia => {
         let dataObject = {}
-        dataObject['BACA'] = {};
-        dataObject['BACA'].studyEntries = {};
-        dataObject['BACA'].id = {};
-        dataObject['BACA'].id = config.BCACFolderId;
+        dataObject['BCAC'] = {};
+        dataObject['BCAC'].studyEntries = {};
+        dataObject['BCAC'].id = {};
+        dataObject['BCAC'].id = config.BCACFolderId;
         let studyEntries = consortia.entries;
         studyEntries = studyEntries.filter(data => nonStudyFolder.indexOf(data.name.toLowerCase().trim()) === -1)
         document.getElementById('studyCount').textContent = studyEntries.length;
-//         debugger;
         studyEntries.forEach(async study => {
             const studyName = study.name;
             const studyId = study.id;
 
-            dataObject['BACA'].studyEntries[studyName] = {};
-            dataObject['BACA'].studyEntries[studyName].id = {};
-            dataObject['BACA'].studyEntries[studyName].id = studyId;
-            dataObject['BACA'].studyEntries[studyName].dataEntries = {};
+            dataObject['BCAC'].studyEntries[studyName] = {};
+            dataObject['BCAC'].studyEntries[studyName].id = {};
+            dataObject['BCAC'].studyEntries[studyName].id = parseInt(studyId);
+            dataObject['BCAC'].studyEntries[studyName].dataEntries = {};
             
             await getFolderItems(studyId, access_token).then(data => {
                 let dataEntries = data.entries;
@@ -77,10 +77,10 @@ export async function getSummary(access_token) {
                 dataEntries.forEach(async dt => {
                     const dataName = dt.name;
                     const dataId = dt.id;
-                    dataObject['BACA'].studyEntries[studyName].dataEntries[dataName] = {};
-                    dataObject['BACA'].studyEntries[studyName].dataEntries[dataName].id = {};
-                    dataObject['BACA'].studyEntries[studyName].dataEntries[dataName].id = dataId;
-                    dataObject['BACA'].studyEntries[studyName].dataEntries[dataName].fileEntries = {};
+                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName] = {};
+                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].id = {};
+                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].id = parseInt(dataId);
+                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries = {};
 
                     await getFolderItems(dataId, access_token).then(files => {
                         let fileEntries = files.entries;
@@ -88,39 +88,91 @@ export async function getSummary(access_token) {
                         fileEntries.forEach(async dataFile => {
                             const fileName = dataFile.name;
                             const fileId = dataFile.id;
-
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName] = {};
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = {};
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = parseInt(fileId);
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].data = {};
                             let txt = await getFile(fileId, access_token);
                             let dt=txt2dt(txt);
-                            console.log(dt);
-                        })
+                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].data = dt;
+                            let caseCountElement = document.getElementById('caseCountSummary');
+                            caseCountElement.textContent = parseInt(caseCountElement.textContent) + dt.tab.BCAC_ID.length;
+                            document.getElementById('dataSummaryDiv').setAttribute('data-data-summary', JSON.stringify(dataObject));
+                        });
                     });
                 });
             });
         });
-        console.log(dataObject);
+        
     });
 }
 
-export const countSpecificStudy = async (folderId, access_token) => {
-    await getFolderItems(folderId, access_token).then(data => {
-        let entries = data.entries;
-        entries = entries.filter(dt => nonStudyFolder.indexOf(dt.name.toLowerCase().trim()) === -1)
-        let studyDropDown = document.getElementById('studyDropDown');
-        studyDropDown.innerHTML = studyDropDownTemplate(entries);
-        let studyOptions = document.getElementById('studyOptions');
-        studyOptions.addEventListener('change', () => {
-            if(studyOptions.value === "") return;
-            countSpecificData(studyOptions.value, access_token)
-        });
-    });
+export const countSpecificStudy = folderId => {
+    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    console.log(dataObject);
+    for(let consortia in dataObject){
+        if(dataObject[consortia].id === folderId){
+            let studyDropDown = document.getElementById('studyDropDown');
+            studyDropDown.innerHTML = studyDropDownTemplate(dataObject[consortia].studyEntries);
+            document.getElementById('studyCount').textContent = Object.keys(dataObject[consortia].studyEntries).length
+            let studyOptions = document.getElementById('studyOptions');
+            studyOptions.addEventListener('change', () => {
+                if(studyOptions.value === "") return;
+                countSpecificData(parseInt(studyOptions.value));
+            });
+        }
+    }
 };
 
-export const countSpecificData = async (folderId, access_token) => {
-    await getFolderItems(folderId, access_token).then(data => {
-        let entries = data.entries;
-        entries = entries.filter(dt => 'samples' !== dt.name.toLowerCase().trim());
-        document.getElementById('dataCount').textContent = entries.length;
-        let dataDropDown = document.getElementById('dataDropDown');
-        dataDropDown.innerHTML = dataDropDownTemplate(entries);
-    });
+const countSpecificData = async folderId => {
+    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    for(let consortia in dataObject){
+        const studyEntries = dataObject[consortia].studyEntries;
+        for(let study in studyEntries){
+            const studyId = dataObject[consortia].studyEntries[study].id;
+            const dataEntries = studyEntries[study].dataEntries;
+            if(studyId === folderId){
+                document.getElementById('dataCount').textContent = Object.keys(dataEntries).length;
+                let caseCounter = 0;
+                for(let data in dataEntries){
+                    const fileEntries = dataEntries[data].fileEntries;
+                    for(let file in fileEntries){
+                        const caseData = fileEntries[file].data.tab;
+                        caseCounter += caseData.BCAC_ID.length;
+                    };
+                };
+                document.getElementById('caseCountSummary').textContent = caseCounter;
+
+                let dataDropDown = document.getElementById('dataDropDown');
+                dataDropDown.innerHTML = dataDropDownTemplate(dataEntries);
+                let dataOptions = document.getElementById('dataOptions');
+                dataOptions.addEventListener('change', () => {
+                    if(dataOptions.value === "") return;
+                    countSpecificCases(parseInt(dataOptions.value));
+                });
+            };
+        };
+    };
+};
+
+const countSpecificCases = async folderId => {
+    let dataObject = JSON.parse(document.getElementById('dataSummaryDiv').dataset.dataSummary);
+    for(let consortia in dataObject){
+        const studyEntries = dataObject[consortia].studyEntries;
+        for(let study in studyEntries){
+            const dataEntries = studyEntries[study].dataEntries;
+            for(let data in dataEntries){
+                const dataId = dataEntries[data].id;
+                if(dataId === folderId){
+                    const fileEntries = dataEntries[data].fileEntries;
+                    let caseCounter = 0;
+                    for(let file in fileEntries){
+                        const caseData = fileEntries[file].data.tab;
+                        caseCounter += caseData.BCAC_ID.length;
+                    };
+                    document.getElementById('caseCountSummary').textContent = caseCounter;
+                };
+            };
+        };
+    };
 };
