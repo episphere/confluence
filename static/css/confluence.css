@@ -109,6 +109,7 @@ body {
     color: #000;
     font-weight: bold;
     font-size: 30px;
+    margin: 0;
 }
 
 .data-summary-count {
@@ -126,7 +127,11 @@ body {
 }
 
 .summary-inner-row {
-    padding: 30px 0 30px 0;
+    padding-bottom: 30px;
+}
+
+.summary-inner-col {
+    padding-right: 10px;
 }
 
 .back-to-top {
@@ -134,6 +139,8 @@ body {
     text-align: center;
     margin-bottom: 0px;
     background-color: #f5f5f5;
+    text-decoration: none !important;
+    color: #4d4d4d !important;
 }
 
 .element-invisible {
@@ -239,11 +246,6 @@ span.icon {
 .footer-tagline {
     color: black;
     font-size: 1.1rem
-}
-
-.back-to-top {
-    text-decoration: none !important;
-    color: #4d4d4d !important;
 }
 
 .grid

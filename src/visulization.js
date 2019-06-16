@@ -386,3 +386,7 @@ const plotlyFile=function(fl,parm,div){
     };
     Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
+
+export const generateSummaryViz = () => {
+    console.log('Inside summary Viz');
+}

@@ -1,7 +1,7 @@
 import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate, dataDropDownTemplate } from "../components/elements.js";
-import { txt2dt } from "../visulization.js";
+import { txt2dt, generateSummaryViz } from "../visulization.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
 export function template() {
@@ -9,16 +9,16 @@ export function template() {
         <div class="row main-summary-row">
             <div class="col main-summary-col">
                 <div class="row summary-inner-row">
-                    <div class="col">
-                        <span class="data-summary-label">Consortia</span></br>
+                    <div class="col form-group summary-inner-col">
+                        <label for="consortiaOption" class="data-summary-label">Consortia</label></br>
                         <span><i class="fas fa-4x fa-layer-group"></i></span>
                         <span class="data-summary-count" id="consortiaCount">1</span></br>
-                        <select class="select" id="consortiaOption" hidden=true>
+                        <select class="form-control" id="consortiaOption" hidden=true>
                             <option disabled selected> -- select a consortia -- </option>
                             <option value="${config.BCACFolderId}">BCAC</option>
                         </select>
                     </div>
-                    <div class="col">
+                    <div class="col form-group summary-inner-col">
                         <span class="data-summary-label">Studies</span></br>
                         <span><i class="fas fa-4x fa-university"></i></span>
                         <span class="data-summary-count" id="studyCount">0</span></br>
@@ -28,13 +28,13 @@ export function template() {
                 </div>
                 </br>
                 <div class="row summary-inner-row">
-                    <div class="col">
+                    <div class="col form-group summary-inner-col">
                         <span class="data-summary-label">Data</span></br>
                         <span><i class="fas fa-4x fa-database"></i></span>
                         <span class="data-summary-count" id="dataCount">0</span></br>
                         <div id="dataDropDown"></div>
                     </div>
-                    <div class="col">
+                    <div class="col summary-inner-col">
                         <span class="data-summary-label">Cases</span></br>
                         <span><i class="fas fa-4x fa-users"></i></span>
                         <span class="data-summary-count" id="caseCountSummary">0</span>
@@ -149,6 +149,7 @@ const countSpecificData = async folderId => {
                 dataOptions.addEventListener('change', () => {
                     if(dataOptions.value === "") return;
                     countSpecificCases(parseInt(dataOptions.value));
+                    generateSummaryViz();
                 });
             };
         };
