@@ -178,7 +178,7 @@ const countSpecificCases = async (folderId) => {
                         caseCounter += caseData;
                     };
                     document.getElementById('caseCountSummary').textContent = caseCounter;
-                    if(fileId !== 0 && checker) generateSummaryViz(fileId, fileName);
+                    if(fileId !== 0) generateSummaryViz(fileId, fileName);
                 };
             };
         };
