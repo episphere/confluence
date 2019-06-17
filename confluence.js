@@ -6,10 +6,10 @@ import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { generateViz } from './src/visulization.js';
 import { storeAccessToken } from './src/shared.js';
+import { template as dataExplorationTemplate, dataExploration, dataExplorationCountSpecificStudy } from './src/pages/dataExploration.js';
 
 const confluence=function(){
     let confluenceDiv=document.getElementById('confluenceDiv');
-    let summaryDiv = document.getElementById('summaryDiv');
     let navBarOptions = document.getElementById('navBarOptions');
 
     document.getElementById('loginBoxObs').onclick = loginObs;
@@ -34,20 +34,26 @@ const confluence=function(){
         const dataSummaryElement = document.getElementById('dataSummary');
         
         dataExplorationElement.addEventListener('click', async () => {
+            if(dataExplorationElement.classList.contains('active')) return;
             removeActiveClass('nav-menu-links');
             dataExplorationElement.classList.add('active');
-            await generateViz(access_token);
+            confluenceDiv.innerHTML = dataExplorationTemplate();
+            dataExploration();
+            let consortiaOption = document.getElementById('dataExplorationConsortiaOption');
+            consortiaOption.addEventListener('change', () => {
+                if(consortiaOption.value === "") return;
+                dataExplorationCountSpecificStudy(parseInt(consortiaOption.value));
+            });
         });
         dataSubmissionElement.addEventListener('click', () => {
             removeActiveClass('nav-menu-links');
             dataSubmissionElement.classList.add('active');
-            summaryDiv.innerHTML = '';
             confluenceDiv.innerHTML = dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {
+            if(dataSummaryElement.classList.contains('active')) return;
             removeActiveClass('nav-menu-links');
             dataSummaryElement.classList.add('active');
-            summaryDiv.innerHTML = '';
             confluenceDiv.innerHTML = dataSummary(access_token);
             getSummary(access_token);
             let consortiaOption = document.getElementById('consortiaOption');

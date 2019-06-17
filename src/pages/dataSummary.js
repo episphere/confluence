@@ -33,7 +33,7 @@ export function template() {
                         <span class="data-summary-count" id="dataCount">0</span></br>
                         <div id="dataDropDown"></div>
                     </div>
-                    <div class="col summary-inner-col">
+                    <div class="col form-group summary-inner-col">
                         <span class="data-summary-label">Cases</span></br>
                         <span><i class="fas fa-4x fa-users"></i></span>
                         <span class="data-summary-count" id="caseCountSummary">0</span>
@@ -51,10 +51,11 @@ export function template() {
 export async function getSummary(access_token) {
     await getFolderItems(config.BCACFolderId, access_token).then(consortia => {
         let dataObject = {}
-        dataObject['BCAC'] = {};
-        dataObject['BCAC'].studyEntries = {};
-        dataObject['BCAC'].id = {};
-        dataObject['BCAC'].id = config.BCACFolderId;
+        const consortiaFolderName = 'BCAC';
+        dataObject[consortiaFolderName] = {};
+        dataObject[consortiaFolderName].studyEntries = {};
+        dataObject[consortiaFolderName].id = {};
+        dataObject[consortiaFolderName].id = config.BCACFolderId;
         let studyEntries = consortia.entries;
         studyEntries = studyEntries.filter(data => nonStudyFolder.indexOf(data.name.toLowerCase().trim()) === -1)
         document.getElementById('studyCount').textContent = studyEntries.length;
@@ -62,10 +63,10 @@ export async function getSummary(access_token) {
             const studyName = study.name;
             const studyId = study.id;
 
-            dataObject['BCAC'].studyEntries[studyName] = {};
-            dataObject['BCAC'].studyEntries[studyName].id = {};
-            dataObject['BCAC'].studyEntries[studyName].id = parseInt(studyId);
-            dataObject['BCAC'].studyEntries[studyName].dataEntries = {};
+            dataObject[consortiaFolderName].studyEntries[studyName] = {};
+            dataObject[consortiaFolderName].studyEntries[studyName].id = {};
+            dataObject[consortiaFolderName].studyEntries[studyName].id = parseInt(studyId);
+            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries = {};
             
             await getFolderItems(studyId, access_token).then(data => {
                 let dataEntries = data.entries;
@@ -77,10 +78,10 @@ export async function getSummary(access_token) {
                 dataEntries.forEach(async dt => {
                     const dataName = dt.name;
                     const dataId = dt.id;
-                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName] = {};
-                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].id = {};
-                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].id = parseInt(dataId);
-                    dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries = {};
+                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName] = {};
+                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].id = {};
+                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].id = parseInt(dataId);
+                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries = {};
 
                     await getFolderItems(dataId, access_token).then(files => {
                         let fileEntries = files.entries;
@@ -88,13 +89,13 @@ export async function getSummary(access_token) {
                         fileEntries.forEach(async dataFile => {
                             const fileName = dataFile.name;
                             const fileId = dataFile.id;
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName] = {};
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = {};
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = parseInt(fileId);
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = {};
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName] = {};
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = {};
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = parseInt(fileId);
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = {};
                             let txt = await getFile(fileId, access_token);
                             let dt=txt2dt(txt);
-                            dataObject['BCAC'].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = dt.tab.BCAC_ID.length;
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = dt.tab.BCAC_ID.length;
                             let caseCountElement = document.getElementById('caseCountSummary');
                             caseCountElement.textContent = parseInt(caseCountElement.textContent) + dt.tab.BCAC_ID.length;
                             if(localStorage.data_summary) delete localStorage.data_summary;
@@ -113,7 +114,7 @@ export const countSpecificStudy = (folderId) => {
     for(let consortia in dataObject){
         if(dataObject[consortia].id === folderId){
             let studyDropDown = document.getElementById('studyDropDown');
-            studyDropDown.innerHTML = studyDropDownTemplate(dataObject[consortia].studyEntries);
+            studyDropDown.innerHTML = studyDropDownTemplate(dataObject[consortia].studyEntries, 'studyOptions');
             document.getElementById('studyCount').textContent = Object.keys(dataObject[consortia].studyEntries).length
             let studyOptions = document.getElementById('studyOptions');
             studyOptions.addEventListener('change', () => {
@@ -146,7 +147,7 @@ const countSpecificData = async (folderId) => {
                 document.getElementById('caseCountSummary').textContent = caseCounter;
 
                 let dataDropDown = document.getElementById('dataDropDown');
-                dataDropDown.innerHTML = dataDropDownTemplate(dataEntries);
+                dataDropDown.innerHTML = dataDropDownTemplate(dataEntries, 'dataOptions');
                 let dataOptions = document.getElementById('dataOptions');
                 dataOptions.addEventListener('change', () => {
                     if(dataOptions.value === "") return;
@@ -157,7 +158,7 @@ const countSpecificData = async (folderId) => {
     };
 };
 
-const countSpecificCases = async folderId => {
+const countSpecificCases = async (folderId) => {
     let dataObject = JSON.parse(localStorage.data_summary);
     let fileId = 0;
     let fileName = '';
@@ -177,7 +178,7 @@ const countSpecificCases = async folderId => {
                         caseCounter += caseData;
                     };
                     document.getElementById('caseCountSummary').textContent = caseCounter;
-                    if(fileId !== 0) generateSummaryViz(fileId, fileName);
+                    if(fileId !== 0 && checker) generateSummaryViz(fileId, fileName);
                 };
             };
         };

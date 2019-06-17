@@ -8,7 +8,7 @@ export const getFolderItems = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        delete localStorage.parms
+        localStorage.clear();
         alert('session expired, reloading')
         location.reload();
     }else{
@@ -24,7 +24,7 @@ export const getFile = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        delete localStorage.parms
+        localStorage.clear();
         alert('session expired, reloading')
         location.reload();
     }else{
@@ -40,7 +40,7 @@ export const getFileInfo = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        delete localStorage.parms
+        localStorage.clear();
         alert('session expired, reloading')
         location.reload();
     }else{
@@ -66,7 +66,7 @@ export const storeAccessToken = async function(){
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             localStorage.parms=this.responseText
-            location.search='' // clear url, reload the page
+            location.reload();
           }
         });
         xhr.open("POST", "https://api.box.com/oauth2/token");
@@ -77,6 +77,7 @@ export const storeAccessToken = async function(){
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)
             if(confluence.parms.access_token === undefined){
+                localStorage.clear();
                 alert('access token not found, please contact system administrator')
             }
         }else{
@@ -94,4 +95,4 @@ const searchParms=function(){
         })
     }
     return parms
-}
+};

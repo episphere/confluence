@@ -1,6 +1,6 @@
-export const studyDropDownTemplate = (entries) => {
+export const studyDropDownTemplate = (entries, studyOptionsId) => {
     let template = '';
-    template += `<select id="studyOptions" class="form-control">
+    template += `<select id="${studyOptionsId}" class="form-control">
             <option disabled selected> -- select a study -- </option>
         `;
     for(let studyName in entries){
@@ -10,9 +10,9 @@ export const studyDropDownTemplate = (entries) => {
     return template;
 }
 
-export const dataDropDownTemplate = (entries) => {
+export const dataDropDownTemplate = (entries, dataOptionsId) => {
     let template = '';
-    template += `<select id="dataOptions" class="form-control">
+    template += `<select id="${dataOptionsId}" class="form-control">
             <option disabled selected> -- select a data -- </option>
         `;
     for(let dataName in entries){

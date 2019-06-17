@@ -28,6 +28,6 @@ export const loginAppProd=function(){
 }
 
 export const logOut = () => {
-    delete localStorage.parms;
+    localStorage.clear();
     location.reload();
 }
