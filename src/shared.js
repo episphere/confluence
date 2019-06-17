@@ -66,7 +66,7 @@ export const storeAccessToken = async function(){
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             localStorage.parms=this.responseText
-            location.reload();
+            location.search = '';
           }
         });
         xhr.open("POST", "https://api.box.com/oauth2/token");

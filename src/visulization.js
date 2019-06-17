@@ -1,6 +1,6 @@
 import { getFolderItems, getFile, getFileInfo } from './shared.js';
 import { config } from './config.js';
-import { parametersDropDownTemplate } from './components/elements.js';
+import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
 
 export const generateViz = async function(access_token){
     let confluenceDiv=document.getElementById('confluenceDiv');
@@ -426,4 +426,24 @@ const generateBarChart = (fileData, parm) => {
         yaxis: {title:`Count`}
     };
     Plotly.newPlot('dataSummaryViz', [trace], layout, {responsive: true, displayModeBar: false});
+}
+
+export const exploreData = async (fileId, fileName) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let dataExplorationParameter = document.getElementById('dataExplorationParameter');
+    dataExplorationParameter.innerHTML = `${fileName}`;
+    let fileData = await getFile(fileId, access_token);
+
+    let dt=fileData.split(/\n/g).map(tx=>tx.split(/\t/g));
+    if((fileData.split(/\n+/).slice(-1).length==1)&&(fileData.slice(-1)[0].length)){
+        dt.pop()
+    };
+    
+    $('#pagination-container').pagination({
+        dataSource: dt,
+        pageSize: 15,
+        callback: function(data, pagination) {
+            document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
+        }
+    });
 }

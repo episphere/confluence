@@ -1,5 +1,6 @@
 import { config } from "../config.js";
 import { studyDropDownTemplate, dataDropDownTemplate } from "../components/elements.js";
+import { exploreData } from "../visulization.js";
 
 export const template = () => {
     return `
@@ -31,8 +32,11 @@ export const template = () => {
                 <span><i class="fas fa-4x fa-users"></i></span>
                 <span class="data-summary-count" id="dataExplorationCaseCount">0</span>
             </div>
-        </div>
+        </div></br></br>
         <div class="row main-summary-row">
+            <div id="dataExplorationParameter"></div></br></br>
+            <div id="dataExplorationTable" class="table-responsive"></div>
+            <div id="pagination-container"></div>
         </div>
     `;  
 }
@@ -69,6 +73,8 @@ export const dataExplorationCountSpecificStudy = (folderId) => {
             let studyOptions = document.getElementById('dataExplorationStudyOptions');
             studyOptions.addEventListener('change', () => {
                 if(studyOptions.value === "") return;
+                document.getElementById('dataExplorationParameter').innerHTML = '';
+                document.getElementById('dataExplorationTable').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value));
             });
         }
@@ -126,7 +132,7 @@ const countSpecificCases = async (folderId) => {
                         caseCounter += caseData;
                     };
                     document.getElementById('dataExplorationCaseCount').textContent = caseCounter;
-                    // if(fileId !== 0 ) generateSummaryViz(fileId, fileName);
+                    if(fileId !== 0 ) exploreData(fileId, fileName);
                 };
             };
         };
