@@ -118,6 +118,8 @@ export const countSpecificStudy = (folderId) => {
             let studyOptions = document.getElementById('studyOptions');
             studyOptions.addEventListener('change', () => {
                 if(studyOptions.value === "") return;
+                document.getElementById('dataSummaryParameter').innerHTML = '';
+                document.getElementById('dataSummaryViz').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value));
             });
         }
