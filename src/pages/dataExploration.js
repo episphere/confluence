@@ -32,9 +32,9 @@ export const template = () => {
                 <span><i class="fas fa-4x fa-users"></i></span>
                 <span class="data-summary-count" id="dataExplorationCaseCount">0</span>
             </div>
-        </div></br></br>
+        </div>
         <div class="row main-summary-row">
-            <div id="dataExplorationParameter"></div></br></br>
+            <div id="dataExplorationParameter"></div>
             <div id="dataExplorationTable" class="table-responsive"></div>
             <div id="pagination-container"></div>
         </div>
@@ -75,6 +75,7 @@ export const dataExplorationCountSpecificStudy = (folderId) => {
                 if(studyOptions.value === "") return;
                 document.getElementById('dataExplorationParameter').innerHTML = '';
                 document.getElementById('dataExplorationTable').innerHTML = '';
+                document.getElementById('pagination-container').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value));
             });
         }

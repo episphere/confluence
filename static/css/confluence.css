@@ -182,8 +182,14 @@ body {
     white-space: nowrap;
 }
 
-#pagination-container{
+#pagination-container {
     padding: 1rem;
+}
+
+#dataExplorationParameter {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+    color: #8e4410;
 }
 
 .menu-item {
