@@ -1,5 +1,6 @@
 import { getFolderItems, getFile, getFileInfo } from './shared.js';
 import { config } from './config.js';
+import { parametersDropDownTemplate } from './components/elements.js';
 
 export const generateViz = async function(access_token){
     let confluenceDiv=document.getElementById('confluenceDiv');
@@ -136,7 +137,6 @@ const summary=async function(directory, access_token){ // summary plots
                     r.ageInt=parseInt(r.ageInt)
                     coreData.push(r)
                 })
-
             })
             let h =`<div id="dcPlot">
                         <table>
@@ -168,7 +168,6 @@ const summary=async function(directory, access_token){ // summary plots
 
             dc.config.defaultColors(d3.schemeCategory10)
             let cf=crossfilter(dd)
-
             // Status Pie Chard
             let C_pieStatus = dc.pieChart("#pieStatus");
             let status = cf.dimension(function(d){return d.status});
@@ -387,6 +386,44 @@ const plotlyFile=function(fl,parm,div){
     Plotly.newPlot(div, [trace], layout, {responsive: true});
 }
 
-export const generateSummaryViz = () => {
-    console.log('Inside summary Viz');
+export const generateSummaryViz = async (fileId, fileName) => {
+    let dataSummaryParameter = document.getElementById('dataSummaryParameter');
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let fileData = await getFile(fileId, access_token);
+    fileData = txt2dt(fileData);
+    dataSummaryParameter.innerHTML = parametersDropDownTemplate(fileName, Object.keys(fileData.uni));
+
+    let parametersDropDown = document.getElementById('parametersDropDown');
+    parametersDropDown.addEventListener('change', () => {
+        document.getElementById('dataSummaryViz').innerHTML = '';
+        generateBarChart(fileData, parametersDropDown.value)
+    });
+    let parm = 'ageInt';
+    if(fileData.uni[parm]){
+        generateBarChart(fileData, parm);
+    }else{
+        document.getElementById('dataSummaryViz').innerHTML = '<span style="color:red">Please select a parameter!</span>' 
+    }
+}
+
+const generateBarChart = (fileData, parm) => {
+    var trace = {
+        type:'bar',
+        x:Object.keys(fileData.uni[parm]),
+        y:Object.keys(fileData.uni[parm]).map(k=>fileData.uni[parm][k]),
+        marker: {
+            color: '#c0236a'
+        }
+    }
+    if(trace.x.length>1){
+        if(trace.x.slice(-1)[0]=="undefined"||trace.x.slice(-1)[0]==""){
+            trace.x.pop()
+            trace.y.pop()
+        }
+    }
+    var layout = {
+        xaxis: {title:`${parm}`},
+        yaxis: {title:`Count`}
+    };
+    Plotly.newPlot('dataSummaryViz', [trace], layout, {responsive: true, displayModeBar: false});
 }

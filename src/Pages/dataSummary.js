@@ -23,7 +23,6 @@ export function template() {
                         <span><i class="fas fa-4x fa-university"></i></span>
                         <span class="data-summary-count" id="studyCount">0</span></br>
                         <div id="studyDropDown"></div>
-                        
                     </div>
                 </div>
                 </br>
@@ -42,6 +41,8 @@ export function template() {
                 </div>
             </div>
             <div class="col main-summary-col">
+                <div id="dataSummaryParameter"></div>
+                <div id="dataSummaryViz"></div>
             </div>
         </div>
     `;  
@@ -104,11 +105,10 @@ export async function getSummary(access_token) {
                 });
             });
         });
-        
     });
 }
 
-export const countSpecificStudy = folderId => {
+export const countSpecificStudy = (folderId) => {
     let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         if(dataObject[consortia].id === folderId){
@@ -124,7 +124,7 @@ export const countSpecificStudy = folderId => {
     }
 };
 
-const countSpecificData = async folderId => {
+const countSpecificData = async (folderId) => {
     let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         const studyEntries = dataObject[consortia].studyEntries;
@@ -149,7 +149,6 @@ const countSpecificData = async folderId => {
                 dataOptions.addEventListener('change', () => {
                     if(dataOptions.value === "") return;
                     countSpecificCases(parseInt(dataOptions.value));
-                    generateSummaryViz();
                 });
             };
         };
@@ -158,6 +157,8 @@ const countSpecificData = async folderId => {
 
 const countSpecificCases = async folderId => {
     let dataObject = JSON.parse(localStorage.data_summary);
+    let fileId = 0;
+    let fileName = '';
     for(let consortia in dataObject){
         const studyEntries = dataObject[consortia].studyEntries;
         for(let study in studyEntries){
@@ -169,9 +170,12 @@ const countSpecificCases = async folderId => {
                     let caseCounter = 0;
                     for(let file in fileEntries){
                         const caseData = fileEntries[file].cases;
+                        fileId = fileEntries[file].id;
+                        fileName = file;
                         caseCounter += caseData;
                     };
                     document.getElementById('caseCountSummary').textContent = caseCounter;
+                    if(fileId !== 0) generateSummaryViz(fileId, fileName);
                 };
             };
         };

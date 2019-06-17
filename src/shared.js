@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 
 export const getFolderItems = async function(id, access_token){
-    var r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
+    let r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
@@ -17,21 +17,35 @@ export const getFolderItems = async function(id, access_token){
 }
 
 export const getFile = async function(id, access_token){
-    return (await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+    let r = (await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    })).text()
+    }))
+    if(r.statusText=="Unauthorized"){
+        delete localStorage.parms
+        alert('session expired, reloading')
+        location.reload();
+    }else{
+        return r.text()
+    }
 };
 
 export const getFileInfo = async function(id, access_token){
-    return (await fetch('https://api.box.com/2.0/files/'+id,{
+    let r = (await fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    })).json()
+    }))
+    if(r.statusText=="Unauthorized"){
+        delete localStorage.parms
+        alert('session expired, reloading')
+        location.reload();
+    }else{
+        return r.json()
+    }
 }
 
 export const storeAccessToken = async function(){
@@ -47,11 +61,10 @@ export const storeAccessToken = async function(){
             clt = config.iniObs
         }
         
-        var data = `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`;
-        var xhr = new XMLHttpRequest();
+        let data = `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`;
+        let xhr = new XMLHttpRequest();
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
-            console.log(this.responseText);
             localStorage.parms=this.responseText
             location.search='' // clear url, reload the page
           }

@@ -1,7 +1,7 @@
 import template from './src/components/navBarMenuItems.js';
-import { template as homePage } from './src/Pages/homePage.js';
-import { template as dataSubmission } from './src/Pages/dataSubmission.js';
-import { template as dataSummary, getSummary, countSpecificStudy } from './src/Pages/dataSummary.js';
+import { template as homePage } from './src/pages/homePage.js';
+import { template as dataSubmission } from './src/pages/dataSubmission.js';
+import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataSummary.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { generateViz } from './src/visulization.js';

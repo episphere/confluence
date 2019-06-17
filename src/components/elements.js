@@ -21,3 +21,16 @@ export const dataDropDownTemplate = (entries) => {
     template += '</select>';
     return template;
 }
+
+export const parametersDropDownTemplate = (fileName, parameters) => {
+    let template = '';
+    template += `${fileName}</br></br>
+            <select id="parametersDropDown" class="form-control">
+            <option disabled selected> -- select a parameter -- </option>
+            `;
+    parameters.forEach(parameter => {
+        template += `<option value="${parameter}">${parameter}</option>`
+    });
+    template += '</select>';
+    return template;
+}
