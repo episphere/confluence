@@ -1,6 +1,6 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage } from './src/pages/homePage.js';
-import { template as dataSubmission } from './src/pages/dataSubmission.js';
+import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataSummary.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
@@ -48,7 +48,8 @@ const confluence=function(){
         dataSubmissionElement.addEventListener('click', () => {
             removeActiveClass('nav-menu-links');
             dataSubmissionElement.classList.add('active');
-            confluenceDiv.innerHTML = dataSubmission();
+            confluenceDiv.innerHTML = dataSubmissionTemplate();
+            dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {
             if(dataSummaryElement.classList.contains('active')) return;

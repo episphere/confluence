@@ -54,18 +54,17 @@ export async function getSummary(access_token) {
         const consortiaFolderName = 'BCAC';
         dataObject[consortiaFolderName] = {};
         dataObject[consortiaFolderName].studyEntries = {};
-        dataObject[consortiaFolderName].id = {};
         dataObject[consortiaFolderName].id = config.BCACFolderId;
+        dataObject[consortiaFolderName].type = 'folder';
         let studyEntries = consortia.entries;
         studyEntries = studyEntries.filter(data => nonStudyFolder.indexOf(data.name.toLowerCase().trim()) === -1)
         document.getElementById('studyCount').textContent = studyEntries.length;
         studyEntries.forEach(async study => {
             const studyName = study.name;
             const studyId = study.id;
-
             dataObject[consortiaFolderName].studyEntries[studyName] = {};
-            dataObject[consortiaFolderName].studyEntries[studyName].id = {};
             dataObject[consortiaFolderName].studyEntries[studyName].id = parseInt(studyId);
+            dataObject[consortiaFolderName].studyEntries[studyName].type = study.type;
             dataObject[consortiaFolderName].studyEntries[studyName].dataEntries = {};
             
             await getFolderItems(studyId, access_token).then(data => {
@@ -79,8 +78,8 @@ export async function getSummary(access_token) {
                     const dataName = dt.name;
                     const dataId = dt.id;
                     dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName] = {};
-                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].id = {};
                     dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].id = parseInt(dataId);
+                    dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].type = dt.type;
                     dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries = {};
 
                     await getFolderItems(dataId, access_token).then(files => {
@@ -90,8 +89,8 @@ export async function getSummary(access_token) {
                             const fileName = dataFile.name;
                             const fileId = dataFile.id;
                             dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName] = {};
-                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = {};
                             dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].id = parseInt(fileId);
+                            dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].type = dataFile.type;
                             dataObject[consortiaFolderName].studyEntries[studyName].dataEntries[dataName].fileEntries[fileName].cases = {};
                             let txt = await getFile(fileId, access_token);
                             let dt=txt2dt(txt);
