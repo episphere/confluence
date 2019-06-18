@@ -119,7 +119,7 @@ export const dataSubmission = () => {
                 const fileName = file.name;
                 const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
                 if(fileType !== 'txt'){
-                    const message = `<strong>Info!</strong> Uploaded file type not supported, please upload txt file!`;
+                    const message = `<strong>Info!</strong> File type not supported, please upload txt file!`;
                     document.getElementById('alertMessage').innerHTML = alertTemplate('alert-info', message);
                 }else {
                     var r = confirm('Upload a new file - '+fileName +' ?');
