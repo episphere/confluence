@@ -200,6 +200,10 @@ body {
     color: #8e4410;
 }
 
+#dataExplorationTable {
+    max-height: 1000px;
+}
+
 .menu-item {
     display: inline;
     padding: 0.375em 9px;
