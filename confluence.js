@@ -9,7 +9,7 @@ import { storeAccessToken } from './src/shared.js';
 import { template as dataExplorationTemplate, dataExploration, dataExplorationCountSpecificStudy } from './src/pages/dataExploration.js';
 
 const confluence=function(){
-    let confluenceDiv=document.getElementById('confluenceDiv');
+    let confluenceDiv = document.getElementById('confluenceDiv');
     let navBarOptions = document.getElementById('navBarOptions');
 
     document.getElementById('loginBoxObs').onclick = loginObs;

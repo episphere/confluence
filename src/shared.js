@@ -152,6 +152,42 @@ export const uploadFileBox = async (folderId, fileName, file) => {
     };
 };
 
+export const updateLocalStorage = (parentId, newFolderId, newFolderName, newFolderEntries, newFolderType) => {
+    const data_summary = JSON.parse(localStorage.data_summary);
+    for(let consortia in data_summary){
+        let studyEntries = data_summary[consortia].studyEntries;
+        if(data_summary[consortia].id === parentId){
+            studyEntries[newFolderName] = {};
+            studyEntries[newFolderName].id = newFolderId;
+            studyEntries[newFolderName].type = newFolderType;
+            studyEntries[newFolderName].dataEntries = {};
+        }
+        else{
+            for(let study in studyEntries){
+                let dataEntries = studyEntries[study].dataEntries;
+                if(studyEntries[study].id === parentId){
+                    dataEntries[newFolderName] = {};
+                    dataEntries[newFolderName].id = newFolderId;
+                    dataEntries[newFolderName].type = newFolderType;
+                    dataEntries[newFolderName].fileEntries = {};
+                }
+                else{
+                    for(let data in dataEntries){
+                        let fileEntries = dataEntries[data].fileEntries;
+                        if(dataEntries[data].id === parentId){
+                            fileEntries[newFolderName] = {};
+                            fileEntries[newFolderName].id = newFolderId;
+                            fileEntries[newFolderName].type = newFolderType;
+                            fileEntries[newFolderName].cases = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    localStorage.data_summary = JSON.stringify(data_summary);
+}
+
 const sessionExpired = () => {
     localStorage.clear();
     alert('session expired, reloading')

@@ -1,4 +1,4 @@
-import { downloadFileTxt, createFolder, uploadFileBox } from "../shared.js";
+import { downloadFileTxt, createFolder, uploadFileBox, updateLocalStorage } from "../shared.js";
 import { alertTemplate } from "../components/elements.js";
 
 export function template() {
@@ -91,6 +91,7 @@ export const dataSubmission = () => {
         });
     });
 
+    // Create new folder
     let creatFolder = document.getElementsByClassName('fa-folder-plus');
     Array.from(creatFolder).forEach(element => {
         element.addEventListener('click', async function() {
@@ -102,14 +103,23 @@ export const dataSubmission = () => {
                 if(r == true){
                     const response = await createFolder(folderId, folderName);
                     if(response){
-                        const message = `<strong>Success!</strong> Folder - ${folderName} created, please reload page to see it!`;
+                        const message = `<strong>Success!</strong> Folder - ${folderName} created!`;
                         document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
+                        const parentId = parseInt(response.parent.id);
+                        const newFolderId = parseInt(response.id);
+                        const newFolderName = response.name;
+                        const newFolderEntries = response.item_collection.entries;
+                        const newFolderType = response.type;
+                        updateLocalStorage(parentId, newFolderId, newFolderName, newFolderEntries, newFolderType);
+                        document.getElementById('confluenceDiv').innerHTML = template(); 
+                        dataSubmission();
                     };
                 };
             };
         });
     });
 
+    // file upload
     let uploadFile = document.getElementsByClassName('fa-file-upload');
     Array.from(uploadFile).forEach(element => {
         element.addEventListener('click', async function() {
@@ -126,8 +136,16 @@ export const dataSubmission = () => {
                     if(r == true){
                         const response = await uploadFileBox(folderId, fileName, file);
                         if(response){
-                            const message = `<strong>Success!</strong> File - ${fileName} uploaded, please reload page to see it!`;
+                            const message = `<strong>Success!</strong> File - ${fileName} uploaded!`;
                             document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
+                            const parentId = parseInt(response.entries[0].parent.id);
+                            const newFolderId = parseInt(response.entries[0].id);
+                            const newFolderName = response.entries[0].name;
+                            const newFolderEntries = [];
+                            const newFolderType = response.entries[0].type;
+                            updateLocalStorage(parentId, newFolderId, newFolderName, newFolderEntries, newFolderType);
+                            document.getElementById('confluenceDiv').innerHTML = template(); 
+                            dataSubmission();
                         };
                     };
                 };
