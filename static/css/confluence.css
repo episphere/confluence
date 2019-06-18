@@ -208,11 +208,15 @@ body {
     list-style-type:none;
 }
 
-.data-submission{
+.data-submission {
     text-align: left;
 }
 
-.fa-plus:hover{
+.fa-plus:hover {
+    cursor: pointer;
+}
+
+.fa-file-download:hover {
     cursor: pointer;
 }
 

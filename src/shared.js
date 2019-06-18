@@ -96,3 +96,18 @@ const searchParms=function(){
     }
     return parms
 };
+
+export const downloadFileTxt = async (fileId, fileName) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let fileData = await getFile(fileId, access_token);
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileData));
+    element.setAttribute('download', fileName);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}

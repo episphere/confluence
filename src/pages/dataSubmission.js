@@ -1,3 +1,5 @@
+import { downloadFileTxt } from "../shared.js";
+
 export function template() {
 
     const data_summary = JSON.parse(localStorage.data_summary);
@@ -32,10 +34,11 @@ export function template() {
                             template += '<ul class="ul-list-style content">'
                             for(let file in fileEntries){
                                 type = fileEntries[file].type;
+                                const fileId = fileEntries[file].id;
                                 liClass = type === 'folder' ? 'collapsible' : '';
                                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
-                                expandClass = type === 'folder' ? 'fas fa-plus' : '';
-                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i class="${expandClass}"></i></li>`
+                                expandClass = type === 'folder' ? 'fas fa-plus' : 'fas fa-file-download';
+                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
                             }
                             template += '</ul>'
                         }
@@ -63,9 +66,17 @@ export const dataSubmission = () => {
             } else {
                 this.getElementsByClassName('fa-plus')[0].classList.add('fa-minus');
                 this.getElementsByClassName('fa-plus')[0].classList.remove('fa-plus');
-                // content.style.maxHeight = content.scrollHeight + "px";
                 content.style.maxHeight = "1000px";
             } 
         })
+    });
+
+    let fileDownload = document.getElementsByClassName('fa-file-download');
+    Array.from(fileDownload).forEach(element => {
+        element.addEventListener('click', function() {
+            const fileId = this.dataset.fileId;
+            const fileName = this.dataset.fileName;
+            downloadFileTxt(fileId, fileName);
+        });
     });
 }
