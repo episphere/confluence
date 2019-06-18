@@ -177,6 +177,14 @@ body {
     white-space: nowrap;
 }
 
+.page-size-selector {
+    padding: 1rem;
+}
+
+#pageSizeSelector {
+    height: 2rem;
+}
+
 .table td {
     padding: .25rem;
     white-space: nowrap;

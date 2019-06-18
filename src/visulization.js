@@ -446,4 +446,21 @@ export const exploreData = async (fileId, fileName) => {
             document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
         }
     });
+    let pageSizeSelector = document.getElementById('pageSizeSelector');
+    pageSizeSelector.hidden = false;
+    pageSizeSelector.addEventListener('change', () => {
+        updatePageSize(pageSizeSelector.value, dt);
+    });
+}
+
+const updatePageSize = (pageSize, dt) => {
+    document.getElementById('pagination-container').innerHTML = '';
+    document.getElementById('dataExplorationTable').innerHTML = '';
+    $('#pagination-container').pagination({
+        dataSource: dt,
+        pageSize: pageSize,
+        callback: function(data, pagination) {
+            document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
+        }
+    });
 }
