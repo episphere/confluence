@@ -1,7 +1,6 @@
-import { downloadFileTxt } from "../shared.js";
+import { downloadFileTxt, createFolder } from "../shared.js";
 
 export function template() {
-
     const data_summary = JSON.parse(localStorage.data_summary);
     let template = '';
     template += '<div class="row data-submission"><ul class="ul-list-style">';
@@ -50,10 +49,10 @@ export function template() {
                             template += `<li><i data-folder-id="${dataId}" title="Upload new file" class="fas fa-file-upload"></i></li></ul>`
                         }
                     }
-                    template += `<li><i data-folder-id="${studyId}" title="Create new folder" class="fas fa-folder-plus"></i></li></ul>`
+                    template += `<li><i data-folder-id="${studyId}" title="Create new folder" class="fas fa-folder-plus"></i> <input type="text" placeholder="Enter folder name" class="input-create-folder"/></li></ul>`
                 }
             }
-            template += `<i data-folder-id="${consortiaId}" title="Create new folder" class="fas fa-folder-plus"></ul>`
+            template += `<li><i data-folder-id="${consortiaId}" title="Create new folder" class="fas fa-folder-plus"></i> <input type="text" placeholder="Enter folder name" class="input-create-folder"/></li></ul>`
         }
     }
     template += '</ul></div>'
@@ -90,4 +89,27 @@ export const dataSubmission = () => {
             downloadFileTxt(fileId, fileName);
         });
     });
-}
+
+    let creatFolder = document.getElementsByClassName('fa-folder-plus');
+    Array.from(creatFolder).forEach(element => {
+        element.addEventListener('click', async function() {
+            if(this.nextElementSibling.value && this.nextElementSibling.value !== ""){
+                const folderId = this.dataset.folderId;
+                const folderName = this.nextElementSibling.value;
+
+                var r = confirm('Create a new folder - '+folderName +' ?');
+                if(r == true){
+                    const response = await createFolder(folderId, folderName);
+                    if(response){
+                        document.getElementById('alertMessage').innerHTML = `
+                            <div class="alert alert-success alert-dismissible">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Success!</strong> Folder - ${folderName} created, please reload page to see it!
+                            </div>
+                        `;
+                    };
+                };
+            };
+        });
+    });
+};

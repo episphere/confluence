@@ -221,15 +221,31 @@ body {
 }
 
 .fa-folder-plus {
-    color: #5858f2;
+    color: #58aef2;
 }
 
 .fa-file-download {
-    color: #61aa61;
+    color: #69b039;
 }
 
 .fa-file-upload {
     color: #f2b139;
+}
+
+.input-create-folder {
+    display: inline;
+    height: 1.5rem;
+    padding: .25rem .5rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s;
+    margin: 0px;
 }
 
 .fa-folder-open {

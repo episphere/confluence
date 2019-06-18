@@ -110,4 +110,29 @@ export const downloadFileTxt = async (fileId, fileName) => {
     element.click();
 
     document.body.removeChild(element);
+};
+
+export const createFolder = async (folderId, folderName) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let obj = {
+        "name": folderName,
+        "parent": {
+            "id": folderId
+        }
+    };
+    let response = await fetch("https://api.box.com/2.0/folders", {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+access_token
+        },
+        body: JSON.stringify(obj)
+    })
+    if(response.statusText=="Unauthorized"){
+        localStorage.clear();
+        alert('session expired, reloading')
+        location.reload();
+    }
+    else if(response.status === 201){
+        return response.json();
+    }
 }
