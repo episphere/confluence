@@ -212,20 +212,28 @@ body {
     text-align: left;
 }
 
-.fa-plus:hover {
-    cursor: pointer;
-}
-
-.fa-file-download:hover {
+.fa-plus:hover, .fa-minus:hover, .fa-file-download:hover, .fa-folder-plus:hover, .fa-file-upload:hover{
     cursor: pointer;
 }
 
 .fa-folder {
-    color: #f2f27e;
+    color: #f0db5e;
 }
 
-.fa-minus:hover{
-    cursor: pointer;
+.fa-folder-plus {
+    color: #5858f2;
+}
+
+.fa-file-download {
+    color: #61aa61;
+}
+
+.fa-file-upload {
+    color: #f2b139;
+}
+
+.fa-folder-open {
+    color: #e4c150
 }
 
 .content {

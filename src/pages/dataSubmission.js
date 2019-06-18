@@ -6,8 +6,9 @@ export function template() {
     let template = '';
     template += '<div class="row data-submission"><ul class="ul-list-style">';
     for(let consortia in data_summary){
-        let type = data_summary[consortia].type;
+        const consortiaId = data_summary[consortia].id;
         const studyEntries = data_summary[consortia].studyEntries;
+        let type = data_summary[consortia].type;
         let liClass = type === 'folder' ? 'collapsible' : '';
         let faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
         let expandClass = type === 'folder' ? 'fas fa-plus' : '';
@@ -16,6 +17,7 @@ export function template() {
         if(type === 'folder'){
             template += '<ul class="ul-list-style content">'
             for(let study in studyEntries){
+                const studyId = studyEntries[study].id;
                 type = studyEntries[study].type;
                 liClass = type === 'folder' ? 'collapsible' : '';
                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
@@ -26,6 +28,7 @@ export function template() {
                     const dataEntries = studyEntries[study].dataEntries;
                     template += '<ul class="ul-list-style content">'
                     for(let data in dataEntries){
+                        const dataId = dataEntries[data].id;
                         type = dataEntries[data].type;
                         liClass = type === 'folder' ? 'collapsible' : '';
                         faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
@@ -44,13 +47,13 @@ export function template() {
                                 title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
                                 template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
                             }
-                            template += '</ul>'
+                            template += `<li><i data-folder-id="${dataId}" title="Upload new file" class="fas fa-file-upload"></i></li></ul>`
                         }
                     }
-                    template += '</ul>'
+                    template += `<li><i data-folder-id="${studyId}" title="Create new folder" class="fas fa-folder-plus"></i></li></ul>`
                 }
             }
-            template += '</ul>'
+            template += `<i data-folder-id="${consortiaId}" title="Create new folder" class="fas fa-folder-plus"></ul>`
         }
     }
     template += '</ul></div>'
@@ -65,9 +68,13 @@ export const dataSubmission = () => {
             var content = this.nextElementSibling;
             if (content.style.maxHeight){
                 content.style.maxHeight = null;
+                this.getElementsByClassName('fa-folder-open')[0].classList.add('fa-folder');
+                this.getElementsByClassName('fa-folder-open')[0].classList.remove('fa-folder-open');
                 this.getElementsByClassName('fa-minus')[0].classList.add('fa-plus');
                 this.getElementsByClassName('fa-minus')[0].classList.remove('fa-minus');
             } else {
+                this.getElementsByClassName('fa-folder')[0].classList.add('fa-folder-open');
+                this.getElementsByClassName('fa-folder')[0].classList.remove('fa-folder');
                 this.getElementsByClassName('fa-plus')[0].classList.add('fa-minus');
                 this.getElementsByClassName('fa-plus')[0].classList.remove('fa-plus');
                 content.style.maxHeight = "1000px";
