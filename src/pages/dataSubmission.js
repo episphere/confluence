@@ -11,7 +11,8 @@ export function template() {
         let liClass = type === 'folder' ? 'collapsible' : '';
         let faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
         let expandClass = type === 'folder' ? 'fas fa-plus' : '';
-        template += `<li class="${liClass}"><i class="${faClass}"></i> ${consortia} <i class="${expandClass}"></i></li>`
+        let title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
+        template += `<li class="${liClass}"><i class="${faClass}"></i> ${consortia} <i title="${title}" class="${expandClass}"></i></li>`
         if(type === 'folder'){
             template += '<ul class="ul-list-style content">'
             for(let study in studyEntries){
@@ -19,7 +20,8 @@ export function template() {
                 liClass = type === 'folder' ? 'collapsible' : '';
                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                 expandClass = type === 'folder' ? 'fas fa-plus' : '';
-                template += `<li class="${liClass}"><i class="${faClass}"></i> ${study} <i class="${expandClass}"></i></li>`
+                title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
+                template += `<li class="${liClass}"><i class="${faClass}"></i> ${study} <i title="${title}" class="${expandClass}"></i></li>`
                 if(type === 'folder'){
                     const dataEntries = studyEntries[study].dataEntries;
                     template += '<ul class="ul-list-style content">'
@@ -28,7 +30,8 @@ export function template() {
                         liClass = type === 'folder' ? 'collapsible' : '';
                         faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                         expandClass = type === 'folder' ? 'fas fa-plus' : '';
-                        template += `<li class="${liClass}"><i class="${faClass}"></i> ${data} <i class="${expandClass}"></i></li>`
+                        title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
+                        template += `<li class="${liClass}"><i class="${faClass}"></i> ${data} <i title="${title}" class="${expandClass}"></i></li>`
                         if(type === 'folder'){
                             const fileEntries = dataEntries[data].fileEntries;
                             template += '<ul class="ul-list-style content">'
@@ -38,7 +41,8 @@ export function template() {
                                 liClass = type === 'folder' ? 'collapsible' : '';
                                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                                 expandClass = type === 'folder' ? 'fas fa-plus' : 'fas fa-file-download';
-                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
+                                title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
+                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
                             }
                             template += '</ul>'
                         }
