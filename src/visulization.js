@@ -441,7 +441,7 @@ export const exploreData = async (fileId, fileName) => {
     
     $('#pagination-container').pagination({
         dataSource: dt,
-        pageSize: 15,
+        pageSize: 20,
         callback: function(data, pagination) {
             document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
         }

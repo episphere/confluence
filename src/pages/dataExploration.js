@@ -38,8 +38,7 @@ export const template = () => {
             <div id="dataExplorationTable" class="table-responsive"></div>
             <div class="page-size-selector">
             <select class="form-control" id="pageSizeSelector" hidden=true>
-                <option disabled selected> -- select page size -- </option>
-                <option value=20>20</option>
+                <option selected value=20>20</option>
                 <option value=40>40</option>
                 <option value=60>60</option>
                 <option value=80>80</option>
