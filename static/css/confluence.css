@@ -216,6 +216,10 @@ body {
     cursor: pointer;
 }
 
+.fa-folder {
+    color: #f2f27e;
+}
+
 .fa-minus:hover{
     cursor: pointer;
 }
