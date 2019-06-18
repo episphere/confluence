@@ -1,4 +1,5 @@
-import { downloadFileTxt, createFolder } from "../shared.js";
+import { downloadFileTxt, createFolder, uploadFileBox } from "../shared.js";
+import { alertTemplate } from "../components/elements.js";
 
 export function template() {
     const data_summary = JSON.parse(localStorage.data_summary);
@@ -46,7 +47,7 @@ export function template() {
                                 title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
                                 template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
                             }
-                            template += `<li><i data-folder-id="${dataId}" title="Upload new file" class="fas fa-file-upload"></i></li></ul>`
+                            template += `<li><i data-folder-id="${dataId}" title="Upload new file" class="fas fa-file-upload"></i> <input type="file" class="input-create-folder"/></li></ul>`
                         }
                     }
                     template += `<li><i data-folder-id="${studyId}" title="Create new folder" class="fas fa-folder-plus"></i> <input type="text" placeholder="Enter folder name" class="input-create-folder"/></li></ul>`
@@ -101,12 +102,33 @@ export const dataSubmission = () => {
                 if(r == true){
                     const response = await createFolder(folderId, folderName);
                     if(response){
-                        document.getElementById('alertMessage').innerHTML = `
-                            <div class="alert alert-success alert-dismissible">
-                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                <strong>Success!</strong> Folder - ${folderName} created, please reload page to see it!
-                            </div>
-                        `;
+                        const message = `<strong>Success!</strong> Folder - ${folderName} created, please reload page to see it!`;
+                        document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
+                    };
+                };
+            };
+        });
+    });
+
+    let uploadFile = document.getElementsByClassName('fa-file-upload');
+    Array.from(uploadFile).forEach(element => {
+        element.addEventListener('click', async function() {
+            if(this.nextElementSibling.files.length > 0){
+                const folderId = this.dataset.folderId;
+                const file = this.nextElementSibling.files[0];
+                const fileName = file.name;
+                const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
+                if(fileType !== 'txt'){
+                    const message = `<strong>Info!</strong> Uploaded file type not supported, please upload txt file!`;
+                    document.getElementById('alertMessage').innerHTML = alertTemplate('alert-info', message);
+                }else {
+                    var r = confirm('Upload a new file - '+fileName +' ?');
+                    if(r == true){
+                        const response = await uploadFileBox(folderId, fileName, file);
+                        if(response){
+                            const message = `<strong>Success!</strong> File - ${fileName} uploaded, please reload page to see it!`;
+                            document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
+                        };
                     };
                 };
             };

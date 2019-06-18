@@ -8,9 +8,7 @@ export const getFolderItems = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        localStorage.clear();
-        alert('session expired, reloading')
-        location.reload();
+        sessionExpired();
     }else{
         return r.json()
     }
@@ -24,9 +22,7 @@ export const getFile = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        localStorage.clear();
-        alert('session expired, reloading')
-        location.reload();
+        sessionExpired();
     }else{
         return r.text()
     }
@@ -40,9 +36,7 @@ export const getFileInfo = async function(id, access_token){
         }
     }))
     if(r.statusText=="Unauthorized"){
-        localStorage.clear();
-        alert('session expired, reloading')
-        location.reload();
+        sessionExpired();
     }else{
         return r.json()
     }
@@ -126,13 +120,40 @@ export const createFolder = async (folderId, folderName) => {
             Authorization:"Bearer "+access_token
         },
         body: JSON.stringify(obj)
-    })
+    });
     if(response.statusText=="Unauthorized"){
-        localStorage.clear();
-        alert('session expired, reloading')
-        location.reload();
+        sessionExpired();
     }
     else if(response.status === 201){
         return response.json();
+    };
+};
+
+export const uploadFileBox = async (folderId, fileName, file) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const form = new FormData();
+    form.append('file', file);
+    form.append('name', fileName);
+    form.append('parent_id', folderId);
+
+    let response = await fetch("https://upload.box.com/api/2.0/files/content", {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+access_token
+        },
+        body: form,
+        contentType: false,
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
     }
+    else if(response.status === 201){
+        return response.json();
+    };
+};
+
+const sessionExpired = () => {
+    localStorage.clear();
+    alert('session expired, reloading')
+    location.reload();
 }

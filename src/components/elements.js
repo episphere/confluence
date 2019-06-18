@@ -58,3 +58,12 @@ export const dataExplorationTable = (fileData, all) => {
     template += '</tbody></table>';
     return template;
 };
+
+export const alertTemplate = (className, message) => {
+    return `
+        <div class="alert ${className} alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            ${message}
+        </div>
+    `;
+}
