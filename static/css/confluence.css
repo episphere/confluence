@@ -285,7 +285,7 @@ body {
     padding: 0 40px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-in-out;
 }
 
 .menu-item {
