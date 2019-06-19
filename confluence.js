@@ -46,6 +46,7 @@ const confluence=function(){
             });
         });
         dataSubmissionElement.addEventListener('click', () => {
+            if(dataSubmissionElement.classList.contains('active')) return;
             removeActiveClass('nav-menu-links');
             dataSubmissionElement.classList.add('active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();
