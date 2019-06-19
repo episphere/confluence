@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, getFileInfo } from './shared.js';
+import { getFolderItems, getFile, getFileInfo, downloadFileTxt } from './shared.js';
 import { config } from './config.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
 
@@ -431,7 +431,10 @@ const generateBarChart = (fileData, parm) => {
 export const exploreData = async (fileId, fileName) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let dataExplorationParameter = document.getElementById('dataExplorationParameter');
-    dataExplorationParameter.innerHTML = `${fileName}`;
+    dataExplorationParameter.innerHTML = `${fileName} <i title="Download File" id="dataExplorationFileDownload" data-file-id="${fileId}" data-file-name="${fileName}" class="fas fa-file-download"></i>`;
+    document.getElementById('dataExplorationFileDownload').addEventListener('click', () => {
+        downloadFileTxt(fileId, fileName);
+    });
     let fileData = await getFile(fileId, access_token);
 
     let dt=fileData.split(/\n/g).map(tx=>tx.split(/\t/g));
