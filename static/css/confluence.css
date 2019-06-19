@@ -17,6 +17,10 @@ p,li,div {
     font-family:sans-serif;
 }
 
+li {
+    padding: 0.125rem 0;
+}
+
 button {
     color:blue
 }
