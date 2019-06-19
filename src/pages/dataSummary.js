@@ -1,6 +1,6 @@
 import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
-import { studyDropDownTemplate, dataDropDownTemplate } from "../components/elements.js";
+import { studyDropDownTemplate, dataDropDownTemplate, fileDropDownTemplate } from "../components/elements.js";
 import { txt2dt, generateSummaryViz } from "../visulization.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
@@ -34,8 +34,16 @@ export function template() {
                         <div id="dataDropDown"></div>
                     </div>
                     <div class="col form-group summary-inner-col">
+                        <span class="data-summary-label">Files</span></br>
+                        <span><i class="fas fa-4x fa-file"></i></span>
+                        <span class="data-summary-count" id="fileCount">0</span></br>
+                        <div id="fileDropDown"></div>
+                    </div>
+                </div>
+                </br>
+                <div class="row summary-inner-row">
+                    <div class="col form-group summary-inner-col">
                         <span class="data-summary-label">Cases</span>
-                        
                         </br>
                         <span><i class="fas fa-4x fa-users"></i></span>
                         <span class="data-summary-count" id="caseCountSummary">0</span>
@@ -87,6 +95,9 @@ export async function getSummary(access_token) {
                     await getFolderItems(dataId, access_token).then(files => {
                         let fileEntries = files.entries;
                         fileEntries = fileEntries.filter(file => file.type === 'file' && file.name.slice(file.name.lastIndexOf('.')+1, file.name.length) === 'txt');
+                        let fileCountElement = document.getElementById('fileCount');
+                        fileCountElement.textContent = parseInt(fileCountElement.textContent) + fileEntries.length;
+                        // debugger;
                         fileEntries.forEach(async dataFile => {
                             const fileName = dataFile.name;
                             const fileId = dataFile.id;
@@ -114,76 +125,85 @@ export const countSpecificStudy = (folderId) => {
     let dataObject = JSON.parse(localStorage.data_summary);
     for(let consortia in dataObject){
         if(dataObject[consortia].id === folderId){
+            const studyEntries = dataObject[consortia].studyEntries;
             let studyDropDown = document.getElementById('studyDropDown');
-            studyDropDown.innerHTML = studyDropDownTemplate(dataObject[consortia].studyEntries, 'studyOptions');
-            document.getElementById('studyCount').textContent = Object.keys(dataObject[consortia].studyEntries).length
+            studyDropDown.innerHTML = studyDropDownTemplate(studyEntries, 'studyOptions');
+            document.getElementById('studyCount').textContent = Object.keys(studyEntries).length
             let studyOptions = document.getElementById('studyOptions');
             studyOptions.addEventListener('change', () => {
                 if(studyOptions.value === "") return;
                 document.getElementById('dataSummaryParameter').innerHTML = '';
                 document.getElementById('dataSummaryViz').innerHTML = '';
-                countSpecificData(parseInt(studyOptions.value));
+                countSpecificData(parseInt(studyOptions.value), studyEntries);
             });
         }
     }
 };
 
-const countSpecificData = async (folderId) => {
-    let dataObject = JSON.parse(localStorage.data_summary);
-    for(let consortia in dataObject){
-        const studyEntries = dataObject[consortia].studyEntries;
-        for(let study in studyEntries){
-            const studyId = dataObject[consortia].studyEntries[study].id;
-            const dataEntries = studyEntries[study].dataEntries;
-            if(studyId === folderId){
-                document.getElementById('dataCount').textContent = Object.keys(dataEntries).length;
-                let caseCounter = 0;
-                for(let data in dataEntries){
-                    const fileEntries = dataEntries[data].fileEntries;
-                    for(let file in fileEntries){
-                        const caseData = fileEntries[file].cases;
-                        caseCounter += caseData;
-                    };
-                };
-                document.getElementById('caseCountSummary').textContent = caseCounter;
-
-                let dataDropDown = document.getElementById('dataDropDown');
-                dataDropDown.innerHTML = dataDropDownTemplate(dataEntries, 'dataOptions');
-                let dataOptions = document.getElementById('dataOptions');
-                dataOptions.addEventListener('change', () => {
-                    if(dataOptions.value === "") return;
-                    countSpecificCases(parseInt(dataOptions.value));
-                });
-            };
-        };
-    };
-};
-
-const countSpecificCases = async (folderId) => {
-    let dataObject = JSON.parse(localStorage.data_summary);
-    let fileId = 0;
-    let fileName = '';
-    for(let consortia in dataObject){
-        const studyEntries = dataObject[consortia].studyEntries;
-        for(let study in studyEntries){
-            const dataEntries = studyEntries[study].dataEntries;
+const countSpecificData = async (folderId, studyEntries) => {
+    for(let study in studyEntries){
+        const studyId = studyEntries[study].id;
+        const dataEntries = studyEntries[study].dataEntries;
+        if(studyId === folderId){
+            document.getElementById('dataCount').textContent = Object.keys(dataEntries).length;
+            let caseCounter = 0;
+            let fileCounter = 0;
             for(let data in dataEntries){
-                const dataId = dataEntries[data].id;
-                if(dataId === folderId){
-                    const fileEntries = dataEntries[data].fileEntries;
-                    let caseCounter = 0;
-                    for(let file in fileEntries){
-                        const caseData = fileEntries[file].cases;
-                        fileId = fileEntries[file].id;
-                        fileName = file;
-                        caseCounter += caseData;
-                    };
-                    document.getElementById('caseCountSummary').textContent = caseCounter;
-                    document.getElementById('dataSummaryParameter').innerHTML = '';
-                    document.getElementById('dataSummaryViz').innerHTML = '';
-                    if(fileId !== 0) generateSummaryViz(fileId, fileName);
+                const fileEntries = dataEntries[data].fileEntries;
+                fileCounter += Object.keys(fileEntries).length;
+                for(let file in fileEntries){
+                    const caseData = fileEntries[file].cases;
+                    caseCounter += caseData;
                 };
             };
+            
+            document.getElementById('fileCount').textContent = fileCounter;
+            document.getElementById('caseCountSummary').textContent = caseCounter;
+            let dataDropDown = document.getElementById('dataDropDown');
+            dataDropDown.innerHTML = dataDropDownTemplate(dataEntries, 'dataOptions');
+            let dataOptions = document.getElementById('dataOptions');
+            dataOptions.addEventListener('change', () => {
+                if(dataOptions.value === "") return;
+                countSpecificFiles(parseInt(dataOptions.value), dataEntries);
+            });
         };
     };
 };
+
+const countSpecificFiles = async (folderId, dataEntries) => {
+    for(let data in dataEntries){
+        const dataId = dataEntries[data].id;
+        if(dataId === folderId){
+            const fileEntries = dataEntries[data].fileEntries;
+            document.getElementById('fileCount').textContent = Object.keys(fileEntries).length;
+            document.getElementById('fileDropDown').innerHTML = fileDropDownTemplate(fileEntries, 'fileOptions');
+            let fileOptions = document.getElementById('fileOptions');
+            fileOptions.addEventListener('change', function() {
+                if(fileOptions.value === "") return;
+                countSpecificCases(parseInt(fileOptions.value), fileEntries);
+            });
+            let caseCounter = 0;
+            for(let file in fileEntries){
+                const caseData = fileEntries[file].cases;
+                caseCounter += caseData;
+            };
+            document.getElementById('caseCountSummary').textContent = caseCounter;
+            document.getElementById('dataSummaryParameter').innerHTML = '';
+            document.getElementById('dataSummaryViz').innerHTML = '';
+            
+        };
+    };
+};
+
+const countSpecificCases = async (fileId, fileEntries) => {
+    for(let file in fileEntries){
+        if(fileEntries[file].id === fileId){
+            const caseCounter = fileEntries[file].cases;
+            document.getElementById('caseCountSummary').textContent = caseCounter;
+            document.getElementById('dataSummaryParameter').innerHTML = '';
+            document.getElementById('dataSummaryViz').innerHTML = '';
+            generateSummaryViz(fileId, file);
+            
+        }
+    };
+}

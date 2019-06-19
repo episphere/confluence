@@ -22,6 +22,18 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
     return template;
 };
 
+export const fileDropDownTemplate = (entries, fileOptionsId) => {
+    let template = '';
+    template += `<select id="${fileOptionsId}" class="form-control">
+            <option disabled selected> -- select a file -- </option>
+        `;
+    for(let fileName in entries){
+        template += `<option value="${entries[fileName].id}">${fileName}</option>`
+    }
+    template += '</select>';
+    return template;
+};
+
 export const parametersDropDownTemplate = (fileName, parameters) => {
     let template = '';
     template += `${fileName}</br></br>
