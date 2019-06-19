@@ -34,9 +34,9 @@ const confluence=function(){
         const dataSummaryElement = document.getElementById('dataSummary');
         
         dataExplorationElement.addEventListener('click', async () => {
-            if(dataExplorationElement.classList.contains('active')) return;
+            if(dataExplorationElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links');
-            dataExplorationElement.classList.add('active');
+            dataExplorationElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataExplorationTemplate();
             dataExploration();
             let consortiaOption = document.getElementById('dataExplorationConsortiaOption');
@@ -46,16 +46,16 @@ const confluence=function(){
             });
         });
         dataSubmissionElement.addEventListener('click', () => {
-            if(dataSubmissionElement.classList.contains('active')) return;
+            if(dataSubmissionElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links');
-            dataSubmissionElement.classList.add('active');
+            dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();
             dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {
-            if(dataSummaryElement.classList.contains('active')) return;
+            if(dataSummaryElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links');
-            dataSummaryElement.classList.add('active');
+            dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary(access_token);
             getSummary(access_token);
             let consortiaOption = document.getElementById('consortiaOption');
@@ -87,7 +87,7 @@ const confluence=function(){
 const removeActiveClass = (className) => {
     let fileIconElement = document.getElementsByClassName(className);
     Array.from(fileIconElement).forEach(elm => {
-        elm.classList.remove('active');
+        elm.classList.remove('navbar-active');
     });
 }
 
