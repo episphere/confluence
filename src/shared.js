@@ -1,4 +1,5 @@
 import { config } from "./config.js";
+import { txt2dt } from "./visulization.js";
 
 export const getFolderItems = async function(id, access_token){
     let r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
@@ -152,7 +153,7 @@ export const uploadFileBox = async (folderId, fileName, file) => {
     };
 };
 
-export const updateLocalStorage = (parentId, newFolderId, newFolderName, newFolderEntries, newFolderType) => {
+export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderEntries, newFolderType) => {
     const data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){
         let studyEntries = data_summary[consortia].studyEntries;
@@ -179,6 +180,12 @@ export const updateLocalStorage = (parentId, newFolderId, newFolderName, newFold
                             fileEntries[newFolderName].id = newFolderId;
                             fileEntries[newFolderName].type = newFolderType;
                             fileEntries[newFolderName].cases = 0;
+                            if(newFolderType === 'file'){
+                                const access_token = JSON.parse(localStorage.parms).access_token;
+                                let txt = await getFile(newFolderId, access_token);
+                                let dt=txt2dt(txt);
+                                if(dt.tab && dt.tab.BCAC_ID) fileEntries[newFolderName].cases = dt.tab.BCAC_ID.length;
+                            }
                         }
                     }
                 }
