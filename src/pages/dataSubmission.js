@@ -47,13 +47,28 @@ export function template() {
                                 title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
                                 template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
                             }
-                            template += `<li><i data-folder-id="${dataId}" title="Upload new file" class="fas fa-file-upload"></i> <input type="file" class="input-create-folder"/></li></ul>`
+                            template += `<li>
+                                        <i class="fas fa-file-upload"></i> 
+                                        <input type="file" class="input-file-upload"/> 
+                                        <i data-folder-id="${dataId}" title="Upload new file" class="fas upload-file fa-arrow-up"></i>
+                                    </li>
+                                </ul>`
                         }
                     }
-                    template += `<li><i data-folder-id="${studyId}" title="Create new folder" class="fas fa-folder-plus"></i> <input type="text" placeholder="Enter folder name" class="input-create-folder"/></li></ul>`
+                    template += `<li>
+                                <i class="fas fa-folder-plus"></i> 
+                                <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
+                                <i data-folder-id="${studyId}" title="Create new folder" class="fas create-folder fa-arrow-up"></i>
+                            </li>
+                        </ul>`
                 }
             }
-            template += `<li><i data-folder-id="${consortiaId}" title="Create new folder" class="fas fa-folder-plus"></i> <input type="text" placeholder="Enter folder name" class="input-create-folder"/></li></ul>`
+            template += `<li>
+                        <i class="fas fa-folder-plus"></i> 
+                        <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
+                        <i data-folder-id="${consortiaId}" title="Create new folder" class="fas create-folder fa-arrow-up"></i>
+                    </li>
+                </ul>`
         }
     }
     template += '</ul></div>'
@@ -92,12 +107,12 @@ export const dataSubmission = () => {
     });
 
     // Create new folder
-    let creatFolder = document.getElementsByClassName('fa-folder-plus');
+    let creatFolder = document.getElementsByClassName('create-folder');
     Array.from(creatFolder).forEach(element => {
         element.addEventListener('click', async function() {
-            if(this.nextElementSibling.value && this.nextElementSibling.value !== ""){
+            if(this.previousElementSibling.value && this.previousElementSibling.value !== ""){
                 const folderId = this.dataset.folderId;
-                const folderName = this.nextElementSibling.value;
+                const folderName = this.previousElementSibling.value;
 
                 var r = confirm('Create a new folder - '+folderName +' ?');
                 if(r == true){
@@ -120,12 +135,12 @@ export const dataSubmission = () => {
     });
 
     // file upload
-    let uploadFile = document.getElementsByClassName('fa-file-upload');
+    let uploadFile = document.getElementsByClassName('upload-file');
     Array.from(uploadFile).forEach(element => {
         element.addEventListener('click', async function() {
-            if(this.nextElementSibling.files.length > 0){
+            if(this.previousElementSibling.files.length > 0){
                 const folderId = this.dataset.folderId;
-                const file = this.nextElementSibling.files[0];
+                const file = this.previousElementSibling.files[0];
                 const fileName = file.name;
                 const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
                 if(fileType !== 'txt'){
