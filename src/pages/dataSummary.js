@@ -34,7 +34,9 @@ export function template() {
                         <div id="dataDropDown"></div>
                     </div>
                     <div class="col form-group summary-inner-col">
-                        <span class="data-summary-label">Cases</span></br>
+                        <span class="data-summary-label">Cases</span>
+                        
+                        </br>
                         <span><i class="fas fa-4x fa-users"></i></span>
                         <span class="data-summary-count" id="caseCountSummary">0</span>
                     </div>
@@ -177,6 +179,8 @@ const countSpecificCases = async (folderId) => {
                         caseCounter += caseData;
                     };
                     document.getElementById('caseCountSummary').textContent = caseCounter;
+                    document.getElementById('dataSummaryParameter').innerHTML = '';
+                    document.getElementById('dataSummaryViz').innerHTML = '';
                     if(fileId !== 0) generateSummaryViz(fileId, fileName);
                 };
             };
