@@ -13,7 +13,7 @@ export function template() {
         let faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
         let expandClass = type === 'folder' ? 'fas fa-plus' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
-        template += `<li class="${liClass}"><i class="${faClass}"></i> ${consortia} <i title="${title}" class="${expandClass}"></i></li>`
+        template += `<li class="${liClass}"><i class="${faClass}"></i> ${consortia} <a href="#"><i title="${title}" class="${expandClass}"></i></a></li>`
         if(type === 'folder'){
             template += '<ul class="ul-list-style content">'
             for(let study in studyEntries){
@@ -23,7 +23,7 @@ export function template() {
                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                 expandClass = type === 'folder' ? 'fas fa-plus' : '';
                 title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
-                template += `<li class="${liClass}"><i class="${faClass}"></i> ${study} <i title="${title}" class="${expandClass}"></i></li>`
+                template += `<li class="${liClass}"><i class="${faClass}"></i> ${study} <a href="#"><i title="${title}" class="${expandClass}"></i></a></li>`
                 if(type === 'folder'){
                     const dataEntries = studyEntries[study].dataEntries;
                     template += '<ul class="ul-list-style content">'
@@ -34,7 +34,7 @@ export function template() {
                         faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                         expandClass = type === 'folder' ? 'fas fa-plus' : '';
                         title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
-                        template += `<li class="${liClass}"><i class="${faClass}"></i> ${data} <i title="${title}" class="${expandClass}"></i></li>`
+                        template += `<li class="${liClass}"><i class="${faClass}"></i> ${data} <a href="#"><i title="${title}" class="${expandClass}"></i></a></li>`
                         if(type === 'folder'){
                             const fileEntries = dataEntries[data].fileEntries;
                             template += '<ul class="ul-list-style content">'
@@ -45,12 +45,12 @@ export function template() {
                                 faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
                                 expandClass = type === 'folder' ? 'fas fa-plus' : 'fas fa-file-download';
                                 title = type === 'folder' ? 'Expand / Collapse' : 'Download File';
-                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></li>`
+                                template += `<li class="${liClass}"><i class="${faClass}"></i> ${file} <a href="#"><i title="${title}" data-file-id="${fileId}" data-file-name="${file}" class="${expandClass}"></i></a></li>`
                             }
                             template += `<li>
                                         <i class="fas fa-file-upload"></i> 
                                         <input type="file" class="input-file-upload"/> 
-                                        <i data-folder-id="${dataId}" title="Upload new file" class="fas upload-file fa-arrow-up"></i>
+                                        <a class="upload-file" data-folder-id="${dataId}" href="#"><i title="Upload new file" class="fas fa-arrow-up"></i></a>
                                     </li>
                                 </ul>`
                         }
@@ -58,7 +58,7 @@ export function template() {
                     template += `<li>
                                 <i class="fas fa-folder-plus"></i> 
                                 <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
-                                <i data-folder-id="${studyId}" title="Create new folder" class="fas create-folder fa-arrow-up"></i>
+                                <a class="create-folder" data-folder-id="${studyId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
                             </li>
                         </ul>`
                 }
@@ -66,7 +66,7 @@ export function template() {
             template += `<li>
                         <i class="fas fa-folder-plus"></i> 
                         <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
-                        <i data-folder-id="${consortiaId}" title="Create new folder" class="fas create-folder fa-arrow-up"></i>
+                        <a class="create-folder" data-folder-id="${consortiaId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
                     </li>
                 </ul>`
         }
@@ -117,7 +117,7 @@ export const dataSubmission = () => {
                 var r = confirm('Create a new folder - '+folderName +' ?');
                 if(r == true){
                     const response = await createFolder(folderId, folderName);
-                    if(response){
+                    if(!response.status){
                         const message = `<strong>Success!</strong> Folder - ${folderName} created!`;
                         document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
                         const parentId = parseInt(response.parent.id);
@@ -129,6 +129,10 @@ export const dataSubmission = () => {
                         document.getElementById('confluenceDiv').innerHTML = template(); 
                         dataSubmission();
                     };
+                    if(response.status && response.statusText){
+                        const message = `<strong>Error!</strong> (${response.status}) ${response.statusText}`;
+                        document.getElementById('alertMessage').innerHTML = alertTemplate('alert-danger', message);
+                    }
                 };
             };
         });
@@ -150,7 +154,7 @@ export const dataSubmission = () => {
                     var r = confirm('Upload a new file - '+fileName +' ?');
                     if(r == true){
                         const response = await uploadFileBox(folderId, fileName, file);
-                        if(response){
+                        if(!response.status){
                             const message = `<strong>Success!</strong> File - ${fileName} uploaded!`;
                             document.getElementById('alertMessage').innerHTML = alertTemplate('alert-success', message);
                             const parentId = parseInt(response.entries[0].parent.id);
@@ -160,6 +164,10 @@ export const dataSubmission = () => {
                             await updateLocalStorage(parentId, newFolderId, newFolderName, newFolderType);
                             document.getElementById('confluenceDiv').innerHTML = template(); 
                             dataSubmission();
+                        };
+                        if(response.status && response.statusText){
+                            const message = `<strong>Error!</strong> (${response.status}) ${response.statusText}`;
+                            document.getElementById('alertMessage').innerHTML = alertTemplate('alert-danger', message);
                         };
                     };
                 };

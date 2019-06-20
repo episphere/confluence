@@ -127,6 +127,9 @@ export const createFolder = async (folderId, folderName) => {
     }
     else if(response.status === 201){
         return response.json();
+    }
+    else{
+        return {status: response.status, statusText: response.statusText};
     };
 };
 
@@ -150,6 +153,9 @@ export const uploadFileBox = async (folderId, fileName, file) => {
     }
     else if(response.status === 201){
         return response.json();
+    }
+    else{
+        return {status: response.status, statusText: response.statusText};
     };
 };
 
