@@ -8,7 +8,7 @@ export const checkAccessTokenValidity = async access_token => {
         }
     }))
     if(response.statusText=="Unauthorized"){
-        delete localStorage.parms
+        localStorage.clear();
         return false;
     }else{
         return true;
