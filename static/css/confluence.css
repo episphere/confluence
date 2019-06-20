@@ -242,7 +242,7 @@ body {
     color: #807c7c;
 }
 
-.fa-folder {
+.fa-folder, .fa-folder-open {
     color: #e4c150;
 }
 
@@ -290,10 +290,6 @@ body {
     transition: border-color .15s;
     margin: 0px;
     width: 145px;
-}
-
-.fa-folder-open {
-    color: #e4c150
 }
 
 .content {
