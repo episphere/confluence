@@ -125,7 +125,7 @@ export const dataSubmission = () => {
                         const newFolderName = response.name;
                         const newFolderEntries = response.item_collection.entries;
                         const newFolderType = response.type;
-                        updateLocalStorage(parentId, newFolderId, newFolderName, newFolderEntries, newFolderType);
+                        await updateLocalStorage(parentId, newFolderId, newFolderName, newFolderType);
                         document.getElementById('confluenceDiv').innerHTML = template(); 
                         dataSubmission();
                     };
