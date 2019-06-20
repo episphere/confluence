@@ -94,6 +94,7 @@ export const dataExplorationCountSpecificStudy = (folderId) => {
                 document.getElementById('dataExplorationTable').innerHTML = '';
                 document.getElementById('pagination-container').innerHTML = '';
                 document.getElementById('pageSizeSelector').hidden = true;
+                document.getElementById('dataExplorationFileDropDown').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value), studyEntries);
             });
         }
@@ -123,6 +124,10 @@ const countSpecificData = async (folderId, studyEntries) => {
             let dataOptions = document.getElementById('dataExplorationDataOptions');
             dataOptions.addEventListener('change', () => {
                 if(dataOptions.value === "") return;
+                document.getElementById('dataExplorationParameter').innerHTML = '';
+                document.getElementById('dataExplorationTable').innerHTML = '';
+                document.getElementById('pagination-container').innerHTML = '';
+                document.getElementById('pageSizeSelector').hidden = true;
                 countSpecificFiles(parseInt(dataOptions.value), dataEntries);
             });
         };

@@ -134,6 +134,7 @@ export const countSpecificStudy = (folderId) => {
                 if(studyOptions.value === "") return;
                 document.getElementById('dataSummaryParameter').innerHTML = '';
                 document.getElementById('dataSummaryViz').innerHTML = '';
+                document.getElementById('fileDropDown').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value), studyEntries);
             });
         }
