@@ -136,7 +136,7 @@ export const dataSubmission = () => {
 
     // file upload
     let uploadFile = document.getElementsByClassName('upload-file');
-    Array.from(uploadFile).forEach(element => {
+    Array.from(uploadFile).forEach(async element => {
         element.addEventListener('click', async function() {
             if(this.previousElementSibling.files.length > 0){
                 const folderId = this.dataset.folderId;
@@ -156,9 +156,8 @@ export const dataSubmission = () => {
                             const parentId = parseInt(response.entries[0].parent.id);
                             const newFolderId = parseInt(response.entries[0].id);
                             const newFolderName = response.entries[0].name;
-                            const newFolderEntries = [];
                             const newFolderType = response.entries[0].type;
-                            updateLocalStorage(parentId, newFolderId, newFolderName, newFolderEntries, newFolderType);
+                            await updateLocalStorage(parentId, newFolderId, newFolderName, newFolderType);
                             document.getElementById('confluenceDiv').innerHTML = template(); 
                             dataSubmission();
                         };

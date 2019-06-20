@@ -153,8 +153,8 @@ export const uploadFileBox = async (folderId, fileName, file) => {
     };
 };
 
-export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderEntries, newFolderType) => {
-    const data_summary = JSON.parse(localStorage.data_summary);
+export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
+    let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){
         let studyEntries = data_summary[consortia].studyEntries;
         if(data_summary[consortia].id === parentId){
