@@ -13,7 +13,7 @@ export function template() {
                         <label for="consortiaOption" class="data-summary-label">Consortia</label></br>
                         <span><i class="fas fa-4x fa-layer-group"></i></span>
                         <span class="data-summary-count" id="consortiaCount">1</span></br>
-                        <select class="form-control" id="consortiaOption" hidden=true>
+                        <select class="dropdown-options" id="consortiaOption" hidden=true>
                             <option disabled selected> -- select a consortia -- </option>
                             <option value="${config.BCACFolderId}">BCAC</option>
                         </select>

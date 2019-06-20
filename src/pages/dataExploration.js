@@ -9,7 +9,7 @@ export const template = () => {
                 <label for="consortiaOption" class="data-summary-label">Consortia</label></br>
                 <span><i class="fas fa-4x fa-layer-group"></i></span>
                 <span class="data-summary-count" id="dataExplorationConsortiaCount">1</span></br>
-                <select class="form-control" id="dataExplorationConsortiaOption" hidden=true>
+                <select class="dropdown-options" id="dataExplorationConsortiaOption" hidden=true>
                     <option disabled selected> -- select a consortia -- </option>
                     <option value="${config.BCACFolderId}">BCAC</option>
                 </select>
@@ -42,7 +42,7 @@ export const template = () => {
             <div id="dataExplorationParameter"></div>
             <div id="dataExplorationTable" class="table-responsive"></div>
             <div class="page-size-selector">
-            <select class="form-control" id="pageSizeSelector" hidden=true>
+            <select class="dropdown-options" id="pageSizeSelector" hidden=true>
                 <option selected value=20>20</option>
                 <option value=40>40</option>
                 <option value=60>60</option>

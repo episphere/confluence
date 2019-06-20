@@ -1,6 +1,6 @@
 export const studyDropDownTemplate = (entries, studyOptionsId) => {
     let template = '';
-    template += `<select id="${studyOptionsId}" class="form-control">
+    template += `<select id="${studyOptionsId}" class="dropdown-options">
             <option disabled selected> -- select a study -- </option>
         `;
     for(let studyName in entries){
@@ -12,7 +12,7 @@ export const studyDropDownTemplate = (entries, studyOptionsId) => {
 
 export const dataDropDownTemplate = (entries, dataOptionsId) => {
     let template = '';
-    template += `<select id="${dataOptionsId}" class="form-control">
+    template += `<select id="${dataOptionsId}" class="dropdown-options">
             <option disabled selected> -- select a data -- </option>
         `;
     for(let dataName in entries){
@@ -24,7 +24,7 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
 
 export const fileDropDownTemplate = (entries, fileOptionsId) => {
     let template = '';
-    template += `<select id="${fileOptionsId}" class="form-control">
+    template += `<select id="${fileOptionsId}" class="dropdown-options">
             <option disabled selected> -- select a file -- </option>
         `;
     for(let fileName in entries){
@@ -37,7 +37,7 @@ export const fileDropDownTemplate = (entries, fileOptionsId) => {
 export const parametersDropDownTemplate = (fileName, parameters) => {
     let template = '';
     template += `${fileName}</br></br>
-            <select id="parametersDropDown" class="form-control">
+            <select id="parametersDropDown" class="dropdown-options">
             <option disabled selected> -- select a parameter -- </option>
             `;
     parameters.forEach(parameter => {

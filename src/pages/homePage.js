@@ -8,7 +8,7 @@ export function template() {
                 <li>About confluence: - <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="_blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></li>
                 <li>Source Code: - <a href="https://github.com/episphere/confluence" target="_blank">https://github.com/episphere/confluence</a></li>
                 <li>GitHub issues: - <a href="https://github.com/episphere/confluence/issues" target="_blank">https://github.com/episphere/confluence/issues</a></li>
-                <li>Please <strong>Login</strong> with your <strong>box account</strong>, to explore!</li>
+                <li>Please <strong>Login</strong> with your <strong>BOX account</strong>, to explore!</li>
             </ul>
         </div>  
     `;
