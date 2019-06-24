@@ -7,6 +7,7 @@ export function footerTemplate() {
             
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-wrapper">
                 <ul class="menu">
+                    <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project">DCEG Confluence</a></li>|
                     <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/">DCEG Home</a></li>|
                     <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/about/contact-dceg">Contact DCEG</a></li>|
                     <li class="menu-item"><a class="footer-links" href="https://www.cancer.gov/global/web/policies">Policies</a></li>|
