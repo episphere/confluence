@@ -197,14 +197,14 @@ const countSpecificData = async (selectedValues, studyEntries) => {
             const dataEntries = studyEntries[intStudyId].dataEntries;
             dataCounter += Object.keys(dataEntries).length;
             for(let dataId in dataEntries){
-                if(checker_obj[dataEntries[dataId].name.toLowerCase().trim()]) return;
-                checker_obj[dataEntries[dataId].name.toLowerCase().trim()] = {};
-                template += `<option data-parent-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}">${dataEntries[dataId].name}</option>`
                 const fileEntries = dataEntries[dataId].fileEntries;
                 for(let fileId in fileEntries){
                     caseCounter += fileEntries[fileId].cases;
                     controlCounter += fileEntries[fileId].controls;
                 }
+                if(checker_obj[dataEntries[dataId].name.toLowerCase().trim()]) return;
+                checker_obj[dataEntries[dataId].name.toLowerCase().trim()] = {};
+                template += `<option data-parent-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}">${dataEntries[dataId].name}</option>`;
             }
         }
     });
