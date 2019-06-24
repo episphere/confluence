@@ -1,75 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <link rel="shortcut icon" href="static/images/favicon.ico">
-    <link rel="stylesheet" href="static/css/confluence.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="static/js/d3.min.js"></script>
-    <script src="static/js/crossfilter.min.js"></script>
-    <script src="static/js/dc.min.js"></script>
-    <script src="confluence.js" type="module"></script>
-    <title>Confluence Data Commons</title>
-</head>
-<body>
-    <div id="page">
-        <div id="header" class="header header-wrapper">
-            <div class="container">
-                <div id="alertMessage"></div>
-                <div class="row">
-                    <div class="col">
-                        <a href="#" title="Home" rel="home" id="logo">
-                            <img src="https://dceg.cancer.gov/PublishedContent/Images/research/cancer-types/breast-cancer/Confluence_Logo.__v10025474.png" height="90px" width="200px" alt="NCI Confluence Data Commons" class="banner-logo">
-                        </a>
-                    </div>
-                    <div class="col">
-                        <div class="row authentication-link">
-                            
-                            <div id="authenticationLinks" class="col login-btn">
-                                <a href="#" hidden=true class="header-item" id="loginBoxObs">Login Observable</a>
-                                <a href="#" hidden=true class="header-item" id="loginBoxAppDev">Login Dev</a>
-                                <a href="#" hidden=true class="header-item" id="loginBoxAppProd">Login</a>
-                                <a href="#" hidden=true class="header-item" id="logOutBtn">Log Out</a>
+    <head>
+        <meta charset="utf-8">
+        <link rel="shortcut icon" href="static/images/favicon.ico">
+        <link rel="stylesheet" href="static/css/confluence.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="static/js/d3.min.js"></script>
+        <script src="static/js/crossfilter.min.js"></script>
+        <script src="static/js/dc.min.js"></script>
+        <script src="confluence.js" type="module"></script>
+        <title>Confluence Data Commons</title>
+    </head>
+    <body>
+        <div id="page">
+            <div id="header" class="header header-wrapper">
+                <div class="container">
+                    <div id="alertMessage"></div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="#" title="Home" rel="home" id="logo">
+                                <img src="https://dceg.cancer.gov/PublishedContent/Images/research/cancer-types/breast-cancer/Confluence_Logo.__v10025474.png" height="90px" width="200px" alt="NCI Confluence Data Commons" class="banner-logo">
+                            </a>
+                        </div>
+                        <div class="col">
+                            <div class="row authentication-link">
+                                
+                                <div id="authenticationLinks" class="col login-btn">
+                                    <a href="#" hidden=true class="header-item" id="loginBoxObs">Login Observable</a>
+                                    <a href="#" hidden=true class="header-item" id="loginBoxAppDev">Login Dev</a>
+                                    <a href="#" hidden=true class="header-item" id="loginBoxAppProd">Login</a>
+                                    <a href="#" hidden=true class="header-item" id="logOutBtn">Log Out</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarToggler">
-                    <div class="navbar-nav grid" id="navBarOptions">
-                        <div class="grid-border"></div>
-                        <div class="nav-item navbar-active grid-elements">
-                            <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage">Confluence</a>
-                        </div>
-                        <div class="grid-border"></div>
-                    </ul>
+            
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarToggler">
+                        <div class="navbar-nav grid" id="navBarOptions">
+                            <div class="grid-border"></div>
+                            <div class="nav-item navbar-active grid-elements">
+                                <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage">Confluence</a>
+                            </div>
+                            <div class="grid-border"></div>
+                        </ul>
+                    </div>
+                </div>
+            </nav>    
+            
+            <div id="maincontainer">
+                <div class="container">
+                    <div class="main-container">
+                        <div id="confluenceDiv"></div>
+                    </div>
                 </div>
             </div>
-        </nav>    
-        
-        <div id="maincontainer">
-            <div class="container">
-                <div class="main-container">
-                    <div id="confluenceDiv"></div>
-                </div>
-            </div>
+            
+            <div id="footer"></div>
         </div>
-        
-        <div id="footer"></div>
-    </div>
-</body>
-
+    </body>
 </html>

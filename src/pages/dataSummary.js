@@ -119,7 +119,7 @@ export async function getSummary() {
                                 consortiaOptions.hidden = false;
                                 consortiaOptions.options[0].selected = true;
                                 consortiaOptions.dispatchEvent(new Event('change'));
-                            }, 500);
+                            }, 1500);
                         }
                     });
                 });
