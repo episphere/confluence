@@ -98,7 +98,6 @@ body {
 }
 
 .dropdown-options {
-    width: 100%;
     padding: .275rem;
     font-size: 1rem;
     font-weight: 400;
@@ -153,12 +152,16 @@ body {
     white-space: nowrap;
 }
 
-input[type='checkbox'] {
+.cases-controls-chkbox {
     width: 25px;
     height: 25px;
     background:white;
     border-radius:5px;
     border:1px solid #555;
+}
+
+.align-left {
+    text-align: left;
 }
 
 .data-summary-count {
@@ -173,7 +176,6 @@ input[type='checkbox'] {
     height: inherit;
     background-color: #fff;
     width: inherit;
-    margin:;
 }
 
 .first-list-item {
@@ -275,6 +277,14 @@ input[type='checkbox'] {
 .ul-list-style {
     list-style-type:none;
     margin-top: 1rem;
+}
+
+.ul-data-exploration {
+    list-style-type:none;
+    max-height: 100px;
+    overflow: auto;
+    margin: 0;
+    padding-left: .5rem;
 }
 
 .data-submission {
