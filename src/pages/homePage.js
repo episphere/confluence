@@ -3,22 +3,22 @@ export const template = () => {
     <div class="main-summary-row home-page-stats">
         <div class="summary-inner-col">
             <span class="data-summary-label">Consortia</span></br>
-            <span><i class="fas fa-4x fa-layer-group"></i></span>
+            <span><i class="fas fa-3x fa-layer-group"></i></span>
             <span class="data-summary-count">1</span></br>
         </div></br>
         <div class="summary-inner-col">
             <span class="data-summary-label">Studies</span></br>
-            <span><i class="fas fa-4x fa-university"></i></span>
+            <span><i class="fas fa-3x fa-university"></i></span>
             <span class="data-summary-count">4</span></br>
         </div></br>
         <div class="summary-inner-col">
             <span class="data-summary-label">Cases</span></br>
-            <span><i class="fas fa-4x fa-user"></i></span>
+            <span><i class="fas fa-3x fa-user"></i></span>
             <span class="data-summary-count" id="publicCaseCount">0</span>
         </div></br>
         <div class="summary-inner-col">
             <span class="data-summary-label">Controls</span></br>
-            <span><i class="fas fa-4x fa-user"></i></span>
+            <span><i class="fas fa-3x fa-user"></i></span>
             <span class="data-summary-count" id="publicControlCount">0</span>
         </div>
     </div>
