@@ -117,7 +117,7 @@ body {
 }
 
 .main-container {
-    background-image: radial-gradient(at center center, rgb(83, 202, 235) 0%, rgb(111, 199, 224) 48%, rgb(131, 186, 244) 100%);
+    background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(201, 227, 235) 48%, rgb(131, 186, 244) 100%);
     height: inherit;
     padding: 1rem;
     min-height: inherit;
