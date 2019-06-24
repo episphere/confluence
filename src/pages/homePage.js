@@ -30,7 +30,7 @@ export const template = () => {
 }
 
 export const homePageVisualization = async () => {
-    const fileData = await fetch('/src/data.json');
+    const fileData = await fetch('/data.json');
     fileData.json().then(data => {
         document.getElementById('publicCaseCount').textContent = data.cases;
         document.getElementById('publicControlCount').textContent = data.controls;
