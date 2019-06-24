@@ -23,7 +23,7 @@ export const template = () => {
                     <div id="studyDropDown"></div>
                 </div>
                 <div class="summary-inner-col">
-                    <span class="interactive-summary-label">Data Type</span></br>
+                    <span class="interactive-summary-label">Data Types</span></br>
                     <span><i class="fas fa-3x fa-database"></i></span>
                     <span class="data-summary-count" id="dataCount">0</span></br>
                     <div id="dataDropDown"></div>
@@ -148,8 +148,10 @@ export const countSpecificStudy = (folderId) => {
             };
             countSpecificData(selectedValues, studyEntries);
         });
-            studyOptions.options[0].selected = true;
-            studyOptions.dispatchEvent(new Event('change'));
+        Array.from(studyOptions.options).forEach(element => {
+            element.selected = true;
+        });
+        studyOptions.dispatchEvent(new Event('change'));
     };
 };
 
@@ -187,13 +189,17 @@ const countSpecificData = async (selectedValues, studyEntries) => {
     let caseCounter = 0;
     let controlCounter = 0;
     let dataCounter = 0;
+    let checker_obj = {};
+
     selectedValues.forEach(studyId => {
         const intStudyId = parseInt(studyId);
         if(studyEntries[intStudyId]){
             const dataEntries = studyEntries[intStudyId].dataEntries;
             dataCounter += Object.keys(dataEntries).length;
             for(let dataId in dataEntries){
-                template += `<option value="${dataId}">${dataEntries[dataId].name}</option>`
+                if(checker_obj[dataEntries[dataId].name.toLowerCase().trim()]) return;
+                checker_obj[dataEntries[dataId].name.toLowerCase().trim()] = {};
+                template += `<option data-parent-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}">${dataEntries[dataId].name}</option>`
                 const fileEntries = dataEntries[dataId].fileEntries;
                 for(let fileId in fileEntries){
                     caseCounter += fileEntries[fileId].cases;
@@ -214,14 +220,19 @@ const countSpecificData = async (selectedValues, studyEntries) => {
     dataOptions.addEventListener('change', () => {
         if(dataOptions.value === "") return;
         var selectedDataOptions = [];
-        for (var i = 0; i < dataOptions.options.length; i++) {
-            if (dataOptions.options[i].selected) {
-                selectedDataOptions.push(dataOptions.options[i].value);
+
+        Array.from(dataOptions.options).forEach(element => {
+            if(element.selected){
+                selectedDataOptions.push(element.value);
             }
-        };
+        });
         console.log(selectedDataOptions);
         // countSpecificCases(parseInt(dataOptions.value), dataEntries);
     });
+    Array.from(dataOptions).forEach(element => {
+        element.selected = true;
+    });
+    dataOptions.dispatchEvent(new Event('change'));
 };
 
 const countSpecificCases = async (folderId, dataEntries) => {
