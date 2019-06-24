@@ -1,10 +1,9 @@
 export const studyDropDownTemplate = (entries, studyOptionsId) => {
     let template = '';
-    template += `<select id="${studyOptionsId}" class="dropdown-options">
-            <option disabled selected> -- select a study -- </option>
+    template += `<select multiple id="${studyOptionsId}" class="dropdown-options">
         `;
-    for(let studyName in entries){
-        template += `<option value="${entries[studyName].id}">${studyName}</option>`
+    for(let studyId in entries){
+        template += `<option value="${studyId}">${entries[studyId].name}</option>`
     }
     template += '</select>';
     return template;
@@ -12,23 +11,9 @@ export const studyDropDownTemplate = (entries, studyOptionsId) => {
 
 export const dataDropDownTemplate = (entries, dataOptionsId) => {
     let template = '';
-    template += `<select id="${dataOptionsId}" class="dropdown-options">
-            <option disabled selected> -- select a data -- </option>
-        `;
+    template += `<select multiple id="${dataOptionsId}" class="dropdown-options">`;
     for(let dataName in entries){
         template += `<option value="${entries[dataName].id}">${dataName}</option>`
-    }
-    template += '</select>';
-    return template;
-};
-
-export const fileDropDownTemplate = (entries, fileOptionsId) => {
-    let template = '';
-    template += `<select id="${fileOptionsId}" class="dropdown-options">
-            <option disabled selected> -- select a file -- </option>
-        `;
-    for(let fileName in entries){
-        template += `<option value="${entries[fileName].id}">${fileName}</option>`
     }
     template += '</select>';
     return template;

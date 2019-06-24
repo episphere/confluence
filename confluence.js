@@ -1,12 +1,11 @@
 import template from './src/components/navBarMenuItems.js';
-import { template as homePage } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataSummary.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { generateViz } from './src/visulization.js';
-import { storeAccessToken } from './src/shared.js';
-import { template as dataExplorationTemplate, dataExploration, dataExplorationCountSpecificStudy } from './src/pages/dataExploration.js';
+import { storeAccessToken, removeActiveClass } from './src/shared.js';
+// import { template as dataExplorationTemplate, dataExploration, dataExplorationCountSpecificStudy } from './src/pages/dataExploration.js';
 
 const confluence=function(){
     let confluenceDiv = document.getElementById('confluenceDiv');
@@ -19,34 +18,28 @@ const confluence=function(){
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
     
-    if(localStorage.parms === undefined){
-        confluenceDiv.innerHTML = homePage();
-        if(location.origin.match('localhost')) loginBoxAppDev.hidden=false;
-        if(location.origin.match('episphere')) loginBoxAppProd.hidden=false;
-        storeAccessToken();
-    }
-    
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token) {
-        const access_token = JSON.parse(localStorage.parms).access_token;
         navBarOptions.innerHTML = template();
-        const dataExplorationElement = document.getElementById('dataExploration');
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         
-        dataExplorationElement.addEventListener('click', async () => {
-            if(dataExplorationElement.classList.contains('navbar-active')) return;
-            removeActiveClass('nav-menu-links');
-            dataExplorationElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataExplorationTemplate();
-            dataExploration();
-            let consortiaOption = document.getElementById('dataExplorationConsortiaOption');
-            consortiaOption.addEventListener('change', () => {
-                if(consortiaOption.value === "") return;
-                dataExplorationCountSpecificStudy(parseInt(consortiaOption.value));
-            });
-        });
+        // const dataExplorationElement = document.getElementById('dataExploration');
+        // dataExplorationElement.addEventListener('click', async () => {
+        //     if(dataExplorationElement.classList.contains('navbar-active')) return;
+        //     if(localStorage.data_summary === undefined) return;
+        //     removeActiveClass('nav-menu-links');
+        //     dataExplorationElement.classList.add('navbar-active');
+        //     confluenceDiv.innerHTML = dataExplorationTemplate();
+        //     dataExploration();
+        //     let consortiaOption = document.getElementById('dataExplorationConsortiaOption');
+        //     consortiaOption.addEventListener('change', () => {
+        //         if(consortiaOption.value === "") return;
+        //         dataExplorationCountSpecificStudy(parseInt(consortiaOption.value));
+        //     });
+        // });
         dataSubmissionElement.addEventListener('click', () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
+            if(localStorage.data_summary === undefined) return;
             removeActiveClass('nav-menu-links');
             dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();
@@ -56,8 +49,8 @@ const confluence=function(){
             if(dataSummaryElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links');
             dataSummaryElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataSummary(access_token);
-            getSummary(access_token);
+            confluenceDiv.innerHTML = dataSummary();
+            getSummary();
             let consortiaOption = document.getElementById('consortiaOption');
             consortiaOption.addEventListener('change', () => {
                 if(consortiaOption.value === "") return;
@@ -67,34 +60,19 @@ const confluence=function(){
         dataSummaryElement.click();
         logOutBtn.hidden = false
     }
-
-    // index.html events
-    if(typeof(hideIndividualReports)){
-        document.getElementById('hideIndividualReports').addEventListener('click',function(){
-            if(this.textContent=="[-]"){
-                this.textContent="[+]"
-                this.style.color="green"
-                confluenceDiv.hidden=true
-            }else{
-                this.textContent="[-]"
-                this.style.color="orange"
-                confluenceDiv.hidden=false
-            }
-        })
+    if(localStorage.parms === undefined){
+        confluenceDiv.innerHTML = homePage();
+        homePageVisualization();
+        if(location.origin.match('localhost')) loginBoxAppDev.hidden=false;
+        if(location.origin.match('episphere')) loginBoxAppProd.hidden=false;
+        storeAccessToken();
     }
 }
 
-const removeActiveClass = (className) => {
-    let fileIconElement = document.getElementsByClassName(className);
-    Array.from(fileIconElement).forEach(elm => {
-        elm.classList.remove('navbar-active');
-    });
-}
-
 window.onload=async function(){
+    confluenceDiv.innerHTML = "";
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        await checkAccessTokenValidity(access_token);
+        await checkAccessTokenValidity();
     }
     confluence();
 }

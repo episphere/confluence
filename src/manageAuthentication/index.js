@@ -1,6 +1,7 @@
 import { config } from '../config.js'
 
-export const checkAccessTokenValidity = async access_token => {
+export const checkAccessTokenValidity = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
     const response = (await fetch('https://api.box.com/2.0/folders/0/items',{
         method:'GET',
         headers:{

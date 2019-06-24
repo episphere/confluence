@@ -1,7 +1,8 @@
 import { config } from "./config.js";
 import { txt2dt } from "./visulization.js";
 
-export const getFolderItems = async function(id, access_token){
+export const getFolderItems = async function(id){
+    const access_token = JSON.parse(localStorage.parms).access_token;
     let r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
         method:'GET',
         headers:{
@@ -15,7 +16,8 @@ export const getFolderItems = async function(id, access_token){
     }
 }
 
-export const getFile = async function(id, access_token){
+export const getFile = async function(id){
+    const access_token = JSON.parse(localStorage.parms).access_token;
     let r = (await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
         headers:{
@@ -29,7 +31,8 @@ export const getFile = async function(id, access_token){
     }
 };
 
-export const getFileInfo = async function(id, access_token){
+export const getFileInfo = async function(id){
+    const access_token = JSON.parse(localStorage.parms).access_token;
     let r = (await fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
         headers:{
@@ -44,7 +47,7 @@ export const getFileInfo = async function(id, access_token){
 }
 
 export const storeAccessToken = async function(){
-    let parms=searchParms()
+    let parms = searchParms()
     if(parms.code){
         //exchange code for authorization token
         let clt={}
@@ -58,11 +61,12 @@ export const storeAccessToken = async function(){
         
         let data = `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`;
         let xhr = new XMLHttpRequest();
+        document.getElementById('confluenceDiv').innerHTML = '';
         xhr.addEventListener("readystatechange", function () {
-          if (this.readyState === 4) {
-            localStorage.parms=this.responseText
-            location.search = '';
-          }
+            if (this.readyState === 4) {
+                localStorage.parms=this.responseText;
+                location.search = '';
+            }
         });
         xhr.open("POST", "https://api.box.com/oauth2/token");
         xhr.setRequestHeader("cache-control", "no-cache");
@@ -162,35 +166,45 @@ export const uploadFileBox = async (folderId, fileName, file) => {
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){
-        let studyEntries = data_summary[consortia].studyEntries;
-        if(data_summary[consortia].id === parentId){
-            studyEntries[newFolderName] = {};
-            studyEntries[newFolderName].id = newFolderId;
-            studyEntries[newFolderName].type = newFolderType;
-            studyEntries[newFolderName].dataEntries = {};
+        const consortiaId = parseInt(consortia);
+        let studyEntries = data_summary[consortiaId].studyEntries;
+        if(consortiaId === parentId){
+            studyEntries[newFolderId] = {};
+            studyEntries[newFolderId].name = newFolderName;
+            studyEntries[newFolderId].type = newFolderType;
+            studyEntries[newFolderId].dataEntries = {};
         }
         else{
             for(let study in studyEntries){
-                let dataEntries = studyEntries[study].dataEntries;
-                if(studyEntries[study].id === parentId){
-                    dataEntries[newFolderName] = {};
-                    dataEntries[newFolderName].id = newFolderId;
-                    dataEntries[newFolderName].type = newFolderType;
-                    dataEntries[newFolderName].fileEntries = {};
+                const studyId = parseInt(study);
+                let dataEntries = studyEntries[studyId].dataEntries;
+                if(studyId === parentId){
+                    dataEntries[newFolderId] = {};
+                    dataEntries[newFolderId].name = newFolderName;
+                    dataEntries[newFolderId].type = newFolderType;
+                    dataEntries[newFolderId].fileEntries = {};
                 }
                 else{
                     for(let data in dataEntries){
-                        let fileEntries = dataEntries[data].fileEntries;
-                        if(dataEntries[data].id === parentId){
-                            fileEntries[newFolderName] = {};
-                            fileEntries[newFolderName].id = newFolderId;
-                            fileEntries[newFolderName].type = newFolderType;
-                            fileEntries[newFolderName].cases = 0;
+                        const dataId = parseInt(data);
+                        let fileEntries = dataEntries[dataId].fileEntries;
+                        if(dataId === parentId){
+                            fileEntries[newFolderId] = {};
+                            fileEntries[newFolderId].name = newFolderName;
+                            fileEntries[newFolderId].type = newFolderType;
+                            fileEntries[newFolderId].cases = 0;
+                            fileEntries[newFolderId].controls = 0;
                             if(newFolderType === 'file'){
                                 const access_token = JSON.parse(localStorage.parms).access_token;
                                 let txt = await getFile(newFolderId, access_token);
-                                let dt=txt2dt(txt);
-                                if(dt.tab && dt.tab.BCAC_ID) fileEntries[newFolderName].cases = dt.tab.BCAC_ID.length;
+                                let dt = txt2dt(txt);
+
+                                if(dt.tab && dt.tab.status){
+                                    const numberOfCases = dt.tab.status.filter(value => value === "1").length;
+                                    const numberOfControls = dt.tab.status.filter(value => value === "0").length;
+                                    fileEntries[newFolderId].cases = numberOfCases;
+                                    fileEntries[newFolderId].controls = numberOfControls;
+                                }
                             }
                         }
                     }
@@ -199,6 +213,13 @@ export const updateLocalStorage = async (parentId, newFolderId, newFolderName, n
         }
     }
     localStorage.data_summary = JSON.stringify(data_summary);
+}
+
+export const removeActiveClass = (className) => {
+    let fileIconElement = document.getElementsByClassName(className);
+    Array.from(fileIconElement).forEach(elm => {
+        elm.classList.remove('navbar-active');
+    });
 }
 
 const sessionExpired = () => {

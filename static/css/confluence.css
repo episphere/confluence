@@ -92,15 +92,14 @@ body {
 .container {
     min-height: inherit;
     height: 100%;
-    /* max-width: 100% !important; */
+    max-width: 100% !important;
     margin: 0 auto;
     padding: 0;
 }
 
 .dropdown-options {
     width: 100%;
-    height: calc(1.5em + .75rem + 2px);
-    padding: .375rem .75rem;
+    padding: .275rem;
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
@@ -112,26 +111,54 @@ body {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.main-container {
+.home-page-stats {
+    margin: auto;
     background-color: #fff;
+}
+
+.main-container {
+    background-image: radial-gradient(at center center, rgb(83, 202, 235) 0%, rgb(111, 199, 224) 48%, rgb(131, 186, 244) 100%);
     height: inherit;
+    padding: 1rem;
+    min-height: inherit;
+    position: relative;
+    width: 100%;
 }
 
 .content-wrapper {
     padding-top: 15px;
-    height: inherit;
+    /* height: inherit; */
 }
 
 #confluenceDiv {
     height: inherit;
     width: inherit;
+    text-align: center;
+    min-height: inherit;
 }
 
 .data-summary-label {
     color: #000;
     font-weight: bold;
-    font-size: 30px;
+    font-size: 2rem;
     margin: 0;
+    white-space: nowrap;
+}
+
+.interactive-summary-label {
+    color: #000;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+input[type='checkbox'] {
+    width: 25px;
+    height: 25px;
+    background:white;
+    border-radius:5px;
+    border:1px solid #555;
 }
 
 .data-summary-count {
@@ -140,12 +167,27 @@ body {
     font-size: 40px;
 }
 
-.main-summary-col {
+.interactive-stats {
+    display: flex;
+    flex-wrap: wrap;
     height: inherit;
+    background-color: #fff;
+    width: inherit;
+    margin:;
+}
+
+.first-list-item {
+    margin-top: 1rem;
 }
 
 .main-summary-row {
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     height: inherit;
+    flex-wrap: wrap;
+    display: flex;
+    width: inherit;
 }
 
 .summary-inner-row {
@@ -153,7 +195,11 @@ body {
 }
 
 .summary-inner-col {
-    padding-right: 10px;
+    white-space: nowrap;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width: 100%;
 }
 
 .back-to-top {
@@ -228,10 +274,14 @@ body {
 
 .ul-list-style {
     list-style-type:none;
+    margin-top: 1rem;
 }
 
 .data-submission {
     text-align: left;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
 }
 
 .fa-plus:hover, .fa-minus:hover, .fa-file-download:hover, .fa-folder-plus:hover, .fa-file-upload:hover, .fa-arrow-up:hover{
@@ -297,6 +347,7 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-in-out;
+    margin: 0;
 }
 
 .menu-item {

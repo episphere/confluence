@@ -1,5 +1,5 @@
 import { config } from "../config.js";
-import { studyDropDownTemplate, dataDropDownTemplate, fileDropDownTemplate } from "../components/elements.js";
+import { studyDropDownTemplate, dataDropDownTemplate } from "../components/elements.js";
 import { exploreData } from "../visulization.js";
 
 export const template = () => {
@@ -25,12 +25,6 @@ export const template = () => {
                 <span><i class="fas fa-4x fa-database"></i></span>
                 <span class="data-summary-count" id="dataExplorationDataCount">0</span></br>
                 <div id="dataExplorationDataDropDown"></div>
-            </div>
-            <div class="col form-group summary-inner-col">
-                <span class="data-summary-label">Files</span></br>
-                <span><i class="fas fa-4x fa-file"></i></span>
-                <span class="data-summary-count" id="dataExplorationFileCount">0</span></br>
-                <div id="dataExplorationFileDropDown"></div>
             </div>
             <div class="col form-group summary-inner-col">
                 <span class="data-summary-label">Cases</span></br>
@@ -66,8 +60,6 @@ export const dataExploration = async () => {
             dataCountElement.textContent = parseInt(dataCountElement.textContent) + Object.keys(dataEntries).length;
             for(const file in dataEntries){
                 const fileEntries = dataEntries[file].fileEntries;
-                let fileCountElement = document.getElementById('dataExplorationFileCount')
-                fileCountElement.textContent = parseInt(fileCountElement.textContent) + Object.keys(fileEntries).length;
                 for(const fileData in fileEntries){
                     const cases = fileEntries[fileData].cases;
                     let caseCountElement = document.getElementById('dataExplorationCaseCount');
@@ -94,7 +86,6 @@ export const dataExplorationCountSpecificStudy = (folderId) => {
                 document.getElementById('dataExplorationTable').innerHTML = '';
                 document.getElementById('pagination-container').innerHTML = '';
                 document.getElementById('pageSizeSelector').hidden = true;
-                document.getElementById('dataExplorationFileDropDown').innerHTML = '';
                 countSpecificData(parseInt(studyOptions.value), studyEntries);
             });
         }
@@ -117,7 +108,6 @@ const countSpecificData = async (folderId, studyEntries) => {
                     caseCounter += caseData;
                 };
             };
-            document.getElementById('dataExplorationFileCount').textContent = fileCounter;
             document.getElementById('dataExplorationCaseCount').textContent = caseCounter;
             let dataDropDown = document.getElementById('dataExplorationDataDropDown');
             dataDropDown.innerHTML = dataDropDownTemplate(dataEntries, 'dataExplorationDataOptions');
@@ -128,13 +118,13 @@ const countSpecificData = async (folderId, studyEntries) => {
                 document.getElementById('dataExplorationTable').innerHTML = '';
                 document.getElementById('pagination-container').innerHTML = '';
                 document.getElementById('pageSizeSelector').hidden = true;
-                countSpecificFiles(parseInt(dataOptions.value), dataEntries);
+                countSpecificCases(parseInt(dataOptions.value), dataEntries);
             });
         };
     };
 };
 
-const countSpecificFiles = async (folderId, dataEntries) => {
+const countSpecificCases = async (folderId, dataEntries) => {
     for(let data in dataEntries){
         const dataId = dataEntries[data].id;
         if(dataId === folderId){
@@ -142,26 +132,11 @@ const countSpecificFiles = async (folderId, dataEntries) => {
             let caseCounter = 0;
             for(let file in fileEntries){
                 const caseData = fileEntries[file].cases;
+                const fileId = fileEntries[file].id;
                 caseCounter += caseData;
+                exploreData(fileId, file);
             };
-            document.getElementById('dataExplorationFileCount').textContent = Object.keys(fileEntries).length;
             document.getElementById('dataExplorationCaseCount').textContent = caseCounter;
-            let fileDropDown = document.getElementById('dataExplorationFileDropDown');
-            fileDropDown.innerHTML = fileDropDownTemplate(fileEntries, 'dataExplorationFileOptions');
-            let fileOptions = document.getElementById('dataExplorationFileOptions');
-            fileOptions.addEventListener('change', () => {
-                if(fileOptions.value === "") return;
-                countSpecificCases(parseInt(fileOptions.value), fileEntries);
-            });
-        };
-    };
-};
-
-const countSpecificCases = async (fileId, fileEntries) => {
-    for(const file in fileEntries){
-        if(fileEntries[file].id === fileId){
-            document.getElementById('dataExplorationCaseCount').textContent = fileEntries[file].cases;
-            exploreData(fileId, file);
         };
     };
 };

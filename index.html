@@ -5,13 +5,11 @@
     <meta charset="utf-8">
     <link rel="shortcut icon" href="static/images/favicon.ico">
     <link rel="stylesheet" href="static/css/confluence.css">
-    <link rel="stylesheet" href="static/css/pagination.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://pagination.js.org/dist/2.1.4/pagination.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="static/js/d3.min.js"></script>
     <script src="static/js/crossfilter.min.js"></script>
@@ -64,20 +62,8 @@
         
         <div id="maincontainer">
             <div class="container">
-                <div class="col main-container">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-wrapper">
-                        </br>
-                        <h3 hidden=true id="summaryHead">Summary Counts</h3>
-                        <div id="confluenceStatistics" hidden=true>
-                            Studies: <span id="partnerCount" class="statistics">...</span>;
-                            Cases: <span id="caseCount" class="statistics">0</span>
-                        </div>
-                        <div hidden=true id="summaryDiv">processing ...</div>
-                        <h3 hidden=true id="individualReportsHeader">Individual reports <span id="hideIndividualReports" class="individual-report-collapse">[-]</span></h3>
-                
-                        <div id="confluenceDiv" style="text-align: center"></div>
-                    </div>
-                    
+                <div class="main-container">
+                    <div id="confluenceDiv"></div>
                 </div>
             </div>
         </div>
