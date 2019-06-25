@@ -51,10 +51,12 @@ const confluence=function(){
             dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
-            let consortiaOption = document.getElementById('consortiaOption');
-            consortiaOption.addEventListener('change', () => {
-                if(consortiaOption.value === "") return;
-                countSpecificStudy(parseInt(consortiaOption.value));
+            let consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+            Array.from(consortiaCheckBox).forEach(element => {
+                element.addEventListener('change', () => {
+                    if(element.value === "") return;
+                    countSpecificStudy(parseInt(element.value));
+                });
             });
         });
         dataSummaryElement.click();

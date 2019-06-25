@@ -12,9 +12,9 @@ export const template = () => {
                     <label for="consortiaOption" class="interactive-summary-label">Consortia</label></br>
                     <span><i class="fas fa-3x fa-layer-group"></i></span>
                     <span class="data-summary-count" id="consortiaCount">1</span></br>
-                    <select multiple class="dropdown-options" id="consortiaOption" hidden=true>
-                        <option value="${config.BCACFolderId}">BCAC</option>
-                    </select>
+                    <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
+                        <li><input type="checkbox" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/>BCAC</li>
+                    </ul>
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Studies</span></br>
@@ -117,8 +117,10 @@ export async function getSummary() {
                             setTimeout(()=>{
                                 const consortiaOptions = document.getElementById('consortiaOption');
                                 consortiaOptions.hidden = false;
-                                consortiaOptions.options[0].selected = true;
-                                consortiaOptions.dispatchEvent(new Event('change'));
+
+                                const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+                                consortiaCheckBox[0].checked = true;
+                                consortiaCheckBox[0].dispatchEvent(new Event('change'));
                             }, 1500);
                         }
                     });
