@@ -1,11 +1,10 @@
-export const studyDropDownTemplate = (entries, studyOptionsId) => {
+export const studyDropDownTemplate = (entries) => {
     let template = '';
-    template += `<select multiple id="${studyOptionsId}" class="dropdown-options">
-        `;
+    
     for(let studyId in entries){
-        template += `<option value="${studyId}">${entries[studyId].name}</option>`
+        template += `<li><input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>${entries[studyId].name}</li>`
     }
-    template += '</select>';
+    
     return template;
 };
 
@@ -19,9 +18,12 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
     return template;
 };
 
-export const parametersDropDownTemplate = (fileName, parameters) => {
+export const parametersDropDownTemplate = (data) => {
+    let studies = Object.keys(data);
+    let parameters = Object.keys(data[studies[0]].allData);
+    parameters.sort();
     let template = '';
-    template += `${fileName}</br></br>
+    template += `
             <select id="parametersDropDown" class="dropdown-options">
             <option disabled selected> -- select a parameter -- </option>
             `;

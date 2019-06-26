@@ -53,7 +53,7 @@ const confluence=function(){
             getSummary();
             let consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
             Array.from(consortiaCheckBox).forEach(element => {
-                element.addEventListener('change', () => {
+                element.addEventListener('click', () => {
                     if(element.value === "") return;
                     countSpecificStudy(parseInt(element.value));
                 });

@@ -429,13 +429,12 @@ const generateBarChart = (fileData, parm) => {
 }
 
 export const exploreData = async (fileId, fileName) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
     let dataExplorationParameter = document.getElementById('dataExplorationParameter');
     dataExplorationParameter.innerHTML = `${fileName} <a title="Download File" id="dataExplorationFileDownload" data-file-id="${fileId}" data-file-name="${fileName}" href="#"><i class="fas fa-file-download"></i></a>`;
     document.getElementById('dataExplorationFileDownload').addEventListener('click', () => {
         downloadFileTxt(fileId, fileName);
     });
-    let fileData = await getFile(fileId, access_token);
+    let fileData = await getFile(fileId);
 
     let dt=fileData.split(/\n/g).map(tx=>tx.split(/\t/g));
     if((fileData.split(/\n+/).slice(-1).length==1)&&(fileData.slice(-1)[0].length)){
