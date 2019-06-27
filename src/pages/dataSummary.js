@@ -1,7 +1,7 @@
 import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate, parametersDropDownTemplate } from "../components/elements.js";
-import { txt2dt, generateSummaryViz } from "../visulization.js";
+import { txt2dt } from "../visulization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from "../event.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
@@ -90,60 +90,59 @@ export async function getSummary() {
         dataObject[consortiaFolderId].studyEntries[studyId].type = study.type;
         dataObject[consortiaFolderId].studyEntries[studyId].dataEntries = {};
         
-        await getFolderItems(studyId).then(data => {
-            let dataEntries = data.entries;
-            dataEntries = dataEntries.filter(dt => dt.name.toLowerCase().trim() !== 'samples');
-            
-            let dataCountElement = document.getElementById('dataCount')
-            dataCountElement.textContent = parseInt(dataCountElement.textContent) + dataEntries.length;
+        let data = await getFolderItems(studyId);
+        let dataEntries = data.entries;
+        dataEntries = dataEntries.filter(dt => dt.name.toLowerCase().trim() !== 'samples');
+        
+        let dataCountElement = document.getElementById('dataCount')
+        dataCountElement.textContent = parseInt(dataCountElement.textContent) + dataEntries.length;
 
-            dataEntries.forEach(async (dt, dataIndex) => {
-                const dataName = dt.name;
-                const dataId = parseInt(dt.id);
-                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId] = {};
-                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].name = dataName;
-                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].type = dt.type;
-                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
+        for(let dt of dataEntries){
+            const dataName = dt.name;
+            const dataId = parseInt(dt.id);
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId] = {};
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].name = dataName;
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].type = dt.type;
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
 
-                const files = await getFolderItems(dataId);
-                let fileEntries = files.entries;
-                fileEntries = fileEntries.filter(file => file.type === 'file' && file.name.slice(file.name.lastIndexOf('.')+1, file.name.length) === 'txt');
-                for(let dataFile of fileEntries){
-                    const fileName = dataFile.name;
-                    const fileId = parseInt(dataFile.id);
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = fileName;
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = dataFile.type;
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = 0;
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = 0;
-                    let txt = await getFile(fileId);
-                    let dt = txt2dt(txt);
-                    
-                    if(dt.tab && dt.tab.status){
-                        const numberOfCases = dt.tab.status.filter(value => value === "1").length;
-                        const numberOfControls = dt.tab.status.filter(value => value === "0").length;
-                        dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = numberOfCases;
-                        dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = numberOfControls
-                        let caseCountElement = document.getElementById('caseCount');
-                        caseCountElement.textContent = parseInt(caseCountElement.textContent) + numberOfCases;
-                        let controlCountElement = document.getElementById('controlCount');
-                        controlCountElement.textContent = parseInt(controlCountElement.textContent) + numberOfControls;
-                    };
-                    
-                    
-                    if(localStorage.data_summary) delete localStorage.data_summary;
-                    localStorage.data_summary = JSON.stringify(dataObject);
-                    if(studyIndex === studyEntries.length - 1 && dataIndex === dataEntries.length -1){
-                        const consortiaOptions = document.getElementById('consortiaOption');
-                        consortiaOptions.hidden = false;
-
-                        const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
-                        consortiaCheckBox[0].checked = true;
-                        consortiaCheckBox[0].dispatchEvent(new Event('click'));
-                    };
+            const files = await getFolderItems(dataId);
+            let fileEntries = files.entries;
+            fileEntries = fileEntries.filter(file => file.type === 'file' && file.name.slice(file.name.lastIndexOf('.')+1, file.name.length) === 'txt');
+            for(let dataFile of fileEntries){
+                const fileName = dataFile.name;
+                const fileId = parseInt(dataFile.id);
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = fileName;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = dataFile.type;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = 0;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = 0;
+                let txt = await getFile(fileId);
+                let dt = txt2dt(txt);
+                
+                if(dt.tab && dt.tab.status){
+                    const numberOfCases = dt.tab.status.filter(value => value === "1").length;
+                    const numberOfControls = dt.tab.status.filter(value => value === "0").length;
+                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = numberOfCases;
+                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = numberOfControls
+                    let caseCountElement = document.getElementById('caseCount');
+                    caseCountElement.textContent = parseInt(caseCountElement.textContent) + numberOfCases;
+                    let controlCountElement = document.getElementById('controlCount');
+                    controlCountElement.textContent = parseInt(controlCountElement.textContent) + numberOfControls;
                 };
-            });
-        });
+                
+                
+                if(localStorage.data_summary) delete localStorage.data_summary;
+                localStorage.data_summary = JSON.stringify(dataObject);
+                if(studyIndex === studyEntries.length - 1){
+                    const consortiaOptions = document.getElementById('consortiaOption');
+                    consortiaOptions.hidden = false;
+
+                    const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+                    consortiaCheckBox[0].checked = true;
+                    consortiaCheckBox[0].dispatchEvent(new Event('click'));
+                };
+            };
+        };
     });
 }
 
@@ -223,99 +222,6 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     
     // Data type search/filter Event
     addEventSearchDataType();
-};
-
-export const getData = (studyEntries, studyIds, values) => {
-    let allIds = {};
-    studyIds.forEach(id => {
-        const intId = parseInt(id);
-        allIds[intId] = {};
-        allIds[intId].fileData = {};
-        const dataEntries = studyEntries[intId].dataEntries;
-        let selectedDataIds = [];
-        values.forEach(value => {
-            const selectedDataEntries = Object.keys(dataEntries).filter(key => dataEntries[key].name === value);
-            if(selectedDataEntries.length > 0) selectedDataIds.push(parseInt(selectedDataEntries[0]));
-        });
-
-        selectedDataIds.forEach(dataId => {
-            let fileEntries = dataEntries[dataId].fileEntries;
-            allIds[intId].fileData = {...allIds[intId].fileData, ...fileEntries};
-        });
-    });
-    getFileContent(allIds, studyEntries);
-}
-
-const getFileContent = async (allIds, studyEntries) => {
-    let finalData = {};
-    for(const studyId in allIds){
-        finalData[studyId] = {};
-        finalData[studyId].allData = {};
-        let fileData = allIds[studyId].fileData;
-        let fileIds = Object.keys(fileData);
-        for(const id of fileIds){
-            const intId = parseInt(id);
-            let rawData = await getFile(intId);
-            let jsonData = txt2dt(rawData);
-            finalData[studyId].allData = {...finalData[studyId].allData, ...jsonData.uni};
-            let dataSummaryParameter = document.getElementById('dataSummaryParameter');
-            dataSummaryParameter.innerHTML = parametersDropDownTemplate(finalData);
-            const parametersDropDown = document.getElementById('parametersDropDown');
-            parametersDropDown.addEventListener('change', () => {
-                generatCharts(finalData, studyEntries, parametersDropDown.value);
-            });
-        };
-    };
-    generatCharts(finalData, studyEntries);
-    console.log(finalData);
-};
-
-const generatCharts = (data, studyEntries, parameter) => {
-    document.getElementById('dataSummaryViz').innerHTML = '';
-    let parm = parameter ? parameter : 'ageInt';
-    let allTraces = [];
-    for(const studyId in data){
-        let trace = {
-            // mode:'lines+markers',
-            type: 'bar',
-            x:Object.keys(data[studyId].allData[parm]),
-            y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
-            name: studyEntries[studyId].name
-        }
-        if(trace.x.length>1){
-            if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
-                trace.x.pop()
-                trace.y.pop()
-            }
-        }
-        allTraces.push(trace);
-    };
-
-    var layout = {
-        xaxis: {title:`${parm}`},
-        yaxis: {title:`Count`},
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        barmode: 'group'
-    };
-    Plotly.newPlot('dataSummaryViz', allTraces, layout, {responsive: true, displayModeBar: false});
-    document.getElementById('loadingAnimation').hidden = true;
-};
-
-const countSpecificCases = async (folderId, dataEntries) => {
-    for(let data in dataEntries){
-        const dataId = dataEntries[data].id;
-        if(dataId === folderId){
-            const fileEntries = dataEntries[data].fileEntries;
-            for(let file in fileEntries){
-                const fileId = fileEntries[file].id;
-                
-                document.getElementById('dataSummaryParameter').innerHTML = '';
-                document.getElementById('dataSummaryViz').innerHTML = '';
-                generateSummaryViz(fileId, file);
-            };
-        };
-    };
 };
 
 const getAgeDataForAllStudies = async (studyEntries) => {

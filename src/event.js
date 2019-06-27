@@ -1,4 +1,5 @@
-import { countSpecificData, getData, clearGraphAndParameters } from './pages/dataSummary.js';
+import { countSpecificData, clearGraphAndParameters } from './pages/dataSummary.js';
+import { getData } from './visulization.js'
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
