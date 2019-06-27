@@ -264,9 +264,10 @@ const getFileContent = async (allIds, studyEntries) => {
             parametersDropDown.addEventListener('change', () => {
                 generatCharts(finalData, studyEntries, parametersDropDown.value);
             });
-            generatCharts(finalData, studyEntries);
         };
     };
+    generatCharts(finalData, studyEntries);
+    console.log(finalData);
 };
 
 const generatCharts = (data, studyEntries, parameter) => {
