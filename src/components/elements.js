@@ -2,7 +2,10 @@ export const studyDropDownTemplate = (entries) => {
     let template = '';
     
     for(let studyId in entries){
-        template += `<li><input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>${entries[studyId].name}</li>`
+        template += `<li>
+                    <input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>
+                    <label>${entries[studyId].name}</label>
+                </li>`
     }
     
     return template;

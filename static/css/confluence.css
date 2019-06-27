@@ -115,6 +115,10 @@ body {
     width: 100%;
 }
 
+#loadingAnimation {
+    margin-left: 45%;
+}
+
 label {
     margin: 0 !important;
 }
