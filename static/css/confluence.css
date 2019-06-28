@@ -19,7 +19,7 @@ p,li,div {
 
 
 button {
-    color:blue
+    background-color: white;
 }
 
 .statistics {
@@ -106,7 +106,7 @@ body {
     background-color: #fff;
 }
 
-.main-container {
+.main-container { 
     background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(201, 227, 235) 48%, rgb(131, 186, 244) 100%);
     height: inherit;
     padding: 1rem;
@@ -116,7 +116,41 @@ body {
 }
 
 #loadingAnimation {
-    margin-left: 45%;
+    height: 40px;
+    display: inline-block;
+}
+
+.chart-selection {
+    margin: 1rem 0;
+    width: inherit;
+    display: inline-block;
+}
+
+.chart-type {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.toggle-chart-link:hover {
+    text-decoration: none;
+}
+
+.chart-active:hover {
+    text-decoration: none;
+    color: #6ca9eb;
+}
+
+.chart-active {
+    background-color: #0e2637;
+    padding: 0.35rem;
+    color: #fff;
+}
+
+.toggle-chart-link{
+    padding: 0.35rem;
+    border: 0.5px solid #0e2637;
+    color: #0e2637;
+    background-color: #fff;
 }
 
 label {
@@ -200,12 +234,11 @@ label {
 }
 
 .main-summary-row {
-    display: flex;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     height: inherit;
-    flex-wrap: wrap;
     display: flex;
+    min-height: 30%;
     width: inherit;
 }
 

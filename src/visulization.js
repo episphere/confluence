@@ -1,4 +1,4 @@
-import { getFile, getFileInfo, downloadFileTxt } from './shared.js';
+import { getFile, downloadFileTxt, convertTextToJson } from './shared.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
 
 const unique=function(arr){
@@ -35,7 +35,7 @@ export const txt2dt=function(txt){
     }
 };
 
-export const getData = (studyEntries, studyIds, values) => {
+export const getData = (studyEntries, studyIds, values, status) => {
     let allIds = {};
     studyIds.forEach(id => {
         const intId = parseInt(id);
@@ -53,10 +53,10 @@ export const getData = (studyEntries, studyIds, values) => {
             allIds[intId].fileData = {...allIds[intId].fileData, ...fileEntries};
         });
     });
-    getFileContent(allIds, studyEntries);
+    getFileContent(allIds, studyEntries, status);
 }
 
-const getFileContent = async (allIds, studyEntries) => {
+const getFileContent = async (allIds, studyEntries, status) => {
     let finalData = {};
     for(const studyId in allIds){
         finalData[studyId] = {};
@@ -66,8 +66,8 @@ const getFileContent = async (allIds, studyEntries) => {
         for(const id of fileIds){
             const intId = parseInt(id);
             let rawData = await getFile(intId);
-            let jsonData = txt2dt(rawData);
-            finalData[studyId].allData = {...finalData[studyId].allData, ...jsonData.uni};
+            let jsonData = convertTextToJson(rawData, status);
+            finalData[studyId].allData = {...finalData[studyId].allData, ...jsonData};
             let dataSummaryParameter = document.getElementById('dataSummaryParameter');
             dataSummaryParameter.innerHTML = parametersDropDownTemplate(finalData);
             const parametersDropDown = document.getElementById('parametersDropDown');
@@ -80,12 +80,13 @@ const getFileContent = async (allIds, studyEntries) => {
 };
 
 const generatCharts = (data, studyEntries, parameter) => {
-    document.getElementById('dataSummaryViz').innerHTML = '';
+    document.getElementById('dataSummaryVizBarChart').innerHTML = '';
+    document.getElementById('dataSummaryVizLineChart').innerHTML = '';
     let parm = parameter ? parameter : 'ageInt';
-    let allTraces = [];
+    let allTraces1 = [];
+    let allTraces2 = [];
     for(const studyId in data){
         let trace = {
-            // mode:'lines+markers',
             type: 'bar',
             x:Object.keys(data[studyId].allData[parm]),
             y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
@@ -97,18 +98,33 @@ const generatCharts = (data, studyEntries, parameter) => {
                 trace.y.pop()
             }
         }
-        allTraces.push(trace);
+        allTraces1.push(trace);
+
+        let trace2 = {
+            mode:'lines+markers',
+            x:Object.keys(data[studyId].allData[parm]),
+            y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
+            name: studyEntries[studyId].name
+        }
+        if(trace2.x.length>1){
+            if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
+                trace.x.pop()
+                trace.y.pop()
+            }
+        }
+        allTraces2.push(trace2);
     };
 
     var layout = {
         xaxis: {title:`${parm}`},
         yaxis: {title:`Count`},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        barmode: 'group'
+        plot_bgcolor: 'rgba(0,0,0,0)'
     };
-    Plotly.newPlot('dataSummaryViz', allTraces, layout, {responsive: true, displayModeBar: false});
+    Plotly.newPlot('dataSummaryVizBarChart', allTraces1, layout, {responsive: true, displayModeBar: false});
+    Plotly.newPlot('dataSummaryVizLineChart', allTraces2, layout, {responsive: true, displayModeBar: false});
     document.getElementById('loadingAnimation').hidden = true;
+    document.getElementById('toggleCharts').hidden = false;
 };
 
 export const exploreData = async (fileId, fileName) => {

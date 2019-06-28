@@ -1,8 +1,8 @@
 import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
-import { studyDropDownTemplate, parametersDropDownTemplate } from "../components/elements.js";
+import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from "../event.js";
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventToggleCharts, addEventCasesControls } from "../event.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
 export const template = () => {
@@ -39,12 +39,12 @@ export const template = () => {
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Cases</span></br>
-                    <input type="checkbox" disabled class="cases-controls-chkbox" checked id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
+                    <input type="checkbox" class="cases-controls-chkbox" id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="caseCount">0</span>
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Controls</span></br>
-                    <input type="checkbox" disabled class="cases-controls-chkbox" checked id="controlsCheckBox"> <i for="controlsCheckBox" class="fas fa-3x fa-user"></i>
+                    <input type="checkbox" class="cases-controls-chkbox" id="controlsCheckBox"> <i for="controlsCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="controlCount">0</span>
                 </div>
             </div>
@@ -62,14 +62,20 @@ export const template = () => {
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
+            <div class="chart-selection" id="toggleCharts" hidden=true>
+                <div class="chart-type"><a class="chart-active" href="#" id="barChartBtn"><i class="far fa-chart-bar"></i> Bar Chart</a></div>
+                <div class="chart-type"><a class="toggle-chart-link" href="#" id="lineChartBtn"><i class="fas fa-chart-line"></i> Line Chart</a></div>
+            </div>
             
             <div class="main-summary-row" id="dataSummaryParameter"></div>
-            <div class="main-summary-row" id="dataSummaryViz"></div>
+            <div class="main-summary-row" id="dataSummaryVizBarChart"></div>
+            <div class="main-summary-row" id="dataSummaryVizLineChart" style="display:none"></div>
+            <div id="storeTraces"></div>
         </div>
     `;  
 }
 
-export async function getSummary() {
+export const getSummary = async () => {
     let consortia = await getFolderItems(config.BCACFolderId);
     let dataObject = {}
     const consortiaFolderName = 'BCAC';
@@ -204,7 +210,7 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
 
     // Add event listener to data type check box list
     addEventDataTypeCheckBox(studyEntries);
-
+    addEventCasesControls(studyEntries);
     addEventSelectAllDataType();
     
     // Select first data type by default and trigger event
@@ -222,6 +228,8 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     
     // Data type search/filter Event
     addEventSearchDataType();
+
+    addEventToggleCharts();
 };
 
 const getAgeDataForAllStudies = async (studyEntries) => {
@@ -253,6 +261,8 @@ const getAgeDataForAllStudies = async (studyEntries) => {
 };
 
 export const clearGraphAndParameters = () => {
-    document.getElementById('dataSummaryViz').innerHTML = '';
+    document.getElementById('dataSummaryVizBarChart').innerHTML = '';
+    document.getElementById('dataSummaryVizLineChart').innerHTML = '';
     document.getElementById('dataSummaryParameter').innerHTML = '';
+    document.getElementById('toggleCharts').hidden = true;
 }

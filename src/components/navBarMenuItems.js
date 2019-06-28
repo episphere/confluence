@@ -2,7 +2,7 @@ const template = () => {
     return `
         <div class="grid-border"></div>
         <div class="nav-item grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Platform Summary" id="dataSummary"><i class="fas fa-chart-pie"></i> Data Exploration</a>
+            <a class="nav-link nav-menu-links" href="#" title="Data Platform Summary" id="dataSummary"><i class="fas fa-chart-bar"></i> Data Exploration</a>
         </div>
         <div class="grid-border"></div>
         <div class="nav-item grid-elements">

@@ -76,19 +76,25 @@ export const addEventSelectAllStudies = () => {
 export const addEventDataTypeCheckBox = (studyEntries) => {
     let values = [];
     const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
-
+    const casesCheckBox = document.getElementById('casesCheckBox');
+    const controlsCheckBox = document.getElementById('controlsCheckBox');
+    let status = null;
     Array.from(dataTypeCheckBox).forEach(element => {
         element.addEventListener('click', () => {
             const value = element.value;
             const studyIds = element.dataset.studyId.split(',');
+
+            if(casesCheckBox.checked && controlsCheckBox.checked) status = null;
+            if(!casesCheckBox.checked && controlsCheckBox.checked) status = "0";
+            if(casesCheckBox.checked && !controlsCheckBox.checked) status = "1";
             if(element.checked){
                 values.push(value);
-                getData(studyEntries, studyIds, values);
+                getData(studyEntries, studyIds, values, status);
             }
             else{
                 values.splice(values.indexOf(value), 1);
                 if(checkBoxchecker(dataTypeCheckBox) === true) {
-                    getData(studyEntries, studyIds, values);
+                    getData(studyEntries, studyIds, values, status);
                 }else{
                     clearGraphAndParameters();
                 }
@@ -140,6 +146,77 @@ export const addEventSelectAllDataType = () => {
         }
     });
 };
+
+export const addEventToggleCharts = () => {
+    const barChartBtn = document.getElementById('barChartBtn');
+    const lineChartBtn = document.getElementById('lineChartBtn');
+
+    barChartBtn.addEventListener('click', () => {
+        document.getElementById('dataSummaryVizLineChart').style.display = 'none';
+        document.getElementById('dataSummaryVizBarChart').style.display = '';
+        lineChartBtn.classList.add('toggle-chart-link');
+        lineChartBtn.classList.remove('chart-active');
+        barChartBtn.classList.add('chart-active');
+        barChartBtn.classList.remove('toggle-chart-link');
+    });
+    
+    lineChartBtn.addEventListener('click', () => {
+        document.getElementById('dataSummaryVizBarChart').style.display = 'none';
+        document.getElementById('dataSummaryVizLineChart').style.display = '';
+        lineChartBtn.classList.remove('toggle-chart-link');
+        lineChartBtn.classList.add('chart-active');
+        barChartBtn.classList.remove('chart-active');
+        barChartBtn.classList.add('toggle-chart-link');
+    });
+};
+
+export const addEventCasesControls = (studyEntries) => {
+    let status = null;
+    let values = [];
+    let studiesId = [];
+    
+    const casesCheckBox = document.getElementById('casesCheckBox');
+    const controlsCheckBox = document.getElementById('controlsCheckBox');
+    casesCheckBox.addEventListener('click', () => {
+        const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+        Array.from(dataTypeCheckBox).forEach(element => {
+            if(element.checked){
+                values.push(element.value);
+                studiesId = element.dataset.studyId.split(',');
+            }
+        });
+        if(casesCheckBox.checked){
+            if(controlsCheckBox.checked) status = null;
+            if(!controlsCheckBox.checked) status = "1";
+            getData(studyEntries, studiesId, values, status);
+        }
+        else{
+            if(controlsCheckBox.checked) status = "0";
+            if(!controlsCheckBox.checked) status = null;
+            getData(studyEntries, studiesId, values, status);
+        }
+    });
+
+    controlsCheckBox.addEventListener('click', () => {
+        const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+        Array.from(dataTypeCheckBox).forEach(element => {
+            if(element.checked){
+                values.push(element.value);
+                studiesId = element.dataset.studyId.split(',');
+            }
+        });
+        if(controlsCheckBox.checked){
+            if(casesCheckBox.checked) status = null;
+            if(!casesCheckBox.checked) status = "0";
+            getData(studyEntries, studiesId, values, status);
+        }
+        else{
+            if(casesCheckBox.checked) status = "1";
+            if(!casesCheckBox.checked) status = null;
+            getData(studyEntries, studiesId, values, status);
+        }
+    });
+}
 
 const checkBoxchecker = (chkbox) => {
     let checkElements = false;
