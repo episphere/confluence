@@ -39,12 +39,12 @@ export const template = () => {
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Cases</span></br>
-                    <input type="checkbox" class="cases-controls-chkbox" id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
+                    <input type="checkbox" class="cases-controls-chkbox" checked id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="caseCount">0</span>
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Controls</span></br>
-                    <input type="checkbox" class="cases-controls-chkbox" id="controlsCheckBox"> <i for="controlsCheckBox" class="fas fa-3x fa-user"></i>
+                    <input type="checkbox" class="cases-controls-chkbox" checked id="controlsCheckBox"> <i for="controlsCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="controlCount">0</span>
                 </div>
             </div>
