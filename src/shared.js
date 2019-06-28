@@ -272,6 +272,6 @@ export const convertTextToJson = (rawData, status) => {
 
 const sessionExpired = () => {
     localStorage.clear();
-    alert('session expired, reloading')
+    alert('session expired, reloading');
     location.reload();
 }
