@@ -1,5 +1,6 @@
 import { config } from "./config.js";
 import { txt2dt } from "./visulization.js";
+import { coreVariables } from "./variables.js";
 
 export const getFolderItems = async function(id){
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -253,7 +254,8 @@ export const convertTextToJson = (rawData, status) => {
     filterData.forEach(id => {
         let dataSet = jsonData[id];
         for(const key in dataSet){
-            const value = dataSet[key];
+            let value = dataSet[key];
+            if(value !== "" && coreVariables.BCAC[key] && coreVariables.BCAC[key][value]) value = coreVariables.BCAC[key][value];
             
             if(finalData[key]){
                 if(finalData[key][value]){
