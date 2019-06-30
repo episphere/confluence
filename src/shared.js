@@ -232,8 +232,8 @@ export const convertTextToJson = (rawData, status) => {
     rows.splice(0, 1);
     var obj = rows.map(function (el) {
         var obj = {};
-        for (var i = 0, l = el.length; i < l; i++) {
-          obj[headings[i]] = el[i];
+        for (var i = 0; i < el.length; i++) {
+          obj[headings[i].trim()] = el[i];
         }
         return obj;
     });
