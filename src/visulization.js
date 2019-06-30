@@ -81,7 +81,7 @@ const getFileContent = async (allIds, studyEntries, status) => {
 
 const generatCharts = (data, studyEntries, parameter) => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
-    document.getElementById('dataSummaryVizLineChart').innerHTML = '';
+    // document.getElementById('dataSummaryVizLineChart').innerHTML = '';
     let parm = parameter ? parameter : 'ageInt';
     let allTraces1 = [];
     let allTraces2 = [];
@@ -122,9 +122,9 @@ const generatCharts = (data, studyEntries, parameter) => {
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot('dataSummaryVizBarChart', allTraces1, layout, {responsive: true, displayModeBar: false});
-    Plotly.newPlot('dataSummaryVizLineChart', allTraces2, layout, {responsive: true, displayModeBar: false});
+    // Plotly.newPlot('dataSummaryVizLineChart', allTraces2, layout, {responsive: true, displayModeBar: false});
     document.getElementById('loadingAnimation').hidden = true;
-    document.getElementById('toggleCharts').hidden = false;
+    // document.getElementById('toggleCharts').hidden = false;
 };
 
 export const exploreData = async (fileId, fileName) => {

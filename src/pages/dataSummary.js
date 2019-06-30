@@ -62,18 +62,18 @@ export const template = () => {
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
-            <div class="chart-selection" id="toggleCharts" hidden=true>
-                <div class="chart-type"><a class="chart-active" href="#" id="barChartBtn"><i class="far fa-chart-bar"></i> Bar Chart</a></div>
-                <div class="chart-type"><a class="toggle-chart-link" href="#" id="lineChartBtn"><i class="fas fa-chart-line"></i> Line Chart</a></div>
-            </div>
             
             <div class="main-summary-row" id="dataSummaryParameter"></div>
             <div class="main-summary-row" id="dataSummaryVizBarChart"></div>
-            <div class="main-summary-row" id="dataSummaryVizLineChart" style="display:none"></div>
             <div id="storeTraces"></div>
         </div>
     `;  
 }
+{/* <div class="main-summary-row" id="dataSummaryVizLineChart" style="display:none"></div> */}
+{/* <div class="chart-selection" id="toggleCharts" hidden=true>
+    <div class="chart-type"><a class="chart-active" href="#" id="barChartBtn"><i class="far fa-chart-bar"></i> Bar Chart</a></div>
+    <div class="chart-type"><a class="toggle-chart-link" href="#" id="lineChartBtn"><i class="fas fa-chart-line"></i> Line Chart</a></div>
+</div> */}
 
 export const getSummary = async () => {
     let consortia = await getFolderItems(config.BCACFolderId);
@@ -229,7 +229,7 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     // Data type search/filter Event
     addEventSearchDataType();
 
-    addEventToggleCharts();
+    // addEventToggleCharts();
 };
 
 const getAgeDataForAllStudies = async (studyEntries) => {
@@ -262,7 +262,7 @@ const getAgeDataForAllStudies = async (studyEntries) => {
 
 export const clearGraphAndParameters = () => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
-    document.getElementById('dataSummaryVizLineChart').innerHTML = '';
+    // document.getElementById('dataSummaryVizLineChart').innerHTML = '';
     document.getElementById('dataSummaryParameter').innerHTML = '';
-    document.getElementById('toggleCharts').hidden = true;
+    // document.getElementById('toggleCharts').hidden = true;
 }
