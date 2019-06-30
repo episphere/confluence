@@ -29,7 +29,7 @@ export const parametersDropDownTemplate = (data) => {
     let template = '';
     template += `
             <select id="parametersDropDown" class="dropdown-options">
-            <option disabled selected> -- select a parameter -- </option>
+                <option disabled selected> -- select a parameter -- </option>
             `;
     parameters.forEach(parameter => {
         template += `<option value="${parameter}">${parameter}</option>`
