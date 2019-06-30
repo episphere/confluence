@@ -1,10 +1,6 @@
 export function footerTemplate() {
     return `
-        <div class="back-to-top">
-            <span><a class="back-to-top" href="#maincontainer">Back to top</br><i class="fas fa-caret-up"></i></a></span>
-        </div>       
         <div class="row footer-content">
-            
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 content-wrapper">
                 <ul class="menu">
                     <li class="menu-item"><a class="footer-links" href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project">DCEG Confluence</a></li>|

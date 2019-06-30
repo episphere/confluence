@@ -23,8 +23,8 @@ export const template = () => {
         </div>
     </div>
     <div class="main-summary-row">
-        <div class="summary-inner-col" id="barChart"></div>
-        <div class="summary-inner-col" id="pieChart"></div>
+        <div class="summary-inner-col col-md-8" id="barChart"></div>
+        <div class="summary-inner-col col-md-4" id="pieChart"></div>
     </div>
     `;
 }

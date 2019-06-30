@@ -83,7 +83,8 @@ body {
 
 #maincontainer {
     background-color: #f5f5f5;
-    min-height: 69%;
+    min-height: calc(100vh - 303px);
+    padding-bottom: 1rem;
 }
 
 .container {
@@ -100,14 +101,16 @@ body {
     border-radius: .25rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     margin-left: 0.5rem;
+    margin-bottom: 0;
 }
 
 .home-page-stats {
     margin: auto;
     background-color: #fff;
+    padding-bottom: 0.5rem;
 }
 
-.main-container { 
+.main-container {
     background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(201, 227, 235) 48%, rgb(131, 186, 244) 100%);
     height: inherit;
     padding: 1rem;
@@ -218,6 +221,7 @@ label {
     height: inherit;
     background-color: #fff;
     width: inherit;
+    padding-bottom: 1rem;
 }
 
 .search-options {
@@ -334,7 +338,6 @@ label {
 .ul-data-exploration {
     max-height: 110px;
     overflow: auto;
-    margin-bottom: 1rem;
     padding: .5rem;
 }
 
@@ -369,13 +372,14 @@ label {
     color: #f2b139;
 }
 
-.input-file-upload {
+.custom__form-control {
     display: inline;
-    height: 1.5rem;
+    height: 1.8rem;
+    max-width: 40%;
     padding: 0 .5rem;
     font-size: 1rem;
     font-weight: 400;
-    line-height: 1;
+    line-height: 1.5;
     color: #495057;
     background-color: #fff;
     background-clip: padding-box;
@@ -383,10 +387,9 @@ label {
     border-radius: .25rem;
     transition: border-color .15s;
     margin: 0px;
-    width: 225px;
 }
 
-.input-create-folder {
+.file-upload {
     display: inline;
     height: 1.5rem;
     padding: 0 .5rem;
@@ -400,7 +403,24 @@ label {
     border-radius: .25rem;
     transition: border-color .15s;
     margin: 0px;
-    width: 145px;
+    max-width: 30%;
+}
+
+.create-folder {
+    display: inline;
+    height: 1.5rem;
+    padding: 0 .5rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s;
+    margin: 0px;
+    max-width: 30%;
 }
 
 .content {
@@ -461,8 +481,8 @@ span.icon {
     text-align:center;
     border-top: 1px solid #574F4F;
     width: 100%;
-    margin: -9px 0px 0px 0px !important;
     background-color: #fff;
+    margin: 0 !important;
 }
 
 .footer-links {

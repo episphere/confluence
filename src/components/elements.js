@@ -28,7 +28,7 @@ export const parametersDropDownTemplate = (data) => {
     parameters.sort();
     let template = '';
     template += `
-            <select id="parametersDropDown" class="dropdown-options">
+            <select id="parametersDropDown" class="dropdown-options custom__form-control">
                 <option disabled selected> -- select a parameter -- </option>
             `;
     parameters.forEach(parameter => {
