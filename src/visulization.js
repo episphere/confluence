@@ -1,5 +1,6 @@
 import { getFile, downloadFileTxt, convertTextToJson } from './shared.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
+let oldParameter = '';
 
 const unique=function(arr){
     let u={}
@@ -82,7 +83,8 @@ const getFileContent = async (allIds, studyEntries, status) => {
 const generatCharts = (data, studyEntries, parameter) => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
     // document.getElementById('dataSummaryVizLineChart').innerHTML = '';
-    let parm = parameter ? parameter : 'ageInt';
+    oldParameter = parameter ? parameter : oldParameter;
+    let parm = parameter ? parameter : oldParameter !== '' ? oldParameter : 'ageInt';
     let allTraces1 = [];
     let allTraces2 = [];
     for(const studyId in data){
