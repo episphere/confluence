@@ -2,7 +2,7 @@ import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventToggleCharts, addEventCasesControls } from "../event.js";
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventCasesControls } from "../event.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
 export const template = () => {
@@ -69,11 +69,6 @@ export const template = () => {
         </div>
     `;  
 }
-{/* <div class="main-summary-row" id="dataSummaryVizLineChart" style="display:none"></div> */}
-{/* <div class="chart-selection" id="toggleCharts" hidden=true>
-    <div class="chart-type"><a class="chart-active" href="#" id="barChartBtn"><i class="far fa-chart-bar"></i> Bar Chart</a></div>
-    <div class="chart-type"><a class="toggle-chart-link" href="#" id="lineChartBtn"><i class="fas fa-chart-line"></i> Line Chart</a></div>
-</div> */}
 
 export const getSummary = async () => {
     let consortia = await getFolderItems(config.BCACFolderId);
@@ -228,8 +223,6 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     
     // Data type search/filter Event
     addEventSearchDataType();
-
-    // addEventToggleCharts();
 };
 
 const getAgeDataForAllStudies = async (studyEntries) => {

@@ -147,29 +147,6 @@ export const addEventSelectAllDataType = () => {
     });
 };
 
-export const addEventToggleCharts = () => {
-    const barChartBtn = document.getElementById('barChartBtn');
-    const lineChartBtn = document.getElementById('lineChartBtn');
-
-    barChartBtn.addEventListener('click', () => {
-        document.getElementById('dataSummaryVizLineChart').style.display = 'none';
-        document.getElementById('dataSummaryVizBarChart').style.display = '';
-        lineChartBtn.classList.add('toggle-chart-link');
-        lineChartBtn.classList.remove('chart-active');
-        barChartBtn.classList.add('chart-active');
-        barChartBtn.classList.remove('toggle-chart-link');
-    });
-    
-    lineChartBtn.addEventListener('click', () => {
-        document.getElementById('dataSummaryVizBarChart').style.display = 'none';
-        document.getElementById('dataSummaryVizLineChart').style.display = '';
-        lineChartBtn.classList.remove('toggle-chart-link');
-        lineChartBtn.classList.add('chart-active');
-        barChartBtn.classList.remove('chart-active');
-        barChartBtn.classList.add('toggle-chart-link');
-    });
-};
-
 export const addEventCasesControls = (studyEntries) => {
     let status = null;
     let values = [];

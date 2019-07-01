@@ -87,7 +87,6 @@ const generatCharts = (data, studyEntries, parameter) => {
     let parm = parameter ? parameter : oldParameter !== '' ? oldParameter : 'ageInt';
     document.getElementById('parametersDropDown').value = parm;
     let allTraces1 = [];
-    // let allTraces2 = [];
     for(const studyId in data){
         let trace = {
             type: 'bar',
@@ -102,20 +101,6 @@ const generatCharts = (data, studyEntries, parameter) => {
             }
         }
         allTraces1.push(trace);
-
-        // let trace2 = {
-        //     mode:'lines+markers',
-        //     x:Object.keys(data[studyId].allData[parm]),
-        //     y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
-        //     name: studyEntries[studyId].name
-        // }
-        // if(trace2.x.length>1){
-        //     if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
-        //         trace.x.pop()
-        //         trace.y.pop()
-        //     }
-        // }
-        // allTraces2.push(trace2);
     };
 
     var layout = {
@@ -125,9 +110,7 @@ const generatCharts = (data, studyEntries, parameter) => {
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot('dataSummaryVizBarChart', allTraces1, layout, {responsive: true, displayModeBar: false});
-    // Plotly.newPlot('dataSummaryVizLineChart', allTraces2, layout, {responsive: true, displayModeBar: false});
     document.getElementById('loadingAnimation').hidden = true;
-    // document.getElementById('toggleCharts').hidden = false;
 };
 
 export const exploreData = async (fileId, fileName) => {
