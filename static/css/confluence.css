@@ -83,7 +83,7 @@ body {
 
 #maincontainer {
     background-color: #f5f5f5;
-    min-height: calc(100vh - 303px);
+    min-height: calc(100vh - 270px);
     padding-bottom: 1rem;
 }
 

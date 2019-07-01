@@ -166,6 +166,139 @@ export const coreVariables = {
             1: 'positive',
             888: "Don't Know",
             'label': 'Estrogen receptor status of index tumour'
+        },
+        eduCat: {
+            'label': 'Highest level of education received'
+        },
+        eduComments: {
+            'label': 'Details of coding used for eduCat'
+        },
+        ageMenarche: {
+            888: "Don't Know",
+            'label': 'Age at menarche'
+        },
+        mensAgeLast: {
+            777: 'Not Applicable (still menstruating)',
+            888: "Don't Know",
+            'label': 'Age at menopause'
+        },
+        menoStat: {
+            1: 'pre/peri',
+            2: 'post (postmenopausal: last menstruation more than 12 months before reference date)',
+            888: "Don't Know",
+            'label': 'Menopausal status at reference date'
+        },
+        parous: {
+            0: 'nulliparous',
+            1: '1+ full term pregnancies',
+            888: "Don't Know",
+            'label': 'Nulliparous v parous'
+        },
+        parity: {
+            888: "Don't Know",
+            'label': 'Number of full-term pregnancies'
+        },
+        ageFFTP: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Age at end of first full-term pregnancy'
+        },
+        lastChildAge: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Age at end of last full-term pregnancy (or current age if pregnant)'
+        },
+        breastFed: {
+            0: 'No',
+            1: 'Yes',
+            888: "Don't Know",
+            'label': 'Ever breastfed'
+        },
+        breastMos: {
+            888: "Don't Know",
+            'label':'Lifetime duration of breastfeeding'
+        },
+        weight: {
+            888: "Don't Know",
+            'label': 'Weight at interview/questionnaire'
+        },
+        height: {
+            888: "Don't Know",
+            'label': 'Adult body height'
+        },
+        BMI: {
+            'label': 'Body mass index at interview/questionnaire in kg'
+        },
+        OCEver: {
+            0: 'never',
+            1: 'ever',
+            888: "Don't Know",
+            'label': 'Use of oral contraceptives (OC)'
+        },
+        OCCurrent: {
+            0: 'no',
+            1: 'yes, i.e. current use at reference date',
+            888: "Don't Know",
+            'label': 'Current use'
+        },
+        HRTEver: {
+            0: 'never',
+            1: 'ever',
+            888: "Don't Know",
+            'label': 'Use of hormonal replacement therapy (HRT)'
+        },
+        HRTCurrent: {
+            0: 'no',
+            1: 'yes, i.e. current use at reference date (only if duration of use >3 months)',
+            888: "Don't Know",
+            'label': 'Current use'
+        },
+        EPCurrent: {
+            0: 'no',
+            1: 'yes, i.e. current use at reference date',
+            888: "Don't Know",
+            'label': 'Current use of combined therapy'
+        },
+        ECurrent: {
+            0: 'no',
+            1: 'yes, i.e. current use at reference date',
+            888: "Don't Know",
+            'label': 'Current use of estrogen only'
+        },
+        alcoholCum: {
+            888: "Don't Know",
+            'label': 'Cumulative lifetime gms/day alcohol'
+        },
+        smokingEver: {
+            0: 'never',
+            1: 'past',
+            2: 'current, in last year before reference date (year before diagnosis for cases, year before questionnaire for controls)',
+            888: "Don't Know",
+            'label': 'Cigarette smoking'
+        },
+        BBD_history: {
+            0: 'No',
+            1: 'Yes',
+            888: "Don't Know",
+            'label': 'History of benign breast disease'
+        },
+        BBD_number: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Number of benign breast disease diagnoses'
+        },
+        Screen_Ever: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Ever attended breast cancer screening'
+        },
+        Detection_screen: {
+            1: 'routine breast cancer screening',
+            2: 'other methods of detection',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Mode of detection of first breast cancer diagnosis'
         }
     }
 };
