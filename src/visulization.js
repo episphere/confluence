@@ -86,7 +86,7 @@ const generatCharts = (data, studyEntries, parameter) => {
     oldParameter = parameter ? parameter : oldParameter;
     let parm = parameter ? parameter : oldParameter !== '' ? oldParameter : 'ageInt';
     let allTraces1 = [];
-    let allTraces2 = [];
+    // let allTraces2 = [];
     for(const studyId in data){
         let trace = {
             type: 'bar',
