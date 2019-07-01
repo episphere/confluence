@@ -56,7 +56,7 @@ export const coreVariables = {
             'DMY': 'day,month and year known',
             'MY': 'only month and year known',
             'Y': 'only year known',
-            'Not Applicable': 'all unknown',
+            'NA': 'all unknown',
             'label': 'Marker for date of birth'
         },
         bDay: {
@@ -627,6 +627,520 @@ export const coreVariables = {
             5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
             888: "Don't Know",
             'label': 'Source of data on HER2 status of index tumour'
+        },
+        Bilateral: {
+            0: 'unilateral',
+            1: 'bilateral (contralateral)',
+            2: 'ipsilateral (new primary tumour in the same breast)',
+            888: "Don't Know",
+            'label': 'Bilaterality status'
+        },
+        BilateralTime: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Time between first primary and second primary breast cancer (if Bilateral=1 or 2)'
+        },
+        AgeDiagIndex: {
+            888: "Don't Know",
+            'label': 'Age of diagnosis of index breast cancer'
+        },
+        AgeDiag1: {
+            888: "Don't Know",
+            'label': 'Age of diagnosis of first breast cancer'
+        },
+        AgeDiag2: {
+            777: 'Not Applicable (if the patients has no second tumour)',
+            888: "Don't Know",
+            'label': 'Age of diagnosis of second/contralateral breast cancer'
+        },
+        DateDiagIndex: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of diagnosis of index breast cancer'
+        },
+        DateDiagIndex_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of diagnosis of index breast cancer'
+        },
+        DateDiag1: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of diagnosis of first breast cancer'
+        },
+        DateDiag1_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of diagnosis of first breast cancer'
+        },
+        DateDiag2: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of diagnosis of second/contralateral breast cancer'
+        },
+        DateDiag2_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of diagnosis of second/contralateral breast cancer'
+        },
+        DateEnter: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of blood draw/entry into study'
+        },
+        DateEnter_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of blood draw/entry into study'
+        },
+        DateLastFU: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of death/last follow-up'
+        },
+        DateLastFU_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of death/last follow-up'
+        },
+        YearsToEnter: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Time in years between diagnosis and study entry'
+        },
+        YearsToStatus: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Time in years between diagnosis and last follow-up'
+        },
+        VitalStatus: {
+            0: 'alive',
+            1: 'dead',
+            777: 'Not Applicable (for controls)',
+            888: "Don't Know",
+            'label': 'Vital status at last follow-up'
+        },
+        CauseDeath: {
+            888: "Don't Know",
+            'label': 'Cause of death'
+        },
+        BrDeath: {
+            0: 'death from other cause',
+            1: 'death from breast cancer',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'If death whether died from breast cancer'
+        },
+        Locoregional_relapse: {
+            0: 'no',
+            1: 'yes',
+            2: 'Local relapse',
+            3: 'Regional relapse to the lymph nodes',
+            4: 'both local and regional',
+            888: "Don't Know",
+            'label': 'Locoregional relapse'
+        },
+        Date_Locoregional_relapse: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of locoregional relapse'
+        },
+        Date_Locoregional_relapse_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of locoregional relapse'
+        },
+        Distant_metastasis_relapse: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Distant metastases relapse'
+        },
+        Date_Distant_metastasis_relapse: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Date of distant metastasis'
+        },
+        Date_Distant_metastasis_relapse_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of distant metastasis'
+        },
+        YearsToRelapse: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Time in years between diagnosis and first relapse'
+        },
+        Date_Follow_up_relapse: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Last date that follow-up was updated for relapse'
+        },
+        Date_Follow_up_relapse_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for date of follow-up relapse'
+        },
+        Chemo_adjuvant: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Adjuvant chemotherapy'
+        },
+        Chemo_adjuvant_type: {
+            'label': 'Adjuvant chemotherapy drug'
+        },
+        Chemo_adjuvant_type_corr: {
+            'label': 'Adjuvant chemotherapy drug'
+        },
+        Chemo_adjuvant_dose: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Adjuvant chemotherapy number of cycles'
+        },
+        Chemo_adjuvant_start: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Start date'
+        },
+        Chemo_adjuvant_start_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for start date of adjuvant chemotherapy'
+        },
+        Chemo_adjuvant_stop: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Stop date'
+        },
+        Chemo_adjuvant_stop_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for stop date of adjuvant chemotherapy'
+        },
+        Chemo_anthracycline: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive an Anthracycline therapy?'
+        },
+        Chemo_anthracycline_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive an Anthracycline therapy?'
+        },
+        Chemo_taxane: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive Taxanes?'
+        },
+        Chemo_taxane_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive Taxanes?'
+        },
+        Chemo_CMF: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive CMF like treatment?'
+        },
+        Chemo_CMF_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive CMF like treatment?'
+        },
+        Chemo_adjuvant_duration: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Duration adjuvant treatment in months'
+        },
+        Horm_adjuvant: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Adjuvant anti-hormone therapy'
+        },
+        Horm_adjuvant_type: {
+            'label': 'Adjuvant anti-hormone therapy drug'
+        },
+        Horm_adjuvant_type_corr: {
+            'label': 'Adjuvant anti-hormone therapy drug'
+        },
+        Horm_adjuvant_start: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Start date'
+        },
+        Horm_adjuvant_start_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for start date of adjuvant anti-hormone therapy'
+        },
+        Horm_adjuvant_stop: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Stop date'
+        },
+        Horm_adjuvant_stop_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for stop date of adjuvant anti-hormone therapy'
+        },
+        Horm_adjuvant_duration: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Adjuvant anti-hormone therapy duration in months'
+        },
+        Trastuzumab_adjuvant: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Adjuvant trastuzumab'
+        },
+        Trastuzumab_adjuvant_start: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Start date'
+        },
+        Trastuzumab_adjuvant_start_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for start date of adjuvant trastuzumab'
+        },
+        Trastuzumab_adjuvant_stop: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Stop date'
+        },
+        Trastuzumab_adjuvant_stop_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for stop date of adjuvant trastuzumab'
+        },
+        Trastuzumab_adjuvant_duration: {
+            'label': 'Adjuvant trastuzumab duration in weeks'
+        },
+        Trastuzumab_chemo: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Adjuvant trastuzumab concomitantly with adjuvant chemotherapy'
+        },
+        Surgery: {
+            0: 'no',
+            1: 'breast saving',
+            2: 'mastectomy (with or without axilary)',
+            3: 'type unknown',
+            888: "Don't Know",
+            'label': 'Breast surgery'
+        },
+        Radiation: {
+            0: 'no',
+            1: 'yes, breast',
+            2: 'yes, breast and lymph nodes',
+            3: 'yes, lymph nodes only',
+            4: 'yes, metastases, thoracic spine',
+            5: 'yes, organ unknown',
+            888: "Don't Know",
+            'label': 'Adjuvant radiation'
+        },
+        Doses: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Available in your study? (do not provide actual data yet)'
+        },
+        Fields: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Available in your study? (do not provide actual data yet)'
+        },
+        Chemo_neoadjuvant: {
+            0: 'no',
+            1: 'yes',
+            888: "Don't Know",
+            'label': 'Neoadjuvant chemotherapy'
+        },
+        Chemo_neoadjuvant_type: {
+            'label': 'Neoadjuvant chemotherapy drug'
+        },
+        Chemo_neoadjuvant_type_corr: {
+            'label': 'Neoadjuvant chemotherapy drug'
+        },
+        Chemo_neoadjuvant_dose: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Neoadjuvant chemotherapy number of cycles'
+        },
+        Chemo_neoadjuvant_start: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Start date'
+        },
+        Chemo_neoadjuvant_start_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for start date of neoadjuvant chemotherapy'
+        },
+        Chemo_neoadjuvant_stop: {
+            '07/07/7000': 'Not Applicable',
+            '08/08/8000': "Don't Know",
+            'label': 'Stop date'
+        },
+        Chemo_neoadjuvant_stop_known: {
+            'DMY': 'day,month and year known',
+            'MY': 'only month and year known',
+            'Y': 'only year known',
+            'NA': 'all unknown',
+            'label': 'Marker for stop date of neoadjuvant chemotherapy'
+        },
+        Chemo_neoadjuvant_adjuvant_duration: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Duration neoadjuvant treatment in months'
+        },
+        Chemo_neoadjuvant_anthracycline: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive an Anthracycline therapy?'
+        },
+        Chemo_neoadjuvant_anthracycline_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive an Anthracycline therapy?'
+        },
+        Chemo_neoadjuvant_taxane: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive Taxanes?'
+        },
+        Chemo_neoadjuvant_taxane_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Did the patient receive Taxanes?'
+        },
+        Chemo_neoadjuvant_CMF: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': ''
+        },
+        Chemo_neoadjuvant_CMF_corr: {
+            0: 'no',
+            1: 'yes',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': ''
+        },
+        Stage_neoadjuvant_pre: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Stage before neoadjuvant treatment'
+        },
+        NodeStatus1_neoadjuvant_pre: {
+            0: 'LN negative',
+            1: 'LN positive (clinical)',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Lymph node status indicator before neoadjuvant treatment',
+        },
+        Size1_neoadjuvant_pre: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Tumour size before neoadjuvant treatment'
+        },
+        SizeGroup1_neoadjuvant_pre: {
+            'label': 'Tumour size before neoadjuvant treatment'
+        },
+        Stage_neoadjuvant_post: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Stage after neoadjuvant treatment'
+        },
+        NodeStatus1_neoadjuvant_post: {
+            0: 'LN negative',
+            1: 'LN positive',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Lymph node status indicator after neoadjuvant treatment'
+        },
+        Size1_neoadjuvant_post: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Tumour size after neoadjuvant treatment'
+        },
+        SizeGroup1_neoadjuvant_post: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Tumour size after neoadjuvant treatment'
+        },
+        pCRbreast: {
+            1: 'complete response',
+            2: 'partial response',
+            3: 'no response',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Pathological response breast'
+        },
+        pCRaxilla: {
+            'label': 'Pathological axilla'
+        },
+        CR: {
+            'label': 'Clinical response by mammography or ultrasound'
         }
     }
 };
