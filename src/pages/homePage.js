@@ -29,6 +29,14 @@ export const template = () => {
     `;
 }
 
+export const confluenceLogo = () => {
+    let path = '/confluence/static/images/image.png';
+    if(location.origin.indexOf('localhost') !== -1) path = '/static/images/image.png';
+    return `<a href="#" title="Home" rel="home">
+                <img src="${path}" height="40px" width="300px" alt="NCI Confluence Data Commons" class="banner-logo">
+            </a>`;
+}
+
 export const homePageVisualization = async () => {
     let path = '/confluence/data.json';
     if(location.origin.indexOf('localhost') !== -1) path = '/data.json'
