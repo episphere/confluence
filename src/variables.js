@@ -1137,9 +1137,19 @@ export const coreVariables = {
             'label': 'Pathological response breast'
         },
         pCRaxilla: {
+            1: 'complete response',
+            2: 'partial response',
+            3: 'no response',
+            777: 'Not Applicable',
+            888: "Don't Know",
             'label': 'Pathological axilla'
         },
         CR: {
+            1: 'complete response',
+            2: 'partial response',
+            3: 'no response',
+            777: 'Not Applicable',
+            888: "Don't Know",
             'label': 'Clinical response by mammography or ultrasound'
         }
     }
