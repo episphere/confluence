@@ -299,6 +299,334 @@ export const coreVariables = {
             777: 'Not Applicable',
             888: "Don't Know",
             'label': 'Mode of detection of first breast cancer diagnosis'
+        },
+        Index: {
+            1: 'ascertained for first tumour',
+            2: 'ascertained for second tumour',
+            888: "Don't Know",
+            'label': 'Identification of index tumour'
+        },
+        Index_corr: {
+            1: 'ascertained for first tumour',
+            2: 'ascertained for second tumour',
+            'label': 'Identification of index tumour where index is missing (888)'
+        },
+        Behaviour1: {
+            1: 'invasive',
+            2: 'in-situ',
+            888: "Don't Know",
+            'label': 'Invasive or in-situr for first breast cancer'
+        },
+        Behaviour2: {
+            1: 'invasive',
+            2: 'in-situ',
+            777: 'Not Applicable (if the patient has no second tumour)',
+            888: "Don't Know",
+            'label': 'Invasive or in-situr for second/contralateral breast cancer'
+        },
+        BehaviourIndex: {
+            1: 'invasive',
+            2: 'in-situ',
+            888: "Don't Know",
+            'label': 'Invasive or in-situr for index tumour'
+        },
+        Grade1: {
+            1: 'well differentiated',
+            2: 'moderately differentiated',
+            3: 'poorly/un-differentiated',
+            888: "Don't Know",
+            'label': 'Histopathological grade'
+        },
+        Grade2: {
+            1: 'well differentiated',
+            2: 'moderately differentiated',
+            3: 'poorly/un-differentiated',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Histopathological grade'
+        },
+        GradeIndex: {
+            1: 'well differentiated',
+            2: 'moderately differentiated',
+            3: 'poorly/un-differentiated',
+            888: "Don't Know",
+            'label': 'Histopathological grade for index tumour'
+        },
+        Stage1: {
+            888: "Don't Know",
+            'label': 'TNM stage'
+        },
+        Stage2: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'TNM stage'
+        },
+        StageIndex: {
+            888: "Don't Know",
+            'label': 'TNM stage for index tumour'
+        },
+        Morphology1: {
+            888: "Don't Know",
+            'label': 'ICD morphology code'
+        },
+        Morphology2: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'ICD morphology code'
+        },
+        Morphologygroup1: {
+            888: "Don't Know",
+            'label': 'Morphology in 8 categories'
+        },
+        Morphologygroup2: {
+            888: "Don't Know",
+            'label': 'Morphology in 8 categories'
+        },
+        Size1: {
+            888: "Don't Know",
+            'label': 'Tumour size (maximum diameter)'
+        },
+        Size2: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Tumour size (maximum diameter)'
+        },
+        SizeIndex: {
+            888: "Don't Know",
+            'label': 'Tumour size (maximum diameter) for index tumour'
+        },
+        Size1_Cat: {
+            1: '≤2cm',
+            2: '>2cm and ≤5cm',
+            3: '>5cm',
+            888: "Don't Know",
+            'label': 'Categorization of size'
+        },
+        Size2_Cat: {
+            1: '≤2cm',
+            2: '>2cm and ≤5cm',
+            3: '>5cm',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Categorization of size'
+        },
+        SizeIndex_Cat: {
+            1: '≤2cm',
+            2: '>2cm and ≤5cm',
+            3: '>5cm',
+            888: "Don't Know",
+            'label': 'Categorization of size for index tumour'
+        },
+        SizeGroup1: {
+            888: "Don't Know",
+            'label': 'Tumour size categories'
+        },
+        SizeGroup2: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Tumour size categories'
+        },
+        SizeGroupIndex: {
+            888: "Don't Know",
+            'label': 'Tumour size categories for index tumour'
+        },
+        M1_status: {
+            0: 'M0 (No distant metastasis)',
+            1: 'M1 (Distant metastasis)',
+            8: 'Mx',
+            888: "Don't Know",
+            'label': 'M from TNM (distant metastases)'
+        },
+        M2_status: {
+            0: 'M0 (No distant metastasis)',
+            1: 'M1 (Distant metastasis)',
+            8: 'Mx',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'M from TNM (distant metastases)'
+        },
+        MIndex_status: {
+            0: 'M0 (No distant metastasis)',
+            1: 'M1 (Distant metastasis)',
+            8: 'Mx',
+            888: "Don't Know",
+            'label': 'M from TNM (distant metastases) for index tumour'
+        },
+        Nodes1: {
+            888: "Don't Know",
+            'label': 'Number of positive nodes'
+        },
+        Nodes2: {
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Number of positive nodes'
+        },
+        NodesIndex: {
+            888: "Don't Know",
+            'label': 'Number of positive nodes for index tumour'
+        },
+        NodeStatus1: {
+            0: 'LN negative',
+            1: 'LN positive',
+            888: "Don't Know",
+            'label': 'Lymph node status indicator'
+        },
+        NodeStatus2: {
+            0: 'LN negative',
+            1: 'LN positive',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Lymph node status indicator'
+        },
+        NodeStatusIndex: {
+            0: 'LN negative',
+            1: 'LN positive',
+            888: "Don't Know",
+            'label': 'Lymph node status indicator for index tumour'
+        },
+        ER_status1: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Estrogen receptor status of first tumour'
+        },
+        ER_status2: {
+            0: 'negative',
+            1: 'positive',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Estrogen receptor status of second tumour'
+        },
+        ER_statusIndex: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Estrogen receptor status of index tumour'
+        },
+        ER_status1_source: {
+            0: 'clinical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on ER status of first tumour'
+        },
+        ER_status2_source: {
+            0: 'clinical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Source of data on ER status of second tumour'
+        },
+        ER_statusIndex_source: {
+            0: 'clinical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on ER status of index tumour'
+        },
+        PR_status1: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Progesteron receptor status of first tumour'
+        },
+        PR_status2: {
+            0: 'negative',
+            1: 'positive',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Progesteron receptor status of second tumour'
+        },
+        PR_statusIndex: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Progesteron receptor status of index tumour'
+        },
+        PR_status1_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on PR status of first tumour'
+        },
+        PR_status2_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Source of data on PR status of second tumour'
+        },
+        PR_statusIndex_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on PR status of index tumour'
+        },
+        HER2_status1: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Human epidermal growth factor receptor 2 status of first tumour'
+        },
+        HER2_status2: {
+            0: 'negative',
+            1: 'positive',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Human epidermal growth factor receptor 2 status of second tumour'
+        },
+        HER2_statusIndex: {
+            0: 'negative',
+            1: 'positive',
+            888: "Don't Know",
+            'label': 'Human epidermal growth factor receptor 2 status of index tumour'
+        },
+        HER2_status1_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on HER2 status of first tumour'
+        },
+        HER2_status2_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            777: 'Not Applicable',
+            888: "Don't Know",
+            'label': 'Source of data on HER2 status of second tumour'
+        },
+        HER2_statusIndex_source: {
+            0: 'linical records',
+            1: 'IHC stain of whole sections',
+            2: 'IHC stain of TMAs',
+            3: 'other',
+            4: 'Derived from Ariol data of TMAs',
+            5: 'Derived from semi-quantitative IHC stain data (not defined whether from whole sections or TMAs)',
+            888: "Don't Know",
+            'label': 'Source of data on HER2 status of index tumour'
         }
     }
 };
