@@ -49,16 +49,16 @@ export const template = () => {
                 </div>
             </div>
             <div class="main-summary-row" id="loadingAnimation">
-                <div class="spinner-grow text-secondary" role="status">
+                <div class="spinner-grow spinner-color" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
-                <div class="spinner-grow text-secondary" role="status">
+                <div class="spinner-grow spinner-color" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
-                <div class="spinner-grow text-secondary" role="status">
+                <div class="spinner-grow spinner-color" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
-                <div class="spinner-grow text-secondary" role="status">
+                <div class="spinner-grow spinner-color" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>

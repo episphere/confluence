@@ -444,8 +444,11 @@ label {
 .nav-menu-links {
     text-decoration: none !important;
     color:#fff !important;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0.5rem 1rem !important;
+}
+
+.spinner-color {
+    color: #574f4f !important;
 }
 
 .nav-menu-links:hover {

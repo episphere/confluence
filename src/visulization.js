@@ -100,19 +100,19 @@ const generatCharts = (data, studyEntries, parameter) => {
         }
         allTraces1.push(trace);
 
-        let trace2 = {
-            mode:'lines+markers',
-            x:Object.keys(data[studyId].allData[parm]),
-            y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
-            name: studyEntries[studyId].name
-        }
-        if(trace2.x.length>1){
-            if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
-                trace.x.pop()
-                trace.y.pop()
-            }
-        }
-        allTraces2.push(trace2);
+        // let trace2 = {
+        //     mode:'lines+markers',
+        //     x:Object.keys(data[studyId].allData[parm]),
+        //     y:Object.keys(data[studyId].allData[parm]).map(k=>data[studyId].allData[parm][k]),
+        //     name: studyEntries[studyId].name
+        // }
+        // if(trace2.x.length>1){
+        //     if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
+        //         trace.x.pop()
+        //         trace.y.pop()
+        //     }
+        // }
+        // allTraces2.push(trace2);
     };
 
     var layout = {
