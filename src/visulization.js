@@ -85,6 +85,7 @@ const generatCharts = (data, studyEntries, parameter) => {
     // document.getElementById('dataSummaryVizLineChart').innerHTML = '';
     oldParameter = parameter ? parameter : oldParameter;
     let parm = parameter ? parameter : oldParameter !== '' ? oldParameter : 'ageInt';
+    document.getElementById('parametersDropDown').value = parm;
     let allTraces1 = [];
     // let allTraces2 = [];
     for(const studyId in data){
