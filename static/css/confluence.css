@@ -458,6 +458,10 @@ label {
     margin-top: 2rem;
 }
 
+.pie-label {
+    fill: #000 !important;
+}
+
 #dataSummaryVizPieChart2 {
     min-height: 300px
 }

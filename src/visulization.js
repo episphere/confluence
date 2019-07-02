@@ -68,7 +68,7 @@ const getFileContent = async (allIds, status) => {
 
 const generateDCChart = (jsonData, selection) => {
     let cf = crossfilter(jsonData);
-    dc.config.defaultColors(d3.schemeSet2);
+    dc.config.defaultColors(d3.schemeCategory10);
     
     let pieChart = dc.pieChart("#dataSummaryVizPieChart");
     let status = cf.dimension(function(d){return d.status});
