@@ -246,6 +246,12 @@ export const convertTextToJson = async (fileIds, status) => {
     let jsonData = {};
     
     allObjs.forEach(data => {
+        for(const key in data){
+            const value = data[key];
+            if(value !== "" && coreVariables.BCAC[key] && coreVariables.BCAC[key][value]){
+                data[key] = coreVariables.BCAC[key][value];
+            }
+        }
         if(jsonData[data.BCAC_ID]){
             jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
         }else{
@@ -253,6 +259,7 @@ export const convertTextToJson = async (fileIds, status) => {
             jsonData[data.BCAC_ID] = data;
         }
     });
+    console.log(jsonData);
 
     return Object.values(jsonData);
 }

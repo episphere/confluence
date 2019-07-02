@@ -96,7 +96,7 @@ const generateDCChart = (jsonData, selection) => {
         .dimension(status)
         .group(G_status)
         .label(function(c){
-            return `${coreVariables.BCAC['status'][c.key]} (${c.value})`
+            return `${c.key} (${c.value})`
         });
     oldParameter = selection ? selection : oldParameter;
     let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ethnicityClass';
@@ -123,13 +123,7 @@ const generateDCChart = (jsonData, selection) => {
         .dimension(data)
         .group(G_status2)
         .label(function(c){
-            if(coreVariables.BCAC[parameter][c.key]){
-                return `${coreVariables.BCAC[parameter][c.key]} (${c.value})`
-            }
-            else{
-                return `${c.key} (${c.value})`
-            }
-            
+            return `${c.key} (${c.value})`
         });
 
     
