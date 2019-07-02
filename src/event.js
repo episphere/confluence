@@ -9,7 +9,7 @@ export const addEventStudiesCheckBox = (dataObject, folderId) => {
         element.addEventListener('click', () => {
             const studyId = element.value;
             if(element.checked === true){
-                selectedValues.push(studyId);
+                if(selectedValues.indexOf(studyId) === -1) selectedValues.push(studyId);
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
             }else{
                 selectedValues.splice(selectedValues.indexOf(studyId), 1);
@@ -25,6 +25,50 @@ export const addEventStudiesCheckBox = (dataObject, folderId) => {
         });
     });
 };
+
+const triggerEventStudies = (studyEntries) => {
+    let allIds = [];
+    let values = [];
+    let status = null;
+    const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+    const casesCheckBox = document.getElementById('casesCheckBox');
+    const controlsCheckBox = document.getElementById('controlsCheckBox');
+    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
+    
+    studiesCheckBox.forEach(element => {
+        if(element.checked) allIds.push(element.value);
+    });
+    dataTypeCheckBox.forEach(element => {
+        if(element.checked) values.push(element.value);
+    })
+    if(casesCheckBox.checked && controlsCheckBox.checked) status = null;
+    if(!casesCheckBox.checked && controlsCheckBox.checked) status = "0";
+    if(casesCheckBox.checked && !controlsCheckBox.checked) status = "1";
+
+    if(allIds.length === 0 || values.length === 0) {
+        clearGraphAndParameters();
+    }
+    else{
+        let caseCounter = 0;
+        let controlCounter = 0;
+        let dataCount = 0;
+        allIds.forEach(id => {
+            dataCount += Object.keys(studyEntries[id].dataEntries).length;
+            const dataEntries = studyEntries[id].dataEntries;
+            for(let dataId in dataEntries){
+                const fileEntries = dataEntries[dataId].fileEntries;
+                for(let fileId in fileEntries){
+                    controlCounter += fileEntries[fileId].controls;
+                    caseCounter += fileEntries[fileId].cases;
+                }
+            }
+        });
+        document.getElementById('dataCount').textContent = dataCount;
+        document.getElementById('caseCount').textContent = caseCounter;
+        document.getElementById('controlCount').textContent = controlCounter;
+        getData(studyEntries, allIds, values, status);
+    }
+}
 
 export const addEventSearchStudies = () => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -47,7 +91,7 @@ export const addEventSearchStudies = () => {
     });
 };
 
-export const addEventSelectAllStudies = () => {
+export const addEventSelectAllStudies = (studyEntries) => {
     const studySelectAll = document.getElementById('studySelectAll');
     studySelectAll.addEventListener('click', () => {
         const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -55,21 +99,20 @@ export const addEventSelectAllStudies = () => {
             Array.from(studiesCheckBox).forEach(element => {
                 if(element.checked === false && element.parentNode.style.display !== "none"){
                     element.checked = true;
-                    element.dispatchEvent(new Event('click'));
                 }
             });
         }
         else{
             Array.from(studiesCheckBox).forEach(element => {
-                element.checked = false;
-            });
-            Array.from(studiesCheckBox).forEach(element => {
-                element.dispatchEvent(new Event('click'));
+                if(element.checked === true && element.parentNode.style.display !== "none"){
+                    element.checked = false;
+                }
             });
             document.getElementById('dataCount').textContent = '0';
             document.getElementById('caseCount').textContent = '0';
             document.getElementById('controlCount').textContent = '0';
-        }
+        };
+        triggerEventStudies(studyEntries);
     });
 };
 
@@ -124,7 +167,7 @@ export const addEventSearchDataType = () => {
     });
 };
 
-export const addEventSelectAllDataType = () => {
+export const addEventSelectAllDataType = (studyEntries) => {
     const dataTypeSelectAll = document.getElementById('dataTypeSelectAll');
     dataTypeSelectAll.addEventListener('click', () => {
         const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
@@ -132,20 +175,39 @@ export const addEventSelectAllDataType = () => {
             Array.from(dataTypeCheckBox).forEach(element => {
                 if(element.checked === false && element.parentNode.style.display !== "none"){
                     element.checked = true;
-                    element.dispatchEvent(new Event('click'));
                 }
             });
         }
         else{
             Array.from(dataTypeCheckBox).forEach(element => {
-                element.checked = false;
-            });
-            Array.from(dataTypeCheckBox).forEach(element => {
-                element.dispatchEvent(new Event('click'));
+                if(element.checked === true && element.parentNode.style.display !== "none"){
+                    element.checked = false;
+                }
             });
         }
+        dispatchEventDataTypeSelectAll(studyEntries);
     });
 };
+
+const dispatchEventDataTypeSelectAll = (studyEntries) => {
+    let studyIds = [];
+    let values = [];
+    const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
+    
+    studiesCheckBox.forEach(element => {
+        if(element.checked) studyIds.push(element.value);
+    });
+    dataTypeCheckBox.forEach(element => {
+        if(element.checked) values.push(element.value);
+    });
+    if(studyIds.length === 0 || values.length === 0) {
+        clearGraphAndParameters();
+    }
+    else{
+        getData(studyEntries, studyIds, values, null);
+    }
+}
 
 export const addEventCasesControls = (studyEntries) => {
     let status = null;

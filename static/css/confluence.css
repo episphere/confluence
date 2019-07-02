@@ -194,6 +194,7 @@ label {
     font-size: 1.5rem;
     margin-right: 1rem;
     white-space: nowrap;
+    margin-top: 1rem;
 }
 
 .cases-controls-chkbox {
@@ -220,7 +221,7 @@ label {
     height: inherit;
     background-color: #fff;
     width: inherit;
-    padding-bottom: 1rem;
+    padding: 1rem;
 }
 
 .search-options {
@@ -448,6 +449,19 @@ label {
 
 .spinner-color {
     color: #574f4f !important;
+}
+
+#dataSummaryVizBarChart {
+    min-height: 400px;
+}
+
+#dataSummaryVizPieChart2 {
+    min-height: 400px;
+}
+
+.about-confluence {
+    background-color: #fff;
+    padding-top: 1rem;
 }
 
 .nav-menu-links:hover {

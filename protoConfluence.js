@@ -271,7 +271,6 @@ confluence.summary=async function(){ // summary plots
                 })
                 return u
             } 
-
             dc.config.defaultColors(d3.schemeCategory10)
             let cf=crossfilter(dd)
 

@@ -223,53 +223,38 @@ export const removeActiveClass = (className) => {
     });
 }
 
-export const convertTextToJson = (rawData, status) => {
-    let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
-    if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
-        rows.pop()
+export const convertTextToJson = async (fileIds, status) => {
+    let allObjs = [];
+    for(const id of fileIds){
+        const intId = parseInt(id);
+        let rawData = await getFile(intId);
+        let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
+        if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
+            rows.pop()
+        };
+        const headings = rows[0];
+        rows.splice(0, 1);
+        var obj = rows.map(function (el) {
+            var obj = {};
+            for (var i = 0; i < el.length; i++) {
+              obj[headings[i].trim()] = el[i];
+            }
+            return obj;
+        });
+        allObjs = allObjs.concat(obj);
     };
-    const headings = rows[0];
-    rows.splice(0, 1);
-    var obj = rows.map(function (el) {
-        var obj = {};
-        for (var i = 0; i < el.length; i++) {
-          obj[headings[i].trim()] = el[i];
-        }
-        return obj;
-    });
     let jsonData = {};
-    obj.forEach(data => {
+    
+    allObjs.forEach(data => {
         if(jsonData[data.BCAC_ID]){
-            jsonData[data.BCAC_ID] = {...crossFileData[data.BCAC_ID], ...data}
+            jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
         }else{
             jsonData[data.BCAC_ID] = {};
             jsonData[data.BCAC_ID] = data;
         }
     });
 
-    let filterData = Object.keys(jsonData);
-    if(status) filterData = filterData.filter(key => jsonData[key].status === status);
-
-    let finalData = {};
-    filterData.forEach(id => {
-        let dataSet = jsonData[id];
-        for(const key in dataSet){
-            let value = dataSet[key];
-            if(value !== "" && coreVariables.BCAC[key] && coreVariables.BCAC[key][value]) value = coreVariables.BCAC[key][value];
-            
-            if(finalData[key]){
-                if(finalData[key][value]){
-                    finalData[key][value] += 1;
-                }else{
-                    if(value !== "") finalData[key][value] = 1;
-                }
-            }else{
-                finalData[key] = {};
-                if(value !== "") finalData[key][value] = 1;
-            }
-        };
-    });
-    return finalData;
+    return Object.values(jsonData);
 }
 
 const sessionExpired = () => {

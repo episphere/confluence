@@ -54,10 +54,10 @@ const confluence=function(){
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
             let consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
-            Array.from(consortiaCheckBox).forEach(element => {
+            Array.from(consortiaCheckBox).forEach((element, index) => {
                 element.addEventListener('click', () => {
                     if(element.value === "") return;
-                    countSpecificStudy(parseInt(element.value));
+                    if(index === consortiaCheckBox.length -1) countSpecificStudy(parseInt(element.value));
                 });
             });
         });

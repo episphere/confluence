@@ -22,9 +22,7 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
 };
 
 export const parametersDropDownTemplate = (data) => {
-    let studies = Object.keys(data);
-    let allData = data[studies[0]].allData;
-    let parameters = Object.keys(allData).filter(keys => Object.keys(allData[keys]).length !== 0);
+    let parameters = Object.keys(data[0]);
     parameters.sort();
     let template = '';
     template += `

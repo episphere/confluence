@@ -37,12 +37,13 @@ export const template = () => {
                         <ul class="align-left" id="dataTypeList"></ul>
                     </ul>
                 </div>
-                <div class="summary-inner-col">
+                <div class="summary-inner-col" id="dataSummaryVizPieChart"></div>
+                <div class="summary-inner-col" hidden=true>
                     <span class="interactive-summary-label">Cases</span></br>
                     <input type="checkbox" class="cases-controls-chkbox" checked id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="caseCount">0</span>
                 </div>
-                <div class="summary-inner-col">
+                <div class="summary-inner-col" hidden=true>
                     <span class="interactive-summary-label">Controls</span></br>
                     <input type="checkbox" class="cases-controls-chkbox" checked id="controlsCheckBox"> <i for="controlsCheckBox" class="fas fa-3x fa-user"></i>
                     <span class="data-summary-count" id="controlCount">0</span>
@@ -63,9 +64,13 @@ export const template = () => {
                 </div>
             </div>
             
-            <div class="main-summary-row" id="dataSummaryParameter"></div>
-            <div class="main-summary-row" id="dataSummaryVizBarChart"></div>
-            <div id="storeTraces"></div>
+            <div class="main-summary-row">
+                <div class="summary-inner-col" id="dataSummaryVizBarChart"></div>
+                <div class="summary-inner-col">
+                    <div id="dataSummaryParameter"></div>
+                    <div id="dataSummaryVizPieChart2"></div>
+                </div>
+            </div>
         </div>
     `;  
 }
@@ -117,32 +122,33 @@ export const getSummary = async () => {
                 dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = dataFile.type;
                 dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = 0;
                 dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = 0;
-                let txt = await getFile(fileId);
-                let dt = txt2dt(txt);
+                // let txt = await getFile(fileId);
+                // let dt = txt2dt(txt);
                 
-                if(dt.tab && dt.tab.status){
-                    const numberOfCases = dt.tab.status.filter(value => value === "1").length;
-                    const numberOfControls = dt.tab.status.filter(value => value === "0").length;
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = numberOfCases;
-                    dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = numberOfControls
-                    let caseCountElement = document.getElementById('caseCount');
-                    caseCountElement.textContent = parseInt(caseCountElement.textContent) + numberOfCases;
-                    let controlCountElement = document.getElementById('controlCount');
-                    controlCountElement.textContent = parseInt(controlCountElement.textContent) + numberOfControls;
-                };
+                // if(dt.tab && dt.tab.status){
+                //     const numberOfCases = dt.tab.status.filter(value => value === "1").length;
+                //     const numberOfControls = dt.tab.status.filter(value => value === "0").length;
+                //     dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = numberOfCases;
+                //     dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = numberOfControls
+                //     let caseCountElement = document.getElementById('caseCount');
+                //     caseCountElement.textContent = parseInt(caseCountElement.textContent) + numberOfCases;
+                //     let controlCountElement = document.getElementById('controlCount');
+                //     controlCountElement.textContent = parseInt(controlCountElement.textContent) + numberOfControls;
+                // };
                 
                 
                 if(localStorage.data_summary) delete localStorage.data_summary;
                 localStorage.data_summary = JSON.stringify(dataObject);
-                if(studyIndex === studyEntries.length - 1){
-                    const consortiaOptions = document.getElementById('consortiaOption');
-                    consortiaOptions.hidden = false;
-
-                    const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
-                    consortiaCheckBox[0].checked = true;
-                    consortiaCheckBox[0].dispatchEvent(new Event('click'));
-                };
+                
             };
+        };
+        if(studyIndex === studyEntries.length - 1){
+            const consortiaOptions = document.getElementById('consortiaOption');
+            consortiaOptions.hidden = false;
+
+            const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+            consortiaCheckBox[0].checked = true;
+            consortiaCheckBox[0].dispatchEvent(new Event('click'));
         };
     });
 }
@@ -151,8 +157,9 @@ export const countSpecificStudy = (folderId) => {
     const studyOption = document.getElementById('studyOption');
     studyOption.hidden = false;
     let dataObject = JSON.parse(localStorage.data_summary);
+    let studyEntries = '';
     if(dataObject[folderId]){
-        const studyEntries = dataObject[folderId].studyEntries;
+        studyEntries = dataObject[folderId].studyEntries;
         let studiesList = document.getElementById('studiesList');
         studiesList.innerHTML = studyDropDownTemplate(studyEntries, 'studyOptions');
         document.getElementById('studyCount').textContent = Object.keys(studyEntries).length
@@ -167,7 +174,7 @@ export const countSpecificStudy = (folderId) => {
 
     addEventSearchStudies();
 
-    addEventSelectAllStudies();
+    addEventSelectAllStudies(studyEntries);
 };
 
 export const countSpecificData = async (selectedValues, studyEntries) => {
@@ -206,7 +213,7 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     // Add event listener to data type check box list
     addEventDataTypeCheckBox(studyEntries);
     addEventCasesControls(studyEntries);
-    addEventSelectAllDataType();
+    addEventSelectAllDataType(studyEntries);
     
     // Select first data type by default and trigger event
     if(selectedValues.length > 0){
@@ -255,7 +262,7 @@ const getAgeDataForAllStudies = async (studyEntries) => {
 
 export const clearGraphAndParameters = () => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
-    // document.getElementById('dataSummaryVizLineChart').innerHTML = '';
+    document.getElementById('dataSummaryVizPieChart').innerHTML = '';
+    document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
     document.getElementById('dataSummaryParameter').innerHTML = '';
-    // document.getElementById('toggleCharts').hidden = true;
 }
