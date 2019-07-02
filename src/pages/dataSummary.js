@@ -64,7 +64,7 @@ export const template = () => {
                 </div>
             </div>
             
-            <div class="main-summary-row">
+            <div class="main-summary-row dynamic-charts">
                 <div class="summary-inner-col" id="dataSummaryVizBarChart"></div>
                 <div class="summary-inner-col">
                     <div id="dataSummaryParameter"></div>

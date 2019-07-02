@@ -451,12 +451,13 @@ label {
     color: #574f4f !important;
 }
 
-#dataSummaryVizBarChart {
+.dynamic-charts {
     min-height: 400px;
+    margin-top: 2rem;
 }
 
 #dataSummaryVizPieChart2 {
-    min-height: 400px;
+    min-height: 300px
 }
 
 .about-confluence {

@@ -98,8 +98,9 @@ const generateDCChart = (jsonData, selection) => {
         .label(function(c){
             return `${coreVariables.BCAC['status'][c.key]} (${c.value})`
         });
-
-    let parameter = selection ? selection : 'ethnicityClass';
+    oldParameter = selection ? selection : oldParameter;
+    let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ethnicityClass';
+    document.getElementById('parametersDropDown').value = parameter;
     let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
     let data = cf.dimension(function(d){return d[parameter]});
 
