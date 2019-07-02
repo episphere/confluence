@@ -7,15 +7,14 @@ export const addEventStudiesCheckBox = (dataObject, folderId) => {
     Array.from(studiesCheckBox).forEach(element => {
         element.addEventListener('click', () => {
             clearGraphAndParameters();
-            showAnimation();
             const selectedValues = getAllSelectedStudies();
             if(selectedValues.length > 0){
+                showAnimation();
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
             }
             else{
                 document.getElementById('dataDropDown').hidden = true;
                 document.getElementById('dataCount').textContent = '0';
-                clearGraphAndParameters();
             }
         });
     });
@@ -132,7 +131,6 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
     Array.from(dataTypeCheckBox).forEach(element => {
         element.addEventListener('click', () => {
             clearGraphAndParameters();
-            showAnimation();
             const value = element.value;
             const studyIds = element.dataset.studyId.split(',');
 
@@ -141,14 +139,14 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
             if(casesCheckBox.checked && !controlsCheckBox.checked) status = "1";
             if(element.checked){
                 values.push(value);
+                showAnimation();
                 getData(studyEntries, studyIds, values, status);
             }
             else{
                 values.splice(values.indexOf(value), 1);
                 if(checkBoxchecker(dataTypeCheckBox) === true) {
+                    showAnimation();
                     getData(studyEntries, studyIds, values, status);
-                }else{
-                    clearGraphAndParameters();
                 }
             }
         });

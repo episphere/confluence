@@ -60,22 +60,22 @@ export const homePageVisualization = async () => {
 
         const ageData = data.age;        
         var trace = {
-            mode:'lines+markers',
-            type: "scatter",
-            // type: "bar",
+            // mode:'lines+markers',
+            // type: "scatter",
+            type: "bar",
             x:Object.keys(ageData),
             y:Object.keys(ageData).map(keys => ageData[keys]),
-            // marker: {
-            //     color: '#c0236a'
-            // },
             marker: {
-                color: '#c0236a',
-                size: 6
+                color: '#c0236a'
             },
-            line: {
-            color: '#000',
-            width: 1
-            }
+            // marker: {
+            //     color: '#c0236a',
+            //     size: 6
+            // },
+            // line: {
+            // color: '#000',
+            // width: 1
+            // }
         }
         if(trace.x.length>1){
             if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
