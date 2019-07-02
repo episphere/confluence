@@ -1,5 +1,6 @@
 import { config } from "./config.js";
 import { txt2dt } from "./visulization.js";
+import { variables } from "./variables.js";
 
 export const getFolderItems = async function(id){
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -222,8 +223,55 @@ export const removeActiveClass = (className) => {
     });
 }
 
+export const convertTextToJson = async (fileIds, status) => {
+    let allObjs = [];
+    for(const id of fileIds){
+        const intId = parseInt(id);
+        let rawData = await getFile(intId);
+        let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
+        if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
+            rows.pop()
+        };
+        const headings = rows[0];
+        rows.splice(0, 1);
+        var obj = rows.map(function (el) {
+            var obj = {};
+            for (var i = 0; i < el.length; i++) {
+              obj[headings[i].trim()] = el[i];
+            }
+            return obj;
+        });
+        allObjs = allObjs.concat(obj);
+    };
+    let jsonData = {};
+    
+    allObjs.forEach(data => {
+        for(const key in data){
+            const value = data[key];
+            if(value !== "" && variables.BCAC[key] && variables.BCAC[key][value]){
+                data[key] = variables.BCAC[key][value];
+            }
+        }
+        if(jsonData[data.BCAC_ID]){
+            jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
+        }else{
+            jsonData[data.BCAC_ID] = {};
+            jsonData[data.BCAC_ID] = data;
+        }
+    });
+    return Object.values(jsonData);
+}
+
 const sessionExpired = () => {
     localStorage.clear();
-    alert('session expired, reloading')
+    alert('session expired, reloading');
     location.reload();
+}
+
+export const showAnimation = () => {
+    document.getElementById('loadingAnimation').hidden = false;
+}
+
+export const hideAnimation = () => {
+    document.getElementById('loadingAnimation').hidden = true;
 }

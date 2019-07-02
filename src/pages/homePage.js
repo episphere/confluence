@@ -23,10 +23,31 @@ export const template = () => {
         </div>
     </div>
     <div class="main-summary-row">
-        <div class="summary-inner-col" id="barChart"></div>
-        <div class="summary-inner-col" id="pieChart"></div>
+        <div class="summary-inner-col col-md-8" id="barChart"></div>
+        <div class="summary-inner-col col-md-4" id="pieChart"></div>
+    </div>
+    <div class="main-summary-row about-confluence">
+        <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/PublishedContent/Images/research/cancer-types/breast-cancer/Confluence_Logo.__v10025474.png"></div>
+        <div class="col-md-9 align-left">The Confluence project will develop a large research resource by 2020 to uncover breast cancer genetics through genome-wide association studies (GWAS). The resource will include at least 300,000 breast cancer cases and 300,000 controls of different races/ethnicities. This will be accomplished by the confluence of existing GWAS and new genome-wide genotyping data to be generated through this project.</div>
+        
+        <div class="col-md-12 align-left">
+            Broad scientific aims that can be addressed through this resource include:<br>
+            <ol>
+                <li>To discover susceptibility loci and advance knowledge of etiology of breast cancer overall and by subtypes.</li>
+                <li>To develop polygenic risk scores and integrate them with known risk factors for personalized risk assessment for breast cancer overall and by subtypes. </li>
+                <li>To discover loci for breast cancer prognosis, long-term survival, response to treatment, and second breast cancer. </li>
+            </ol>
+        </div>
     </div>
     `;
+}
+
+export const confluenceLogo = () => {
+    let path = '/confluence/static/images/image.png';
+    if(location.origin.indexOf('localhost') !== -1) path = '/static/images/image.png';
+    return `<a href="#" title="Home" rel="home">
+                <img src="${path}" height="40px" width="300px" alt="NCI Confluence Data Commons" class="banner-logo">
+            </a>`;
 }
 
 export const homePageVisualization = async () => {
@@ -39,22 +60,22 @@ export const homePageVisualization = async () => {
 
         const ageData = data.age;        
         var trace = {
-            mode:'lines+markers',
-            type: "scatter",
-            // type: "bar",
+            // mode:'lines+markers',
+            // type: "scatter",
+            type: "bar",
             x:Object.keys(ageData),
             y:Object.keys(ageData).map(keys => ageData[keys]),
-            // marker: {
-            //     color: '#c0236a'
-            // },
             marker: {
-                color: '#c0236a',
-                size: 6
+                color: '#c0236a'
             },
-            line: {
-            color: '#000',
-            width: 1
-            }
+            // marker: {
+            //     color: '#c0236a',
+            //     size: 6
+            // },
+            // line: {
+            // color: '#000',
+            // width: 1
+            // }
         }
         if(trace.x.length>1){
             if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){

@@ -1,11 +1,13 @@
-export const studyDropDownTemplate = (entries, studyOptionsId) => {
+export const studyDropDownTemplate = (entries) => {
     let template = '';
-    template += `<select multiple id="${studyOptionsId}" class="dropdown-options">
-        `;
+    
     for(let studyId in entries){
-        template += `<option value="${studyId}">${entries[studyId].name}</option>`
+        template += `<li>
+                    <input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>
+                    <label>${entries[studyId].name}</label>
+                </li>`
     }
-    template += '</select>';
+    
     return template;
 };
 
@@ -19,11 +21,16 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
     return template;
 };
 
-export const parametersDropDownTemplate = (fileName, parameters) => {
+export const parametersDropDownTemplate = (data) => {
+    const parametersLength = data.map(d => Object.keys(d).length);
+    if(parametersLength.length === 0) return;
+    let maximumparameters = Math.max(...parametersLength);
+    let parameters = Object.keys(data[parametersLength.indexOf(maximumparameters)]);
+    parameters.sort();
     let template = '';
-    template += `${fileName}</br></br>
-            <select id="parametersDropDown" class="dropdown-options">
-            <option disabled selected> -- select a parameter -- </option>
+    template += `
+            <select id="parametersDropDown" class="dropdown-options custom__form-control">
+                <option disabled selected> -- select a parameter -- </option>
             `;
     parameters.forEach(parameter => {
         template += `<option value="${parameter}">${parameter}</option>`

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
     <head>
         <meta charset="utf-8">
         <link rel="shortcut icon" href="static/images/favicon.ico">
@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script src="static/js/d3.min.js"></script>
@@ -22,10 +21,7 @@
                 <div class="container">
                     <div id="alertMessage"></div>
                     <div class="row">
-                        <div class="col">
-                            <a href="#" title="Home" rel="home" id="logo">
-                                <img src="/confluence/static/images/image.png" height="50px" width="300px" alt="NCI Confluence Data Commons" class="banner-logo">
-                            </a>
+                        <div class="col" id="confluenceLogo">
                         </div>
                         <div class="col">
                             <div class="row authentication-link">
@@ -61,8 +57,7 @@
             
             <div id="maincontainer">
                 <div class="container">
-                    <div class="main-container">
-                        <div id="confluenceDiv"></div>
+                    <div class="main-container" id="confluenceDiv">
                     </div>
                 </div>
             </div>

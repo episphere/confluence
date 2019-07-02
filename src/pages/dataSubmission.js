@@ -49,24 +49,24 @@ export function template() {
                             }
                             template += `<li>
                                         <i class="fas fa-file-upload"></i> 
-                                        <input type="file" class="input-file-upload"/> 
-                                        <a class="upload-file" data-folder-id="${dataId}" href="#"><i title="Upload new file" class="fas fa-arrow-up"></i></a>
+                                        <input type="file" class="file-upload"/> 
+                                        <a class="uploadFile" data-folder-id="${dataId}" href="#"><i title="Upload new file" class="fas fa-arrow-up"></i></a>
                                     </li>
                                 </ul>`
                         }
                     }
                     template += `<li>
                                 <i class="fas fa-folder-plus"></i> 
-                                <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
-                                <a class="create-folder" data-folder-id="${studyId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
+                                <input type="text" placeholder="Enter folder name" class="create-folder"/> 
+                                <a class="createFolder" data-folder-id="${studyId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
                             </li>
                         </ul>`
                 }
             }
             template += `<li>
                         <i class="fas fa-folder-plus"></i> 
-                        <input type="text" placeholder="Enter folder name" class="input-create-folder"/> 
-                        <a class="create-folder" data-folder-id="${consortiaId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
+                        <input type="text" placeholder="Enter folder name" class="create-folder"/> 
+                        <a class="createFolder" data-folder-id="${consortiaId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
                     </li>
                 </ul>`
         }
@@ -96,7 +96,7 @@ export const dataSubmission = () => {
             } 
         })
     });
-
+    collapsible[0].dispatchEvent(new Event('click'));
     // let fileDownload = document.getElementsByClassName('fa-file-download');
     // Array.from(fileDownload).forEach(element => {
     //     element.addEventListener('click', function() {
@@ -107,8 +107,8 @@ export const dataSubmission = () => {
     // });
 
     // Create new folder
-    let creatFolder = document.getElementsByClassName('create-folder');
-    Array.from(creatFolder).forEach(element => {
+    let creatFolderElement = document.getElementsByClassName('createFolder');
+    Array.from(creatFolderElement).forEach(element => {
         element.addEventListener('click', async function() {
             if(this.previousElementSibling.value && this.previousElementSibling.value !== ""){
                 const folderId = this.dataset.folderId;
@@ -138,7 +138,7 @@ export const dataSubmission = () => {
     });
 
     // file upload
-    let uploadFile = document.getElementsByClassName('upload-file');
+    let uploadFile = document.getElementsByClassName('uploadFile');
     Array.from(uploadFile).forEach(async element => {
         element.addEventListener('click', async function() {
             if(this.previousElementSibling.files.length > 0){
