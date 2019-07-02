@@ -1,4 +1,4 @@
-import { getFile, downloadFileTxt, convertTextToJson, hideAnimation } from './shared.js';
+import { getFile, downloadFileTxt, convertTextToJson, hideAnimation, disableEnableCheckBox } from './shared.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
 import { variables } from './variables.js';
 let oldParameter = '';
@@ -146,6 +146,7 @@ const generateDCChart = (jsonData, selection) => {
     }
     document.getElementById('pieChartLabel').innerHTML = `${pieLabel}`;
     hideAnimation();
+    disableEnableCheckBox(false);
 }
 
 const valUnique=function(k,v, jsonData){

@@ -275,3 +275,18 @@ export const showAnimation = () => {
 export const hideAnimation = () => {
     document.getElementById('loadingAnimation').hidden = true;
 }
+
+export const disableEnableCheckBox = (value) => {
+    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
+    Array.from(studiesCheckBox).forEach(element => {
+        element.disabled = value;
+    });
+
+    const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+    Array.from(dataTypeCheckBox).forEach(element => {
+        element.disabled = value;
+    });
+
+    document.getElementById('studySelectAll').disabled = value;
+    document.getElementById('dataTypeSelectAll').disabled = value;
+}

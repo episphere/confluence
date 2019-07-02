@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataSummary.js';
 import { getData } from './visulization.js'
-import { showAnimation } from './shared.js';
+import { showAnimation, disableEnableCheckBox } from './shared.js';
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -10,6 +10,7 @@ export const addEventStudiesCheckBox = (dataObject, folderId) => {
             const selectedValues = getAllSelectedStudies();
             if(selectedValues.length > 0){
                 showAnimation();
+                disableEnableCheckBox(true);
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
             }
             else{
@@ -55,6 +56,7 @@ const triggerEventStudies = (studyEntries) => {
     else{
         clearGraphAndParameters();
         showAnimation();
+        disableEnableCheckBox(true);
         let caseCounter = 0;
         let controlCounter = 0;
         let dataCount = 0;
@@ -140,12 +142,14 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
             if(element.checked){
                 values.push(value);
                 showAnimation();
+                disableEnableCheckBox(true);
                 getData(studyEntries, studyIds, values, status);
             }
             else{
                 values.splice(values.indexOf(value), 1);
                 if(checkBoxchecker(dataTypeCheckBox) === true) {
                     showAnimation();
+                    disableEnableCheckBox(true);
                     getData(studyEntries, studyIds, values, status);
                 }
             }
@@ -214,6 +218,7 @@ const dispatchEventDataTypeSelectAll = (studyEntries) => {
     else{
         clearGraphAndParameters();
         showAnimation();
+        disableEnableCheckBox(true);
         getData(studyEntries, studyIds, values, null);
     }
 }
