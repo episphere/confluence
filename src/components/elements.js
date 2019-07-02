@@ -22,7 +22,9 @@ export const dataDropDownTemplate = (entries, dataOptionsId) => {
 };
 
 export const parametersDropDownTemplate = (data) => {
-    let parameters = Object.keys(data[0]);
+    const parametersLength = data.map(d => Object.keys(d).length);
+    let maximumparameters = Math.max(...parametersLength);
+    let parameters = Object.keys(data[parametersLength.indexOf(maximumparameters)]);
     parameters.sort();
     let template = '';
     template += `

@@ -1,11 +1,13 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataSummary.js';
 import { getData } from './visulization.js'
+import { showAnimation } from './shared.js';
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
-
     Array.from(studiesCheckBox).forEach(element => {
         element.addEventListener('click', () => {
+            clearGraphAndParameters();
+            showAnimation();
             const selectedValues = getAllSelectedStudies();
             if(selectedValues.length > 0){
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
@@ -52,6 +54,8 @@ const triggerEventStudies = (studyEntries) => {
         clearGraphAndParameters();
     }
     else{
+        clearGraphAndParameters();
+        showAnimation();
         let caseCounter = 0;
         let controlCounter = 0;
         let dataCount = 0;
@@ -127,6 +131,8 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
     let status = null;
     Array.from(dataTypeCheckBox).forEach(element => {
         element.addEventListener('click', () => {
+            clearGraphAndParameters();
+            showAnimation();
             const value = element.value;
             const studyIds = element.dataset.studyId.split(',');
 
@@ -208,6 +214,8 @@ const dispatchEventDataTypeSelectAll = (studyEntries) => {
         clearGraphAndParameters();
     }
     else{
+        clearGraphAndParameters();
+        showAnimation();
         getData(studyEntries, studyIds, values, null);
     }
 }

@@ -1,6 +1,6 @@
 import { config } from "./config.js";
 import { txt2dt } from "./visulization.js";
-import { coreVariables } from "./variables.js";
+import { variables } from "./variables.js";
 
 export const getFolderItems = async function(id){
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -248,8 +248,8 @@ export const convertTextToJson = async (fileIds, status) => {
     allObjs.forEach(data => {
         for(const key in data){
             const value = data[key];
-            if(value !== "" && coreVariables.BCAC[key] && coreVariables.BCAC[key][value]){
-                data[key] = coreVariables.BCAC[key][value];
+            if(value !== "" && variables.BCAC[key] && variables.BCAC[key][value]){
+                data[key] = variables.BCAC[key][value];
             }
         }
         if(jsonData[data.BCAC_ID]){
@@ -259,8 +259,6 @@ export const convertTextToJson = async (fileIds, status) => {
             jsonData[data.BCAC_ID] = data;
         }
     });
-    console.log(jsonData);
-
     return Object.values(jsonData);
 }
 
@@ -268,4 +266,12 @@ const sessionExpired = () => {
     localStorage.clear();
     alert('session expired, reloading');
     location.reload();
+}
+
+export const showAnimation = () => {
+    document.getElementById('loadingAnimation').hidden = false;
+}
+
+export const hideAnimation = () => {
+    document.getElementById('loadingAnimation').hidden = true;
 }

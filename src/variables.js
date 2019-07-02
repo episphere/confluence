@@ -1,4 +1,4 @@
-export const coreVariables = {
+export const variables = {
     BCAC: {
         contrType: {
             1: 'population-based',

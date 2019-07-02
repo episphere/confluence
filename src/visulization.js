@@ -1,6 +1,5 @@
-import { getFile, downloadFileTxt, convertTextToJson } from './shared.js';
+import { getFile, downloadFileTxt, convertTextToJson, hideAnimation } from './shared.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
-import { coreVariables } from './variables.js';
 let oldParameter = '';
 
 const unique=function(arr){
@@ -97,7 +96,7 @@ const generateDCChart = (jsonData, selection) => {
             return `${c.key} (${c.value})`
         });
 
-        
+
     oldParameter = selection ? selection : oldParameter;
     let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ethnicityClass';
     document.getElementById('parametersDropDown').value = parameter;
@@ -136,7 +135,7 @@ const generateDCChart = (jsonData, selection) => {
 
     dc.renderAll();
     
-    document.getElementById('loadingAnimation').hidden = true;
+    hideAnimation();
 }
 
 const valUnique=function(k,v, jsonData){
@@ -174,7 +173,7 @@ const generatCharts = (data, parameter) => {
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot('dataSummaryVizBarChart', allTraces1, layout, {responsive: true, displayModeBar: false});
-    document.getElementById('loadingAnimation').hidden = true;
+    hideAnimation();
 };
 
 export const exploreData = async (fileId, fileName) => {
