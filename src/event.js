@@ -3,31 +3,33 @@ import { getData } from './visulization.js'
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
-    let selectedValues = [];
 
     Array.from(studiesCheckBox).forEach(element => {
         element.addEventListener('click', () => {
-            const studyId = element.value;
-            if(element.checked === true){
-                if(selectedValues.indexOf(studyId) === -1) selectedValues.push(studyId);
+            const selectedValues = getAllSelectedStudies();
+            if(selectedValues.length > 0){
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
-            }else{
-                selectedValues.splice(selectedValues.indexOf(studyId), 1);
-                if(checkBoxchecker(studiesCheckBox) === false) {
-                    document.getElementById('dataDropDown').hidden = true;
-                    document.getElementById('dataCount').textContent = '0';
-                    document.getElementById('caseCount').textContent = '0';
-                    document.getElementById('controlCount').textContent = '0';
-                    clearGraphAndParameters();
-                }
-                if(checkBoxchecker(studiesCheckBox) === true) countSpecificData(selectedValues, dataObject[folderId].studyEntries);
+            }
+            else{
+                document.getElementById('dataDropDown').hidden = true;
+                document.getElementById('dataCount').textContent = '0';
+                clearGraphAndParameters();
             }
         });
     });
 };
 
+const getAllSelectedStudies = () => {
+    let selectedValues = [];
+    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
+    Array.from(studiesCheckBox).forEach(element => {
+        if(element.checked) selectedValues.push(element.value);
+    });
+    return selectedValues;
+}
+
 const triggerEventStudies = (studyEntries) => {
-    let allIds = [];
+    let studyIds = [];
     let values = [];
     let status = null;
     const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
@@ -36,7 +38,7 @@ const triggerEventStudies = (studyEntries) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
     
     studiesCheckBox.forEach(element => {
-        if(element.checked) allIds.push(element.value);
+        if(element.checked) studyIds.push(element.value);
     });
     dataTypeCheckBox.forEach(element => {
         if(element.checked) values.push(element.value);
@@ -45,14 +47,15 @@ const triggerEventStudies = (studyEntries) => {
     if(!casesCheckBox.checked && controlsCheckBox.checked) status = "0";
     if(casesCheckBox.checked && !controlsCheckBox.checked) status = "1";
 
-    if(allIds.length === 0 || values.length === 0) {
+    if(studyIds.length === 0) document.getElementById('dataDropDown').hidden = true;
+    if(studyIds.length === 0 || values.length === 0) {
         clearGraphAndParameters();
     }
     else{
         let caseCounter = 0;
         let controlCounter = 0;
         let dataCount = 0;
-        allIds.forEach(id => {
+        studyIds.forEach(id => {
             dataCount += Object.keys(studyEntries[id].dataEntries).length;
             const dataEntries = studyEntries[id].dataEntries;
             for(let dataId in dataEntries){
@@ -66,7 +69,7 @@ const triggerEventStudies = (studyEntries) => {
         document.getElementById('dataCount').textContent = dataCount;
         document.getElementById('caseCount').textContent = caseCounter;
         document.getElementById('controlCount').textContent = controlCounter;
-        getData(studyEntries, allIds, values, status);
+        getData(studyEntries, studyIds, values, status);
     }
 }
 

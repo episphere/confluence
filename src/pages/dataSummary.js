@@ -225,8 +225,6 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     }
     
     document.getElementById('dataCount').textContent = dataCounter;
-    document.getElementById('caseCount').textContent = caseCounter;
-    document.getElementById('controlCount').textContent = controlCounter;
     
     // Data type search/filter Event
     addEventSearchDataType();
