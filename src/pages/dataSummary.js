@@ -37,7 +37,10 @@ export const template = () => {
                         <ul class="align-left" id="dataTypeList"></ul>
                     </ul>
                 </div>
-                <div class="summary-inner-col" id="dataSummaryVizPieChart"></div>
+                <div class="summary-inner-col">
+                    <div id="dataSummaryVizPieChart"></div>
+                    <label id="statusPieChart"></label>
+                </div>
                 <div class="summary-inner-col" hidden=true>
                     <span class="interactive-summary-label">Cases</span></br>
                     <input type="checkbox" class="cases-controls-chkbox" checked id="casesCheckBox"> <i for="casesCheckBox" class="fas fa-3x fa-user"></i>
@@ -65,10 +68,14 @@ export const template = () => {
             </div>
             
             <div class="main-summary-row dynamic-charts">
-                <div class="summary-inner-col" id="dataSummaryVizBarChart"></div>
+                <div class="summary-inner-col">
+                    <div id="dataSummaryVizBarChart"></div>
+                    <label id="barChartLabel"></label>
+                </div>
                 <div class="summary-inner-col">
                     <div id="dataSummaryParameter"></div>
                     <div id="dataSummaryVizPieChart2"></div>
+                    <label id="pieChartLabel"></label>
                 </div>
             </div>
         </div>
@@ -263,4 +270,7 @@ export const clearGraphAndParameters = () => {
     document.getElementById('dataSummaryVizPieChart').innerHTML = '';
     document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
     document.getElementById('dataSummaryParameter').innerHTML = '';
+    document.getElementById('barChartLabel').innerHTML = '';
+    document.getElementById('pieChartLabel').innerHTML = '';
+    document.getElementById('statusPieChart').innerHTML = '';
 }

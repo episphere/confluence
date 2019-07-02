@@ -73,19 +73,19 @@ export const variables = {
         },
         ageInt: {
             888: "Don't Know",
-            'label': 'Age at interview/questionNot Applicableire for controls and cases'
+            'label': 'Age at interview/questionnaire for controls and cases'
         },
         intDate : {
             '08/08/8000': "Don't Know",
-            'label': 'Date at interview/questionNot Applicableire for cases and controls '
+            'label': 'Date at interview/questionnaire for cases and controls '
         },
         refMonth: {
             888: "Don't Know",
-            'label': 'Month of diagnosis of breast cancer for cases and month of completing interview/questionNot Applicableire for controls'
+            'label': 'Month of diagnosis of breast cancer for cases and month of completing interview/questionnaire for controls'
         },
         refYear: {
             888: "Don't Know",
-            'label': 'Year of diagnosis of breast cancer for cases and year of completing interview/questionNot Applicableire for controls'
+            'label': 'Year of diagnosis of breast cancer for cases and year of completing interview/questionnaire for controls'
         },
         AgeDiagIndex: {
             888: "Don't Know",

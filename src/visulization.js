@@ -1,5 +1,6 @@
 import { getFile, downloadFileTxt, convertTextToJson, hideAnimation } from './shared.js';
 import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
+import { variables } from './variables.js';
 let oldParameter = '';
 
 const unique=function(arr){
@@ -135,7 +136,15 @@ const generateDCChart = (jsonData, selection) => {
         .elasticY(true);
 
     dc.renderAll();
-    
+    document.getElementById('barChartLabel').innerHTML = `${variables.BCAC['ageInt']['label']}`;
+    document.getElementById('statusPieChart').innerHTML = `${variables.BCAC['status']['label']}`;
+    let pieLabel = ''
+    if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
+        pieLabel = variables.BCAC[parameter]['label'];
+    }else{
+        pieLabel = parameter;
+    }
+    document.getElementById('pieChartLabel').innerHTML = `${pieLabel}`;
     hideAnimation();
 }
 
