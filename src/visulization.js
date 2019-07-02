@@ -123,14 +123,15 @@ const generateDCChart = (jsonData, selection) => {
 
     
     let barChart = dc.barChart('#dataSummaryVizBarChart');
-    
     let age = cf.dimension(function(d) {return d.ageInt;});
     let ageCount = age.group().reduceCount();
     barChart.dimension(age)
         .group(ageCount)
         .x(d3.scaleLinear().domain([20,100]))
         .xAxisLabel('Age')
-        .yAxisLabel('Count')
+        .yAxisLabel(function(){
+            return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
+        })
         .elasticY(true);
 
     dc.renderAll();
