@@ -69,23 +69,21 @@ const getFileContent = async (allIds, status) => {
 
 const generateDCChart = (jsonData, selection) => {
     let cf = crossfilter(jsonData);
+    const ageInt = 'ageInt';
     dc.config.defaultColors(d3.schemeCategory10);
     
     let pieChart = dc.pieChart("#dataSummaryVizPieChart");
     let status = cf.dimension(function(d){return d.status});
 
     let status_reduce = valUnique('status',0, jsonData)
-    let count_study = valUnique('study',0, jsonData)
     let G_status = status.group().reduce(
         // reduce in
         function(p,v){
-            count_study[v.study]+=1
             status_reduce[v.status]+=1
             return status_reduce[v.status]
         },
         //reduce out
         function(p,v){
-            count_study[v.study]-=1
             status_reduce[v.status]-=1
             return status_reduce[v.status]
         },
@@ -98,6 +96,8 @@ const generateDCChart = (jsonData, selection) => {
         .label(function(c){
             return `${c.key} (${c.value})`
         });
+
+        
     oldParameter = selection ? selection : oldParameter;
     let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ethnicityClass';
     document.getElementById('parametersDropDown').value = parameter;
@@ -105,16 +105,13 @@ const generateDCChart = (jsonData, selection) => {
     let data = cf.dimension(function(d){return d[parameter]});
 
     let data_reduce = valUnique(parameter, 0, jsonData)
-    let count_study2 = valUnique('study', 0, jsonData)
     let G_status2 = data.group().reduce(
         function(p,v){
-            count_study2[v.study]+=1
-            data_reduce[v[parameter]]+=1
+            data_reduce[v[parameter]] += 1
             return data_reduce[v[parameter]]
         },
         function(p,v){
-            count_study2[v.study]-=1
-            data_reduce[v[parameter]]-=1
+            data_reduce[v[parameter]] -= 1
             return data_reduce[v[parameter]]
         },
         function(p){return 0}
