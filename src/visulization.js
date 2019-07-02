@@ -68,8 +68,7 @@ const getFileContent = async (allIds, status) => {
 
 const generateDCChart = (jsonData, selection) => {
     let cf = crossfilter(jsonData);
-    const ageInt = 'ageInt';
-    dc.config.defaultColors(d3.schemeCategory10);
+    dc.config.defaultColors(d3.schemeSet2);
     
     let pieChart = dc.pieChart("#dataSummaryVizPieChart");
     let status = cf.dimension(function(d){return d.status});
@@ -131,7 +130,8 @@ const generateDCChart = (jsonData, selection) => {
         .group(ageCount)
         .x(d3.scaleLinear().domain([20,100]))
         .xAxisLabel('Age')
-        .yAxisLabel('Count');
+        .yAxisLabel('Count')
+        .elasticY(true);
 
     dc.renderAll();
     
