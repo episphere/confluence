@@ -289,4 +289,6 @@ export const disableEnableCheckBox = (value) => {
 
     document.getElementById('studySelectAll').disabled = value;
     document.getElementById('dataTypeSelectAll').disabled = value;
+    document.getElementById('searchStudies').disabled = value;
+    document.getElementById('searchdataTypes').disabled = value;
 }

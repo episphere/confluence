@@ -155,7 +155,7 @@ export const variables = {
             0: 'No',
             1: 'Yes',
             888: "Don't Know",
-            'label': 'Family history of  breast cancer in a first degree relative (0=no, 1=yes)'
+            'label': 'Family history of  breast cancer in a first degree relative'
         },
         fhnumber: {
             888: "Don't Know",

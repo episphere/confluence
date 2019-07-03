@@ -94,6 +94,10 @@ body {
     padding: 0;
 }
 
+#pieChartLabel {
+    margin-top: 1rem !important;
+}
+
 .dropdown-options {
     padding: .275rem;
     border: 1px solid #ced4da;
