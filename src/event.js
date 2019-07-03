@@ -49,6 +49,7 @@ const triggerEventStudies = (studyEntries) => {
     if(!casesCheckBox.checked && controlsCheckBox.checked) status = "0";
     if(casesCheckBox.checked && !controlsCheckBox.checked) status = "1";
 
+    document.getElementById('dataDropDown').hidden = false;
     if(studyIds.length === 0) document.getElementById('dataDropDown').hidden = true;
     if(studyIds.length === 0 || values.length === 0) {
         clearGraphAndParameters();
