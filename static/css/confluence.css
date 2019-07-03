@@ -96,6 +96,7 @@ body {
 
 #pieChartLabel {
     margin-top: 1rem !important;
+    white-space: pre-line;
 }
 
 .dropdown-options {
