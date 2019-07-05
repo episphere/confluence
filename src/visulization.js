@@ -93,6 +93,7 @@ export const generateDCChart = (cf, jsonData, selection) => {
     pieChart.innerRadius(60)
         .dimension(status)
         .group(G_status)
+        .externalRadiusPadding(5)
         .label(function(c){
             return `${c.key} (${c.value})`
         });
