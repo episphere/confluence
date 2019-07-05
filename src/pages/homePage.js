@@ -46,7 +46,7 @@ export const confluenceLogo = () => {
     let path = '/confluence/static/images/image.png';
     if(location.origin.indexOf('localhost') !== -1) path = '/static/images/image.png';
     return `<a href="#" title="Home" rel="home">
-                <img src="${path}" height="40px" width="300px" alt="NCI Confluence Data Commons" class="banner-logo">
+                <img src="${path}" height="40px" width="300px" alt="NCI Confluence Data Platform" class="banner-logo">
             </a>`;
 }
 
@@ -60,22 +60,12 @@ export const homePageVisualization = async () => {
 
         const ageData = data.age;        
         var trace = {
-            // mode:'lines+markers',
-            // type: "scatter",
             type: "bar",
             x:Object.keys(ageData),
             y:Object.keys(ageData).map(keys => ageData[keys]),
             marker: {
                 color: '#c0236a'
-            },
-            // marker: {
-            //     color: '#c0236a',
-            //     size: 6
-            // },
-            // line: {
-            // color: '#000',
-            // width: 1
-            // }
+            }
         }
         if(trace.x.length>1){
             if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
