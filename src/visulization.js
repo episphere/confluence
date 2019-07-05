@@ -1,7 +1,7 @@
 import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
-import { addEventShowAllVariables, addEventVariableItem } from './event.js';
+import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } from './event.js';
 import { unHideDivs } from './pages/dataExploration.js';
 let oldParameter = '';
 
@@ -66,6 +66,8 @@ const getFileContent = async (allIds) => {
     addEventVariableItem(cf, jsonData);
     document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
     addEventShowAllVariables(cf, jsonData);
+    document.getElementById('showPieChart').innerHTML = '<input type="checkbox"> Show pie chart'
+    addEventShowPieChart(cf, jsonData);
     generateDCChart(cf, jsonData);
 };
 
@@ -125,7 +127,7 @@ export const generateDCChart = (cf, jsonData, selection) => {
     disableCheckBox(false);
 }
 
-export const renderPieChart = (cf, jsonData, selection) => {
+export const renderPieChart = (cf, jsonData, selection, pieChart) => {
     oldParameter = selection ? selection : oldParameter;
     let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ER_statusIndex';
     let variableItem = document.getElementsByClassName('variableItem');
@@ -139,7 +141,9 @@ export const renderPieChart = (cf, jsonData, selection) => {
     let data_reduce = valUnique(parameter, 0, jsonData);
 
     // If there are less then 10 unique value render pie chart else render bar chart
-    if(Object.keys(data_reduce).length < 10){
+    if(Object.keys(data_reduce).length < 10 || pieChart){
+        document.getElementById('showPieChart').childNodes[0].checked = false;
+        document.getElementById('showPieChart').style.display = 'none';
         document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
         let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
         let data = cf.dimension(function(d){return d[parameter]});
@@ -166,6 +170,7 @@ export const renderPieChart = (cf, jsonData, selection) => {
         pieChart2.render();
     }
     else{
+        document.getElementById('showPieChart').style.display = 'block';
         document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
         const { min, max } = getMinMax(jsonData, parameter);
         let barChart = dc.barChart('#dataSummaryVizPieChart2');

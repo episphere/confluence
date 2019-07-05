@@ -205,6 +205,7 @@ export const addEventVariableItem = (cf, jsonData) => {
     let variableItem = document.getElementsByClassName('variableItem');
     Array.from(variableItem).forEach(element => {
         element.addEventListener('click', () => {
+            if(element.classList.contains('active')) return;
             removeActiveClass('variableItem', 'active');
             element.classList.add('active');
             const variable = element.innerHTML;
@@ -225,6 +226,23 @@ export const addEventShowAllVariables = (cf, jsonData) => {
             parameterList.innerHTML = parameterListTemplate();
         }
         addEventVariableItem(cf, jsonData);
+    });
+}
+
+export const addEventShowPieChart = (cf, jsonData) => {
+    let variable = '';
+    const showPieChart = document.getElementById('showPieChart');
+    showPieChart.childNodes[0].addEventListener('click', () => {
+        let variableItem = document.getElementsByClassName('variableItem');
+        Array.from(variableItem).forEach(element => {
+            if(element.classList.contains('active')) variable = element.innerHTML;
+        })
+        if(showPieChart.childNodes[0].checked){
+            renderPieChart(cf, jsonData, variable, true);
+        }
+        else{
+            renderPieChart(cf, jsonData, variable, false);
+        }
     });
 }
 

@@ -68,6 +68,7 @@ export const template = () => {
                     <label id="barChartLabel"></label>
                 </div>
                 <div class="summary-inner-col col-md-4">
+                    <span style="text-align:right;display:none" id="showPieChart"></span>
                     <div id="dataSummaryVizPieChart2"></div>
                     <label id="pieChartLabel"></label>
                 </div>
@@ -244,6 +245,7 @@ export const clearGraphAndParameters = () => {
     document.getElementById('barChartLabel').innerHTML = '';
     document.getElementById('pieChartLabel').innerHTML = '';
     document.getElementById('statusPieChart').innerHTML = '';
+    document.getElementById('showPieChart').style.display = 'none';
 }
 
 export const unHideDivs = () => {
