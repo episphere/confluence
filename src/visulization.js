@@ -140,6 +140,7 @@ export const renderPieChart = (cf, jsonData, selection) => {
 
     // If there are less then 10 unique value render pie chart else render bar chart
     if(Object.keys(data_reduce).length < 10){
+        document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
         let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
         let data = cf.dimension(function(d){return d[parameter]});
         
@@ -165,6 +166,7 @@ export const renderPieChart = (cf, jsonData, selection) => {
         pieChart2.render();
     }
     else{
+        document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
         const { min, max } = getMinMax(jsonData, parameter);
         let barChart = dc.barChart('#dataSummaryVizPieChart2');
         let age = cf.dimension(function(d) {return d[parameter];});
