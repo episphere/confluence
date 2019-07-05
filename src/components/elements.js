@@ -11,57 +11,44 @@ export const studyDropDownTemplate = (entries) => {
     return template;
 };
 
-export const dataDropDownTemplate = (entries, dataOptionsId) => {
-    let template = '';
-    template += `<select multiple id="${dataOptionsId}" class="dropdown-options">`;
-    for(let dataName in entries){
-        template += `<option value="${entries[dataName].id}">${dataName}</option>`
+export const parameterListTemplate = (jsonData) => {
+    let parameters = [];
+    let template = ''
+    if(!jsonData){
+        document.getElementById('variableLabel').innerHTML = 'Most useful variables';
+        document.getElementById('parameterList').classList.remove('list-variables');
+        if(document.getElementById('toggleVariable')){
+            document.getElementById('toggleVariable').innerHTML = 'Show All <i class="fas fa-caret-down"></i>';
+        }else{
+            document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>';
+        }
+        parameters = ['ER_statusIndex', 'ethnicityClass', 'famHist', 'contrType'];
+        parameters.forEach((param) => {
+            template += `<a class="list-group-item list-group-item-action variableItem" href="#">${param}</a>`
+        });
     }
-    template += '</select>';
-    return template;
-};
+    else{
+        const parametersLength = jsonData.map(d => Object.keys(d).length);
+        if(parametersLength.length === 0) return;
+        let maximumparameters = Math.max(...parametersLength);
+        parameters = Object.keys(jsonData[parametersLength.indexOf(maximumparameters)]);
+        parameters.sort();
+        
+        document.getElementById('variableLabel').innerHTML = 'All variables';
+        document.getElementById('parameterList').classList.add('list-variables');
+        if(document.getElementById('toggleVariable')){
+            document.getElementById('toggleVariable').innerHTML = 'Show Less <i class="fas fa-caret-up"></i>';
+        }else{
+            document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show Less <i class="fas fa-caret-up"></i></a>';
+        }
 
-export const parametersDropDownTemplate = (data) => {
-    const parametersLength = data.map(d => Object.keys(d).length);
-    if(parametersLength.length === 0) return;
-    let maximumparameters = Math.max(...parametersLength);
-    let parameters = Object.keys(data[parametersLength.indexOf(maximumparameters)]);
-    parameters.sort();
-    let template = '';
-    template += `
-            <select id="parametersDropDown" class="dropdown-options custom__form-control">
-                <option disabled selected> -- select a parameter -- </option>
-            `;
-    parameters.forEach(parameter => {
-        template += `<option value="${parameter}">${parameter}</option>`
-    });
-    template += '</select>';
-    return template;
-};
-
-export const dataExplorationTable = (fileData, all) => {
-    let template = '';
-    template += '<table class="table table-hover table-condensed table-bordered">';
+        parameters.forEach((param) => {
+            template += `<a class="list-group-item list-group-item-action variableItem" href="#">${param}</a>`
+        });
+    }
     
-    template += '<thead><tr>';
-    all[0].forEach(fields => {
-        template += `<th>${fields}</th>`;
-    });
-    template += '</tr></thead>';
-
-    template += '<tbody>';
-    for(let index = 0; index < fileData.length; index++){
-        if(index !== 0){
-            template += '<tr>';
-            fileData[index].forEach(fields => {
-                template += `<td>${fields}</td>`;
-            });
-            template += '</tr>';
-        };
-    };
-    template += '</tbody></table>';
     return template;
-};
+}
 
 export const alertTemplate = (className, message) => {
     return `

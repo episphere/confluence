@@ -173,7 +173,6 @@ label {
 
 .content-wrapper {
     padding-top: 15px;
-    /* height: inherit; */
 }
 
 #confluenceDiv {
@@ -181,10 +180,6 @@ label {
     width: inherit;
     text-align: center;
     min-height: inherit;
-}
-
-#dataSummaryParameter {
-    margin: 1rem 0;
 }
 
 .data-summary-label {
@@ -467,8 +462,40 @@ label {
     fill: #000 !important;
 }
 
+#variableLabel {
+    font-weight: bold;
+}
+
 #dataSummaryVizPieChart2 {
-    min-height: 300px
+    min-height: 360px;
+}
+
+#dataSummaryVizPieChart {
+    padding: 0 0.5rem;
+}
+
+.list-group-item{
+    padding: 0.25rem 1.25rem !important;
+}
+
+.list-group-item.active{
+    background-color: #fff !important;
+    border-color: #1127fc !important;
+    color: #000 !important;
+}
+
+.list-variables{
+    overflow: scroll;
+    max-height: 180px;
+}
+
+#dataSummaryParameter {
+    max-width: 275px;
+}
+
+.list-group{
+    margin-top: .25rem;
+    margin-bottom: 0.32rem !important;
 }
 
 #dataSummaryVizBarChart {

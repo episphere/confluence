@@ -1,6 +1,8 @@
-import { getFile, downloadFileTxt, convertTextToJson, hideAnimation, disableEnableCheckBox } from './shared.js';
-import { parametersDropDownTemplate, dataExplorationTable } from './components/elements.js';
+import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass } from './shared.js';
+import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
+import { addEventShowAllVariables, addEventVariableItem } from './event.js';
+import { unHideDivs } from './pages/dataExploration.js';
 let oldParameter = '';
 
 const unique=function(arr){
@@ -37,7 +39,7 @@ export const txt2dt=function(txt){
     }
 };
 
-export const getData = (studyEntries, studyIds, values, status) => {
+export const getData = (studyEntries, studyIds, values) => {
     let allIds = {};
     studyIds.forEach(id => {
         const dataEntries = studyEntries[parseInt(id)].dataEntries;
@@ -52,23 +54,22 @@ export const getData = (studyEntries, studyIds, values, status) => {
             allIds = {...allIds, ...fileEntries};
         });
     });
-    getFileContent(allIds, status);
+    getFileContent(allIds);
 }
 
-const getFileContent = async (allIds, status) => {
-    let fileIds = Object.keys(allIds);
-    let jsonData = await convertTextToJson(fileIds, status);
-    let dataSummaryParameter = document.getElementById('dataSummaryParameter');
-    dataSummaryParameter.innerHTML = parametersDropDownTemplate(jsonData);
-    const parametersDropDown = document.getElementById('parametersDropDown');
-    parametersDropDown.addEventListener('change', () => {
-        generateDCChart(jsonData, parametersDropDown.value);
-    });
-    generateDCChart(jsonData);
+const getFileContent = async (allIds) => {
+    const jsonData = await convertTextToJson(Object.keys(allIds));
+    const cf = getCrossFilter(jsonData);
+    
+    let parameterList = document.getElementById('parameterList');
+    parameterList.innerHTML = parameterListTemplate();
+    addEventVariableItem(cf, jsonData);
+    document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
+    addEventShowAllVariables(cf, jsonData);
+    generateDCChart(cf, jsonData);
 };
 
-const generateDCChart = (jsonData, selection) => {
-    let cf = crossfilter(jsonData);
+export const generateDCChart = (cf, jsonData, selection) => {
     dc.config.defaultColors(d3.schemeSet2);
     
     let pieChart = dc.pieChart("#dataSummaryVizPieChart");
@@ -97,47 +98,87 @@ const generateDCChart = (jsonData, selection) => {
         });
 
 
-    oldParameter = selection ? selection : oldParameter;
-    let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ethnicityClass';
-    document.getElementById('parametersDropDown').value = parameter;
-    let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
-    let data = cf.dimension(function(d){return d[parameter]});
-
-    let data_reduce = valUnique(parameter, 0, jsonData)
-    let G_status2 = data.group().reduce(
-        function(p,v){
-            data_reduce[v[parameter]] += 1
-            return data_reduce[v[parameter]]
-        },
-        function(p,v){
-            data_reduce[v[parameter]] -= 1
-            return data_reduce[v[parameter]]
-        },
-        function(p){return 0}
-    )
-    pieChart2.innerRadius(80)
-        .dimension(data)
-        .group(G_status2)
-        .label(function(c){
-            return `${c.key} (${c.value})`
-        });
-
+    
+    renderPieChart(cf, jsonData, selection);
     
     let barChart = dc.barChart('#dataSummaryVizBarChart');
+    const { min, max } = getMinMax(jsonData, 'ageInt');
     let age = cf.dimension(function(d) {return d.ageInt;});
     let ageCount = age.group().reduceCount();
     barChart.dimension(age)
         .group(ageCount)
-        .x(d3.scaleLinear().domain([20,100]))
+        .x(d3.scaleLinear().domain([min, max]))
         .xAxisLabel('Age')
         .yAxisLabel(function(){
             return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
         })
         .elasticY(true);
 
-    dc.renderAll();
+    pieChart.render();
+    barChart.render();
     document.getElementById('barChartLabel').innerHTML = `${variables.BCAC['ageInt']['label']}`;
     document.getElementById('statusPieChart').innerHTML = `${variables.BCAC['status']['label']}`;
+    
+    unHideDivs();
+    hideAnimation();
+    disableCheckBox(false);
+}
+
+export const renderPieChart = (cf, jsonData, selection) => {
+    oldParameter = selection ? selection : oldParameter;
+    let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ER_statusIndex';
+    let variableItem = document.getElementsByClassName('variableItem');
+    Array.from(variableItem).forEach(element => {
+        if(element.innerHTML === parameter) {
+            removeActiveClass('variableItem', 'active');
+            element.classList.add('active');
+        }
+    });
+
+    let data_reduce = valUnique(parameter, 0, jsonData);
+
+    // If there are less then 10 unique value render pie chart else render bar chart
+    if(Object.keys(data_reduce).length < 10){
+        let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
+        let data = cf.dimension(function(d){return d[parameter]});
+        
+        let G_status2 = data.group().reduce(
+            function(p,v){
+                data_reduce[v[parameter]] += 1
+                return data_reduce[v[parameter]]
+            },
+            function(p,v){
+                data_reduce[v[parameter]] -= 1
+                return data_reduce[v[parameter]]
+            },
+            function(p){return 0}
+        )
+        pieChart2.innerRadius(80)
+            .dimension(data)
+            .group(G_status2)
+            .externalRadiusPadding(10)
+            .label(function(c){
+                return `${c.key} (${c.value})`
+            });
+
+        pieChart2.render();
+    }
+    else{
+        const { min, max } = getMinMax(jsonData, parameter);
+        let barChart = dc.barChart('#dataSummaryVizPieChart2');
+        let age = cf.dimension(function(d) {return d[parameter];});
+        let ageCount = age.group().reduceCount();
+        barChart.dimension(age)
+            .group(ageCount)
+            .x(d3.scaleLinear().domain([min, max]))
+            .xAxisLabel(parameter)
+            .yAxisLabel(function(){
+                return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
+            })
+            .elasticY(true);
+        barChart.render();
+    };
+
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -145,9 +186,9 @@ const generateDCChart = (jsonData, selection) => {
         pieLabel = parameter;
     }
     document.getElementById('pieChartLabel').innerHTML = `${pieLabel}`;
-    hideAnimation();
-    disableEnableCheckBox(false);
 }
+
+const getCrossFilter = (jsonData) => crossfilter(jsonData);
 
 const valUnique=function(k,v, jsonData){
     var u={}
@@ -156,72 +197,14 @@ const valUnique=function(k,v, jsonData){
         u[d[k]]=v
     })
     return u
-} 
-
-const generatCharts = (data, parameter) => {
-    document.getElementById('dataSummaryVizBarChart').innerHTML = '';
-    oldParameter = parameter ? parameter : oldParameter;
-    let parm = parameter ? parameter : oldParameter !== '' ? oldParameter : 'ageInt';
-    document.getElementById('parametersDropDown').value = parm;
-    let allTraces1 = [];
-    let trace = {
-        type: 'bar',
-        x:Object.keys(data[parm]),
-        y:Object.keys(data[parm]).map(k=>data[parm][k])
-    }
-    if(trace.x.length>1){
-        if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
-            trace.x.pop()
-            trace.y.pop()
-        }
-    }
-    allTraces1.push(trace);
-
-    var layout = {
-        xaxis: {title:`${parm}`},
-        yaxis: {title:`Count`},
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
-    };
-    Plotly.newPlot('dataSummaryVizBarChart', allTraces1, layout, {responsive: true, displayModeBar: false});
-    hideAnimation();
-};
-
-export const exploreData = async (fileId, fileName) => {
-    let dataExplorationParameter = document.getElementById('dataExplorationParameter');
-    dataExplorationParameter.innerHTML = `${fileName} <a title="Download File" id="dataExplorationFileDownload" data-file-id="${fileId}" data-file-name="${fileName}" href="#"><i class="fas fa-file-download"></i></a>`;
-    document.getElementById('dataExplorationFileDownload').addEventListener('click', () => {
-        downloadFileTxt(fileId, fileName);
-    });
-    let fileData = await getFile(fileId);
-
-    let dt=fileData.split(/\n/g).map(tx=>tx.split(/\t/g));
-    if((fileData.split(/\n+/).slice(-1).length==1)&&(fileData.slice(-1)[0].length)){
-        dt.pop()
-    };
-    
-    $('#pagination-container').pagination({
-        dataSource: dt,
-        pageSize: 20,
-        callback: function(data, pagination) {
-            document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
-        }
-    });
-    let pageSizeSelector = document.getElementById('pageSizeSelector');
-    pageSizeSelector.hidden = false;
-    pageSizeSelector.addEventListener('change', () => {
-        updatePageSize(pageSizeSelector.value, dt);
-    });
 }
 
-const updatePageSize = (pageSize, dt) => {
-    document.getElementById('pagination-container').innerHTML = '';
-    document.getElementById('dataExplorationTable').innerHTML = '';
-    $('#pagination-container').pagination({
-        dataSource: dt,
-        pageSize: pageSize,
-        callback: function(data, pagination) {
-            document.getElementById('dataExplorationTable').innerHTML = dataExplorationTable(data, dt);
+const getMinMax = (jsonData, parameter) => {
+    let values = [];
+    jsonData.forEach(data => {
+        if(data[parameter] && data[parameter] !== "" && data[parameter] !== "Don't Know"){
+            values.push(parseInt(data[parameter]));
         }
     });
+    return {min: Math.min(...values), max: Math.max(...values)}
 }

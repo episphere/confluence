@@ -1,142 +1,252 @@
+import { getFolderItems, getFile } from "../shared.js";
 import { config } from "../config.js";
-import { studyDropDownTemplate, dataDropDownTemplate } from "../components/elements.js";
-import { exploreData } from "../visulization.js";
+import { studyDropDownTemplate } from "../components/elements.js";
+import { txt2dt } from "../visulization.js";
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from "../event.js";
+const nonStudyFolder = ['users', 'protocols', 'consents'];
 
 export const template = () => {
     return `
-        <div class="row main-summary-row">
-            <div class="col form-group summary-inner-col">
-                <label for="consortiaOption" class="data-summary-label">Consortia</label></br>
-                <span><i class="fas fa-4x fa-layer-group"></i></span>
-                <span class="data-summary-count" id="dataExplorationConsortiaCount">1</span></br>
-                <select class="dropdown-options" id="dataExplorationConsortiaOption" hidden=true>
-                    <option disabled selected> -- select a consortia -- </option>
-                    <option value="${config.BCACFolderId}">BCAC</option>
-                </select>
+        <div class="main-summary-row">
+            <div class="interactive-stats">
+                <div class="summary-inner-col">
+                    <label for="consortiaOption" class="interactive-summary-label">Consortia</label></br>
+                    <span><i class="fas fa-3x fa-layer-group"></i></span>
+                    <span class="data-summary-count" id="consortiaCount">1</span></br>
+                    <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
+                        <li><input type="checkbox" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/>BCAC</li>
+                    </ul>
+                </div>
+                <div class="summary-inner-col">
+                    <span class="interactive-summary-label">Studies</span></br>
+                    <span><i class="fas fa-3x fa-university"></i></span>
+                    <span class="data-summary-count" id="studyCount">0</span></br>
+                    <ul class="dropdown-options align-left ul-data-exploration" id="studyOption" hidden=true>
+                        <li><input type="text" class="search-options" id="searchStudies" placeholder="Search studies"/></li>
+                        <li><input type="checkbox" class="chk-box-margin" id="studySelectAll"/>Select all</li>
+                        <ul class="align-left" id="studiesList"></ul>
+                    </ul>
+                </div>
+                <div class="summary-inner-col">
+                    <span class="interactive-summary-label">Data Types</span></br>
+                    <span><i class="fas fa-3x fa-database"></i></span>
+                    <span class="data-summary-count" id="dataCount">0</span></br>
+                    <ul class="dropdown-options align-left ul-data-exploration" id="dataDropDown" hidden=true>
+                        <li><input type="text" class="search-options" id="searchdataTypes" placeholder="Search data type"/></li>
+                        <li><input type="checkbox" class="chk-box-margin" id="dataTypeSelectAll"/>Select all</li>
+                        <ul class="align-left" id="dataTypeList"></ul>
+                    </ul>
+                </div>
+                <div class="summary-inner-col">
+                    <div id="dataSummaryVizPieChart"></div>
+                    <label id="statusPieChart"></label>
+                </div>
+                <div class="summary-inner-col" id="dataSummaryParameter" hidden=true>
+                    <label id="variableLabel"></label>
+                    <div class="list-group" id="parameterList"></div>
+                    <span id="showAllVariables"></span>
+                </div>
             </div>
-            <div class="col form-group summary-inner-col">
-                <span class="data-summary-label">Studies</span></br>
-                <span><i class="fas fa-4x fa-university"></i></span>
-                <span class="data-summary-count" id="dataExplorationStudyCount">0</span></br>
-                <div id="dataExplorationStudyDropDown"></div>
+            <div class="main-summary-row" id="loadingAnimation">
+                <div class="spinner-grow spinner-color" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-color" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-color" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-color" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
-            <div class="col form-group summary-inner-col">
-                <span class="data-summary-label">Data</span></br>
-                <span><i class="fas fa-4x fa-database"></i></span>
-                <span class="data-summary-count" id="dataExplorationDataCount">0</span></br>
-                <div id="dataExplorationDataDropDown"></div>
+            
+            <div class="main-summary-row dynamic-charts">
+                <div class="summary-inner-col col-md-8">
+                    <div id="dataSummaryVizBarChart"></div>
+                    <label id="barChartLabel"></label>
+                </div>
+                <div class="summary-inner-col col-md-4">
+                    <div id="dataSummaryVizPieChart2"></div>
+                    <label id="pieChartLabel"></label>
+                </div>
             </div>
-            <div class="col form-group summary-inner-col">
-                <span class="data-summary-label">Cases</span></br>
-                <span><i class="fas fa-4x fa-users"></i></span>
-                <span class="data-summary-count" id="dataExplorationCaseCount">0</span>
-            </div>
-        </div>
-        <div class="row main-summary-row">
-            <div id="dataExplorationParameter"></div>
-            <div id="dataExplorationTable" class="table-responsive"></div>
-            <div class="page-size-selector">
-            <select class="dropdown-options" id="pageSizeSelector" hidden=true>
-                <option selected value=20>20</option>
-                <option value=40>40</option>
-                <option value=60>60</option>
-                <option value=80>80</option>
-                <option value=100>100</option>
-            </select>
-            </div>
-            <div id="pagination-container"></div>
         </div>
     `;  
 }
 
-export const dataExploration = async () => {
-    const dataObject = JSON.parse(localStorage.data_summary);
-    for(const consortia in dataObject){
-        const studyEntries = dataObject[consortia].studyEntries;
-        document.getElementById('dataExplorationStudyCount').textContent = Object.keys(studyEntries).length;
-        for(const data in studyEntries){
-            const dataEntries = studyEntries[data].dataEntries;
-            let dataCountElement = document.getElementById('dataExplorationDataCount')
-            dataCountElement.textContent = parseInt(dataCountElement.textContent) + Object.keys(dataEntries).length;
-            for(const file in dataEntries){
-                const fileEntries = dataEntries[file].fileEntries;
-                for(const fileData in fileEntries){
-                    const cases = fileEntries[fileData].cases;
-                    let caseCountElement = document.getElementById('dataExplorationCaseCount');
-                    caseCountElement.textContent = parseInt(caseCountElement.textContent) + cases;
-                }
+export const getSummary = async () => {
+    let consortia = await getFolderItems(config.BCACFolderId);
+    let dataObject = {}
+    const consortiaFolderName = 'BCAC';
+    const consortiaFolderId = config.BCACFolderId;
+    dataObject[consortiaFolderId] = {};
+    dataObject[consortiaFolderId].studyEntries = {};
+    dataObject[consortiaFolderId].name = consortiaFolderName;
+    dataObject[consortiaFolderId].type = 'folder';
+    let studyEntries = consortia.entries;
+    studyEntries = studyEntries.filter(data => nonStudyFolder.indexOf(data.name.toLowerCase().trim()) === -1)
+    document.getElementById('studyCount').textContent = studyEntries.length;
+    // getAgeDataForAllStudies(studyEntries);
+    studyEntries.forEach(async (study, studyIndex) => {
+        const studyName = study.name;
+        const studyId = parseInt(study.id);
+        dataObject[consortiaFolderId].studyEntries[studyId] = {};
+        dataObject[consortiaFolderId].studyEntries[studyId].name = studyName;
+        dataObject[consortiaFolderId].studyEntries[studyId].type = study.type;
+        dataObject[consortiaFolderId].studyEntries[studyId].dataEntries = {};
+        
+        let data = await getFolderItems(studyId);
+        let dataEntries = data.entries;
+        dataEntries = dataEntries.filter(dt => dt.name.toLowerCase().trim() !== 'samples');
+        
+        let dataCountElement = document.getElementById('dataCount')
+        dataCountElement.textContent = parseInt(dataCountElement.textContent) + dataEntries.length;
+
+        for(let dt of dataEntries){
+            const dataName = dt.name;
+            const dataId = parseInt(dt.id);
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId] = {};
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].name = dataName;
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].type = dt.type;
+            dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
+
+            const files = await getFolderItems(dataId);
+            let fileEntries = files.entries;
+            fileEntries = fileEntries.filter(file => file.type === 'file' && file.name.slice(file.name.lastIndexOf('.')+1, file.name.length) === 'txt');
+            for(let dataFile of fileEntries){
+                const fileName = dataFile.name;
+                const fileId = parseInt(dataFile.id);
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = fileName;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = dataFile.type;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = 0;
+                dataObject[consortiaFolderId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = 0;
+                
+                if(localStorage.data_summary) delete localStorage.data_summary;
+                localStorage.data_summary = JSON.stringify(dataObject);
+                
+            };
+        };
+        if(studyIndex === studyEntries.length - 1){
+            const consortiaOptions = document.getElementById('consortiaOption');
+            consortiaOptions.hidden = false;
+
+            const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+            consortiaCheckBox[0].checked = true;
+            consortiaCheckBox[0].dispatchEvent(new Event('click'));
+        };
+    });
+}
+
+export const countSpecificStudy = (folderId) => {
+    const studyOption = document.getElementById('studyOption');
+    studyOption.hidden = false;
+    let dataObject = JSON.parse(localStorage.data_summary);
+    let studyEntries = '';
+    if(dataObject[folderId]){
+        studyEntries = dataObject[folderId].studyEntries;
+        let studiesList = document.getElementById('studiesList');
+        studiesList.innerHTML = studyDropDownTemplate(studyEntries, 'studyOptions');
+        document.getElementById('studyCount').textContent = Object.keys(studyEntries).length
+    };
+
+    addEventStudiesCheckBox(dataObject, folderId);
+
+    // Select first study by default and trigger event
+    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
+    studiesCheckBox[0].checked = true;
+    studiesCheckBox[0].dispatchEvent(new Event('click'));
+
+    addEventSearchStudies();
+
+    addEventSelectAllStudies(studyEntries);
+};
+
+export const countSpecificData = async (selectedValues, studyEntries) => {
+    const dataDropDown = document.getElementById('dataDropDown');
+    dataDropDown.hidden = false;
+    let template = '';
+    let dataCounter = 0;
+    let checker_obj = {};
+
+    selectedValues.forEach(studyId => {
+        const intStudyId = parseInt(studyId);
+        if(studyEntries[intStudyId]){
+            const dataEntries = studyEntries[intStudyId].dataEntries;
+            dataCounter += Object.keys(dataEntries).length;
+            for(let dataId in dataEntries){
+                if(checker_obj[dataEntries[dataId].name.toLowerCase().trim()]) return;
+                checker_obj[dataEntries[dataId].name.toLowerCase().trim()] = {};
+                template += `<li>
+                                <input type="checkbox" class="chk-box-margin" name="dataTypeCheckBox" data-study-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}"/>
+                                <label>${dataEntries[dataId].name}</label>
+                            </li>`;
             }
         }
+    });
+
+    let dataTypeList = document.getElementById('dataTypeList');
+    dataTypeList.innerHTML = template;
+
+    // Add event listener to data type check box list
+    addEventDataTypeCheckBox(studyEntries);
+    addEventSelectAllDataType(studyEntries);
+    
+    // Select first data type by default and trigger event
+    if(selectedValues.length > 0){
+        const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
+        dataTypeCheckBox[0].checked = true;
+        dataTypeCheckBox[0].dispatchEvent(new Event('click'));
+    }else{
+        document.getElementById('dataDropDown').hidden = true;
     }
-    document.getElementById('dataExplorationConsortiaOption').hidden = false;
+    
+    document.getElementById('dataCount').textContent = dataCounter;
+    
+    // Data type search/filter Event
+    addEventSearchDataType();
 };
 
-export const dataExplorationCountSpecificStudy = (folderId) => {
-    let dataObject = JSON.parse(localStorage.data_summary);
-    for(let consortia in dataObject){
-        if(dataObject[consortia].id === folderId){
-            let studyDropDown = document.getElementById('dataExplorationStudyDropDown');
-            const studyEntries = dataObject[consortia].studyEntries;
-            studyDropDown.innerHTML = studyDropDownTemplate(dataObject[consortia].studyEntries, 'dataExplorationStudyOptions');
-            document.getElementById('dataExplorationStudyCount').textContent = Object.keys(dataObject[consortia].studyEntries).length
-            let studyOptions = document.getElementById('dataExplorationStudyOptions');
-            studyOptions.addEventListener('change', () => {
-                if(studyOptions.value === "") return;
-                document.getElementById('dataExplorationParameter').innerHTML = '';
-                document.getElementById('dataExplorationTable').innerHTML = '';
-                document.getElementById('pagination-container').innerHTML = '';
-                document.getElementById('pageSizeSelector').hidden = true;
-                countSpecificData(parseInt(studyOptions.value), studyEntries);
-            });
-        }
+const getAgeDataForAllStudies = async (studyEntries) => {
+    let obj = {
+        age:[],
+        ethnicity : []
     }
-};
-
-const countSpecificData = async (folderId, studyEntries) => {
-    for(let study in studyEntries){
-        const studyId = studyEntries[study].id;
-        const dataEntries = studyEntries[study].dataEntries;
-        if(studyId === folderId){
-            document.getElementById('dataExplorationDataCount').textContent = Object.keys(dataEntries).length;
-            let caseCounter = 0;
-            let fileCounter = 0;
-            for(let data in dataEntries){
-                const fileEntries = dataEntries[data].fileEntries;
-                fileCounter += Object.keys(fileEntries).length;
-                for(let file in fileEntries){
-                    const caseData = fileEntries[file].cases;
-                    caseCounter += caseData;
+    for(const study of studyEntries){
+        const studyId = study.id;
+        const folderData = await getFolderItems(studyId);
+        const folderEntries = folderData.entries;
+        
+        for(const data of folderEntries){
+            if(data.name.toLowerCase().trim() === 'core data'){
+                const dataId = data.id;
+                const dataContent = await getFolderItems(dataId);
+                const dataEntries = dataContent.entries;
+                for(const fileData of dataEntries){
+                    const fileId = fileData.id;
+                    const fileContent = await getFile(fileId);
+                    const fileDt = txt2dt(fileContent).tab;
+                    obj.age = obj.age.concat(fileDt.ageInt);
+                    obj.ethnicity = obj.ethnicity.concat(fileDt.ethnicityClass)
                 };
             };
-            document.getElementById('dataExplorationCaseCount').textContent = caseCounter;
-            let dataDropDown = document.getElementById('dataExplorationDataDropDown');
-            dataDropDown.innerHTML = dataDropDownTemplate(dataEntries, 'dataExplorationDataOptions');
-            let dataOptions = document.getElementById('dataExplorationDataOptions');
-            dataOptions.addEventListener('change', () => {
-                if(dataOptions.value === "") return;
-                document.getElementById('dataExplorationParameter').innerHTML = '';
-                document.getElementById('dataExplorationTable').innerHTML = '';
-                document.getElementById('pagination-container').innerHTML = '';
-                document.getElementById('pageSizeSelector').hidden = true;
-                countSpecificCases(parseInt(dataOptions.value), dataEntries);
-            });
         };
     };
 };
 
-const countSpecificCases = async (folderId, dataEntries) => {
-    for(let data in dataEntries){
-        const dataId = dataEntries[data].id;
-        if(dataId === folderId){
-            const fileEntries = dataEntries[data].fileEntries;
-            let caseCounter = 0;
-            for(let file in fileEntries){
-                const caseData = fileEntries[file].cases;
-                const fileId = fileEntries[file].id;
-                caseCounter += caseData;
-                exploreData(fileId, file);
-            };
-            document.getElementById('dataExplorationCaseCount').textContent = caseCounter;
-        };
-    };
-};
+export const clearGraphAndParameters = () => {
+    document.getElementById('dataSummaryVizBarChart').innerHTML = '';
+    document.getElementById('dataSummaryVizPieChart').hidden = true;
+    document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
+    document.getElementById('dataSummaryParameter').hidden = true;
+    document.getElementById('barChartLabel').innerHTML = '';
+    document.getElementById('pieChartLabel').innerHTML = '';
+    document.getElementById('statusPieChart').innerHTML = '';
+}
+
+export const unHideDivs = () => {
+    document.getElementById('dataSummaryVizPieChart').hidden = false;
+    document.getElementById('dataSummaryParameter').hidden = false;
+}

@@ -216,14 +216,14 @@ export const updateLocalStorage = async (parentId, newFolderId, newFolderName, n
     localStorage.data_summary = JSON.stringify(data_summary);
 }
 
-export const removeActiveClass = (className) => {
+export const removeActiveClass = (className, activeClass) => {
     let fileIconElement = document.getElementsByClassName(className);
     Array.from(fileIconElement).forEach(elm => {
-        elm.classList.remove('navbar-active');
+        elm.classList.remove(activeClass);
     });
 }
 
-export const convertTextToJson = async (fileIds, status) => {
+export const convertTextToJson = async (fileIds) => {
     let allObjs = [];
     for(const id of fileIds){
         const intId = parseInt(id);
@@ -276,7 +276,7 @@ export const hideAnimation = () => {
     document.getElementById('loadingAnimation').hidden = true;
 }
 
-export const disableEnableCheckBox = (value) => {
+export const disableCheckBox = (value) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
     Array.from(studiesCheckBox).forEach(element => {
         element.disabled = value;

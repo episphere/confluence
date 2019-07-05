@@ -1,11 +1,10 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
-import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataSummary.js';
+import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataExploration.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass } from './src/shared.js';
-// import { template as dataExplorationTemplate, dataExploration, dataExplorationCountSpecificStudy } from './src/pages/dataExploration.js';
 
 const confluence=function(){
     let confluenceDiv = document.getElementById('confluenceDiv');
@@ -24,32 +23,18 @@ const confluence=function(){
         navBarOptions.innerHTML = template();
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
-        
-        // const dataExplorationElement = document.getElementById('dataExploration');
-        // dataExplorationElement.addEventListener('click', async () => {
-        //     if(dataExplorationElement.classList.contains('navbar-active')) return;
-        //     if(localStorage.data_summary === undefined) return;
-        //     removeActiveClass('nav-menu-links');
-        //     dataExplorationElement.classList.add('navbar-active');
-        //     confluenceDiv.innerHTML = dataExplorationTemplate();
-        //     dataExploration();
-        //     let consortiaOption = document.getElementById('dataExplorationConsortiaOption');
-        //     consortiaOption.addEventListener('change', () => {
-        //         if(consortiaOption.value === "") return;
-        //         dataExplorationCountSpecificStudy(parseInt(consortiaOption.value));
-        //     });
-        // });
+
         dataSubmissionElement.addEventListener('click', () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
             if(localStorage.data_summary === undefined) return;
-            removeActiveClass('nav-menu-links');
+            removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();
             dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {
             if(dataSummaryElement.classList.contains('navbar-active')) return;
-            removeActiveClass('nav-menu-links');
+            removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
