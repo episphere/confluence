@@ -201,6 +201,7 @@ label {
 
 .dc-chart .selected circle, .dc-chart .selected path {
     stroke: #711a1a !important;
+    stroke-width: 2 !important;
 }
 
 .align-left {
