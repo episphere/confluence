@@ -14,6 +14,11 @@ export const studyDropDownTemplate = (entries) => {
 export const parameterListTemplate = (jsonData) => {
     let parameters = [];
     let template = ''
+    let selectedVariable = '';
+    const dataSummaryVizChart2 = document.getElementById('dataSummaryVizChart2');
+    if(dataSummaryVizChart2.dataset.selectedVariable && dataSummaryVizChart2.dataset.selectedVariable !== ""){
+        selectedVariable = dataSummaryVizChart2.dataset.selectedVariable
+    }
     if(!jsonData){
         document.getElementById('variableLabel').innerHTML = 'Most useful variables';
         document.getElementById('parameterList').classList.remove('list-variables');
@@ -24,7 +29,7 @@ export const parameterListTemplate = (jsonData) => {
         }
         parameters = ['ER_statusIndex', 'ethnicityClass', 'famHist', 'contrType'];
         parameters.forEach((param) => {
-            template += `<a class="list-group-item list-group-item-action variableItem" href="#">${param}</a>`
+            template += `<a class="list-group-item list-group-item-action variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
         });
     }
     else{
@@ -43,7 +48,7 @@ export const parameterListTemplate = (jsonData) => {
         }
 
         parameters.forEach((param) => {
-            template += `<a class="list-group-item list-group-item-action variableItem" href="#">${param}</a>`
+            template += `<a class="list-group-item list-group-item-action variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
         });
     }
     

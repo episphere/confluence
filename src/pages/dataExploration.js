@@ -69,7 +69,7 @@ export const template = () => {
                 </div>
                 <div class="summary-inner-col col-md-4">
                     <span style="text-align:right;display:none" id="showPieChart"></span>
-                    <div id="dataSummaryVizPieChart2"></div>
+                    <div id="dataSummaryVizChart2"></div>
                     <label id="pieChartLabel"></label>
                 </div>
             </div>
@@ -240,7 +240,7 @@ const getAgeDataForAllStudies = async (studyEntries) => {
 export const clearGraphAndParameters = () => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
     document.getElementById('dataSummaryVizPieChart').hidden = true;
-    document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
+    document.getElementById('dataSummaryVizChart2').innerHTML = '';
     document.getElementById('dataSummaryParameter').hidden = true;
     document.getElementById('barChartLabel').innerHTML = '';
     document.getElementById('pieChartLabel').innerHTML = '';

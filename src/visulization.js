@@ -130,6 +130,7 @@ export const generateDCChart = (cf, jsonData, selection) => {
 export const renderPieChart = (cf, jsonData, selection, pieChart) => {
     oldParameter = selection ? selection : oldParameter;
     let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ER_statusIndex';
+    document.getElementById('dataSummaryVizChart2').setAttribute('data-selected-variable', parameter);
     let variableItem = document.getElementsByClassName('variableItem');
     Array.from(variableItem).forEach(element => {
         if(element.innerHTML === parameter) {
@@ -144,8 +145,8 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
     if(Object.keys(data_reduce).length < 10 || pieChart){
         document.getElementById('showPieChart').childNodes[0].checked = false;
         document.getElementById('showPieChart').style.display = 'none';
-        document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
-        let pieChart2 = dc.pieChart("#dataSummaryVizPieChart2");
+        document.getElementById('dataSummaryVizChart2').innerHTML = '';
+        let pieChart2 = dc.pieChart("#dataSummaryVizChart2");
         let data = cf.dimension(function(d){return d[parameter]});
         
         let G_status2 = data.group().reduce(
@@ -171,9 +172,9 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
     }
     else{
         document.getElementById('showPieChart').style.display = 'block';
-        document.getElementById('dataSummaryVizPieChart2').innerHTML = '';
+        document.getElementById('dataSummaryVizChart2').innerHTML = '';
         const { min, max } = getMinMax(jsonData, parameter);
-        let barChart = dc.barChart('#dataSummaryVizPieChart2');
+        let barChart = dc.barChart('#dataSummaryVizChart2');
         let age = cf.dimension(function(d) {return d[parameter];});
         let ageCount = age.group().reduceCount();
         barChart.dimension(age)
