@@ -19,12 +19,12 @@ export const getFolderItems = async function(id){
 
 export const getFile = async function(id){
     const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = (await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+    let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    }))
+    })
     if(r.statusText=="Unauthorized"){
         sessionExpired();
     }else{
@@ -34,12 +34,12 @@ export const getFile = async function(id){
 
 export const getFileInfo = async function(id){
     const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = (await fetch('https://api.box.com/2.0/files/'+id,{
+    let r = await fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    }))
+    })
     if(r.statusText=="Unauthorized"){
         sessionExpired();
     }else{
@@ -48,7 +48,7 @@ export const getFileInfo = async function(id){
 }
 
 export const storeAccessToken = async function(){
-    let parms = searchParms()
+    let parms = searchParms();
     if(parms.code){
         //exchange code for authorization token
         let clt={}
@@ -59,20 +59,15 @@ export const storeAccessToken = async function(){
         }else if(location.origin.indexOf('observablehq') !== -1){
             clt = config.iniObs
         }
-        
-        let data = `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`;
-        let xhr = new XMLHttpRequest();
         document.getElementById('confluenceDiv').innerHTML = '';
-        xhr.addEventListener("readystatechange", function () {
-            if (this.readyState === 4) {
-                localStorage.parms=this.responseText;
-                location.search = '';
-            }
+        let url = `https://api.box.com/oauth2/token/`;
+        
+        const response = await fetch(url, {
+            method:'POST',
+            body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
         });
-        xhr.open("POST", "https://api.box.com/oauth2/token");
-        xhr.setRequestHeader("cache-control", "no-cache");
-        xhr.setRequestHeader("credentials", "same-origin");
-        xhr.send(data);
+        localStorage.parms = JSON.stringify(await response.json());
+        location.search = '';
     }else{
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)
