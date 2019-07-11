@@ -188,20 +188,6 @@ export const updateLocalStorage = async (parentId, newFolderId, newFolderName, n
                             fileEntries[newFolderId] = {};
                             fileEntries[newFolderId].name = newFolderName;
                             fileEntries[newFolderId].type = newFolderType;
-                            fileEntries[newFolderId].cases = 0;
-                            fileEntries[newFolderId].controls = 0;
-                            if(newFolderType === 'file'){
-                                const access_token = JSON.parse(localStorage.parms).access_token;
-                                let txt = await getFile(newFolderId, access_token);
-                                let dt = txt2dt(txt);
-
-                                if(dt.tab && dt.tab.status){
-                                    const numberOfCases = dt.tab.status.filter(value => value === "1").length;
-                                    const numberOfControls = dt.tab.status.filter(value => value === "0").length;
-                                    fileEntries[newFolderId].cases = numberOfCases;
-                                    fileEntries[newFolderId].controls = numberOfControls;
-                                }
-                            }
                         }
                     }
                 }
