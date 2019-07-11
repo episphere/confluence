@@ -480,11 +480,18 @@ label {
 
 .list-group-item{
     padding: 0.25rem 1.25rem !important;
+    width: inherit;
+    color: #495057;
 }
 
 .list-group-item.active{
     background-color: #fff !important;
     border-color: #1127fc !important;
+    color: #000 !important;
+}
+
+.list-group-item:hover {
+    text-decoration: none;
     color: #000 !important;
 }
 

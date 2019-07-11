@@ -1,3 +1,5 @@
+import { config } from "../config.js";
+
 export const studyDropDownTemplate = (entries) => {
     let template = '';
     
@@ -29,7 +31,7 @@ export const parameterListTemplate = (jsonData) => {
         }
         parameters = ['ER_statusIndex', 'ethnicityClass', 'famHist', 'contrType'];
         parameters.forEach((param) => {
-            template += `<a class="list-group-item list-group-item-action variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
+            template += `<a class="list-group-item variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
         });
     }
     else{
@@ -48,10 +50,10 @@ export const parameterListTemplate = (jsonData) => {
         }
 
         parameters.forEach((param) => {
-            template += `<a class="list-group-item list-group-item-action variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
+            if(config.invalidVariables.indexOf(param.trim().toLowerCase()) !== -1) return;
+            template += `<a class="list-group-item variableItem ${param === selectedVariable ? `active`: ``}" href="#">${param}</a>`
         });
-    }
-    
+    }    
     return template;
 }
 

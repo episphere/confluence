@@ -14,5 +14,6 @@ export const config = {
         server_id:'2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd',
         stateIni:Math.random().toString().slice(2)
     },
-    BCACFolderId : 68819242325
+    BCACFolderId : 68819242325,
+    invalidVariables : ["bcac_id", "bcac_db_version", "onc_id", "dataset_created_by", "date_bcac_db_version_created", "date_dataset_created", "icogs_id"]
 }

@@ -226,7 +226,7 @@ export const convertTextToJson = async (fileIds) => {
     };
     let jsonData = {};
     
-    allObjs.forEach(data => {
+    for(let data of allObjs){
         for(const key in data){
             const value = data[key];
             if(value !== "" && variables.BCAC[key] && variables.BCAC[key][value]){
@@ -239,7 +239,7 @@ export const convertTextToJson = async (fileIds) => {
             jsonData[data.BCAC_ID] = {};
             jsonData[data.BCAC_ID] = data;
         }
-    });
+    }
     return Object.values(jsonData);
 }
 
