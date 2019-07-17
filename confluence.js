@@ -2,6 +2,7 @@ import template from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataExploration.js';
+import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass } from './src/shared.js';
@@ -23,6 +24,7 @@ const confluence=function(){
         navBarOptions.innerHTML = template();
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
+        const dataRequestElement = document.getElementById('dataRequest');
 
         dataSubmissionElement.addEventListener('click', () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -45,6 +47,12 @@ const confluence=function(){
                     if(index === consortiaCheckBox.length -1) countSpecificStudy(parseInt(element.value));
                 });
             });
+        });
+        dataRequestElement.addEventListener('click', () => {
+            if(dataRequestElement.classList.contains('navbar-active')) return;
+            removeActiveClass('nav-menu-links', 'navbar-active');
+            dataRequestElement.classList.add('navbar-active');
+            confluenceDiv.innerHTML = dataRequestTemplate();
         });
         dataSummaryElement.click();
         logOutBtn.hidden = false

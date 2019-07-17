@@ -9,6 +9,10 @@ const template = () => {
             <a class="nav-link nav-menu-links" href="#" title="Data Submission"  id="dataSubmission"><i class="fas fa-upload"></i> Data Submission</a>
         </div>
         <div class="grid-border"></div>
+        <div class="nav-item grid-elements">
+            <a class="nav-link nav-menu-links" href="#" title="Data Request"  id="dataRequest"><i class="fas fa-database"></i> Data Request</a>
+        </div>
+        <div class="grid-border"></div>
     `;
 }
 
