@@ -157,9 +157,15 @@ export const countSpecificStudy = (folderId) => {
 
     // Select first study by default and trigger event
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
-    studiesCheckBox[0].checked = true;
-    studiesCheckBox[0].dispatchEvent(new Event('click'));
-
+    let index = 0;
+    if(dataObject[folderId].studyEntries && Object.keys(dataObject[folderId].studyEntries[studiesCheckBox[index].value].dataEntries).length > 0){
+        studiesCheckBox[index].checked = true;
+        studiesCheckBox[index].dispatchEvent(new Event('click'));
+    }
+    else{
+        studiesCheckBox[index + 1].checked = true;
+        studiesCheckBox[index + 1].dispatchEvent(new Event('click'));
+    }
     addEventSearchStudies();
 
     addEventSelectAllStudies(studyEntries);
