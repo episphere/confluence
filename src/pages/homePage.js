@@ -27,7 +27,7 @@ export const template = () => {
         <div class="summary-inner-col col-md-4" id="pieChart"></div>
     </div>
     <div class="main-summary-row about-confluence">
-        <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/PublishedContent/Images/research/cancer-types/breast-cancer/Confluence_Logo.__v10025474.png"></div>
+        <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/sites/g/files/xnrzdm236/files/styles/cgov_article/public/cgov_contextual_image/100/300/5/files/Confluence_Logo.png?itok=9FBxTnpk"></div>
         <div class="col-md-9 align-left">The Confluence project will develop a large research resource by 2020 to uncover breast cancer genetics through genome-wide association studies (GWAS). The resource will include at least 300,000 breast cancer cases and 300,000 controls of different races/ethnicities. This will be accomplished by the confluence of existing GWAS and new genome-wide genotyping data to be generated through this project.</div>
         
         <div class="col-md-12 align-left">
