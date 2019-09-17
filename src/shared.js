@@ -257,6 +257,9 @@ export const hideAnimation = () => {
     document.getElementById('loadingAnimation').hidden = true;
 }
 
+export const showError = (errorMessage) => {
+    document.getElementById('error').innerHTML = errorMessage;
+}
 export const disableCheckBox = (value) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
     Array.from(studiesCheckBox).forEach(element => {

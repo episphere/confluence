@@ -1,4 +1,4 @@
-import { getFolderItems, getFile } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
@@ -61,7 +61,7 @@ export const template = () => {
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
-            
+            <div class="row" id="error"></div>
             <div class="main-summary-row dynamic-charts">
                 <div class="summary-inner-col col-md-8">
                     <div id="dataSummaryVizBarChart"></div>
@@ -163,8 +163,9 @@ export const countSpecificStudy = (folderId) => {
         studiesCheckBox[index].dispatchEvent(new Event('click'));
     }
     else{
-        studiesCheckBox[index + 1].checked = true;
-        studiesCheckBox[index + 1].dispatchEvent(new Event('click'));
+        studiesCheckBox[index].checked = true;
+        showError('No Data Found in this study!');
+        hideAnimation();
     }
     addEventSearchStudies();
 
@@ -181,6 +182,12 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     selectedValues.forEach(studyId => {
         const intStudyId = parseInt(studyId);
         if(studyEntries[intStudyId]){
+            if(selectedValues.length === 1 && Object.keys(studyEntries[intStudyId].dataEntries).length === 0) {
+                showError('No Data Found in this study!');
+                hideAnimation();
+                disableCheckBox(false); 
+                return;
+            }
             const dataEntries = studyEntries[intStudyId].dataEntries;
             dataCounter += Object.keys(dataEntries).length;
             for(let dataId in dataEntries){
@@ -204,8 +211,8 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
     // Select first data type by default and trigger event
     if(selectedValues.length > 0){
         const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
-        dataTypeCheckBox[0].checked = true;
-        dataTypeCheckBox[0].dispatchEvent(new Event('click'));
+        dataTypeCheckBox[0] ? dataTypeCheckBox[0].checked = true : showError('No Data Found in this study!');
+        dataTypeCheckBox[0] ? dataTypeCheckBox[0].dispatchEvent(new Event('click')) : '';
     }else{
         document.getElementById('dataDropDown').hidden = true;
     }

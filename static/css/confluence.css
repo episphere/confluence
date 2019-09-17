@@ -599,3 +599,8 @@ span.icon {
     align-content: center;
     height: 100%;
 }
+
+#error {
+    padding: 15px !important;
+    color: red;
+}

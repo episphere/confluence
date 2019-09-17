@@ -1,4 +1,4 @@
-import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass } from './shared.js';
+import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } from './event.js';
@@ -72,6 +72,7 @@ const getFileContent = async (allIds) => {
 };
 
 export const generateDCChart = (cf, jsonData, selection) => {
+    if(jsonData.length) showError('');
     dc.config.defaultColors(d3.schemeSet2);
     
     let pieChart = dc.pieChart("#dataSummaryVizPieChart");
