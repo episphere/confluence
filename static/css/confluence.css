@@ -604,3 +604,15 @@ span.icon {
     padding: 15px !important;
     color: red;
 }
+
+.create-study {
+    padding-bottom: 1rem;
+}
+
+.new-study-btn, .upload-in-study {
+    padding-left: 15px;
+}
+
+form {
+    text-align: left;
+}

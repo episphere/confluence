@@ -2,6 +2,7 @@ import { countSpecificData, clearGraphAndParameters } from './pages/dataExplorat
 import { getData, generateDCChart, renderPieChart } from './visulization.js'
 import { showAnimation, disableCheckBox, removeActiveClass } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
+import { variables } from './variables.js';
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -254,3 +255,137 @@ const checkBoxchecker = (chkbox) => {
     });
     return checkElements;
 };
+
+export const addEventConsortiaSelect = () => {
+    const element = document.getElementById('selectConsortiaUIS');
+    element.addEventListener('change', () => {
+        const value = element.value;
+        const selectStudyUIS = document.getElementById('selectStudyUIS');
+        selectStudyUIS.innerHTML = '';
+        const data_summary = JSON.parse(localStorage.data_summary);
+        const firstOption = document.createElement('option');
+        firstOption.value = '';
+        firstOption.text = '-- Select study --'
+        selectStudyUIS.appendChild(firstOption);
+        if(data_summary && data_summary[value]){
+            for(let study in data_summary[value].studyEntries){
+                const option = document.createElement('option');
+                option.value = study;
+                option.text = data_summary[value].studyEntries[study].name;
+                selectStudyUIS.appendChild(option);
+            }
+        }
+    });
+}
+
+export const addEventCreateStudyForm = () => {
+    
+}
+
+export const addEventUploadStudyForm = () => {
+    const form = document.getElementById('uploadStudyForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const consortia = document.getElementById('selectConsortiaUIS');
+        const consortiaText = consortia.options[consortia.selectedIndex].text;
+        const study = document.getElementById('selectStudyUIS');
+        const studyId = study.value;
+        const studyName = study.options[study.selectedIndex].text;
+
+        const file = document.getElementById('uploadDataUIS').files[0]; 
+        const fileName = file.name;
+        const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
+        if(fileType !== 'txt') {
+            alert('File type not supported!');
+            return;
+        }
+        const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
+        if(r){
+            let fileReader = new FileReader();
+            fileReader.onload = function(fileLoadedEvent){
+                const textFromFileLoaded = fileLoadedEvent.target.result;
+                // TO DO: QC
+                separateData(textFromFileLoaded);
+            };
+
+            fileReader.readAsText(file, "UTF-8");
+        }
+    })
+}
+
+const separateData = (textFromFileLoaded) => {
+    let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g))
+    // if((textFromFileLoaded.split(/\n+/).slice(-1).length == 1) && (textFromFileLoaded.slice(-1)[0].length)){
+    //     rows.pop()
+    // };
+    const headings = rows[0];
+    rows.splice(0, 1);
+    let obj = rows.map(function (el) {
+        let obj = {};
+        for (let i = 0; i < el.length; i++) {
+        obj[headings[i].trim()] = el[i];
+        }
+        return obj;
+    });
+    
+    const masterFile = variables.masterFile;
+    const core = masterFile.core.map(att => att.toLowerCase());
+    const pathology = masterFile.pathology.map(att => att.toLowerCase());
+    const riskFactor = masterFile.riskFactor.map(att => att.toLowerCase());
+    const survivalTreatment = masterFile.survivalAndTreatment.map(att => att.toLowerCase());
+    
+    let coreData = [];
+    let pathologyData = [];
+    let rfData = [];
+    let stData = [];
+
+    console.log(obj);
+    
+    obj.forEach(data => {
+        let cObj = {};
+        let pObj = {};
+        let rfObj = {};
+        let stObj = {};
+
+        for(const key in data){
+
+            // Core variables
+            if(core.indexOf(key.toLowerCase()) !== -1){
+                cObj[key] = data[key];
+            }
+
+            // Pathology variables
+            if(pathology.indexOf(key.toLowerCase()) !== -1){
+                pObj[key] = data[key];
+            }
+
+            // Risk factor variables
+            if(riskFactor.indexOf(key.toLowerCase()) !== -1){
+                rfObj[key] = data[key];
+            }
+
+            // Survival and treatement variables
+            if(survivalTreatment.indexOf(key.toLowerCase()) !== -1){
+                stObj[key] = data[key];
+            }
+        }
+
+        if(Object.keys(cObj).length > 0) coreData.push(cObj);
+        if(Object.keys(pObj).length > 0) pathologyData.push(pObj);
+        if(Object.keys(rfObj).length > 0) rfData.push(rfObj);
+        if(Object.keys(stObj).length > 0) stData.push(stObj);
+    });
+
+    console.log('Core Data: -');
+    console.log(coreData);
+
+    console.log('Pathology Data: -');
+    console.log(pathologyData);
+
+    console.log('Risk Factor Data: -');
+    console.log(rfData);
+
+    console.log('Survival and Treatmenet Data: -');
+    console.log(stData);
+
+}

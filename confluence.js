@@ -6,6 +6,7 @@ import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass } from './src/shared.js';
+import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
 const confluence=function(){
     let confluenceDiv = document.getElementById('confluenceDiv');
@@ -32,6 +33,9 @@ const confluence=function(){
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();
+            addEventConsortiaSelect();
+            addEventCreateStudyForm();
+            addEventUploadStudyForm();
             dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {

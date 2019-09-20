@@ -1,9 +1,19 @@
 import { createFolder, uploadFileBox, updateLocalStorage } from "../shared.js";
 import { alertTemplate } from "../components/elements.js";
+import { createStudyModal, uploadInStudy } from "../components/modal.js";
 
-export function template() {
+export const template = () => {
     const data_summary = JSON.parse(localStorage.data_summary);
     let template = '';
+
+    template += `<div class="row create-study">
+                <div class="new-study-btn"><button data-toggle="modal" data-target="#createStudy" class="btn btn-light"><i class="fas fa-plus"></i> Create new study</button></div>
+                <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light"><i class="fas fa-upload"></i> Upload in existing study</button></div>
+            </div>`;
+
+    template += createStudyModal('createStudy', data_summary);
+    template += uploadInStudy('uploadInStudy', data_summary);
+    
     template += '<div class="data-submission"><ul class="ul-list-style first-list-item">';
     for(let consortiaId in data_summary){
         const consortiaName = data_summary[consortiaId].name;
@@ -47,28 +57,13 @@ export function template() {
                                 title = type === 'folder' ? 'Expand / Collapse' : '';
                                 template += `<li class="${liClass}"><i class="${faClass}"></i> ${fileName} <a href="#"><i title="${title}" data-file-id="${fileId}" data-file-name="${fileName}" class="${expandClass}"></i></a></li>`
                             }
-                            template += `<li>
-                                        <i class="fas fa-file-upload"></i> 
-                                        <input type="file" class="file-upload"/> 
-                                        <a class="uploadFile" data-folder-id="${dataId}" href="#"><i title="Upload new file" class="fas fa-arrow-up"></i></a>
-                                    </li>
-                                </ul>`
+                            template += `</ul>`
                         }
                     }
-                    template += `<li>
-                                <i class="fas fa-folder-plus"></i> 
-                                <input type="text" placeholder="Enter folder name" class="create-folder"/> 
-                                <a class="createFolder" data-folder-id="${studyId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
-                            </li>
-                        </ul>`
+                    template += `</ul>`
                 }
             }
-            template += `<li>
-                        <i class="fas fa-folder-plus"></i> 
-                        <input type="text" placeholder="Enter folder name" class="create-folder"/> 
-                        <a class="createFolder" data-folder-id="${consortiaId}" href="#"><i title="Create new folder" class="fas fa-arrow-up"></i></a>
-                    </li>
-                </ul>`
+            template += `</ul>`
         }
     }
     template += '</ul></div>'

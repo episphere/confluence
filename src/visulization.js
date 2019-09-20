@@ -15,23 +15,23 @@ const unique=function(arr){
     return u
 }
 
-export const txt2dt=function(txt){
-    let dt=txt.split(/\n/g).map(tx=>tx.split(/\t/g))
+export const txt2dt = function(txt){
+    let dt = txt.split(/\n/g).map(tx => tx.split(/\t/g))
     // trailing blank
-    if((txt.split(/\n+/).slice(-1).length==1)&&(txt.slice(-1)[0].length)){
+    if((txt.split(/\n+/).slice(-1).length == 1) && (txt.slice(-1)[0].length)){
         dt.pop()
     }
-    let tab={}
-    let hh=dt[0].forEach((h,j)=>{ // headers
-        tab[h]=[]
+    let tab = {}
+    let hh = dt[0].forEach((h,j)=>{ // headers
+        tab[h] = []
         dt.slice(1).forEach((vv,i)=>{
-            tab[h][i]=vv[j]
+            tab[h][i] = vv[j]
         })
     });
 
-    let uni={}
-    Object.keys(tab).forEach(k=>{
-        uni[k]=unique(tab[k])
+    let uni = {}
+    Object.keys(tab).forEach(k => {
+        uni[k] = unique(tab[k])
     })
     return {
         tab:tab,

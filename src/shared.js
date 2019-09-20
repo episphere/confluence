@@ -95,7 +95,7 @@ const searchParms=function(){
 export const downloadFileTxt = async (fileId, fileName) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let fileData = await getFile(fileId, access_token);
-    var element = document.createElement('a');
+    let element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileData));
     element.setAttribute('download', fileName);
 
@@ -215,9 +215,9 @@ export const convertTextToJson = async (fileIds) => {
         };
         const headings = rows[0];
         rows.splice(0, 1);
-        var obj = rows.map(function (el) {
-            var obj = {};
-            for (var i = 0; i < el.length; i++) {
+        let obj = rows.map(function (el) {
+            let obj = {};
+            for (let i = 0; i < el.length; i++) {
               obj[headings[i].trim()] = el[i];
             }
             return obj;
