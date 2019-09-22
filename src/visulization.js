@@ -58,7 +58,7 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 const getFileContent = async (allIds) => {
-    const jsonData = await convertTextToJson(Object.keys(allIds));
+    const jsonData = await convertTextToJson(allIds);
     const cf = getCrossFilter(jsonData);
     
     let parameterList = document.getElementById('parameterList');

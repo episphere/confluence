@@ -47,20 +47,7 @@ export const template = () => {
                     <span id="showAllVariables"></span>
                 </div>
             </div>
-            <div class="main-summary-row" id="loadingAnimation">
-                <div class="spinner-grow spinner-color" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <div class="spinner-grow spinner-color" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <div class="spinner-grow spinner-color" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <div class="spinner-grow spinner-color" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
+            
             <div class="row" id="error"></div>
             <div class="main-summary-row dynamic-charts">
                 <div class="summary-inner-col col-md-8">
@@ -115,7 +102,7 @@ export const getSummary = async () => {
 
             const files = await getFolderItems(dataId);
             let fileEntries = files.entries;
-            fileEntries = fileEntries.filter(file => file.type === 'file' && file.name.slice(file.name.lastIndexOf('.')+1, file.name.length) === 'txt');
+            fileEntries = fileEntries.filter(file => file.type === 'file');
             for(let dataFile of fileEntries){
                 const fileName = dataFile.name;
                 const fileId = parseInt(dataFile.id);
@@ -127,7 +114,6 @@ export const getSummary = async () => {
                 
                 if(localStorage.data_summary) delete localStorage.data_summary;
                 localStorage.data_summary = JSON.stringify(dataObject);
-                
             };
         };
         if(studyIndex === studyEntries.length - 1){

@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, generateDCChart, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 
@@ -288,6 +288,7 @@ export const addEventUploadStudyForm = () => {
         e.preventDefault();
         const consortia = document.getElementById('selectConsortiaUIS');
         const consortiaText = consortia.options[consortia.selectedIndex].text;
+        const consortiaId = consortia.value;
         const study = document.getElementById('selectStudyUIS');
         const studyId = study.value;
         const studyName = study.options[study.selectedIndex].text;
@@ -301,11 +302,12 @@ export const addEventUploadStudyForm = () => {
         }
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
+            showAnimation();
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
                 // TO DO: QC
-                separateData(textFromFileLoaded);
+                separateData(textFromFileLoaded, consortiaId, studyId, fileName);
             };
 
             fileReader.readAsText(file, "UTF-8");
@@ -313,11 +315,8 @@ export const addEventUploadStudyForm = () => {
     })
 }
 
-const separateData = (textFromFileLoaded) => {
-    let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g))
-    // if((textFromFileLoaded.split(/\n+/).slice(-1).length == 1) && (textFromFileLoaded.slice(-1)[0].length)){
-    //     rows.pop()
-    // };
+const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) => {
+    let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
     let obj = rows.map(function (el) {
@@ -338,8 +337,6 @@ const separateData = (textFromFileLoaded) => {
     let pathologyData = [];
     let rfData = [];
     let stData = [];
-
-    console.log(obj);
     
     obj.forEach(data => {
         let cObj = {};
@@ -349,22 +346,18 @@ const separateData = (textFromFileLoaded) => {
 
         for(const key in data){
 
-            // Core variables
             if(core.indexOf(key.toLowerCase()) !== -1){
                 cObj[key] = data[key];
             }
 
-            // Pathology variables
             if(pathology.indexOf(key.toLowerCase()) !== -1){
                 pObj[key] = data[key];
             }
-
-            // Risk factor variables
+            
             if(riskFactor.indexOf(key.toLowerCase()) !== -1){
                 rfObj[key] = data[key];
             }
 
-            // Survival and treatement variables
             if(survivalTreatment.indexOf(key.toLowerCase()) !== -1){
                 stObj[key] = data[key];
             }
@@ -376,16 +369,26 @@ const separateData = (textFromFileLoaded) => {
         if(Object.keys(stObj).length > 0) stData.push(stObj);
     });
 
-    console.log('Core Data: -');
-    console.log(coreData);
+    const data_summary = JSON.parse(localStorage.data_summary);
+    if(data_summary[consortiaId].studyEntries[studyId].dataEntries){
+        const dataFolders = data_summary[consortiaId].studyEntries[studyId].dataEntries;
+        for(const folderId in dataFolders){
+            if(dataFolders[folderId].name === 'Core Data'){
+                await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, folderId);
+            }
 
-    console.log('Pathology Data: -');
-    console.log(pathologyData);
+            if(dataFolders[folderId].name === 'Pathology Data'){
+                await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, folderId);
+            }
 
-    console.log('Risk Factor Data: -');
-    console.log(rfData);
+            if(dataFolders[folderId].name === 'Risk Factor Data'){
+                await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, folderId);
+            }
 
-    console.log('Survival and Treatmenet Data: -');
-    console.log(stData);
-
+            if(dataFolders[folderId].name === 'Survival and Treatment Data'){
+                await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, folderId);
+            }
+        }
+        location.reload();
+    }
 }

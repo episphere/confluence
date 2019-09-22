@@ -5,9 +5,9 @@ import { createStudyModal, uploadInStudy } from "../components/modal.js";
 export const template = () => {
     const data_summary = JSON.parse(localStorage.data_summary);
     let template = '';
-
+    
     template += `<div class="row create-study">
-                <div class="new-study-btn"><button data-toggle="modal" data-target="#createStudy" class="btn btn-light"><i class="fas fa-plus"></i> Create new study</button></div>
+                <div class="new-study-btn"><button data-toggle="modal" data-target="#createStudy" class="btn btn-light"><i class="fas fa-plus"></i> Add new study</button></div>
                 <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light"><i class="fas fa-upload"></i> Upload in existing study</button></div>
             </div>`;
 

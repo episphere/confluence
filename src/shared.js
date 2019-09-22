@@ -146,7 +146,7 @@ export const uploadFileBox = async (folderId, fileName, file) => {
             Authorization:"Bearer "+access_token
         },
         body: form,
-        contentType: false,
+        contentType: false
     });
     if(response.statusText=="Unauthorized"){
         sessionExpired();
@@ -158,6 +158,32 @@ export const uploadFileBox = async (folderId, fileName, file) => {
         return {status: response.status, statusText: response.statusText};
     };
 };
+
+export const uploadFile = async (data, fileName, folderId) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const form = new FormData();
+    const blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
+    form.append('file', blobData);
+    form.append('attributes', `{"name": "${fileName}", "parent": {"id": "${folderId}"}}`);
+
+    let response = await fetch("https://upload.box.com/api/2.0/files/content", {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+access_token
+        },
+        body: form,
+        contentType: false
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else if(response.status === 201){
+        return response.json();
+    }
+    else{
+        return {status: response.status, statusText: response.statusText};
+    };
+}
 
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
@@ -206,23 +232,32 @@ export const removeActiveClass = (className, activeClass) => {
 
 export const convertTextToJson = async (fileIds) => {
     let allObjs = [];
-    for(const id of fileIds){
-        const intId = parseInt(id);
-        let rawData = await getFile(intId);
-        let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
-        if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
-            rows.pop()
-        };
-        const headings = rows[0];
-        rows.splice(0, 1);
-        let obj = rows.map(function (el) {
-            let obj = {};
-            for (let i = 0; i < el.length; i++) {
-              obj[headings[i].trim()] = el[i];
-            }
-            return obj;
-        });
-        allObjs = allObjs.concat(obj);
+    for(const id in fileIds){
+        if(fileIds[id].name.slice(fileIds[id].name.lastIndexOf('.')+1, fileIds[id].name.length) === 'json'){
+            const intId = parseInt(id);
+            let rawData = await getFile(intId);
+            let obj = JSON.parse(rawData);
+            allObjs = allObjs.concat(obj);
+        }
+        else if(fileIds[id].name.slice(fileIds[id].name.lastIndexOf('.')+1, fileIds[id].name.length) === 'txt'){
+            const intId = parseInt(id);
+            let rawData = await getFile(intId);
+            let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
+            if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
+                rows.pop()
+            };
+            if(intId === 527818707993) debugger
+            const headings = rows[0];
+            rows.splice(0, 1);
+            let obj = rows.map(function (el) {
+                let obj = {};
+                for (let i = 0; i < el.length; i++) {
+                obj[headings[i].trim()] = el[i];
+                }
+                return obj;
+            });
+            allObjs = allObjs.concat(obj);
+        }
     };
     let jsonData = {};
     
