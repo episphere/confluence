@@ -5,7 +5,7 @@ import { template as dataSummary, getSummary, countSpecificStudy } from './src/p
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, hideAnimation } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, hideAnimation, showAnimation } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
 const confluence=function(){
@@ -44,6 +44,7 @@ const confluence=function(){
             dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
+            showAnimation();
             let consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
             Array.from(consortiaCheckBox).forEach((element, index) => {
                 element.addEventListener('click', () => {
