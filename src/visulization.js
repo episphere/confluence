@@ -5,7 +5,7 @@ import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } 
 import { unHideDivs } from './pages/dataExploration.js';
 let oldParameter = '';
 
-const unique=function(arr){
+const unique = arr => {
     let u={}
     arr.forEach(v=>{
         if(v=='888'||v=='777'||v==""){v=undefined} // 888 undefined code
@@ -15,7 +15,7 @@ const unique=function(arr){
     return u
 }
 
-export const txt2dt = function(txt){
+export const txt2dt = txt => {
     let dt = txt.split(/\n/g).map(tx => tx.split(/\t/g))
     // trailing blank
     if((txt.split(/\n+/).slice(-1).length == 1) && (txt.slice(-1)[0].length)){

@@ -16,15 +16,15 @@ export const checkAccessTokenValidity = async () => {
     }
 }
 
-export const loginObs=function(){
+export const loginObs = () => {
     document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniObs.client_id}&redirect_uri=https://observablehq.com/@episphere/confluence&state=${config.iniObs.stateIni}`
 }
 
-export const loginAppDev=function(){
+export const loginAppDev = () => {
     document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=http://localhost:8000?state=${config.iniAppDev.stateIni}`
 }
 
-export const loginAppProd=function(){
+export const loginAppProd = () => {
     document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppProd.stateIni}`
 }
 

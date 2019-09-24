@@ -8,12 +8,11 @@ import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut }
 import { storeAccessToken, removeActiveClass, hideAnimation, showAnimation } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
-const confluence=function(){
+const confluence = () => {
     let confluenceDiv = document.getElementById('confluenceDiv');
     let confluenceLogoElement = document.getElementById('confluenceLogo');
     let navBarOptions = document.getElementById('navBarOptions');
 
-    document.getElementById('loginBoxObs').onclick = loginObs;
     document.getElementById('loginBoxAppDev').onclick = loginAppDev;
     document.getElementById('loginBoxAppProd').onclick = loginAppProd;
     document.getElementById('logOutBtn').addEventListener('click', logOut);
@@ -65,13 +64,13 @@ const confluence=function(){
     if(localStorage.parms === undefined){
         confluenceDiv.innerHTML = homePage();
         homePageVisualization();
-        if(location.origin.match('localhost')) loginBoxAppDev.hidden=false;
-        if(location.origin.match('episphere')) loginBoxAppProd.hidden=false;
+        if(location.origin.match('localhost')) loginBoxAppDev.hidden = false;
+        if(location.origin.match('episphere')) loginBoxAppProd.hidden = false;
         storeAccessToken();
     }
 }
 
-window.onload=async function(){
+window.onload = async () => {
     confluenceDiv.innerHTML = "";
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
         await checkAccessTokenValidity();

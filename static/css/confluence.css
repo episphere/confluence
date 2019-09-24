@@ -617,3 +617,15 @@ span.icon {
 form {
     text-align: left;
 }
+
+.btn-primary {
+    background-color: #0053AD !important;
+}
+
+.links-border-right {
+    border-right: 1px solid #000000;
+}
+
+#toggleVariable{
+    color: #0053AD !important;
+}

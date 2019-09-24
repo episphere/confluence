@@ -2,7 +2,7 @@ import { config } from "./config.js";
 import { txt2dt } from "./visulization.js";
 import { variables } from "./variables.js";
 
-export const getFolderItems = async function(id){
+export const getFolderItems = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
         method:'GET',
@@ -17,7 +17,7 @@ export const getFolderItems = async function(id){
     }
 }
 
-export const getFile = async function(id){
+export const getFile = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
@@ -32,7 +32,7 @@ export const getFile = async function(id){
     }
 };
 
-export const getFileInfo = async function(id){
+export const getFileInfo = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let r = await fetch('https://api.box.com/2.0/files/'+id,{
         method:'GET',
@@ -47,7 +47,7 @@ export const getFileInfo = async function(id){
     }
 }
 
-export const storeAccessToken = async function(){
+export const storeAccessToken = async () => {
     let parms = searchParms();
     if(parms.code){
         //exchange code for authorization token
@@ -81,10 +81,10 @@ export const storeAccessToken = async function(){
     }
 }
 
-const searchParms=function(){
+const searchParms = () => {
     let parms={}
     if(location.search.length>3){
-        location.search.slice(1).split('&').forEach(function(pp){
+        location.search.slice(1).split('&').forEach(pp => {
             pp=pp.split('=')
             parms[pp[0]]=pp[1]
         })

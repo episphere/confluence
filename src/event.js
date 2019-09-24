@@ -319,7 +319,7 @@ const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) 
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
-    let obj = rows.map(function (el) {
+    let obj = rows.map(el => {
         let obj = {};
         for (let i = 0; i < el.length; i++) {
         obj[headings[i].trim()] = el[i];

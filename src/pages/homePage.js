@@ -27,7 +27,7 @@ export const template = () => {
         <div class="summary-inner-col col-md-4" id="pieChart"></div>
     </div>
     <div class="main-summary-row about-confluence">
-        <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/sites/g/files/xnrzdm236/files/styles/cgov_article/public/cgov_contextual_image/100/300/5/files/Confluence_Logo.png?itok=9FBxTnpk"></div>
+        <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/sites/g/files/xnrzdm236/files/styles/cgov_article/public/cgov_contextual_image/100/300/5/files/Confluence_Logo.png?itok=9FBxTnpk" alt="Confluence Logo"></div>
         <div class="col-md-9 align-left">The Confluence project will develop a large research resource by 2020 to uncover breast cancer genetics through genome-wide association studies (GWAS). The resource will include at least 300,000 breast cancer cases and 300,000 controls of different races/ethnicities. This will be accomplished by the confluence of existing GWAS and new genome-wide genotyping data to be generated through this project.</div>
         
         <div class="col-md-12 align-left">
@@ -44,9 +44,9 @@ export const template = () => {
 
 export const confluenceLogo = () => {
     let path = '/confluence/static/images/image.png';
-    if(location.origin.indexOf('localhost') !== -1) path = '/static/images/image.png';
+    if(location.origin.indexOf('localhost') !== -1) path = '';
     return `<a href="#" title="Home" rel="home">
-                <img src="${path}" height="40px" width="300px" alt="NCI Confluence Data Platform" class="banner-logo">
+                <img src="./static/images/image.png" height="40px" width="300px" alt="NCI Confluence Data Platform Logo" class="banner-logo">
             </a>`;
 }
 

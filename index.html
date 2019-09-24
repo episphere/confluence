@@ -18,64 +18,67 @@
     </head>
     <body>
         <div id="page">
-            <div id="header" class="header header-wrapper">
-                <div class="container">
-                    <div id="alertMessage"></div>
-                    <div class="row">
-                        <div class="col" id="confluenceLogo">
-                        </div>
-                        <div class="col">
-                            <div class="row authentication-link">
-                                <div id="authenticationLinks" class="col login-btn">
-                                    <a href="#" hidden=true class="header-item" id="loginBoxObs">Login Observable</a>
-                                    <a href="#" hidden=true class="header-item" id="loginBoxAppDev">Login Dev</a>
-                                    <a href="#" hidden=true class="header-item" id="loginBoxAppProd">Login</a>
-                                    <a href="#" hidden=true class="header-item" id="logOutBtn">Log Out</a>
+            <head>
+                <div id="header" class="header header-wrapper">
+                    <div class="container">
+                        <div id="alertMessage"></div>
+                        <div class="row">
+                            <div class="col" id="confluenceLogo">
+                            </div>
+                            <div class="col">
+                                <div class="row authentication-link">
+                                    <div id="authenticationLinks" class="col login-btn">
+                                        <button hidden=true class="btn btn-primary header-item" title="Login Dev" id="loginBoxAppDev">Login Dev</button>
+                                        <button hidden=true class="btn btn-primary header-item" title="Login" id="loginBoxAppProd">Login</button>
+                                        <button hidden=true class="btn btn-primary header-item" title="Log Out" id="logOutBtn">Log Out</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <nav class="navbar navbar-expand-lg navbar-dark">
-                <div class="container">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarToggler">
-                        <div class="navbar-nav grid" id="navBarOptions">
-                            <div class="grid-border"></div>
-                            <div class="nav-item navbar-active grid-elements">
-                                <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage"><i class="fas fa-home"></i> Confluence</a>
+                
+                <nav class="navbar navbar-expand-lg navbar-dark">
+                    <div class="container">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarToggler">
+                            <div class="navbar-nav grid" id="navBarOptions">
+                                <div class="grid-border"></div>
+                                <div class="nav-item navbar-active grid-elements">
+                                    <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage"><i class="fas fa-home"></i> Confluence</a>
+                                </div>
+                                <div class="grid-border"></div>
                             </div>
-                            <div class="grid-border"></div>
+                        </div>
+                    </div>
+                </nav>
+            </head>
+            <main>
+                <div id="maincontainer">
+                    <div class="container">
+                        <div class="main-container" id="confluenceDiv"></div>
+                        <div class="main-summary-row" id="loadingAnimation" hidden=true>
+                            <div class="spinner-grow spinner-color" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <div class="spinner-grow spinner-color" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <div class="spinner-grow spinner-color" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <div class="spinner-grow spinner-color" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </nav>    
-            
-            <div id="maincontainer">
-                <div class="container">
-                    <div class="main-container" id="confluenceDiv"></div>
-                    <div class="main-summary-row" id="loadingAnimation" hidden=true>
-                        <div class="spinner-grow spinner-color" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                        <div class="spinner-grow spinner-color" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                        <div class="spinner-grow spinner-color" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                        <div class="spinner-grow spinner-color" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="footer"></div>
+            </main>
+            <footer>
+                <div id="footer"></div>
+            </footer>
         </div>
     </body>
 </html>

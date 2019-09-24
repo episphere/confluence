@@ -10,11 +10,11 @@ export const template = () => {
         <div class="main-summary-row">
             <div class="interactive-stats">
                 <div class="summary-inner-col">
-                    <label for="consortiaOption" class="interactive-summary-label">Consortia</label></br>
+                    <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label></br>
                     <span><i class="fas fa-3x fa-layer-group"></i></span>
                     <span class="data-summary-count" id="consortiaCount">1</span></br>
                     <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
-                        <li><input type="checkbox" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/>BCAC</li>
+                        <li><input type="checkbox" aria-labelledby="labelConsortia" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/>BCAC</li>
                     </ul>
                 </div>
                 <div class="summary-inner-col">
@@ -22,8 +22,8 @@ export const template = () => {
                     <span><i class="fas fa-3x fa-university"></i></span>
                     <span class="data-summary-count" id="studyCount">0</span></br>
                     <ul class="dropdown-options align-left ul-data-exploration" id="studyOption" hidden=true>
-                        <li><input type="text" class="search-options" id="searchStudies" placeholder="Search studies"/></li>
-                        <li><input type="checkbox" class="chk-box-margin" id="studySelectAll"/>Select all</li>
+                        <li><input type="text" class="search-options" aria-label="Search Studies" id="searchStudies" placeholder="Search studies"/></li>
+                        <li><label><input type="checkbox" class="chk-box-margin" id="studySelectAll"/>Select all</label></li>
                         <ul class="align-left" id="studiesList"></ul>
                     </ul>
                 </div>
@@ -32,8 +32,8 @@ export const template = () => {
                     <span><i class="fas fa-3x fa-database"></i></span>
                     <span class="data-summary-count" id="dataCount">0</span></br>
                     <ul class="dropdown-options align-left ul-data-exploration" id="dataDropDown" hidden=true>
-                        <li><input type="text" class="search-options" id="searchdataTypes" placeholder="Search data type"/></li>
-                        <li><input type="checkbox" class="chk-box-margin" id="dataTypeSelectAll"/>Select all</li>
+                        <li><input type="text" class="search-options" aria-label="Search Data Types" id="searchdataTypes" placeholder="Search data type"/></li>
+                        <li><label><input type="checkbox" class="chk-box-margin" id="dataTypeSelectAll"/>Select all</label></li>
                         <ul class="align-left" id="dataTypeList"></ul>
                     </ul>
                 </div>
@@ -180,8 +180,7 @@ export const countSpecificData = async (selectedValues, studyEntries) => {
                 if(checker_obj[dataEntries[dataId].name.toLowerCase().trim()]) return;
                 checker_obj[dataEntries[dataId].name.toLowerCase().trim()] = {};
                 template += `<li>
-                                <input type="checkbox" class="chk-box-margin" name="dataTypeCheckBox" data-study-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}"/>
-                                <label>${dataEntries[dataId].name}</label>
+                                <label><input type="checkbox" class="chk-box-margin" name="dataTypeCheckBox" data-study-id="${selectedValues.toString()}" value="${dataEntries[dataId].name}"/>${dataEntries[dataId].name}</label>
                             </li>`;
             }
         }

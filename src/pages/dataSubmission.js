@@ -73,20 +73,20 @@ export const template = () => {
 export const dataSubmission = () => {
     let collapsible = document.getElementsByClassName('collapsible');
     Array.from(collapsible).forEach(element => {
-        element.addEventListener('click', function() {
-            this.classList.toggle('.active');
-            var content = this.nextElementSibling;
+        element.addEventListener('click', () => {
+            element.classList.toggle('.active');
+            var content = element.nextElementSibling;
             if (content.style.maxHeight){
                 content.style.maxHeight = null;
-                this.getElementsByClassName('fa-folder-open')[0].classList.add('fa-folder');
-                this.getElementsByClassName('fa-folder-open')[0].classList.remove('fa-folder-open');
-                this.getElementsByClassName('fa-minus')[0].classList.add('fa-plus');
-                this.getElementsByClassName('fa-minus')[0].classList.remove('fa-minus');
+                element.getElementsByClassName('fa-folder-open')[0].classList.add('fa-folder');
+                element.getElementsByClassName('fa-folder-open')[0].classList.remove('fa-folder-open');
+                element.getElementsByClassName('fa-minus')[0].classList.add('fa-plus');
+                element.getElementsByClassName('fa-minus')[0].classList.remove('fa-minus');
             } else {
-                this.getElementsByClassName('fa-folder')[0].classList.add('fa-folder-open');
-                this.getElementsByClassName('fa-folder')[0].classList.remove('fa-folder');
-                this.getElementsByClassName('fa-plus')[0].classList.add('fa-minus');
-                this.getElementsByClassName('fa-plus')[0].classList.remove('fa-plus');
+                element.getElementsByClassName('fa-folder')[0].classList.add('fa-folder-open');
+                element.getElementsByClassName('fa-folder')[0].classList.remove('fa-folder');
+                element.getElementsByClassName('fa-plus')[0].classList.add('fa-minus');
+                element.getElementsByClassName('fa-plus')[0].classList.remove('fa-plus');
                 content.style.maxHeight = "1000px";
             } 
         })
@@ -104,10 +104,10 @@ export const dataSubmission = () => {
     // Create new folder
     let creatFolderElement = document.getElementsByClassName('createFolder');
     Array.from(creatFolderElement).forEach(element => {
-        element.addEventListener('click', async function() {
-            if(this.previousElementSibling.value && this.previousElementSibling.value !== ""){
-                const folderId = this.dataset.folderId;
-                const folderName = this.previousElementSibling.value;
+        element.addEventListener('click', async () => {
+            if(element.previousElementSibling.value && element.previousElementSibling.value !== ""){
+                const folderId = element.dataset.folderId;
+                const folderName = element.previousElementSibling.value;
 
                 var r = confirm('Create a new folder - '+folderName +' ?');
                 if(r == true){
@@ -135,10 +135,10 @@ export const dataSubmission = () => {
     // file upload
     let uploadFile = document.getElementsByClassName('uploadFile');
     Array.from(uploadFile).forEach(async element => {
-        element.addEventListener('click', async function() {
-            if(this.previousElementSibling.files.length > 0){
-                const folderId = this.dataset.folderId;
-                const file = this.previousElementSibling.files[0];
+        element.addEventListener('click', async () => {
+            if(element.previousElementSibling.files.length > 0){
+                const folderId = element.dataset.folderId;
+                const file = element.previousElementSibling.files[0];
                 const fileName = file.name;
                 const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
                 if(fileType !== 'txt'){
