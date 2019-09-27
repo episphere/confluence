@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
@@ -10,11 +10,11 @@ export const template = () => {
         <div class="main-summary-row">
             <div class="interactive-stats">
                 <div class="summary-inner-col">
-                    <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label></br>
+                    <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label> <a href="#" id="editFolderId"><i class="fas fa-edit"></i></a></br>
                     <span><i class="fas fa-3x fa-layer-group"></i></span>
                     <span class="data-summary-count" id="consortiaCount">1</span></br>
                     <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
-                        <li><input type="checkbox" aria-labelledby="labelConsortia" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/>BCAC</li>
+                        <li><input type="checkbox" aria-labelledby="labelConsortia" disabled class="chk-box-margin" name="consortiaCheckBox" value="${config.BCACFolderId}"/><label id="consortiaName"></label></li>
                     </ul>
                 </div>
                 <div class="summary-inner-col">
@@ -65,7 +65,42 @@ export const template = () => {
 }
 
 export const getSummary = async () => {
-    let consortia = await getFolderItems(config.BCACFolderId);
+    const consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.BCACFolderId;
+    let consortia = await getFolderItems(consortiaId);
+    const consortiaInfo = await getFolderInfo(consortiaId);
+    document.getElementById('consortiaName').innerHTML = consortiaInfo.name;
+    const editFolderId = document.getElementById('editFolderId');
+    editFolderId.addEventListener('click', () => {
+        if (localStorage.boxFolderId){
+            delete localStorage.boxFolderId;
+            location.reload();
+        }
+    });
+    if(consortia.status === 404){
+        hideAnimation();
+        document.getElementById('confluenceDiv').innerHTML = `
+            <div class="col">
+                <form id="consortiaIdForm">
+                    <label>Consortia Id / Box Folder Id
+                        <div class="form-group">
+                            <input type="text" class="form-control" required id="boxFolderId" placeholder="Enter Consortia ID / Box Folder ID" title="Consortia ID / Box Folder ID">
+                        </div>
+                        <div class="form-group">
+                            <button id="submit" class="btn btn-dark" title="Submit">Submit</button>
+                        </div>
+                    </label>
+                </form>
+            </div>
+        `;
+        const form = document.getElementById('consortiaIdForm');
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const boxFolderId = document.getElementById('boxFolderId').value;
+            localStorage.boxFolderId = JSON.stringify({folderId: boxFolderId});
+            location.reload();
+        });
+        return;
+    }
     let dataObject = {}
     const consortiaFolderName = 'BCAC';
     const consortiaFolderId = config.BCACFolderId;

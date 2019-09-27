@@ -17,6 +17,21 @@ export const getFolderItems = async (id) => {
     }
 }
 
+export const getFolderInfo = async (id) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let r = (await fetch('https://api.box.com/2.0/folders/'+id,{
+        method:'GET',
+        headers:{
+            Authorization:"Bearer "+access_token
+        }
+    }))
+    if(r.statusText=="Unauthorized"){
+        sessionExpired();
+    }else{
+        return r.json()
+    }
+}
+
 export const getFile = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
