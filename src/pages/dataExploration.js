@@ -1,8 +1,8 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo } from "../shared.js";
 import { config } from "../config.js";
-import { studyDropDownTemplate } from "../components/elements.js";
+import { studyDropDownTemplate, renderForm } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from "../event.js";
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, formSubmit } from "../event.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
 
 export const template = () => {
@@ -72,34 +72,15 @@ export const getSummary = async () => {
     document.getElementById('consortiaName').innerHTML = consortiaInfo.name;
     const editFolderId = document.getElementById('editFolderId');
     editFolderId.addEventListener('click', () => {
-        if (localStorage.boxFolderId){
-            delete localStorage.boxFolderId;
-            location.reload();
-        }
+        hideAnimation();
+        document.getElementById('confluenceDiv').innerHTML = renderForm();
+        formSubmit();
+        return;
     });
     if(consortia.status === 404){
         hideAnimation();
-        document.getElementById('confluenceDiv').innerHTML = `
-            <div class="col">
-                <form id="consortiaIdForm">
-                    <label>Consortia Id / Box Folder Id
-                        <div class="form-group">
-                            <input type="text" class="form-control" required id="boxFolderId" placeholder="Enter Consortia ID / Box Folder ID" title="Consortia ID / Box Folder ID">
-                        </div>
-                        <div class="form-group">
-                            <button id="submit" class="btn btn-dark" title="Submit">Submit</button>
-                        </div>
-                    </label>
-                </form>
-            </div>
-        `;
-        const form = document.getElementById('consortiaIdForm');
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            const boxFolderId = document.getElementById('boxFolderId').value;
-            localStorage.boxFolderId = JSON.stringify({folderId: boxFolderId});
-            location.reload();
-        });
+        document.getElementById('confluenceDiv').innerHTML = renderForm();
+        formSubmit();
         return;
     }
     let dataObject = {}

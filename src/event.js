@@ -392,3 +392,13 @@ const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) 
         location.reload();
     }
 }
+
+export const formSubmit = () => {
+    const form = document.getElementById('consortiaIdForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const boxFolderId = document.getElementById('boxFolderId').value;
+        localStorage.boxFolderId = JSON.stringify({folderId: boxFolderId});
+        location.reload();
+    });
+} 

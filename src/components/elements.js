@@ -64,3 +64,20 @@ export const alertTemplate = (className, message) => {
         </div>
     `;
 }
+
+export const renderForm = () => {
+    return `
+        <div class="col">
+            <form id="consortiaIdForm">
+                <label>Consortia Id / Box Folder Id
+                    <div class="form-group">
+                        <input type="text" class="form-control" required id="boxFolderId" placeholder="Enter Consortia ID / Box Folder ID" title="Consortia ID / Box Folder ID">
+                    </div>
+                    <div class="form-group">
+                        <button id="submit" class="btn btn-dark" title="Submit">Submit</button>
+                    </div>
+                </label>
+            </form>
+        </div>
+    `;
+}
