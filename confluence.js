@@ -28,6 +28,7 @@ const confluence = () => {
     footer.innerHTML = footerTemplate();
     
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token) {
+        logOutBtn.hidden = false
         navBarOptions.innerHTML = template();
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
@@ -66,7 +67,6 @@ const confluence = () => {
             confluenceDiv.innerHTML = dataRequestTemplate();
         });
         dataSummaryElement.click();
-        logOutBtn.hidden = false
     }
     if(localStorage.parms === undefined){
         confluenceDiv.innerHTML = homePage();
