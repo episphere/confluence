@@ -5,10 +5,17 @@ import { template as dataSummary, getSummary, countSpecificStudy } from './src/p
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, hideAnimation, showAnimation } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, hideAnimation, showAnimation, getparameters } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
 const confluence = () => {
+    const hash = decodeURIComponent(window.location.hash);
+    const index = hash.indexOf('?');
+    const parameters = index !== -1 ? getparameters(hash.slice(index+1, hash.length)) : {};
+    if(parameters.consortiaId){
+        localStorage.boxFolderId = JSON.stringify({folderId : parameters.consortiaId});
+    }
+    
     let confluenceDiv = document.getElementById('confluenceDiv');
     let confluenceLogoElement = document.getElementById('confluenceLogo');
     let navBarOptions = document.getElementById('navBarOptions');

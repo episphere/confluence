@@ -326,3 +326,12 @@ export const disableCheckBox = (value) => {
     document.getElementById('searchStudies').disabled = value;
     document.getElementById('searchdataTypes').disabled = value;
 }
+
+export const getparameters = (query) => {
+    const array = query.split('&');
+    let obj = {};
+    array.forEach(value => {
+        obj[value.split('=')[0]] = value.split('=')[1];
+    });
+    return obj;
+}
