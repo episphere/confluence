@@ -36,7 +36,6 @@ const confluence = () => {
 
         dataSubmissionElement.addEventListener('click', () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
-            if(localStorage.data_summary === undefined) return;
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSubmissionTemplate();

@@ -1,17 +1,15 @@
 import { createFolder, uploadFileBox, updateLocalStorage } from "../shared.js";
 import { alertTemplate } from "../components/elements.js";
-import { createStudyModal, uploadInStudy } from "../components/modal.js";
+import { uploadInStudy } from "../components/modal.js";
 
 export const template = () => {
     const data_summary = JSON.parse(localStorage.data_summary);
     let template = '';
     
     template += `<div class="row create-study">
-                <div class="new-study-btn"><button data-toggle="modal" data-target="#createStudy" class="btn btn-light"><i class="fas fa-plus"></i> Add new study</button></div>
                 <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light"><i class="fas fa-upload"></i> Upload in existing study</button></div>
             </div>`;
 
-    template += createStudyModal('createStudy', data_summary);
     template += uploadInStudy('uploadInStudy', data_summary);
     
     template += '<div class="data-submission"><ul class="ul-list-style first-list-item">';

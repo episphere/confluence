@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, generateDCChart, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 
@@ -268,12 +268,12 @@ export const addEventConsortiaSelect = () => {
         firstOption.text = '-- Select study --'
         selectStudyUIS.appendChild(firstOption);
         if(data_summary && data_summary[value]){
-            for(let study in data_summary[value].studyEntries){
+            ['AHS', 'PBCS', 'PLCO', 'USRT'].forEach(study => {
                 const option = document.createElement('option');
                 option.value = study;
-                option.text = data_summary[value].studyEntries[study].name;
+                option.text = study;
                 selectStudyUIS.appendChild(option);
-            }
+            });
         }
     });
 }
@@ -284,13 +284,16 @@ export const addEventCreateStudyForm = () => {
 
 export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        let data_summary = JSON.parse(localStorage.data_summary);
         const consortia = document.getElementById('selectConsortiaUIS');
         const consortiaText = consortia.options[consortia.selectedIndex].text;
         const consortiaId = consortia.value;
         const study = document.getElementById('selectStudyUIS');
-        const studyId = study.value;
+        const studyValue = study.value;
+        
+        let studyId = study.value;
         const studyName = study.options[study.selectedIndex].text;
 
         const file = document.getElementById('uploadDataUIS').files[0]; 
@@ -303,6 +306,25 @@ export const addEventUploadStudyForm = () => {
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
             showAnimation();
+
+            if(data_summary[consortiaId] && Object.keys(data_summary[consortiaId].studyEntries).length === 0){
+                // No studies exists, create new study
+                studyId = await createStudiesAndDataTypes(data_summary, consortiaId, studyValue);
+            }
+            else if(data_summary[consortiaId] && Object.keys(data_summary[consortiaId].studyEntries).length !== 0){
+                const studyEntries = data_summary[consortiaId].studyEntries;
+                let checker = false;
+                for(const ID in studyEntries){
+                    if(studyEntries[ID].name === studyValue){
+                        checker = true;
+                        studyId = ID;
+                    }
+                }
+                if(!checker){
+                    studyId = await createStudiesAndDataTypes(data_summary, consortiaId, studyValue);
+                }
+            }
+
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
@@ -391,6 +413,62 @@ const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) 
         }
         location.reload();
     }
+}
+
+const createStudiesAndDataTypes = async (data_summary, consortiaId, studyValue) => {
+    const response = await createFolder(consortiaId, studyValue);
+    const newStudyId = response.id;
+    const newStudyName = response.name;
+    const newStudyType = response.type;
+
+    // Create 4 data folders
+    const newCData = await createFolder(newStudyId, 'Core Data');
+    const newCId = newCData.id;
+    const newCName = newCData.name;
+    const newCType = newCData.type;
+
+    const newPData = await createFolder(newStudyId, 'Pathology Data');
+    const newPId = newPData.id;
+    const newPName = newPData.name;
+    const newPType = newPData.type;
+
+    const newRFData = await createFolder(newStudyId, 'Risk Factor Data');
+    const newRFId = newRFData.id;
+    const newRFName = newRFData.name;
+    const newRFType = newRFData.type;
+
+    const newSTData = await createFolder(newStudyId, 'Survival and Treatment Data');
+    const newSTId = newSTData.id;
+    const newSTName = newSTData.name;
+    const newSTType = newSTData.type;
+
+    data_summary[consortiaId].studyEntries[newStudyId] = {};
+    data_summary[consortiaId].studyEntries[newStudyId].name = newStudyName;
+    data_summary[consortiaId].studyEntries[newStudyId].type = newStudyType;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries = {};
+
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId] = {};
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].name = newCName;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].type = newCType;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].fileEntries = {};
+
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId] = {};
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].name = newPName;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].type = newPType;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].fileEntries = {};
+
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId] = {};
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].name = newRFName;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].type = newRFType;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].fileEntries = {};
+
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId] = {};
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].name = newSTName;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].type = newSTType;
+    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].fileEntries = {};
+
+    localStorage.data_summary = JSON.stringify(data_summary);
+    return newStudyId;
 }
 
 export const formSubmit = () => {

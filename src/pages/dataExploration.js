@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate, renderForm } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
@@ -10,7 +10,7 @@ export const template = () => {
         <div class="main-summary-row">
             <div class="interactive-stats">
                 <div class="summary-inner-col">
-                    <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label> <a href="#" id="editFolderId"><i class="fas fa-edit"></i></a></br>
+                    <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label></br>
                     <span><i class="fas fa-3x fa-layer-group"></i></span>
                     <span class="data-summary-count" id="consortiaCount">1</span></br>
                     <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
@@ -65,25 +65,42 @@ export const template = () => {
 }
 
 export const getSummary = async () => {
-    const consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.BCACFolderId;
-    document.getElementById('consortiaCBox').value = consortiaId;
+    let consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.BCACFolderId;
+    
     let consortia = await getFolderItems(consortiaId);
-    const consortiaInfo = await getFolderInfo(consortiaId);
-    document.getElementById('consortiaName').innerHTML = consortiaInfo.name;
-    const editFolderId = document.getElementById('editFolderId');
-    editFolderId.addEventListener('click', () => {
-        hideAnimation();
-        document.getElementById('confluenceDiv').innerHTML = renderForm();
-        formSubmit();
-        return;
-    });
+    
+    let dataObject = {}
     if(consortia.status === 404){
         hideAnimation();
-        document.getElementById('confluenceDiv').innerHTML = renderForm();
-        formSubmit();
-        return;
+        const response = await getFolderItems(0);
+        const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'NCI'));
+        
+        if(array.length === 0){
+            const newFolder = await createFolder(0, 'BCAC');
+            consortiaId = parseInt(newFolder.id);
+            dataObject[consortiaId] = {};
+            dataObject[consortiaId].studyEntries = {};
+            dataObject[consortiaId].name = 'BCAC';
+            dataObject[consortiaId].type = 'folder';
+            localStorage.data_summary = JSON.stringify(dataObject);
+        }
+        else{
+            consortiaId = parseInt(array[0].id);
+            consortia = await getFolderItems(consortiaId);
+            if(consortia.entries.length === 0){
+                dataObject[consortiaId] = {};
+                dataObject[consortiaId].studyEntries = {};
+                dataObject[consortiaId].name = array[0].name;
+                dataObject[consortiaId].type = 'folder';
+                localStorage.data_summary = JSON.stringify(dataObject);
+            }
+        }
     }
-    let dataObject = {}
+    
+    document.getElementById('consortiaCBox').value = consortiaId;
+    const consortiaInfo = await getFolderInfo(consortiaId);
+    document.getElementById('consortiaName').innerHTML = consortiaInfo.name;
+    
     dataObject[consortiaId] = {};
     dataObject[consortiaId].studyEntries = {};
     dataObject[consortiaId].name = consortiaInfo.name;
