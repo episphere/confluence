@@ -71,7 +71,6 @@ export const getSummary = async () => {
     
     let dataObject = {}
     if(consortia.status === 404){
-        hideAnimation();
         const response = await getFolderItems(0);
         const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_participation_NCI'));
         
@@ -83,6 +82,7 @@ export const getSummary = async () => {
             dataObject[consortiaId].name = 'BCAC';
             dataObject[consortiaId].type = 'folder';
             localStorage.data_summary = JSON.stringify(dataObject);
+            hideAnimation();
         }
         else{
             consortiaId = parseInt(array[0].id);
