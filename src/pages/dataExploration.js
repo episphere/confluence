@@ -73,7 +73,7 @@ export const getSummary = async () => {
     if(consortia.status === 404){
         hideAnimation();
         const response = await getFolderItems(0);
-        const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'NCI'));
+        const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_participation_NCI'));
         
         if(array.length === 0){
             const newFolder = await createFolder(0, 'BCAC');
