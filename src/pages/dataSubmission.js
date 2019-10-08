@@ -17,7 +17,7 @@ export const template = () => {
         const consortiaName = data_summary[consortiaId].name;
         const studyEntries = data_summary[consortiaId].studyEntries;
         let type = data_summary[consortiaId].type;
-        let liClass = type === 'folder' ? 'collapsible' : '';
+        let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let faClass = type === 'folder' ? 'fas fa-folder' : 'far fa-file';
         let expandClass = type === 'folder' ? 'fas fa-plus' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
@@ -89,7 +89,12 @@ export const dataSubmission = () => {
             } 
         })
     });
-    collapsible[0].dispatchEvent(new Event('click'));
+    
+    let consortiaFolder = document.getElementsByClassName('consortia-folder');
+    Array.from(consortiaFolder).forEach(element => {
+        element.dispatchEvent(new Event('click'));
+    });
+
     // let fileDownload = document.getElementsByClassName('fa-file-download');
     // Array.from(fileDownload).forEach(element => {
     //     element.addEventListener('click', function() {
