@@ -5,12 +5,23 @@ export const studyDropDownTemplate = (entries) => {
     
     for(let studyId in entries){
         template += `<li>
-                    <label><input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>${entries[studyId].name}</label>
-                </li>`
+                        <label><input type="checkbox" class="chk-box-margin" name="studiesCheckBox" value="${studyId}"/>${entries[studyId].name}</label>
+                    </li>`
     }
     
     return template;
 };
+
+export const renderConsortium = () => {
+    let obj = JSON.parse(localStorage.data_summary);
+    let template = '';
+    for(let ID in obj){
+        template += `
+                    <li><input type="radio" aria-labelledby="labelConsortia" class="chk-box-margin" name="consortiaCheckBox" value="${ID}"/><label>${obj[ID].name}</label></li>
+                    `;
+    }
+    return template;
+}
 
 export const parameterListTemplate = (jsonData) => {
     let parameters = [];

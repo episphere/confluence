@@ -335,3 +335,58 @@ export const getparameters = (query) => {
     });
     return obj;
 }
+
+export const getAllFileStructure = async (array) => {
+    let obj = {};
+    for(let i = 0; i < array.length; i++){
+        const ID = array[i].id;
+        obj[ID] = {};
+        obj[ID].name = array[i].name;
+        obj[ID].type = array[i].type;
+        obj[ID].studyEntries = {};
+        obj[ID].count = 0;
+        const studies = await getFolderItems(ID);
+
+        
+        if(studies.total_count && studies.total_count > 0){
+            const allStudies = studies.entries;
+            for(let j = 0; j < allStudies.length; j++){
+                if(allStudies[j].type === 'folder'){
+                    const studyId = allStudies[j].id;
+                    obj[ID].studyEntries[studyId] = {};
+                    obj[ID].studyEntries[studyId].name = allStudies[j].name;
+                    obj[ID].studyEntries[studyId].type = allStudies[j].type;
+                    obj[ID].studyEntries[studyId].dataEntries = {};
+                    obj[ID].count++;
+                    obj[ID].studyEntries[studyId].count = 0;
+                    const dataTypes = await getFolderItems(studyId);
+                    if(dataTypes.total_count && dataTypes.total_count === 0) return;
+                    const allDataTypes = dataTypes.entries;
+                    for(let k = 0; k < allDataTypes.length; k++){
+                        if(allDataTypes[k].type === 'folder' && allDataTypes[k].name.trim().toLowerCase() !== 'samples'){
+                            const dataId = allDataTypes[k].id;
+                            obj[ID].studyEntries[studyId].dataEntries[dataId] = {}
+                            obj[ID].studyEntries[studyId].dataEntries[dataId].name = allDataTypes[k].name;
+                            obj[ID].studyEntries[studyId].dataEntries[dataId].type = allDataTypes[k].type;
+                            obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
+                            obj[ID].studyEntries[studyId].count++;
+                            obj[ID].studyEntries[studyId].dataEntries[dataId].count = 0
+                            const files = await getFolderItems(dataId);
+                            if(files.total_count && files.total_count === 0) return;
+                            const allFiles = files.entries;
+                            for(let l = 0; l < allFiles.length ; l++){
+                                if(allFiles[l].type !== 'file') return;
+                                const fileId = allFiles[l].id;
+                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
+                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = allFiles[l].name;
+                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = allFiles[l].type;
+                                obj[ID].studyEntries[studyId].dataEntries[dataId].count++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return obj;
+}

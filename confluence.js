@@ -33,6 +33,8 @@ const confluence = () => {
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataRequestElement = document.getElementById('dataRequest');
+        const dataGovernanceElement = document.getElementById('dataGovernance');
+        const dataAnalysisElement = document.getElementById('dataAnalysis');
 
         dataSubmissionElement.addEventListener('click', () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -51,18 +53,24 @@ const confluence = () => {
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
             showAnimation();
-            let consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
-            Array.from(consortiaCheckBox).forEach((element, index) => {
-                element.addEventListener('click', () => {
-                    if(element.value === "") return;
-                    if(index === consortiaCheckBox.length -1) countSpecificStudy(parseInt(element.value));
-                });
-            });
+            
         });
         dataRequestElement.addEventListener('click', () => {
             if(dataRequestElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataRequestElement.classList.add('navbar-active');
+            confluenceDiv.innerHTML = dataRequestTemplate();
+        });
+        dataGovernanceElement.addEventListener('click', () => {
+            if(dataGovernanceElement.classList.contains('navbar-active')) return;
+            removeActiveClass('nav-menu-links', 'navbar-active');
+            dataGovernanceElement.classList.add('navbar-active');
+            confluenceDiv.innerHTML = dataRequestTemplate();
+        });
+        dataAnalysisElement.addEventListener('click', () => {
+            if(dataAnalysisElement.classList.contains('navbar-active')) return;
+            removeActiveClass('nav-menu-links', 'navbar-active');
+            dataAnalysisElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataRequestTemplate();
         });
         dataSummaryElement.click();

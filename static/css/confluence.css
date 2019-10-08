@@ -65,6 +65,10 @@ body {
     width: 100%;
 }
 
+.pages-coming-soon {
+    background-color: #716f6f;
+}
+
 .navbar a:hover {
     background-color: #2f2a2a;
 }

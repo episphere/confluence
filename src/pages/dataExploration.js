@@ -1,6 +1,6 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure } from "../shared.js";
 import { config } from "../config.js";
-import { studyDropDownTemplate, renderForm } from "../components/elements.js";
+import { studyDropDownTemplate, renderForm, renderConsortium } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, formSubmit } from "../event.js";
 const nonStudyFolder = ['users', 'protocols', 'consents'];
@@ -12,10 +12,8 @@ export const template = () => {
                 <div class="summary-inner-col">
                     <label for="consortiaOption" class="interactive-summary-label" id="labelConsortia">Consortia</label></br>
                     <span><i class="fas fa-3x fa-layer-group"></i></span>
-                    <span class="data-summary-count" id="consortiaCount">1</span></br>
-                    <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true>
-                        <li><input type="checkbox" aria-labelledby="labelConsortia" disabled class="chk-box-margin" name="consortiaCheckBox" id="consortiaCBox" /><label id="consortiaName"></label></li>
-                    </ul>
+                    <span class="data-summary-count" id="consortiaCount">0</span></br>
+                    <ul class="dropdown-options align-left ul-data-exploration" id="consortiaOption" hidden=true></ul>
                 </div>
                 <div class="summary-inner-col">
                     <span class="interactive-summary-label">Studies</span></br>
@@ -65,7 +63,7 @@ export const template = () => {
 }
 
 export const getSummary = async () => {
-    let consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.BCACFolderId;
+    let consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.EpiBoxFolderId;
     
     let consortia = await getFolderItems(consortiaId);
     
@@ -73,7 +71,9 @@ export const getSummary = async () => {
     if(consortia.status === 404){
         const response = await getFolderItems(0);
         const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_participation_NCI'));
-        
+        if(array.length > 0) {
+            localStorage.data_summary = JSON.stringify(await getAllFileStructure(array));
+        }
         if(array.length === 0){
             const newFolder = await createFolder(0, 'BCAC');
             consortiaId = parseInt(newFolder.id);
@@ -84,79 +84,23 @@ export const getSummary = async () => {
             localStorage.data_summary = JSON.stringify(dataObject);
             hideAnimation();
         }
-        else{
-            consortiaId = parseInt(array[0].id);
-            consortia = await getFolderItems(consortiaId);
-            if(consortia.entries.length === 0){
-                dataObject[consortiaId] = {};
-                dataObject[consortiaId].studyEntries = {};
-                dataObject[consortiaId].name = array[0].name;
-                dataObject[consortiaId].type = 'folder';
-                localStorage.data_summary = JSON.stringify(dataObject);
-            }
-        }
     }
-    
-    document.getElementById('consortiaCBox').value = consortiaId;
-    const consortiaInfo = await getFolderInfo(consortiaId);
-    document.getElementById('consortiaName').innerHTML = consortiaInfo.name;
-    
-    dataObject[consortiaId] = {};
-    dataObject[consortiaId].studyEntries = {};
-    dataObject[consortiaId].name = consortiaInfo.name;
-    dataObject[consortiaId].type = 'folder';
-    let studyEntries = consortia.entries;
-    studyEntries = studyEntries.filter(data => nonStudyFolder.indexOf(data.name.toLowerCase().trim()) === -1)
-    document.getElementById('studyCount').textContent = studyEntries.length;
-    // getAgeDataForAllStudies(studyEntries);
-    studyEntries.forEach(async (study, studyIndex) => {
-        const studyName = study.name;
-        const studyId = parseInt(study.id);
-        dataObject[consortiaId].studyEntries[studyId] = {};
-        dataObject[consortiaId].studyEntries[studyId].name = studyName;
-        dataObject[consortiaId].studyEntries[studyId].type = study.type;
-        dataObject[consortiaId].studyEntries[studyId].dataEntries = {};
-        
-        let data = await getFolderItems(studyId);
-        let dataEntries = data.entries;
-        dataEntries = dataEntries.filter(dt => dt.name.toLowerCase().trim() !== 'samples');
-        
-        let dataCountElement = document.getElementById('dataCount')
-        dataCountElement.textContent = parseInt(dataCountElement.textContent) + dataEntries.length;
 
-        for(let dt of dataEntries){
-            const dataName = dt.name;
-            const dataId = parseInt(dt.id);
-            dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId] = {};
-            dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].name = dataName;
-            dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].type = dt.type;
-            dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
-
-            const files = await getFolderItems(dataId);
-            let fileEntries = files.entries;
-            fileEntries = fileEntries.filter(file => file.type === 'file');
-            for(let dataFile of fileEntries){
-                const fileName = dataFile.name;
-                const fileId = parseInt(dataFile.id);
-                dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
-                dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = fileName;
-                dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = dataFile.type;
-                dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].cases = 0;
-                dataObject[consortiaId].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].controls = 0;
-                
-                if(localStorage.data_summary) delete localStorage.data_summary;
-                localStorage.data_summary = JSON.stringify(dataObject);
-            };
-        };
-        if(studyIndex === studyEntries.length - 1){
-            const consortiaOptions = document.getElementById('consortiaOption');
-            consortiaOptions.hidden = false;
-
-            const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
-            consortiaCheckBox[0].checked = true;
-            consortiaCheckBox[0].dispatchEvent(new Event('click'));
-        };
+    document.getElementById('consortiaCount').innerHTML = Object.keys(JSON.parse(localStorage.data_summary)).length;
+    const consortiaOptions = document.getElementById('consortiaOption');
+    consortiaOptions.innerHTML = renderConsortium();
+    const consortiaCheckBox = document.getElementsByName('consortiaCheckBox');
+    Array.from(consortiaCheckBox).forEach((element) => {
+        element.addEventListener('click', () => {
+            if(element.value === "") return;
+            countSpecificStudy(parseInt(element.value));
+        });
     });
+    consortiaOptions.hidden = false;
+
+    consortiaCheckBox[0].checked = true;
+    consortiaCheckBox[0].dispatchEvent(new Event('click'));
+    // getAgeDataForAllStudies(studyEntries);
 }
 
 export const countSpecificStudy = (folderId) => {
