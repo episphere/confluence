@@ -75,7 +75,7 @@ export const addEventSearchStudies = () => {
         }
         else{
             Array.from(studiesCheckBox).forEach(element => {
-                const elementValue = element.nextElementSibling.innerHTML;
+                const elementValue = element.dataset.studyName;
                 if(elementValue.toLowerCase().trim().indexOf(keyword) === -1){
                     element.parentNode.style.display = "none";
                 }
