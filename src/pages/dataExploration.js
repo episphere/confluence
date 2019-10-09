@@ -70,7 +70,7 @@ export const getSummary = async () => {
     let dataObject = {}
     if(consortia.status === 404){
         const response = await getFolderItems(0);
-        const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_participation_NCI'));
+        const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_NCI'));
         if(array.length > 0) {
             localStorage.data_summary = JSON.stringify(await getAllFileStructure(array));
         }
