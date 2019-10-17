@@ -435,7 +435,7 @@ label {
 }
 
 .content {
-    padding: 0px 40px;
+    padding: 0px 0px 0px 40px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-in-out;
