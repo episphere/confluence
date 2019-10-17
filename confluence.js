@@ -1,11 +1,12 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
-import { template as dataSummary, getSummary, countSpecificStudy } from './src/pages/dataExploration.js';
+import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
+import { template as dataGovernanceTemplate, eventsDataSubmissions } from './src/pages/dataGovernance.js';
 import { footerTemplate } from './src/components/footer.js';
-import { checkAccessTokenValidity, loginObs, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, hideAnimation, showAnimation, getparameters } from './src/shared.js';
+import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getparameters } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
 const confluence = () => {
@@ -65,7 +66,8 @@ const confluence = () => {
             if(dataGovernanceElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataGovernanceElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataRequestTemplate();
+            confluenceDiv.innerHTML = dataGovernanceTemplate();
+            eventsDataSubmissions();
         });
         dataAnalysisElement.addEventListener('click', () => {
             if(dataAnalysisElement.classList.contains('navbar-active')) return;

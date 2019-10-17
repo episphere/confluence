@@ -1,8 +1,9 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { getData, generateDCChart, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder } from './shared.js';
+import { getData, renderPieChart } from './visulization.js'
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
+import { addFields } from './pages/dataGovernance.js';
 
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -479,4 +480,99 @@ export const formSubmit = () => {
         localStorage.boxFolderId = JSON.stringify({folderId: boxFolderId});
         location.reload();
     });
-} 
+}
+
+export const addEventShowAllCollaborator = () => {
+    const btn1 = document.getElementById('addNewCollaborators');
+    const btn2 = document.getElementById('listCollaborators');
+    const folderToShare = document.getElementById('folderToShare');
+    btn2.addEventListener('click', async () => {
+        const ID = folderToShare.dataset.folderId;
+        const name = folderToShare.dataset.folderName;
+        const type = folderToShare.dataset.objectType;
+        btn2.classList.add('active');
+        btn1.classList.remove('active');
+        const collaboratorModalBody = document.getElementById('collaboratorModalBody');
+        collaboratorModalBody.innerHTML = ``;
+        const response = await getCollaboration(ID,`${type}s`);
+        let table = '';
+        if(response){
+            let entries = response.entries;
+            entries = entries.sort((a, b) => (a.accessible_by.name.toLowerCase() > b.accessible_by.name.toLowerCase()) ? 1 : ((b.accessible_by.name.toLowerCase() > a.accessible_by.name.toLowerCase()) ? -1 : 0));
+            table += `<strong>${name}</strong><br><br>
+                <table class="table table-borderless table-striped collaborator-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Added by</th>
+                            <th>Added at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            entries.forEach(entry => {
+                const name = entry.accessible_by.name;
+                const email = entry.accessible_by.login;
+                const role = entry.role;
+                const status = entry.status;
+                const addedBy = `${entry.created_by.name}`;
+                const addedAt = (new Date(entry.created_at)).toLocaleString();
+                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td></tr>`
+            });
+            table += `</tbody></table>`
+        }
+        else{
+            table = 'Collaborators not found!'
+        }
+        collaboratorModalBody.innerHTML = `
+            <div class="modal-body">${table}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        `;
+        
+    });
+};
+
+export const addEventAddNewCollaborator = () => {
+    const btn1 = document.getElementById('addNewCollaborators');
+    const btn2 = document.getElementById('listCollaborators');
+    const folderToShare = document.getElementById('folderToShare');
+    btn1.addEventListener('click', () => {
+        const ID = folderToShare.dataset.folderId;
+        const name = folderToShare.dataset.folderName;
+        const type = folderToShare.dataset.objectType;
+        btn1.classList.add('active');
+        btn2.classList.remove('active');
+        const collaboratorModalBody = document.getElementById('collaboratorModalBody');
+        collaboratorModalBody.innerHTML = `
+            <form id="addCollaborationForm" method="POST">
+                <div class="modal-body">
+                    <div><h5 class="modal-title">Share <strong>${name}</strong></h5></div>
+                    <br>
+                    <div class="row" id="collaboratorEmails">
+                        ${addFields(1)}
+                    </div>
+                    <div class="row">
+                        <div class="col"><button class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        `;
+
+        const addMoreEmail = document.getElementById('addMoreEmail');
+        addMoreEmail.addEventListener('click', () => {
+            const counter = parseInt(addMoreEmail.dataset.counter)+1;
+            addMoreEmail.dataset.counter = counter;
+            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            if(counter === 5) addMoreEmail.disabled = true;
+        });
+    });
+}

@@ -36,6 +36,33 @@ export const uploadInStudy = (id, data) => {
     </div>`
 }
 
+export const shareFolderModal = () => {
+    return `<div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div id="folderToShare"></div>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="addNewCollaborators" href="#">Add collaborator</button>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <button class="nav-link" id="listCollaborators" href="#">All collaborators</button>
+                        </li>
+                    </ul>
+                    
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div id="collaboratorModalBody"></div>
+            </div>
+        </div>
+    </div>`
+}
+
 const createConsortiaOptions = (data) => {
     let template = ``;
     for(let consortia in data){

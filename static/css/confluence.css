@@ -435,7 +435,7 @@ label {
 }
 
 .content {
-    padding: 0 40px;
+    padding: 0px 40px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-in-out;
@@ -632,4 +632,30 @@ form {
 
 #toggleVariable{
     color: #0053AD !important;
+}
+
+.data-governance {
+    text-align: left;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+}
+
+.share-folder{
+    padding: 2px 4px !important;
+    color: #a79292;
+}
+
+.share-folder:focus {
+    color: #332b2b;
+    text-decoration: none;
+}
+
+.share-folder:hover {
+    color: #332b2b;
+    text-decoration: none;
+}
+
+.collaborator-table{
+    font-size: 0.8rem;
 }
