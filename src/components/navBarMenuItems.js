@@ -21,6 +21,28 @@ const template = () => {
             <a class="nav-link nav-menu-links" href="#" title="Data Analysis" id="dataAnalysis"><i class="fas fa-database"></i> Data Analysis</a>
         </div>
         <div class="grid-border"></div>
+        <div class="navbar-nav ml-auto">
+            <div class="grid-border"></div>
+            ${localStorage.parms ? JSON.parse(localStorage.parms).name ? `
+                <div class="nav-item grid-elements dropdown">
+                    <a class="nav-link nav-menu-links dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
+                    </a>
+                    <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item nav-link nav-menu-links" href="#" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    </div>
+                </div>
+            ` : `
+                <div class="nav-item grid-elements">
+                    <a class="nav-link nav-menu-links" href="#" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                </div>
+            ` : `
+                <div class="nav-item grid-elements">
+                    <a class="nav-link nav-menu-links" href="#" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                </div>
+            `}
+            <div class="grid-border"></div>
+        </div>
     `;
 }
 

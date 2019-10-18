@@ -218,6 +218,24 @@ export const getCollaboration = async (id, type) => {
     }
 }
 
+export const getCurrentUser = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const response = await fetch(`https://api.box.com/2.0/users/me`, {
+        headers: {
+            Authorization: "Bearer "+access_token
+        }
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    if(response.status === 200){
+        return response.json();
+    }
+    else{
+        return null;
+    }
+}
+
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){

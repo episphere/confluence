@@ -659,3 +659,14 @@ form {
 .collaborator-table{
     font-size: 0.8rem;
 }
+
+.avatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.navbar-dropdown {
+    background-color: #574F4F !important;
+    padding: 0 !important;
+}

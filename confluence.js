@@ -6,10 +6,10 @@ import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { template as dataGovernanceTemplate, eventsDataSubmissions } from './src/pages/dataGovernance.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getparameters } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
 
-const confluence = () => {
+const confluence = async () => {
     const hash = decodeURIComponent(window.location.hash);
     const index = hash.indexOf('?');
     const parameters = index !== -1 ? getparameters(hash.slice(index+1, hash.length)) : {};
@@ -23,14 +23,21 @@ const confluence = () => {
 
     document.getElementById('loginBoxAppDev').onclick = loginAppDev;
     document.getElementById('loginBoxAppProd').onclick = loginAppProd;
-    document.getElementById('logOutBtn').addEventListener('click', logOut);
+    
     confluenceLogoElement.innerHTML = confluenceLogo();
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
     
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token) {
-        logOutBtn.hidden = false
+        const response = await getCurrentUser();
+
+        if(response){
+            const lclStr = JSON.parse(localStorage.parms);
+            localStorage.parms = JSON.stringify({...lclStr, ...response});
+        };
         navBarOptions.innerHTML = template();
+        document.getElementById('logOutBtn').addEventListener('click', logOut);
+
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataRequestElement = document.getElementById('dataRequest');

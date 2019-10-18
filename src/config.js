@@ -17,3 +17,12 @@ export const config = {
     EpiBoxFolderId : 6454654365,
     invalidVariables : ["bcac_id", "bcac_db_version", "onc_id", "dataset_created_by", "date_bcac_db_version_created", "date_dataset_created", "icogs_id"]
 }
+
+export const boxRoles = {
+    "Editor": "Upload, download, preview, share, edit, and delete",
+    "Viewer Uploader": "Upload, download, preview, share, and edit",
+    "Previewer Uploader": "Upload and preview",
+    "Viewer": "Download, preview and share",
+    "Previewer": "Preview only",
+    "Uploader": "Upload only"
+}
