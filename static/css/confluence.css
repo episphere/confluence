@@ -670,3 +670,7 @@ form {
     background-color: #574F4F !important;
     padding: 0 !important;
 }
+
+.menu-description{
+    font-size: 10px;
+}

@@ -1,5 +1,6 @@
 import { shareFolderModal } from "../components/modal.js";
 import { addEventShowAllCollaborator, addEventAddNewCollaborator } from "../event.js";
+import { boxRoles } from "../config.js";
 
 export const template = () => {
     if(!localStorage.data_summary) return;
@@ -104,18 +105,19 @@ export const eventsDataSubmissions = () => {
 }
 
 export const addFields = (id) => {
-    return `
+    let template = '';
+    template += `
     <div class="form-group col-sm-9">
         <input type="email" id="shareFolderEmail${id}" class="form-control" placeholder="abc@gmail.com" required>
     </div>
     <div class="form-group col-sm-3">
-        <select class="form-control" required id="folderRole${id}">
-            <option value=""> -- Select role -- </option>
-            <option value="editor">Editor</option>
-            <option value="viewer">Viewer</option>
-            <option value="previewer">Previewer</option>
-            <option value="uploader">Uploader</option>
-        </select>
-    </div>
-    `
+    <select class="form-control" required id="folderRole${id}">
+        <option value=""> -- Select role -- </option>
+    `;
+    for(let key in boxRoles){
+        template += `<option value="${key}">${key}</option>`
+    }
+        
+    template +=`</select></div>`;
+    return template;
 }
