@@ -108,7 +108,7 @@ export const addFields = (id) => {
     let template = '';
     template += `
     <div class="form-group col-sm-9">
-        <input type="email" id="shareFolderEmail${id}" class="form-control" placeholder="abc@gmail.com" required>
+        <input type="email" id="shareFolderEmail${id}" autocomplete="off" class="form-control" placeholder="abc@gmail.com" required>
     </div>
     <div class="form-group col-sm-3">
     <select class="form-control" required id="folderRole${id}">

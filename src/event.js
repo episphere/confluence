@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addFields } from './pages/dataGovernance.js';
@@ -574,5 +574,22 @@ export const addEventAddNewCollaborator = () => {
             document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
             if(counter === 5) addMoreEmail.disabled = true;
         });
+
+        addEventCollaboratorForm(ID, type);
+    });
+}
+
+const addEventCollaboratorForm = (ID, type) => {
+    const form = document.getElementById('addCollaborationForm');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        for(let i = 1; i <= 5; i++){
+            const email = document.getElementById(`shareFolderEmail${i}`);
+            const role = document.getElementById(`folderRole${i}`);
+            if(email && role){
+                const response = await addNewCollaborator(ID, type, email.value, role.value.toLowerCase());
+                // if(response) 
+            }
+        }
     });
 }
