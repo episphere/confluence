@@ -259,11 +259,8 @@ export const addNewCollaborator = async (id, type, login, role) => {
     if(response.statusText=="Unauthorized"){
         sessionExpired();
     }
-    if(response.status === 200 || response.status === 201){
-        return response.json();
-    }
     else{
-        return null;
+        return response;
     }
 }
 

@@ -610,6 +610,10 @@ span.icon {
     color: red;
 }
 
+.errorMsg {
+    color: red;
+}
+
 .create-study {
     padding-bottom: 1rem;
 }

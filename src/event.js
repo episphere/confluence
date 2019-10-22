@@ -597,7 +597,7 @@ const addEventCollaboratorForm = (ID, type, name) => {
             const role = document.getElementById(`folderRole${i}`);
             if(email && role){
                 const response = await addNewCollaborator(ID, type, email.value, role.value.toLowerCase());
-                if(response) {
+                if(response.status === 200 || response.status === 201) {
                     template += `
                         <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                             <div class="toast-header">
@@ -613,6 +613,21 @@ const addEventCollaboratorForm = (ID, type, name) => {
                         `;
                         email.value = '';
                         role.value = '';
+                }else{
+                    template += `
+                    <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="mr-auto errorMsg">Error!</strong>
+                            <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Could not add ${email.value} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!
+                        </div>
+                    </div>
+                    `
+                    console.log(response);
                 }
             }
         }
