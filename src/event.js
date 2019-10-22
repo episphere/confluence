@@ -611,6 +611,8 @@ const addEventCollaboratorForm = (ID, type, name) => {
                             </div>
                         </div>
                         `;
+                        email.value = '';
+                        role.value = '';
                 }
             }
         }
