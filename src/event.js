@@ -498,7 +498,19 @@ export const addEventShowAllCollaborator = () => {
         let table = '';
         if(response){
             let entries = response.entries;
-            entries = entries.sort((a, b) => (a.accessible_by.name.toLowerCase() > b.accessible_by.name.toLowerCase()) ? 1 : ((b.accessible_by.name.toLowerCase() > a.accessible_by.name.toLowerCase()) ? -1 : 0));
+            let allEntries = [];
+            
+            entries.forEach(entry => {
+                const name = !entry.invite_email ? entry.accessible_by.name : '';
+                const email = !entry.invite_email ? entry.accessible_by.login : entry.invite_email;
+                const role = entry.role;
+                const status = entry.status;
+                const addedBy = `${entry.created_by.name}`;
+                const addedAt = (new Date(entry.created_at)).toLocaleString();
+                allEntries.push({name, email, role, status, addedBy, addedAt});
+            });
+            allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
+
             table += `<strong>${name}</strong><br><br>
                 <table class="table table-borderless table-striped collaborator-table">
                     <thead>
@@ -513,13 +525,8 @@ export const addEventShowAllCollaborator = () => {
                     </thead>
                     <tbody>
             `;
-            entries.forEach(entry => {
-                const name = entry.accessible_by.name;
-                const email = entry.accessible_by.login;
-                const role = entry.role;
-                const status = entry.status;
-                const addedBy = `${entry.created_by.name}`;
-                const addedAt = (new Date(entry.created_at)).toLocaleString();
+            allEntries.forEach(entry => {
+                const { name, email, role, status, addedBy, addedAt} = entry;
                 table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td></tr>`
             });
             table += `</tbody></table>`
@@ -575,21 +582,44 @@ export const addEventAddNewCollaborator = () => {
             if(counter === 5) addMoreEmail.disabled = true;
         });
 
-        addEventCollaboratorForm(ID, type);
+        addEventCollaboratorForm(ID, type, name);
     });
 }
 
-const addEventCollaboratorForm = (ID, type) => {
+const addEventCollaboratorForm = (ID, type, name) => {
     const form = document.getElementById('addCollaborationForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
+        const showNotification = document.getElementById('showNotification');
+        let template = '';
         for(let i = 1; i <= 5; i++){
             const email = document.getElementById(`shareFolderEmail${i}`);
             const role = document.getElementById(`folderRole${i}`);
             if(email && role){
                 const response = await addNewCollaborator(ID, type, email.value, role.value.toLowerCase());
-                // if(response) 
+                if(response) {
+                    template += `
+                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="mr-auto">Added new collaborator</strong>
+                                <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="toast-body">
+                                ${email.value} added to ${name} as ${role.value}
+                            </div>
+                        </div>
+                        `;
+                }
             }
         }
+        showNotification.innerHTML = template;
+        const hideNotification = document.getElementsByClassName('hideNotification');
+        Array.from(hideNotification).forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.parentNode.parentNode.classList.remove('show');
+            })
+        });
     });
 }

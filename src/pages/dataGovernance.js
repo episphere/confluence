@@ -5,7 +5,13 @@ import { boxRoles } from "../config.js";
 export const template = () => {
     if(!localStorage.data_summary) return;
     const data_summary = JSON.parse(localStorage.data_summary);
-    let template = '';
+    let template = `
+    <div aria-live="polite" aria-atomic="true" style="position: relative;">
+        <div style="position: absolute; top: 2rem; right: 2rem;" id="showNotification">
+            
+        </div>
+    </div>
+    `;
     
     template += '<div class="data-governance"><ul class="ul-list-style first-list-item">';
     for(let consortiaId in data_summary){
