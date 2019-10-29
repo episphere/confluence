@@ -597,38 +597,44 @@ const addEventCollaboratorForm = (ID, type, name) => {
             const role = document.getElementById(`folderRole${i}`);
             if(email && role){
                 const emails = email.value.split(',');
-
+                let top = 0;
                 for(let index = 0; index < emails.length; index++){
                     const login = emails[index].trim();
                     const response = await addNewCollaborator(ID, type, login, role.value.toLowerCase());
-
+                    top = top+2;
                     if(response.status === 200 || response.status === 201) {
                         template += `
+                            <div style="position: absolute; top: ${top}rem; right: 2rem;">
+                                <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header">
+                                        <strong class="mr-auto">Added new collaborator</strong>
+                                        <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="toast-body">
+                                        ${login} added to ${name} as ${role.value}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            `;
+                    }else{
+                        template += `
+                        <div style="position: absolute; top: ${top}rem; right: 2rem;">
                             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                                 <div class="toast-header">
-                                    <strong class="mr-auto">Added new collaborator</strong>
+                                    <strong class="mr-auto errorMsg">Error!</strong>
                                     <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="toast-body">
-                                    ${login} added to ${name} as ${role.value}
+                                    Could not add ${login} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!
                                 </div>
                             </div>
-                            `;
-                    }else{
-                        template += `
-                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <strong class="mr-auto errorMsg">Error!</strong>
-                                <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="toast-body">
-                                Could not add ${login} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!
-                            </div>
                         </div>
+                        
                         `
                     }
                 }

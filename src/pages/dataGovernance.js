@@ -7,9 +7,7 @@ export const template = () => {
     const data_summary = JSON.parse(localStorage.data_summary);
     let template = `
     <div aria-live="polite" aria-atomic="true" style="position: relative;">
-        <div style="position: absolute; top: 2rem; right: 2rem;" id="showNotification">
-            
-        </div>
+        <div id="showNotification"></div>
     </div>
     `;
     
