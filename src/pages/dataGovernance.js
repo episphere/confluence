@@ -112,7 +112,7 @@ export const addFields = (id) => {
     let template = '';
     template += `
     <div class="form-group col-sm-9">
-        <textarea id="shareFolderEmail${id}" class="form-control" placeholder="Enter comma separated email addresses" require  rows="3"></textarea>
+        <textarea id="shareFolderEmail${id}" class="form-control" placeholder="Enter comma separated email addresses" require  rows="2"></textarea>
     </div>
     <div class="form-group col-sm-3">
     <select class="form-control" required id="folderRole${id}">
