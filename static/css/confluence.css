@@ -678,3 +678,11 @@ form {
 .menu-description{
     font-size: 10px;
 }
+
+.removeCollaborator {
+    color: #677685 !important;
+}
+
+.removeCollaborator:hover {
+    color: #414952 !important;
+}

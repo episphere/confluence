@@ -531,7 +531,7 @@ export const addEventShowAllCollaborator = () => {
             `;
             allEntries.forEach(entry => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
-                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-folder-name="${folderName}"><i class="fas fa-times"></i></a>` : ``}</td></tr>`
+                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
             });
             table += `</tbody></table>`
         }
