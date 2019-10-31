@@ -562,7 +562,7 @@ const addEventRemoveCollaborator = () => {
                 if(response.status === 204){
                     top = top+2;
                     let template = notificationTemplate(top, `<span class="successMsg">Collaborator Removed</span>`, `Collaborator ${email} removed from ${folderName} successfully!`);
-                    document.getElementById('listCollaborators').dispatchEvent(new Event('click'));
+                    element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
                     showNotification.innerHTML = template;
                     addEventHideNotification();
                 }
