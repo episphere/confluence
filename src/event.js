@@ -1,10 +1,10 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addFields } from './pages/dataGovernance.js';
-
+let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
     Array.from(studiesCheckBox).forEach(element => {
@@ -550,6 +550,7 @@ export const addEventShowAllCollaborator = () => {
 
 const addEventRemoveCollaborator = () => {
     const removeCollaborator = document.getElementsByClassName('removeCollaborator');
+    const showNotification = document.getElementById('showNotification');
     Array.from(removeCollaborator).forEach(element => {
         element.addEventListener('click', async () => {
             const id = element.dataset.collaboratorId;
@@ -558,10 +559,16 @@ const addEventRemoveCollaborator = () => {
             const r = confirm(`Remove Collaborator ${email} from ${folderName}?`);
             if(r){
                 const response = await removeBoxCollaborator(id);
-                if(response.status === 204) document.getElementById('listCollaborators').dispatchEvent(new Event('click'));
+                if(response.status === 204){
+                    top = top+2;
+                    let template = notificationTemplate(top, `Collaborator Removed`, `Collaborator ${email} removed from ${folderName} successfully!`);
+                    document.getElementById('listCollaborators').dispatchEvent(new Event('click'));
+                    showNotification.innerHTML = template;
+                    addEventHideNotification();
+                } 
             }
         });
-    })
+    });
 }
 
 const checkPermissionLevel = (data) => {
@@ -631,54 +638,30 @@ const addEventCollaboratorForm = (ID, type, name) => {
             const role = document.getElementById(`folderRole${i}`);
             if(email && role){
                 const emails = email.value.split(',');
-                let top = 0;
                 for(let index = 0; index < emails.length; index++){
                     const login = emails[index].trim();
                     const response = await addNewCollaborator(ID, type, login, role.value.toLowerCase());
                     top = top+2;
                     if(response.status === 200 || response.status === 201) {
-                        template += `
-                            <div style="position: absolute; top: ${top}rem; right: 2rem;">
-                                <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                                    <div class="toast-header">
-                                        <strong class="mr-auto">Added new collaborator</strong>
-                                        <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="toast-body">
-                                        ${login} added to ${name} as ${role.value}
-                                    </div>
-                                </div>
-                            </div>
-                            `;
+                        template += notificationTemplate(top, `Added new collaborator`, `${login} added to ${name} as ${role.value} successfully!`)
                     }else{
-                        template += `
-                        <div style="position: absolute; top: ${top}rem; right: 2rem;">
-                            <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="toast-header">
-                                    <strong class="mr-auto errorMsg">Error!</strong>
-                                    <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="toast-body">
-                                    Could not add ${login} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!
-                                </div>
-                            </div>
-                        </div>
-                        
-                        `
+                        template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not add ${login} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!`);
                     }
                 }
             }
         }
         showNotification.innerHTML = template;
-        const hideNotification = document.getElementsByClassName('hideNotification');
-        Array.from(hideNotification).forEach(btn => {
-            btn.addEventListener('click', () => {
-                btn.parentNode.parentNode.classList.remove('show');
-            })
+        addEventHideNotification();
+    });
+}
+
+const addEventHideNotification = () => {
+    const hideNotification = document.getElementsByClassName('hideNotification');
+    Array.from(hideNotification).forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.parentNode.parentNode.parentNode.removeChild(btn.parentNode.parentNode);
+            if(top >= 2) top = top-2;
         });
+        setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 5000);
     });
 }

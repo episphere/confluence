@@ -470,3 +470,21 @@ export const getAllFileStructure = async (array) => {
     }
     return obj;
 }
+
+export const notificationTemplate = (top, header, body) => {
+    return `
+        <div style="position: absolute; top: ${top}rem; right: 2rem;">
+            <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="mr-auto">${header}</strong>
+                    <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body">
+                    ${body}
+                </div>
+            </div>
+        </div>
+        `;
+}
