@@ -264,6 +264,22 @@ export const addNewCollaborator = async (id, type, login, role) => {
     }
 }
 
+export const removeBoxCollaborator = async (id) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: "Bearer "+access_token
+        }
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else{
+        return response;
+    }
+}
+
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){

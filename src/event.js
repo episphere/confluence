@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addFields } from './pages/dataGovernance.js';
@@ -495,8 +495,9 @@ export const addEventShowAllCollaborator = () => {
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = ``;
         const response = await getCollaboration(ID,`${type}s`);
+        const userPermission = checkPermissionLevel(response);
         let table = '';
-        if(response){
+        if(response && response.entries.length > 0){
             let entries = response.entries;
             let allEntries = [];
             
@@ -505,9 +506,11 @@ export const addEventShowAllCollaborator = () => {
                 const email = !entry.invite_email ? entry.accessible_by.login : entry.invite_email;
                 const role = entry.role;
                 const status = entry.status;
+                const id = entry.id;
+                const folderName = entry.item.name;
                 const addedBy = `${entry.created_by.name}`;
                 const addedAt = (new Date(entry.created_at)).toLocaleString();
-                allEntries.push({name, email, role, status, addedBy, addedAt});
+                allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
@@ -521,13 +524,14 @@ export const addEventShowAllCollaborator = () => {
                             <th>Status</th>
                             <th>Added by</th>
                             <th>Added at</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             allEntries.forEach(entry => {
-                const { name, email, role, status, addedBy, addedAt} = entry;
-                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td></tr>`
+                const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
+                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-folder-name="${folderName}"><i class="fas fa-times"></i></a>` : ``}</td></tr>`
             });
             table += `</tbody></table>`
         }
@@ -540,9 +544,39 @@ export const addEventShowAllCollaborator = () => {
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         `;
-        
+        addEventRemoveCollaborator();
     });
 };
+
+const addEventRemoveCollaborator = () => {
+    const removeCollaborator = document.getElementsByClassName('removeCollaborator');
+    Array.from(removeCollaborator).forEach(element => {
+        element.addEventListener('click', async () => {
+            const id = element.dataset.collaboratorId;
+            const folderName = element.dataset.folderName;
+            const email = element.dataset.email;
+            const r = confirm(`Remove Collaborator ${email} from ${folderName}?`);
+            if(r){
+                const response = await removeBoxCollaborator(id);
+                if(response.status === 204) document.getElementById('listCollaborators').dispatchEvent(new Event('click'));
+            }
+        });
+    })
+}
+
+const checkPermissionLevel = (data) => {
+    if(data.entries.length === 0) return null;
+    const login = localStorage.parms && JSON.parse(localStorage.parms).login ? JSON.parse(localStorage.parms).login : undefined;
+    const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
+    if(array.length === 0){
+        const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);
+        if(newArray.length > 0) return 'owner';
+    }
+    else {
+        return array[0].role;
+    }
+    return null;
+}
 
 export const addEventAddNewCollaborator = () => {
     const btn1 = document.getElementById('addNewCollaborators');
@@ -617,7 +651,6 @@ const addEventCollaboratorForm = (ID, type, name) => {
                                     </div>
                                 </div>
                             </div>
-                            
                             `;
                     }else{
                         template += `
