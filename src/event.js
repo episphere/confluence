@@ -561,11 +561,11 @@ const addEventRemoveCollaborator = () => {
                 const response = await removeBoxCollaborator(id);
                 if(response.status === 204){
                     top = top+2;
-                    let template = notificationTemplate(top, `Collaborator Removed`, `Collaborator ${email} removed from ${folderName} successfully!`);
+                    let template = notificationTemplate(top, `<span class="successMsg">Collaborator Removed</span>`, `Collaborator ${email} removed from ${folderName} successfully!`);
                     document.getElementById('listCollaborators').dispatchEvent(new Event('click'));
                     showNotification.innerHTML = template;
                     addEventHideNotification();
-                } 
+                }
             }
         });
     });
@@ -643,7 +643,7 @@ const addEventCollaboratorForm = (ID, type, name) => {
                     const response = await addNewCollaborator(ID, type, login, role.value.toLowerCase());
                     top = top+2;
                     if(response.status === 200 || response.status === 201) {
-                        template += notificationTemplate(top, `Added new collaborator`, `${login} added to ${name} as ${role.value} successfully!`)
+                        template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${name} as ${role.value} successfully!`)
                     }else{
                         template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not add ${login} to ${name} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!`);
                     }

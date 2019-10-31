@@ -686,3 +686,7 @@ form {
 .removeCollaborator:hover {
     color: #414952 !important;
 }
+
+.successMsg {
+    color: #206e20;
+}
