@@ -661,7 +661,7 @@ form {
 }
 
 .collaborator-table{
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .avatar {
@@ -689,4 +689,11 @@ form {
 
 .successMsg {
     color: #206e20;
+}
+
+.updateCollaboratorRole {
+    padding: 0px !important;
+    height: auto !important;
+    font-size: inherit !important;
+    font-weight: normal !important;
 }

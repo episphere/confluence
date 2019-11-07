@@ -1,6 +1,6 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
 import { getData, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addFields } from './pages/dataGovernance.js';
@@ -531,7 +531,9 @@ export const addEventShowAllCollaborator = () => {
             `;
             allEntries.forEach(entry => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
-                table += `<tr><td>${name}</td><td>${email}</td><td>${role}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
+                table += `<tr><td>${name}</td><td>${email}</td><td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
+                        <select data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
+                    ` : `${role}`}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
             });
             table += `</tbody></table>`
         }
@@ -545,8 +547,46 @@ export const addEventShowAllCollaborator = () => {
             </div>
         `;
         addEventRemoveCollaborator();
+        addEventUpdateCollaborator();
     });
 };
+
+const updatePermissionsOptions = (userPermission, role) => {
+    if ( userPermission === 'owner') return `<option ${role === 'co-owner' ? `selected` : ``} value="co-owner">co-owner</option><option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option>`
+    else if ( userPermission === 'co-owner') return `<option ${role === 'co-owner' ? `selected` : ``} value="co-owner">co-owner</option><option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option>`
+    else if ( userPermission === 'editor') return `<option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option>`;
+    else return null;
+}
+
+const addEventUpdateCollaborator = () => {
+    const updateCollaboratorRole = document.getElementsByClassName('updateCollaboratorRole');
+    const showNotification = document.getElementById('showNotification');
+    Array.from(updateCollaboratorRole).forEach(element => {
+        element.addEventListener('change', async () => {
+            const newRole = element.value;
+            const prevRole = element.dataset.previousPermission;
+            const id = element.dataset.collaboratorId;
+            const name = element.dataset.collaboratorName;
+            const login = element.dataset.collaboratorLogin;
+            const r = confirm(`Update Collaborator ${name || login} Role as ${newRole}?`);
+            if(r){
+                const response = await updateBoxCollaborator(id, newRole);
+                if(response.status === 200) {
+                    top = top+2;
+                    let template = notificationTemplate(top, `<span class="successMsg">Collaborator Updated</span>`, `Collaborator ${ name || login} role updated as ${newRole} successfully!`);
+                    showNotification.innerHTML = template;
+                    addEventHideNotification();
+                }
+                else{
+                    element.value = prevRole;    
+                }
+            }
+            else{
+                element.value = prevRole;
+            }
+        })
+    })
+}
 
 const addEventRemoveCollaborator = () => {
     const removeCollaborator = document.getElementsByClassName('removeCollaborator');
@@ -556,12 +596,13 @@ const addEventRemoveCollaborator = () => {
             const id = element.dataset.collaboratorId;
             const folderName = element.dataset.folderName;
             const email = element.dataset.email;
-            const r = confirm(`Remove Collaborator ${email} from ${folderName}?`);
+            const name = element.dataset.collaboratorName;
+            const r = confirm(`Remove Collaborator ${ name || email} from ${folderName}?`);
             if(r){
                 const response = await removeBoxCollaborator(id);
                 if(response.status === 204){
                     top = top+2;
-                    let template = notificationTemplate(top, `<span class="successMsg">Collaborator Removed</span>`, `Collaborator ${email} removed from ${folderName} successfully!`);
+                    let template = notificationTemplate(top, `<span class="successMsg">Collaborator Removed</span>`, `Collaborator ${ name || email} removed from ${folderName} successfully!`);
                     element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
                     showNotification.innerHTML = template;
                     addEventHideNotification();
