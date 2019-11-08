@@ -445,7 +445,7 @@ export const getAllFileStructure = async (array) => {
 
         
         if(studies.total_count && studies.total_count > 0){
-            const allStudies = studies.entries;
+            const allStudies = studies.entries.filter(dt => dt.name !== "Confluence - CPSIII" && dt.name !== "Confluence - Documents for NCI Participating Studies");
             for(let j = 0; j < allStudies.length; j++){
                 if(allStudies[j].type === 'folder'){
                     const studyId = allStudies[j].id;
