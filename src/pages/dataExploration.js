@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure, convertTextToJson, uploadFile } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate, renderForm, renderConsortium } from "../components/elements.js";
 import { txt2dt } from "../visulization.js";
@@ -85,6 +85,8 @@ export const getSummary = async () => {
             hideAnimation();
         }
     }
+    
+    // generateConfluenceSummaryLevelData();
 
     document.getElementById('consortiaCount').innerHTML = Object.keys(JSON.parse(localStorage.data_summary)).length;
     const consortiaOptions = document.getElementById('consortiaOption');
@@ -101,6 +103,28 @@ export const getSummary = async () => {
     consortiaCheckBox[0].checked = true;
     consortiaCheckBox[0].dispatchEvent(new Event('click'));
     // getAgeDataForAllStudies(studyEntries);
+}
+
+const generateConfluenceSummaryLevelData = async () => {
+    const fs = JSON.parse(localStorage.data_summary);
+    const obj = {};
+    const sentries = fs[89412660666].studyEntries;
+    for(const data in sentries){
+        const dentries = sentries[data].dataEntries;
+        for(let ds in dentries){
+            const fileEntries = dentries[ds].fileEntries;
+            for(const id in fileEntries){
+                obj[id] = {};
+                obj[id].name = fileEntries[id].name;
+                obj[id].type = 'file';
+            }
+        }
+    }
+    
+    const jsonData = await convertTextToJson(obj);
+    
+    const summaryData = jsonData.map(data => { return { BCAC_ID: data.BCAC_ID, ageInt: data.ageInt, ethnicityClass: data.ethnicityClass, famHist: data.famHist, fhnumber: data.fhnumber, study: data.study, ER_statusIndex: data.ER_statusIndex}})
+    uploadFile(summaryData, 'summary_data.json', 92639258921);
 }
 
 export const countSpecificStudy = (folderId) => {

@@ -60,7 +60,6 @@ export const getData = (studyEntries, studyIds, values) => {
 const getFileContent = async (allIds) => {
     const jsonData = await convertTextToJson(allIds);
     const cf = getCrossFilter(jsonData);
-    
     let parameterList = document.getElementById('parameterList');
     parameterList.innerHTML = parameterListTemplate();
     addEventVariableItem(cf, jsonData);
@@ -188,7 +187,7 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
             .elasticY(true);
         barChart.render();
     };
-
+    
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];

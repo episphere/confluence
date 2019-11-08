@@ -358,7 +358,6 @@ export const convertTextToJson = async (fileIds) => {
             if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
                 rows.pop()
             };
-            if(intId === 527818707993) debugger
             const headings = rows[0];
             rows.splice(0, 1);
             let obj = rows.map(function (el) {
