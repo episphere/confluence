@@ -67,7 +67,7 @@ export const getSummary = async () => {
     let dataObject = {}
     const response = await getFolderItems(0);
     const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI'));
-    const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence') !== -1 && obj.name.toLowerCase().indexOf('project') !== -1);
+    const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
     if(array.length > 0) {
         document.getElementById('governanceNav').innerHTML = `
             <div class="nav-item grid-elements">
