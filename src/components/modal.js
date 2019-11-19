@@ -91,7 +91,7 @@ export const fileVersionsModal = () => {
 const createConsortiaOptions = async () => {
     let template = ``;
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_NCI'));
+    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'Confluence_NCI'));
     for(let consortia of array){
         template += `<option value="${consortia.id}">${consortia.name}</option>`
     }

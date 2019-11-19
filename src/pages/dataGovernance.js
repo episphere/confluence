@@ -5,7 +5,7 @@ import { getFolderItems } from "../shared.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_NCI'));
+    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'Confluence_NCI'));
     if(array.length <= 0) return;
 
     let template = `
