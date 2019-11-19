@@ -1,4 +1,6 @@
-export const uploadInStudy = (id, data) => {
+import { getFolderItems } from "../shared.js"
+
+export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -14,21 +16,28 @@ export const uploadInStudy = (id, data) => {
                             <label for="selectConsortiaUIS">Select consortia</label>
                             <select class="form-control" name="selectedConsortia" id="selectConsortiaUIS" required>
                                 <option value="">-- Select consortia --</option>
-                                ${createConsortiaOptions(data)}
+                                ${await createConsortiaOptions()}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="selectStudyUIS">Select study</label>
-                            <select class="form-control" id="selectStudyUIS" name="selectedStudy" required></select>
+                            <label>Create new study? 
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" required name="createStudyRadio" value="yes">Yes
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" required name="createStudyRadio" value="no">No
+                                    </label>
+                                </div>
+                            </label>
                         </div>
-                        <div class="form-group">
-                            <label for="uploadDataUIS">Upload data</label>
-                            <input type="file" class="form-control-file" id="uploadDataUIS" name="dataFile" required>
-                        </div>
+                        <div id="studyFormElements"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
                     </div>
                 </form>
             </div>
@@ -63,10 +72,28 @@ export const shareFolderModal = () => {
     </div>`
 }
 
-const createConsortiaOptions = (data) => {
+export const fileVersionsModal = () => {
+    return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" id="modalFVHeader">
+                    
+                </div>
+                <div class="modal-body" id="modalFVBody">
+                    
+                </div>
+            </div>
+        </div>
+    </div>`
+}
+
+
+const createConsortiaOptions = async () => {
     let template = ``;
-    for(let consortia in data){
-        template += `<option value="${consortia}">${data[consortia].name}</option>`
+    const response = await getFolderItems(0);
+    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'BCAC' || obj.name === 'Confluence_NCI'));
+    for(let consortia of array){
+        template += `<option value="${consortia.id}">${consortia.name}</option>`
     }
     return template;
 }

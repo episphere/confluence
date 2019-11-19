@@ -1,13 +1,13 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
-import { template as dataSubmissionTemplate, dataSubmission } from './src/pages/dataSubmission.js';
+import { template as dataSubmissionTemplate, dataSubmission, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { template as dataGovernanceTemplate, eventsDataSubmissions } from './src/pages/dataGovernance.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser } from './src/shared.js';
-import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm } from './src/event.js';
+import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn } from './src/event.js';
 
 const confluence = async () => {
     const hash = decodeURIComponent(window.location.hash);
@@ -41,18 +41,17 @@ const confluence = async () => {
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataRequestElement = document.getElementById('dataRequest');
-        const dataGovernanceElement = document.getElementById('dataGovernance');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
 
-        dataSubmissionElement.addEventListener('click', () => {
+        dataSubmissionElement.addEventListener('click', async () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataSubmissionTemplate();
+            confluenceDiv.innerHTML = await dataSubmissionTemplate();
+            lazyload();
+            addEventStudyRadioBtn();
             addEventConsortiaSelect();
-            addEventCreateStudyForm();
             addEventUploadStudyForm();
-            dataSubmission();
         });
         dataSummaryElement.addEventListener('click', () => {
             if(dataSummaryElement.classList.contains('navbar-active')) return;
@@ -69,13 +68,7 @@ const confluence = async () => {
             dataRequestElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataRequestTemplate();
         });
-        dataGovernanceElement.addEventListener('click', () => {
-            if(dataGovernanceElement.classList.contains('navbar-active')) return;
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            dataGovernanceElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataGovernanceTemplate();
-            eventsDataSubmissions();
-        });
+        
         dataAnalysisElement.addEventListener('click', () => {
             if(dataAnalysisElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links', 'navbar-active');

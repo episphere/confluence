@@ -210,13 +210,18 @@ label {
 }
 
 #parameterList {
-    border-top: 1px solid rgba(0,0,0,.125);
+    /* border-top: 1px solid rgba(0,0,0,.125); */
 }
 
 .align-left {
     text-align: left;
     list-style-type: none;
     padding: 0;
+}
+
+.background-white {
+    background-color: #ffffff;
+    border-radius: 1rem;;
 }
 
 .data-summary-count {
@@ -359,6 +364,24 @@ label {
     padding: 0.5rem 0;
 }
 
+.my-projects-div {
+    text-align: left;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+}
+
+.btn-copy {
+    padding: 0px 4px !important;
+}
+
+.my-projects {
+    text-align: left;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+}
+
 .fa-plus:hover, .fa-minus:hover, .fa-file-download:hover, .fa-folder-plus:hover, .fa-file-upload:hover, .fa-arrow-up:hover{
     cursor: pointer;
 }
@@ -475,8 +498,45 @@ label {
     font-weight: bold;
 }
 
-#dataSummaryVizChart2 {
-    min-height: 360px;
+.dataSummary-chart {
+    min-height: 380px;
+}
+
+.dataSummary-label{
+    color: #531e1a;
+    font-weight: bold;
+}
+
+.dataSummary-selected-range {
+    color: #2c41b7;
+    font-weight: bold;
+}
+
+.data-summary-label-wrap {
+    white-space: normal;
+}
+
+.filter-btn {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    color: #fff;
+    font-size: 0.75rem;
+    background-color: #12345a;
+    margin-bottom: 0.25rem;
+    margin-left: 0.25rem;
+}
+
+.filter-btn:hover {
+    cursor: default;
 }
 
 #dataSummaryVizPieChart {
@@ -643,6 +703,22 @@ form {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
+}
+
+.lazy-loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    vertical-align: text-bottom;
+    border: .25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
+}
+
+.my-projects-table {
+    width: 50% !important;
 }
 
 .share-folder{

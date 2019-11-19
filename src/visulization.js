@@ -1,4 +1,4 @@
-import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError } from './shared.js';
+import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError, getFileJSON } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } from './event.js';
@@ -57,97 +57,125 @@ export const getData = (studyEntries, studyIds, values) => {
     getFileContent(allIds);
 }
 
-const getFileContent = async (allIds) => {
-    const jsonData = await convertTextToJson(allIds);
+export const getFileContent = async (allIds) => {
+    // const jsonData = await convertTextToJson(allIds);
+    const jsonData = await getFileJSON(558252350024); // Get summary level data
     const cf = getCrossFilter(jsonData);
-    let parameterList = document.getElementById('parameterList');
-    parameterList.innerHTML = parameterListTemplate();
-    addEventVariableItem(cf, jsonData);
-    document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
-    addEventShowAllVariables(cf, jsonData);
-    document.getElementById('showPieChart').innerHTML = '<input type="checkbox"> Show pie chart'
-    addEventShowPieChart(cf, jsonData);
-    generateDCChart(cf, jsonData);
+    // let parameterList = document.getElementById('parameterList');
+    // parameterList.innerHTML = parameterListTemplate();
+    // addEventVariableItem(cf, jsonData);
+    // document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
+    // addEventShowAllVariables(cf, jsonData);
+    // document.getElementById('showPieChart').innerHTML = '<input type="checkbox"> Show pie chart'
+    // addEventShowPieChart(cf, jsonData);
+    
+    
+    generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
+
+    generateBarSingleSelect(cf, 'famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6')
+    dc.config.defaultColors(d3.schemeBrBG[4]);
+    renderPieChart(cf, jsonData, 'study', 'dataSummaryVizChart1', 'dataSummaryVizLabel1', 'selectedRange1', 'chartDiv1');
+    dc.config.defaultColors(d3.schemeSet2);
+    renderPieChart(cf, jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
+    dc.config.defaultColors(d3.schemeAccent);
+    renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
+    dc.config.defaultColors(d3.schemeBrBG[6]);
+    renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
+    hideAnimation();
 };
 
-export const generateDCChart = (cf, jsonData, selection) => {
-    if(jsonData.length) showError('');
-    dc.config.defaultColors(d3.schemeSet2);
-    
-    let pieChart = dc.pieChart("#dataSummaryVizPieChart");
-    let status = cf.dimension(function(d){return d.status});
-
-    let status_reduce = valUnique('status',0, jsonData)
-    let G_status = status.group().reduce(
-        // reduce in
-        function(p,v){
-            status_reduce[v.status]+=1
-            return status_reduce[v.status]
-        },
-        //reduce out
-        function(p,v){
-            status_reduce[v.status]-=1
-            return status_reduce[v.status]
-        },
-        // ini
-        function(p){return 0}
-    )
-    pieChart.innerRadius(60)
-        .dimension(status)
-        .group(G_status)
-        .externalRadiusPadding(5)
-        .label(function(c){
-            return `${c.key} (${c.value})`
-        });
-
-
-    
-    renderPieChart(cf, jsonData, selection);
-    
-    let barChart = dc.barChart('#dataSummaryVizBarChart');
-    const { min, max } = getMinMax(jsonData, 'ageInt');
-    let age = cf.dimension(function(d) {return d.ageInt;});
+export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+    document.getElementById(chartDiv).classList.add('background-white');
+    let barChart = dc.barChart(`#${id}`);
+    const { min, max } = getMinMax(jsonData, parameter);
+    let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
     let ageCount = age.group().reduceCount();
     barChart.dimension(age)
         .group(ageCount)
         .x(d3.scaleLinear().domain([min, max]))
-        .xAxisLabel('Age')
         .yAxisLabel(function(){
             return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
         })
-        .elasticY(true);
+        .elasticY(true)
+        .render();
 
-    pieChart.render();
-    barChart.render();
-    document.getElementById('barChartLabel').innerHTML = `${variables.BCAC['ageInt']['label']}`;
-    document.getElementById('statusPieChart').innerHTML = `${variables.BCAC['status']['label']}`;
-    
-    unHideDivs();
-    hideAnimation();
-    disableCheckBox(false);
+    barChart.on('filtered', function(chart) {
+        const filters = chart.filters();
+        if(filters.length) {
+            const range = filters[0];
+            const bottomRange = Math.ceil(range[0]);
+            const topRange = Math.ceil(range[1]);
+            document.getElementById(rangeLabelID).innerHTML = `<button class="filter-btn"><i class="fas fa-filter"></i> ${bottomRange} - ${topRange} years </button>`;
+            // const filterBtn = document.getElementsByClassName('filter-btn');
+            // Array.from(filterBtn).forEach(btn => {
+            //     btn.addEventListener('click', () => {
+            //         chart.filter(null);
+            //     })
+            // });
+        }else{
+            document.getElementById(rangeLabelID).innerHTML = ``;
+        }
+    });
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
+    // unHideDivs();
+    // disableCheckBox(false);
 }
 
-export const renderPieChart = (cf, jsonData, selection, pieChart) => {
-    oldParameter = selection ? selection : oldParameter;
-    let parameter = selection ? selection : oldParameter !== '' ? oldParameter : 'ER_statusIndex';
-    document.getElementById('dataSummaryVizChart2').setAttribute('data-selected-variable', parameter);
-    let variableItem = document.getElementsByClassName('variableItem');
-    Array.from(variableItem).forEach(element => {
-        if(element.innerHTML === parameter) {
-            removeActiveClass('variableItem', 'active');
-            element.classList.add('active');
+const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chartDiv) => {
+    document.getElementById(chartDiv).classList.add('background-white');
+    let rowChart = dc.rowChart(`#${id}`);
+    let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
+    let ageCount = age.group().reduceSum(function(d) {return +1});
+    
+    rowChart
+        .dimension(age)
+        .group(ageCount)
+        .x(d3.scaleBand())
+        .gap(5)
+        .elasticX(true)
+        .colorAccessor(function (d, i){return i;})
+        .render()
+
+    rowChart.on('filtered', function(chart) {
+        const filters = chart.filters();
+        if(filters.length) {
+            let selection = '';
+            filters.forEach((dt) => {
+                selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
+            });
+            document.getElementById(rangeLabelID).innerHTML = selection;
+            // const filterBtn = document.getElementsByClassName('filter-btn');
+            // Array.from(filterBtn).forEach(btn => {
+            //     btn.addEventListener('click', () => {
+            //         chart.filter(null);
+            //     })
+            // });
+        }else{
+            document.getElementById(rangeLabelID).innerHTML = ``;
         }
     });
 
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
+}
+
+const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+    document.getElementById(chartDiv).classList.add('background-white');
+    // let variableItem = document.getElementsByClassName('variableItem');
+    // Array.from(variableItem).forEach(element => {
+    //     if(element.innerHTML === parameter) {
+    //         removeActiveClass('variableItem', 'active');
+    //         element.classList.add('active');
+    //     }
+    // });
     let data_reduce = valUnique(parameter, 0, jsonData);
 
     // If there are less then 10 unique value render pie chart else render bar chart
-    if(Object.keys(data_reduce).length < 10 || pieChart){
-        document.getElementById('showPieChart').childNodes[0].checked = false;
-        document.getElementById('showPieChart').style.display = 'none';
-        document.getElementById('dataSummaryVizChart2').innerHTML = '';
-        let pieChart2 = dc.pieChart("#dataSummaryVizChart2");
-        let data = cf.dimension(function(d){return d[parameter]});
+    if(Object.keys(data_reduce).length < 10){
+        // document.getElementById('showPieChart').childNodes[0].checked = false;
+        // document.getElementById('showPieChart').style.display = 'none';
+        document.getElementById(id).innerHTML = '';
+        let pieChart = dc.pieChart(`#${id}`);
+        let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
         
         let G_status2 = data.group().reduce(
             function(p,v){
@@ -160,7 +188,7 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
             },
             function(p){return 0}
         )
-        pieChart2.innerRadius(80)
+        pieChart.innerRadius(80)
             .dimension(data)
             .group(G_status2)
             .externalRadiusPadding(10)
@@ -168,14 +196,32 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
                 return `${c.key} (${c.value})`
             });
 
-        pieChart2.render();
+        pieChart.render();
+        pieChart.on('filtered', function(chart) {
+            const filters = chart.filters();
+            if(filters.length) {
+                let selection = '';
+                filters.forEach((dt) => {
+                    selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
+                });
+                document.getElementById(rangeLabelID).innerHTML = selection;
+                // const filterBtn = document.getElementsByClassName('filter-btn');
+                // Array.from(filterBtn).forEach(btn => {
+                //     btn.addEventListener('click', () => {
+                //         chart.filter(null);
+                //     })
+                // });
+            }else{
+                document.getElementById(rangeLabelID).innerHTML = ``;
+            }
+        });
     }
     else{
-        document.getElementById('showPieChart').style.display = 'block';
+        // document.getElementById('showPieChart').style.display = 'block';
         document.getElementById('dataSummaryVizChart2').innerHTML = '';
         const { min, max } = getMinMax(jsonData, parameter);
         let barChart = dc.barChart('#dataSummaryVizChart2');
-        let age = cf.dimension(function(d) {return d[parameter];});
+        let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : "";});
         let ageCount = age.group().reduceCount();
         barChart.dimension(age)
             .group(ageCount)
@@ -194,7 +240,7 @@ export const renderPieChart = (cf, jsonData, selection, pieChart) => {
     }else{
         pieLabel = parameter;
     }
-    document.getElementById('pieChartLabel').innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
 }
 
 const getCrossFilter = (jsonData) => crossfilter(jsonData);

@@ -1,9 +1,10 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { getData, renderPieChart } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator } from './shared.js';
+import { getData } from './visulization.js'
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
-import { addFields } from './pages/dataGovernance.js';
+import { template as dataGovernanceTemplate, addFields, eventsDataSubmissions, dataGovernanceLazyLoad, dataGovernanceCollaboration } from './pages/dataGovernance.js';
+import { myProjectsTemplate, expandProjects } from './pages/myProjects.js';
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -60,7 +61,7 @@ const triggerEventStudies = (studyEntries) => {
             dataCount += Object.keys(studyEntries[id].dataEntries).length;
         });
         document.getElementById('dataCount').textContent = dataCount;
-        getData(studyEntries, studyIds, values);
+        // getData(studyEntries, studyIds, values);
     }
 }
 
@@ -122,7 +123,7 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
                 showAnimation();
                 disableCheckBox(true);
                 clearGraphAndParameters();
-                getData(studyEntries, studyIds, values);
+                // getData(studyEntries, studyIds, values);
             }
             else{
                 values.splice(values.indexOf(value), 1);
@@ -130,7 +131,7 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
                     showAnimation();
                     disableCheckBox(true);
                     clearGraphAndParameters();
-                    getData(studyEntries, studyIds, values);
+                    // getData(studyEntries, studyIds, values);
                 }
             }
         });
@@ -199,7 +200,7 @@ const dispatchEventDataTypeSelectAll = (studyEntries) => {
         clearGraphAndParameters();
         showAnimation();
         disableCheckBox(true);
-        getData(studyEntries, studyIds, values, null);
+        // getData(studyEntries, studyIds, values, null);
     }
 };
 
@@ -211,7 +212,7 @@ export const addEventVariableItem = (cf, jsonData) => {
             removeActiveClass('variableItem', 'active');
             element.classList.add('active');
             const variable = element.innerHTML;
-            renderPieChart(cf, jsonData, variable);
+            // renderPieChart(cf, jsonData, variable);
         });
     });
 }
@@ -240,10 +241,10 @@ export const addEventShowPieChart = (cf, jsonData) => {
             if(element.classList.contains('active')) variable = element.innerHTML;
         })
         if(showPieChart.childNodes[0].checked){
-            renderPieChart(cf, jsonData, variable, true);
+            // renderPieChart(cf, jsonData, variable, true);
         }
         else{
-            renderPieChart(cf, jsonData, variable, false);
+            // renderPieChart(cf, jsonData, variable, false);
         }
     });
 }
@@ -257,25 +258,70 @@ const checkBoxchecker = (chkbox) => {
     return checkElements;
 };
 
+export const addEventStudyRadioBtn = () => {
+    const createStudyRadio = document.getElementsByName('createStudyRadio');
+    Array.from(createStudyRadio).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.checked){
+                if(element.value === 'no'){
+                    const studyFormElements = document.getElementById('studyFormElements');
+                    const selectConsortiaUIS = document.getElementById('selectConsortiaUIS');
+                    studyFormElements.innerHTML = `
+                        <div class="form-group">
+                            <label for="selectStudyUIS">Select study</label>
+                            <select class="form-control" id="selectStudyUIS" name="selectedStudy" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="uploadDataUIS">Upload data</label>
+                            <input type="file" class="form-control-file" id="uploadDataUIS" name="dataFile" required>
+                        </div>
+                    `;
+                    if(selectConsortiaUIS.value) selectConsortiaUIS.dispatchEvent(new Event('change'));
+                }
+                else{
+                    const studyFormElements = document.getElementById('studyFormElements');
+                    studyFormElements.innerHTML = `
+                        <div class="form-group">
+                            <label for="newStudyName">Study Name</label>
+                            <input type="text" id="newStudyName" autocomplete="off" required class="form-control" placeholder="Enter study name">
+                        </div>
+                        <div class="form-group">
+                            <label for="uploadDataUIS">Upload data</label>
+                            <input type="file" class="form-control-file" id="uploadDataUIS" name="dataFile" required>
+                        </div>
+                    `;
+                }
+            }
+        });
+    });
+}
+
 export const addEventConsortiaSelect = () => {
     const element = document.getElementById('selectConsortiaUIS');
-    element.addEventListener('change', () => {
-        const value = element.value;
+    element.addEventListener('change', async () => {
         const selectStudyUIS = document.getElementById('selectStudyUIS');
+        if(!selectStudyUIS) return;
+        const value = element.value;
+        if(!value) {
+            Array.from(selectStudyUIS.options).forEach(option => {
+                selectStudyUIS.remove(option);
+            })
+            return;
+        }
+        let entries = (await getFolderItems(value)).entries;
+        
         selectStudyUIS.innerHTML = '';
-        const data_summary = JSON.parse(localStorage.data_summary);
         const firstOption = document.createElement('option');
         firstOption.value = '';
         firstOption.text = '-- Select study --'
         selectStudyUIS.appendChild(firstOption);
-        if(data_summary && data_summary[value]){
-            ['AHS', 'PBCS', 'PLCO', 'USRT'].forEach(study => {
-                const option = document.createElement('option');
-                option.value = study;
-                option.text = study;
-                selectStudyUIS.appendChild(option);
-            });
-        }
+        entries = entries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Documents for NCI Participating Studies');
+        for(let obj of entries){
+            const option = document.createElement('option');
+            option.value = obj.id;
+            option.text = obj.name;
+            selectStudyUIS.appendChild(option);
+        };
     });
 }
 
@@ -287,15 +333,22 @@ export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        let data_summary = JSON.parse(localStorage.data_summary);
         const consortia = document.getElementById('selectConsortiaUIS');
-        const consortiaText = consortia.options[consortia.selectedIndex].text;
         const consortiaId = consortia.value;
+        const consortiaText = consortia.options[consortia.selectedIndex].text;
         const study = document.getElementById('selectStudyUIS');
-        const studyValue = study.value;
-        
-        let studyId = study.value;
-        const studyName = study.options[study.selectedIndex].text;
+        const newStudyName = document.getElementById('newStudyName');
+        let studyId;
+        let studyName = '';
+        if(study){
+            studyId = study.value;
+            studyName = study.options[study.selectedIndex].text;
+        }
+        else if (newStudyName) {
+            const response = await createFolder(consortiaId, newStudyName.value);
+            studyId = response.id;
+            studyName = newStudyName.value;
+        }
 
         const file = document.getElementById('uploadDataUIS').files[0]; 
         const fileName = file.name;
@@ -306,31 +359,21 @@ export const addEventUploadStudyForm = () => {
         }
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
-            showAnimation();
-
-            if(data_summary[consortiaId] && Object.keys(data_summary[consortiaId].studyEntries).length === 0){
-                // No studies exists, create new study
-                studyId = await createStudiesAndDataTypes(data_summary, consortiaId, studyValue);
+            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...`;
+            const dataEntries = (await getFolderItems(studyId)).entries;
+            if(dataEntries.length === 0) {
+                await createFolder(studyId, 'Core Data');
+                await createFolder(studyId, 'Pathology Data');
+                await createFolder(studyId, 'Risk Factor Data');
+                await createFolder(studyId, 'Survival and Treatment Data');
             }
-            else if(data_summary[consortiaId] && Object.keys(data_summary[consortiaId].studyEntries).length !== 0){
-                const studyEntries = data_summary[consortiaId].studyEntries;
-                let checker = false;
-                for(const ID in studyEntries){
-                    if(studyEntries[ID].name === studyValue){
-                        checker = true;
-                        studyId = ID;
-                    }
-                }
-                if(!checker){
-                    studyId = await createStudiesAndDataTypes(data_summary, consortiaId, studyValue);
-                }
-            }
+            
 
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
                 // TO DO: QC
-                separateData(textFromFileLoaded, consortiaId, studyId, fileName);
+                separateData(textFromFileLoaded, studyId, fileName);
             };
 
             fileReader.readAsText(file, "UTF-8");
@@ -338,7 +381,7 @@ export const addEventUploadStudyForm = () => {
     })
 }
 
-const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) => {
+const separateData = async (textFromFileLoaded, studyId, fileName) => {
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
@@ -392,84 +435,25 @@ const separateData = async (textFromFileLoaded, consortiaId, studyId, fileName) 
         if(Object.keys(stObj).length > 0) stData.push(stObj);
     });
 
-    const data_summary = JSON.parse(localStorage.data_summary);
-    if(data_summary[consortiaId].studyEntries[studyId].dataEntries){
-        const dataFolders = data_summary[consortiaId].studyEntries[studyId].dataEntries;
-        for(const folderId in dataFolders){
-            if(dataFolders[folderId].name === 'Core Data'){
-                await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, folderId);
-            }
-
-            if(dataFolders[folderId].name === 'Pathology Data'){
-                await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, folderId);
-            }
-
-            if(dataFolders[folderId].name === 'Risk Factor Data'){
-                await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, folderId);
-            }
-
-            if(dataFolders[folderId].name === 'Survival and Treatment Data'){
-                await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, folderId);
-            }
+    const dataFolders = (await getFolderItems(studyId)).entries;
+    for(const obj of dataFolders){
+        if(obj.name === 'Core Data'){
+            await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, obj.id);
         }
-        location.reload();
+
+        if(obj.name === 'Pathology Data'){
+            await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, obj.id);
+        }
+
+        if(obj.name === 'Risk Factor Data'){
+            await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, obj.id);
+        }
+
+        if(obj.name === 'Survival and Treatment Data'){
+            await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, obj.id);
+        }
     }
-}
-
-const createStudiesAndDataTypes = async (data_summary, consortiaId, studyValue) => {
-    const response = await createFolder(consortiaId, studyValue);
-    const newStudyId = response.id;
-    const newStudyName = response.name;
-    const newStudyType = response.type;
-
-    // Create 4 data folders
-    const newCData = await createFolder(newStudyId, 'Core Data');
-    const newCId = newCData.id;
-    const newCName = newCData.name;
-    const newCType = newCData.type;
-
-    const newPData = await createFolder(newStudyId, 'Pathology Data');
-    const newPId = newPData.id;
-    const newPName = newPData.name;
-    const newPType = newPData.type;
-
-    const newRFData = await createFolder(newStudyId, 'Risk Factor Data');
-    const newRFId = newRFData.id;
-    const newRFName = newRFData.name;
-    const newRFType = newRFData.type;
-
-    const newSTData = await createFolder(newStudyId, 'Survival and Treatment Data');
-    const newSTId = newSTData.id;
-    const newSTName = newSTData.name;
-    const newSTType = newSTData.type;
-
-    data_summary[consortiaId].studyEntries[newStudyId] = {};
-    data_summary[consortiaId].studyEntries[newStudyId].name = newStudyName;
-    data_summary[consortiaId].studyEntries[newStudyId].type = newStudyType;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries = {};
-
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId] = {};
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].name = newCName;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].type = newCType;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newCId].fileEntries = {};
-
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId] = {};
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].name = newPName;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].type = newPType;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newPId].fileEntries = {};
-
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId] = {};
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].name = newRFName;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].type = newRFType;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newRFId].fileEntries = {};
-
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId] = {};
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].name = newSTName;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].type = newSTType;
-    data_summary[consortiaId].studyEntries[newStudyId].dataEntries[newSTId].fileEntries = {};
-
-    localStorage.data_summary = JSON.stringify(data_summary);
-    return newStudyId;
+    location.reload();
 }
 
 export const formSubmit = () => {
@@ -705,4 +689,101 @@ const addEventHideNotification = () => {
         });
         setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 5000);
     });
+}
+
+export const addEventDataGovernanceNavBar = () => {
+    const dataGovernanceElement = document.getElementById('dataGovernance');
+    dataGovernanceElement.addEventListener('click', async () => {
+        if(dataGovernanceElement.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        dataGovernanceElement.classList.add('navbar-active');
+        confluenceDiv.innerHTML = await dataGovernanceTemplate();
+        dataGovernanceLazyLoad();
+        dataGovernanceCollaboration();
+    });
+};
+
+export const addEventMyProjects = (data) => {
+    const myProjects = document.getElementById('myProjects');
+    myProjects.addEventListener('click', async () => {
+        if(myProjects.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        myProjects.classList.add('navbar-active');
+        confluenceDiv.innerHTML = await myProjectsTemplate(data);
+
+        const elements = document.getElementsByClassName('getAllFileversions');
+        Array.from(elements).forEach(element => {
+            element.addEventListener('click', async () => {
+                const ID = element.dataset.fileId;
+                const versions = await getFileVersions(ID);
+                document.getElementById('modalFVHeader').innerHTML = `
+                    <h5 class="modal-title">${element.dataset.fileName}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                `;
+                let template = '';
+                versions.entries.forEach(dt => {
+                    template += `
+                    <tr>
+                        <td>${dt.modified_by.name || dt.modified_by.login}</td>
+                        <td>${new Date(dt.modified_at).toLocaleString()}</td>
+                        <td>${dt.id}</td>
+                        <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${ID}" data-version-id="${dt.id}"><button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button></a></td>
+                    </tr>
+                    `
+                })
+                document.getElementById('modalFVBody').innerHTML = `
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Modified by</th>
+                                <th>Modified at</th>
+                                <th>Version id</th>
+                                <th>API</th>
+                            </tr>
+                        </thead>
+                        <tbody>${template}</tbody>
+                    </table>
+                `;
+                addEventCopyToClipboard();
+            })
+        });
+
+        addEventCopyToClipboard();
+        expandProjects();
+    });
+}
+
+const addEventCopyToClipboard = () => {
+    const copyFileApi = document.getElementsByClassName('copy-file-api');
+    Array.from(copyFileApi).forEach(elem => {
+        elem.addEventListener('click', () => {
+            const fileId = elem.dataset.fileId;
+            const versionId = elem.dataset.versionId;
+            const api = `https://api.box.com/2.0/files/${fileId}/versions/${versionId}`;
+            if (!navigator.clipboard) {
+                const textArea = document.createElement("textarea");
+                textArea.value = api;
+                textArea.style.position="fixed";  //avoid scrolling to bottom
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const copied = document.execCommand('copy');
+                if(copied){
+                    elem.innerHTML = `<button class="btn btn-success btn-copy"><i class="fas fa-check"> Copied!</button></i>`;
+                    setTimeout(()=> {elem.innerHTML = `<button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button>`}, 5000);
+                }
+                document.body.removeChild(textArea);
+            }
+            navigator.clipboard.writeText(api).then(function() {
+                elem.innerHTML = `<button class="btn btn-success btn-copy"><i class="fas fa-check"> Copied!</button></i>`;
+                setTimeout(()=> {elem.innerHTML = `<button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button>`}, 5000);
+            }, function(err) {
+                console.error('Async: Could not copy text: ', err);
+            });
+            
+        });
+    });
+
 }

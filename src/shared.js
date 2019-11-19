@@ -1,5 +1,4 @@
 import { config } from "./config.js";
-import { txt2dt } from "./visulization.js";
 import { variables } from "./variables.js";
 
 export const getFolderItems = async (id) => {
@@ -39,7 +38,7 @@ export const getFile = async (id) => {
         headers:{
             Authorization:"Bearer "+access_token
         }
-    })
+    });
     if(r.statusText=="Unauthorized"){
         sessionExpired();
     }else{
@@ -47,9 +46,39 @@ export const getFile = async (id) => {
     }
 };
 
+export const getFileJSON = async (id) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+        method:'GET',
+        headers:{
+            Authorization:"Bearer "+access_token
+        }
+    });
+    if(r.statusText=="Unauthorized"){
+        sessionExpired();
+    }else{
+        return r.json()
+    }
+};
+
 export const getFileInfo = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let r = await fetch('https://api.box.com/2.0/files/'+id,{
+        method:'GET',
+        headers:{
+            Authorization:"Bearer "+access_token
+        }
+    })
+    if(r.statusText=="Unauthorized"){
+        sessionExpired();
+    }else{
+        return r.json()
+    }
+}
+
+export const getFileVersions = async (id) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let r = await fetch(`https://api.box.com/2.0/files/${id}/versions`,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
@@ -417,10 +446,10 @@ export const disableCheckBox = (value) => {
         element.disabled = value;
     });
 
-    document.getElementById('studySelectAll').disabled = value;
-    document.getElementById('dataTypeSelectAll').disabled = value;
-    document.getElementById('searchStudies').disabled = value;
-    document.getElementById('searchdataTypes').disabled = value;
+//     document.getElementById('studySelectAll').disabled = value;
+//     document.getElementById('dataTypeSelectAll').disabled = value;
+//     document.getElementById('searchStudies').disabled = value;
+//     document.getElementById('searchdataTypes').disabled = value;
 }
 
 export const getparameters = (query) => {
@@ -442,7 +471,6 @@ export const getAllFileStructure = async (array) => {
         obj[ID].studyEntries = {};
         obj[ID].count = 0;
         const studies = await getFolderItems(ID);
-
         
         if(studies.total_count && studies.total_count > 0){
             const allStudies = studies.entries.filter(dt => dt.name !== "Confluence - CPSIII" && dt.name !== "Confluence - Documents for NCI Participating Studies");
