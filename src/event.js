@@ -726,10 +726,11 @@ export const addEventMyProjects = (data) => {
                 versions.entries.forEach(dt => {
                     template += `
                     <tr>
+                        <td>${ID} <a href="#" class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
                         <td>${dt.modified_by.name || dt.modified_by.login}</td>
                         <td>${new Date(dt.modified_at).toLocaleString()}</td>
-                        <td>${dt.id}</td>
-                        <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${ID}" data-version-id="${dt.id}"><button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button></a></td>
+                        <td>${dt.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
+                        <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${ID}" data-version-id="${dt.id}"><i class="far fa-copy"></a></td>
                     </tr>
                     `
                 })
@@ -737,6 +738,7 @@ export const addEventMyProjects = (data) => {
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                <th>File id</th>
                                 <th>Modified by</th>
                                 <th>Modified at</th>
                                 <th>Version id</th>
@@ -761,28 +763,76 @@ const addEventCopyToClipboard = () => {
         elem.addEventListener('click', () => {
             const fileId = elem.dataset.fileId;
             const versionId = elem.dataset.versionId;
-            const api = `https://api.box.com/2.0/files/${fileId}/versions/${versionId}`;
-            if (!navigator.clipboard) {
-                const textArea = document.createElement("textarea");
-                textArea.value = api;
-                textArea.style.position="fixed";  //avoid scrolling to bottom
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                const copied = document.execCommand('copy');
-                if(copied){
-                    elem.innerHTML = `<button class="btn btn-success btn-copy"><i class="fas fa-check"> Copied!</button></i>`;
-                    setTimeout(()=> {elem.innerHTML = `<button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button>`}, 5000);
+
+            if(fileId && !versionId){
+                if (!navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = fileId;
+                    textArea.style.position="fixed";  //avoid scrolling to bottom
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const copied = document.execCommand('copy');
+                    if(copied){
+                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                    }
+                    document.body.removeChild(textArea);
                 }
-                document.body.removeChild(textArea);
+                navigator.clipboard.writeText(fileId).then(function() {
+                    elem.innerHTML = `<i class="fas fa-check"></i>`;
+                    setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                }, function(err) {
+                    console.error('Async: Could not copy text: ', err);
+                });
             }
-            navigator.clipboard.writeText(api).then(function() {
-                elem.innerHTML = `<button class="btn btn-success btn-copy"><i class="fas fa-check"> Copied!</button></i>`;
-                setTimeout(()=> {elem.innerHTML = `<button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button>`}, 5000);
-            }, function(err) {
-                console.error('Async: Could not copy text: ', err);
-            });
-            
+
+            if(!fileId && versionId){
+                if (!navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = versionId;
+                    textArea.style.position="fixed";  //avoid scrolling to bottom
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const copied = document.execCommand('copy');
+                    if(copied){
+                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                    }
+                    document.body.removeChild(textArea);
+                }
+                navigator.clipboard.writeText(versionId).then(function() {
+                    elem.innerHTML = `<i class="fas fa-check"></i>`;
+                    setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                }, function(err) {
+                    console.error('Async: Could not copy text: ', err);
+                });
+            }
+
+            if(fileId && versionId){
+                const api = `https://api.box.com/2.0/files/${fileId}/versions/${versionId}`;
+                if (!navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = api;
+                    textArea.style.position="fixed";  //avoid scrolling to bottom
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const copied = document.execCommand('copy');
+                    if(copied){
+                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                    }
+                    document.body.removeChild(textArea);
+                }
+                navigator.clipboard.writeText(api).then(function() {
+                    elem.innerHTML = `<i class="fas fa-check"></i>`;
+                    setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
+                }, function(err) {
+                    console.error('Async: Could not copy text: ', err);
+                });
+            }
         });
     });
 

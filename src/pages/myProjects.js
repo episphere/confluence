@@ -27,6 +27,7 @@ export const myProjectsTemplate = async (data) => {
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>File id</th>
                                     <th>Created by</th>
                                     <th>Created at</th>
                                     <th>Last modified by</th>
@@ -39,12 +40,13 @@ export const myProjectsTemplate = async (data) => {
                             <tbody>
                                 <tr>
                                     <td>${name}</td>
+                                    <td>${fileInfo.id} <a href="#" class="copy-file-api" title="Copy file id" data-file-id="${obj.id}"><i class="far fa-copy"></i></a></td>
                                     <td>${fileInfo.created_by.name || fileInfo.created_by.login}</td>
                                     <td>${new Date(fileInfo.created_at).toLocaleString()}</td>
                                     <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
                                     <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
-                                    <td>${fileInfo.file_version.id}</td>
-                                    <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${obj.id}" data-version-id="${fileInfo.file_version.id}"><button class="btn btn-dark btn-copy"><i class="far fa-copy"> Copy</button></i></a></td>
+                                    <td>${fileInfo.file_version.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
+                                    <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${obj.id}" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
                                     <td><a data-toggle="modal" data-target="#modalFileVersions" href="#" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
                                 </tr>
                             </tbody>

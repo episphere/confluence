@@ -326,6 +326,23 @@ export const updateBoxCollaborator = async (id, role) => {
     }
 }
 
+export const revokeAccessToken = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const response = await fetch(`https://api.box.com/oauth2/revoke`, {
+        method: 'POST',
+        headers: {
+            Authorization: "Bearer "+access_token
+        },
+        body: JSON.stringify({token: access_token})
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else{
+        return response;
+    }
+}
+
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){
