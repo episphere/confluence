@@ -72,6 +72,8 @@ export const getFileContent = async (allIds) => {
     
     generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
 
+    dc.config.defaultColors(d3.schemeBrBG[4]);
+    renderPieChart(cf, jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     generateBarSingleSelect(cf, 'famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6')
     dc.config.defaultColors(d3.schemeBrBG[4]);
     renderPieChart(cf, jsonData, 'study', 'dataSummaryVizChart1', 'dataSummaryVizLabel1', 'selectedRange1', 'chartDiv1');
