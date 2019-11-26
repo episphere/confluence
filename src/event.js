@@ -3,7 +3,7 @@ import { getData } from './visulization.js'
 import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
-import { template as dataGovernanceTemplate, addFields, eventsDataSubmissions, dataGovernanceLazyLoad, dataGovernanceCollaboration } from './pages/dataGovernance.js';
+import { template as dataGovernanceTemplate, addFields, eventsDataSubmissions, dataGovernanceLazyLoad, dataGovernanceCollaboration, shareData } from './pages/dataGovernance.js';
 import { myProjectsTemplate, expandProjects } from './pages/myProjects.js';
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
@@ -471,6 +471,7 @@ export const addEventShowAllCollaborator = () => {
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
     btn2.addEventListener('click', async () => {
+        if(btn2.classList.contains('active')) return;
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
@@ -615,6 +616,7 @@ export const addEventAddNewCollaborator = () => {
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
     btn1.addEventListener('click', () => {
+        if(btn1.classList.contains('active')) return;
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
@@ -700,6 +702,7 @@ export const addEventDataGovernanceNavBar = () => {
         confluenceDiv.innerHTML = await dataGovernanceTemplate();
         dataGovernanceLazyLoad();
         dataGovernanceCollaboration();
+        shareData();
     });
 };
 

@@ -343,6 +343,69 @@ export const revokeAccessToken = async () => {
     }
 }
 
+export const getAllWebHooks = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const response = await fetch(`https://api.box.com/2.0/webhooks`, {
+        method: 'GET',
+        headers: {
+            Authorization: "Bearer "+access_token
+        }
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else{
+        console.log(await response.json());
+        return response;
+    }
+}
+
+export const createWebHook = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const obj = {
+        address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
+        target: {id: '90879959998', type: "folder"}, 
+        triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+    }
+    const response = await fetch(`https://api.box.com/2.0/webhooks`, {
+        method: 'POST',
+        headers: {
+            Authorization: "Bearer "+access_token
+        },
+        body: JSON.stringify(obj)
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else{
+        console.log(response);
+        return response;
+    }
+}
+
+export const updateWebHook = async () => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const obj = {
+        address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
+        target: {id: '90879959998', type: "folder"}, 
+        triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+    }
+    const response = await fetch(`https://api.box.com/2.0/webhooks/249492740`, {
+        method: 'PUT',
+        headers: {
+            Authorization: "Bearer "+access_token
+        },
+        body: JSON.stringify(obj)
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else{
+        console.log(response);
+        return response;
+    }
+}
+
 export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
     let data_summary = JSON.parse(localStorage.data_summary);
     for(let consortia in data_summary){

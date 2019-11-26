@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure, convertTextToJson, uploadFile } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure, convertTextToJson, uploadFile, getAllWebHooks, createWebHook, updateWebHook } from "../shared.js";
 import { config } from "../config.js";
 import { studyDropDownTemplate, renderForm, renderConsortium } from "../components/elements.js";
 import { txt2dt, getFileContent } from "../visulization.js";
@@ -61,9 +61,9 @@ export const template = () => {
 }
 
 export const getSummary = async () => {
-    // let consortiaId = localStorage.boxFolderId ? JSON.parse(localStorage.boxFolderId).folderId : config.EpiBoxFolderId;
-    
-    
+    // getAllWebHooks();
+    // createWebHook();
+    // updateWebHook();
     let dataObject = {}
     const response = await getFolderItems(0);
     const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI'));

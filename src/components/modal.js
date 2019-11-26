@@ -53,7 +53,7 @@ export const shareFolderModal = () => {
                     <div id="folderToShare"></div>
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <button class="nav-link active" id="addNewCollaborators" href="#">Add collaborator</button>
+                            <button class="nav-link" id="addNewCollaborators" href="#">Add collaborator</button>
                         </li>
                         
                         <li class="nav-item">

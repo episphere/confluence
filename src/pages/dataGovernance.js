@@ -101,7 +101,8 @@ export const dataGovernanceLazyLoad = () => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
+                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
+                    <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a>`;
                 ul.appendChild(li);
             }
 
@@ -110,6 +111,7 @@ export const dataGovernanceLazyLoad = () => {
             element.classList.add('fa-folder-plus');
             element.parentNode.parentNode.appendChild(ul);
             eventsDataSubmissions(element.parentNode);
+            shareData();
         }
         else if(fileEntries.length > 0) {
             const ul = document.createElement('ul');
@@ -118,7 +120,8 @@ export const dataGovernanceLazyLoad = () => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
-                li.innerHTML = `<a  href="#"><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name}`;
+                li.innerHTML = `<a href="#"><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name} 
+                    <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type} href="#"><i class="fas fa-share"></i> Share</a>`;
                 ul.appendChild(li);
             }
 
@@ -127,6 +130,7 @@ export const dataGovernanceLazyLoad = () => {
             element.classList.add('fa-folder-plus');
             element.parentNode.parentNode.appendChild(ul);
             eventsDataSubmissions(element.parentNode);
+            shareData();
         }
     });
 }
@@ -156,7 +160,9 @@ export const dataGovernanceCollaboration = () => {
     Array.from(consortiaFolder).forEach(element => {
         element.dispatchEvent(new Event('click'));
     });
+}
 
+export const shareData = () => {
     const shareFolder = document.getElementsByClassName('share-folder');
     const btn1 = document.getElementById('addNewCollaborators');
     
