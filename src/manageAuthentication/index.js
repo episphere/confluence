@@ -21,7 +21,7 @@ export const loginObs = () => {
 }
 
 export const loginAppDev = () => {
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=http://localhost:8000?state=${config.iniAppDev.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=${location.origin+location.pathname}?state=${config.iniAppDev.stateIni}`
 }
 
 export const loginAppProd = () => {
