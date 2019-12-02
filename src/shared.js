@@ -46,8 +46,7 @@ export const getFile = async (id) => {
     }
 };
 
-export const getFileJSON = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
+export const getFileJSON = async (id, access_token) => {
     let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
         headers:{
@@ -55,9 +54,9 @@ export const getFileJSON = async (id) => {
         }
     });
     if(r.statusText=="Unauthorized"){
-        sessionExpired();
+        return false;
     }else{
-        return r.json()
+        return r.json();
     }
 };
 
@@ -498,7 +497,7 @@ export const convertTextToJson = async (fileIds) => {
     return Object.values(jsonData);
 }
 
-const sessionExpired = () => {
+export const sessionExpired = () => {
     localStorage.clear();
     alert('session expired, reloading');
     location.reload();

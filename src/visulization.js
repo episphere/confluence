@@ -1,4 +1,4 @@
-import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError, getFileJSON } from './shared.js';
+import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError, getFileJSON, sessionExpired } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } from './event.js';
@@ -59,7 +59,11 @@ export const getData = (studyEntries, studyIds, values) => {
 
 export const getFileContent = async (allIds) => {
     // const jsonData = await convertTextToJson(allIds);
-    const jsonData = await getFileJSON(558252350024); // Get summary level data
+    const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
+    if(!jsonData) {
+        sessionExpired();
+        return;
+    }
     const cf = getCrossFilter(jsonData);
     // let parameterList = document.getElementById('parameterList');
     // parameterList.innerHTML = parameterListTemplate();

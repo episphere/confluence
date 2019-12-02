@@ -51,9 +51,7 @@ export const confluenceLogo = () => {
 }
 
 export const homePageVisualization = async () => {
-    let path = '/confluence/data.json';
-    if(location.origin.indexOf('localhost') !== -1) path = '/data.json'
-    const fileData = await fetch(path);
+    const fileData = await fetch('./data.json');
     fileData.json().then(data => {
         document.getElementById('publicCaseCount').textContent = data.cases;
         document.getElementById('publicControlCount').textContent = data.controls;
