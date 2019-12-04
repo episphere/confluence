@@ -72,7 +72,7 @@ export const getSummary = async () => {
     // updateWebHook();
     let dataObject = {}
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI'));
+    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
     const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
     if(array.length > 0) {
         document.getElementById('governanceNav').innerHTML = `

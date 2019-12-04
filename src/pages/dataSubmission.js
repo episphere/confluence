@@ -5,7 +5,7 @@ import { uploadInStudy } from "../components/modal.js";
 export const template = async () => {
     // if(localStorage.data_summary === undefined) return '';
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI'));
+    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
     if(array.length <= 0) return;
     
     // const data_summary = JSON.parse(localStorage.data_summary);
@@ -87,7 +87,7 @@ export const lazyload = () => {
         if(status !== 'pending') return;
         const allEntries = (await getFolderItems(id)).entries;
         element.dataset.status = 'complete';
-        const entries = allEntries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Documents for NCI Participating Studies' && obj.name !== 'Samples');
+        const entries = allEntries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies' && obj.name !== 'Samples');
         const fileEntries = allEntries.filter(obj => obj.type === 'file');
         if (entries.length > 0){
             const ul = document.createElement('ul');

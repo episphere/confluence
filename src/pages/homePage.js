@@ -43,8 +43,6 @@ export const template = () => {
 }
 
 export const confluenceLogo = () => {
-    let path = '/confluence/static/images/image.png';
-    if(location.origin.indexOf('localhost') !== -1) path = '';
     return `<a href="#" title="Home" rel="home">
                 <img src="./static/images/image.png" height="40px" width="300px" alt="NCI Confluence Data Platform Logo" class="banner-logo">
             </a>`;
