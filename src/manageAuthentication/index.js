@@ -1,4 +1,5 @@
 import { config } from '../config.js'
+import { sessionExpired } from '../shared.js';
 
 export const checkAccessTokenValidity = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
