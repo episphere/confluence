@@ -20,7 +20,8 @@ export const template = async () => {
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}
-            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${consortiaName}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a>
+            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${consortiaName}" data-object-type=${type} href="#">
+            <i class="fas fa-share"></i> Share</a>
         </li>
         `
     }
@@ -45,7 +46,7 @@ export const dataGovernanceProjects = async () => {
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `
         <li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${projectName}
-            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${projectName}" data-object-type=${type} href="#">
+            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-permission-type="restrict" data-folder-id=${obj.id} data-folder-name="${projectName}" data-object-type=${type} href="#">
                 <i class="fas fa-share"></i> Share
             </a>
         </li>
