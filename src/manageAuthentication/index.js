@@ -2,17 +2,14 @@ import { config } from '../config.js'
 
 export const checkAccessTokenValidity = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = (await fetch('https://api.box.com/2.0/folders/0/items',{
+    const response = await fetch('https://api.box.com/2.0/folders/0/items',{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    }))
-    if(response.statusText=="Unauthorized"){
-        localStorage.clear();
-        return false;
-    }else{
-        return true;
+    });
+    if(response.status === 401){
+        sessionExpired();
     }
 }
 

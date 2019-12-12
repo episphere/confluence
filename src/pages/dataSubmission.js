@@ -1,14 +1,11 @@
-import { createFolder, uploadFileBox, updateLocalStorage, getFolderItems } from "../shared.js";
-import { alertTemplate } from "../components/elements.js";
+import { getFolderItems } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
 export const template = async () => {
-    // if(localStorage.data_summary === undefined) return '';
     const response = await getFolderItems(0);
     const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
     if(array.length <= 0) return;
     
-    // const data_summary = JSON.parse(localStorage.data_summary);
     let template = '';
     
     template += `<div class="row create-study">
@@ -27,54 +24,6 @@ export const template = async () => {
         template += `<li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}</li>`
     }
 
-
-    // for(let consortiaId in data_summary){
-    //     const consortiaName = data_summary[consortiaId].name;
-    //     const studyEntries = data_summary[consortiaId].studyEntries;
-    //     let type = data_summary[consortiaId].type;
-    //     let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-    //     let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //     let title = type === 'folder' ? 'Expand / Collapse' : '';
-    //     template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${consortiaName}</li>`
-    //     if(type === 'folder'){
-    //         template += '<ul class="ul-list-style content">'
-    //         for(let studyId in studyEntries){
-    //             const studyName = studyEntries[studyId].name;
-    //             type = studyEntries[studyId].type;
-    //             liClass = type === 'folder' ? 'collapsible' : '';
-    //             expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //             title = type === 'folder' ? 'Expand / Collapse' : '';
-    //             template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${studyName}</li>`
-    //             if(type === 'folder'){
-    //                 const dataEntries = studyEntries[studyId].dataEntries;
-    //                 template += '<ul class="ul-list-style content">'
-    //                 for(let dataId in dataEntries){
-    //                     const dataName = dataEntries[dataId].name;
-    //                     type = dataEntries[dataId].type;
-    //                     liClass = type === 'folder' ? 'collapsible' : '';
-    //                     expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //                     title = type === 'folder' ? 'Expand / Collapse' : '';
-    //                     template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${dataName}</li>`
-    //                     if(type === 'folder'){
-    //                         const fileEntries = dataEntries[dataId].fileEntries;
-    //                         template += '<ul class="ul-list-style content">'
-    //                         for(let fileId in fileEntries){
-    //                             type = fileEntries[fileId].type;
-    //                             const fileName = fileEntries[fileId].name;
-    //                             liClass = type === 'folder' ? 'collapsible' : '';
-    //                             expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //                             title = type === 'folder' ? 'Expand / Collapse' : '';
-    //                             template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${fileName}</li>`
-    //                         }
-    //                         template += `</ul>`
-    //                     }
-    //                 }
-    //                 template += `</ul>`
-    //             }
-    //         }
-    //         template += `</ul>`
-    //     }
-    // }
     template += '</ul></div>';
     return template;
 };

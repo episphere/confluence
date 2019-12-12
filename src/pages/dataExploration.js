@@ -1,6 +1,5 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, getFolderInfo, createFolder, getAllFileStructure, convertTextToJson, uploadFile, getAllWebHooks, createWebHook, updateWebHook } from "../shared.js";
-import { config } from "../config.js";
-import { studyDropDownTemplate, renderForm, renderConsortium } from "../components/elements.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile } from "../shared.js";
+import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt, getFileContent } from "../visulization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventDataGovernanceNavBar, addEventMyProjects } from "../event.js";
 
@@ -70,37 +69,50 @@ export const getSummary = async () => {
     // getAllWebHooks();
     // createWebHook();
     // updateWebHook();
-    let dataObject = {}
+    
     const response = await getFolderItems(0);
     const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
     const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
-    if(array.length > 0) {
+
+    if(array.length > 0 && projectArray.length > 0){
         document.getElementById('governanceNav').innerHTML = `
-            <div class="nav-item grid-elements">
+            
+            <div class="nav-item  grid-elements">
                 <a class="nav-link nav-menu-links" href="#" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
             </div>
-            <div class="grid-border"></div>
+        `;
+        document.getElementById('myProjectsNav').innerHTML = `
+            
+            <div class="nav-item  grid-elements">
+                <a class="nav-link nav-menu-links" href="#" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+            </div>
+        `;
+        addEventDataGovernanceNavBar(true);
+        addEventMyProjects(projectArray);
+    }
+    else if(array.length > 0) {
+        document.getElementById('governanceNav').innerHTML = `
+            
+            <div class="nav-item  grid-elements">
+                <a class="nav-link nav-menu-links" href="#" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+            </div>
         `;
         addEventDataGovernanceNavBar();
-        // localStorage.data_summary = JSON.stringify(await getAllFileStructure(array));
     }
-    if(array.length === 0){
-        
-        if(projectArray.length > 0){
-            document.getElementById('myProjectsNav').innerHTML = `
-                <div class="nav-item grid-elements">
-                    <a class="nav-link nav-menu-links" href="#" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
-                </div>
-                <div class="grid-border"></div>
-            `;
-            addEventMyProjects(projectArray);
-        }
+    else if(projectArray.length > 0){
+        document.getElementById('myProjectsNav').innerHTML = `
+            
+            <div class="nav-item  grid-elements">
+                <a class="nav-link nav-menu-links" href="#" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+            </div>
+        `;
+        addEventMyProjects(projectArray);
         // else{
         //     document.getElementById('governanceNav').innerHTML = `
         //         <div class="nav-item grid-elements">
         //             <a class="nav-link nav-menu-links" href="#" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
         //         </div>
-        //         <div class="grid-border"></div>
+        //         
         //     `;
         //     addEventDataGovernanceNavBar();
         //     const newFolder = await createFolder(0, 'BCAC');

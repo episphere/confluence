@@ -9,9 +9,7 @@ export const template = async () => {
     if(array.length <= 0) return;
 
     let template = `
-        <div aria-live="polite" aria-atomic="true" style="position: relative;">
-            <div id="showNotification"></div>
-        </div>
+        <h4 class="h4-heading">Consortium(s)</h4>
     `;
     
     template += '<div class="data-governance"><ul class="ul-list-style first-list-item">';
@@ -26,59 +24,36 @@ export const template = async () => {
         </li>
         `
     }
-    // for(let consortiaId in data_summary){
-    //     const consortiaName = data_summary[consortiaId].name;
-    //     const studyEntries = data_summary[consortiaId].studyEntries;
-    //     let type = data_summary[consortiaId].type;
-    //     let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-    //     let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //     let title = type === 'folder' ? 'Expand / Collapse' : '';
-    //     template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${consortiaName} 
-    //                     <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${consortiaId} data-folder-name="${consortiaName}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a></li>`
-    //     if(type === 'folder'){
-    //         template += '<ul class="ul-list-style content">'
-    //         for(let studyId in studyEntries){
-    //             const studyName = studyEntries[studyId].name;
-    //             type = studyEntries[studyId].type;
-    //             liClass = type === 'folder' ? 'collapsible' : '';
-    //             expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //             title = type === 'folder' ? 'Expand / Collapse' : '';
-    //             template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${studyName} 
-    //                             <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${studyId} data-folder-name="${studyName}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a></li>`
-    //             if(type === 'folder'){
-    //                 const dataEntries = studyEntries[studyId].dataEntries;
-    //                 template += '<ul class="ul-list-style content">'
-    //                 for(let dataId in dataEntries){
-    //                     const dataName = dataEntries[dataId].name;
-    //                     type = dataEntries[dataId].type;
-    //                     liClass = type === 'folder' ? 'collapsible' : '';
-    //                     expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //                     title = type === 'folder' ? 'Expand / Collapse' : '';
-    //                     template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${dataName} 
-    //                                     <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${dataId} data-folder-name="${dataName}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a></li>`
-    //                     if(type === 'folder'){
-    //                         const fileEntries = dataEntries[dataId].fileEntries;
-    //                         template += '<ul class="ul-list-style content">'
-    //                         for(let fileId in fileEntries){
-    //                             type = fileEntries[fileId].type;
-    //                             const fileName = fileEntries[fileId].name;
-    //                             liClass = type === 'folder' ? 'collapsible' : '';
-    //                             expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-    //                             title = type === 'folder' ? 'Expand / Collapse' : '';
-    //                             template += `<li><a class="${liClass}" href="#"><i title="${title}" data-file-id="${fileId}" class="${expandClass}"></i></a> ${fileName} 
-    //                                             <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${fileId} data-folder-name="${fileName}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a></li>`
-    //                         }
-    //                         template += `</ul>`
-    //                     }
-    //                 }
-    //                 template += `</ul>`
-    //             }
-    //         }
-    //         template += `</ul>`
-    //     }
-    // }
     template += `</ul>${shareFolderModal()}</div>`
     return template;
+}
+
+export const dataGovernanceProjects = async () => {
+    const response = await getFolderItems(0);
+    const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
+    const div = document.getElementById('dataGovernanceProjects');
+    let template = `
+        <h4 class="h4-heading">Project(s)</h4>
+    `;
+    
+    template += '<div class="data-governance"><ul class="ul-list-style first-list-item">';
+
+    for(let obj of projectArray){
+        const projectName = obj.name;
+        let type = obj.type;
+        let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
+        let title = type === 'folder' ? 'Expand / Collapse' : '';
+        template += `
+        <li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${projectName}
+            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${projectName}" data-object-type=${type} href="#">
+                <i class="fas fa-share"></i> Share
+            </a>
+        </li>
+        `;
+    }
+    template += `</ul>${shareFolderModal()}</div>`
+    div.innerHTML = template;
+    dataGovernanceLazyLoad();
 }
 
 export const dataGovernanceLazyLoad = () => {
@@ -181,7 +156,7 @@ export const shareData = () => {
     });
 }
 
-export const addFields = (id) => {
+export const addFields = (id, bool) => {
     let template = '';
     template += `
     <div class="form-group col-sm-9">
@@ -191,8 +166,12 @@ export const addFields = (id) => {
     <select class="form-control" required id="folderRole${id}">
         <option value=""> -- Select role -- </option>
     `;
-    for(let key in boxRoles){
-        template += `<option value="${key}">${key}</option>`
+
+    if(bool) template += `<option value="viewer">Viewer</option>`
+    else{
+        for(let key in boxRoles){
+            template += `<option value="${key}">${key}</option>`
+        }
     }
         
     template +=`</select></div>`;

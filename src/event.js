@@ -1,10 +1,11 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { getData } from './visulization.js'
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, getCurrentUser, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
-import { template as dataGovernanceTemplate, addFields, eventsDataSubmissions, dataGovernanceLazyLoad, dataGovernanceCollaboration, shareData } from './pages/dataGovernance.js';
+import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, shareData, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate, expandProjects } from './pages/myProjects.js';
+import { createProjectModal } from './components/modal.js';
+
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
     const studiesCheckBox = document.getElementsByName('studiesCheckBox');
@@ -346,7 +347,9 @@ export const addEventUploadStudyForm = () => {
         }
         else if (newStudyName) {
             const response = await createFolder(consortiaId, newStudyName.value);
-            studyId = response.id;
+            if(response.status !== 201 ) return
+            const data = await response.json();
+            studyId = data.id;
             studyName = newStudyName.value;
         }
 
@@ -693,18 +696,229 @@ const addEventHideNotification = () => {
     });
 }
 
-export const addEventDataGovernanceNavBar = () => {
+export const addEventDataGovernanceNavBar = (bool) => {
     const dataGovernanceElement = document.getElementById('dataGovernance');
     dataGovernanceElement.addEventListener('click', async () => {
         if(dataGovernanceElement.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         dataGovernanceElement.classList.add('navbar-active');
-        confluenceDiv.innerHTML = await dataGovernanceTemplate();
-        dataGovernanceLazyLoad();
+        const confluenceDiv = document.getElementById('confluenceDiv');
+        if(bool){
+            const btnDiv = document.createElement('div');
+            btnDiv.classList = ['align-left create-project-btn'];
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+                                    <i class="fas fa-project-diagram"></i> Create project
+                                </button>
+                                ${createProjectModal()}`;
+
+            const divRow = document.createElement('div');
+            divRow.classList = ['row'];
+    
+            const notifcationDiv = document.createElement('div');
+            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
+                <div id="showNotification"></div>
+            </div>`;
+            
+            const div1 = document.createElement('div');
+            div1.classList = ['col-md-6 align-left'];
+            div1.innerHTML = await dataGovernanceTemplate();
+            divRow.appendChild(div1);
+    
+            const div2 = document.createElement('div');
+            div2.classList = ['col-md-6 align-left'];
+            div2.id = 'dataGovernanceProjects';
+            
+            divRow.appendChild(div2);
+            confluenceDiv.innerHTML = ``;
+            confluenceDiv.appendChild(notifcationDiv);
+            confluenceDiv.appendChild(btnDiv);
+            confluenceDiv.appendChild(divRow);
+            dataGovernanceProjects();
+        }
+        else{
+            confluenceDiv.innerHTML = ``;
+
+            const btnDiv = document.createElement('div');
+            btnDiv.classList = ['align-left create-project-btn'];
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+                                    <i class="fas fa-project-diagram"></i> Create project
+                                </button>
+                                ${createProjectModal()}`;
+            
+            const notifcationDiv = document.createElement('div');
+            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
+                <div id="showNotification"></div>
+            </div>`;
+            
+            const div = document.createElement('div');
+            div.classList = ['align-left'];
+            div.innerHTML = await dataGovernanceTemplate();
+
+            confluenceDiv.appendChild(notifcationDiv);
+            confluenceDiv.appendChild(btnDiv);
+            confluenceDiv.appendChild(div);
+            dataGovernanceLazyLoad();
+        }
+        
+        addEventCreateProjectBtn();
         dataGovernanceCollaboration();
         shareData();
     });
 };
+
+const addEventCreateProjectBtn = () => {
+    const btn = document.getElementById('createProjectBtn');
+    btn.addEventListener('click', async () => {
+        const body = document.getElementById('createProjectModalBody');
+        body.innerHTML = `
+        <form id="createProjectForm" method="POST">
+            <label><strong>Project Name</strong>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="newProjectName" placeholder="Enter project name" required>
+                </div>
+            </label>
+            
+            <div class="form-group" id="consortiumSelection">${await consortiumSelection()}</div>
+            <div class="form-group" id="studySelection"></div>
+            <div class="form-group" id="dataTypeSelection"></div>
+            <div class="form-group" id="fileSelection"></div>
+
+            <div class="form-group">
+                <strong>Add Collaborators</strong>
+                <div class="row" id="collaboratorEmails">
+                    ${addFields(1, true)}
+                </div>
+            </div>
+                
+            <div class="row">
+                <div class="col"><button class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+            </div>
+            </br>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        `
+        addEventCPCSelect();
+        addEventcreateProjectForm();
+    });
+}
+
+const addEventcreateProjectForm = () => {
+    const form = document.getElementById('createProjectForm');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const projectName = 'Confluence_'+document.getElementById('newProjectName').value+'_Project';
+        const fileId = document.getElementById('CPFSelect').value;
+        
+        const showNotification = document.getElementById('showNotification');
+        let template = '';
+        const folder = await createFolder(0, projectName)
+        if(folder.status === 201) {
+            const parent = await folder.json();
+            const copied = await copyFile(fileId, parent.id);
+            if(copied.status === 201) {
+                for(let i = 1; i <= 5; i++){
+                    const email = document.getElementById(`shareFolderEmail${i}`);
+                    const role = document.getElementById(`folderRole${i}`);
+                    if(email && role){
+                        const emails = email.value.split(',');
+                        for(let index = 0; index < emails.length; index++){
+                            const login = emails[index].trim();
+                            const response = await addNewCollaborator(parent.id, 'folder', login, role.value.toLowerCase());
+                            top = top+2;
+                            if(response.status === 200 || response.status === 201) {
+                                template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${projectName} as ${role.value} successfully!`)
+                            }else{
+                                template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not add ${login} to ${projectName} as ${role.value}, <span class="errorMsg">${response.statusText}(${response.status})</span>!!`);
+                            }
+                            
+                        }
+                    }
+                }        
+            }else{
+                template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not copy file to ${projectName}, <span class="errorMsg">${copied.statusText}(${copied.status})</span>!!`);
+            }
+        }
+        else{
+            template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not create ${projectName}, <span class="errorMsg">${copied.statusText}(${copied.status})</span>!!`);
+        }
+        showNotification.innerHTML = template;
+        addEventHideNotification();
+    });
+};
+
+const addEventCPCSelect = () => {
+    const select = document.getElementById('CPCSelect');
+    select.addEventListener('change', async () => {
+        document.getElementById('studySelection').innerHTML = '';
+        document.getElementById('dataTypeSelection').innerHTML = '';
+        document.getElementById('fileSelection').innerHTML = '';
+        if(select.value === "") return;
+        const ID = select.value;
+        const response = await getFolderItems(ID);
+        if(response.entries.length === 0) return;
+        const array = filterStudies(response.entries);
+        if(array.length === 0) return '';
+        let template = '';
+        template += '<strong>Select study</strong><select id="CPSSelect" class="form-control" required>'
+        array.forEach((obj, index) => {
+            if(index === 0) template += '<option value=""> -- Select study -- </option>'
+            template += `<option value="${obj.id}">${obj.name}</option>`;
+        });
+        template += '</select>';
+        document.getElementById('studySelection').innerHTML = template;
+        addEventCPSSelect();
+        
+    });
+}
+
+const addEventCPSSelect = () => {
+    const select = document.getElementById('CPSSelect');
+    select.addEventListener('change', async () => {
+        document.getElementById('dataTypeSelection').innerHTML = '';
+        document.getElementById('fileSelection').innerHTML = '';
+        if(select.value === "") return;
+        const ID = select.value;
+        const response = await getFolderItems(ID);
+        if(response.entries.length === 0) return;
+        const array = filterDataTypes(response.entries);
+        if(array.length === 0) return '';
+        let template = '';
+        template += '<strong>Select data type</strong><select id="CPDTSelect" class="form-control" required>'
+        array.forEach((obj, index) => {
+            if(index === 0) template += '<option value=""> -- Select data type -- </option>'
+            template += `<option value="${obj.id}">${obj.name}</option>`;
+        });
+        template += '</select>';
+        document.getElementById('dataTypeSelection').innerHTML = template;
+        addEventCPDTSelect();
+    });
+}
+
+const addEventCPDTSelect = () => {
+    const select = document.getElementById('CPDTSelect');
+    select.addEventListener('change', async () => {
+        document.getElementById('fileSelection').innerHTML = '';
+        if(select.value === "") return;
+        
+        const ID = select.value;
+        const response = await getFolderItems(ID);
+        if(response.entries.length === 0) return;
+        const array = filterFiles(response.entries);
+        if(array.length === 0) return '';
+        let template = '';
+        template += '<strong>Select file</strong><select id="CPFSelect" class="form-control" required>'
+        array.forEach((obj, index) => {
+            if(index === 0) template += '<option value=""> -- Select file -- </option>'
+            template += `<option value="${obj.id}">${obj.name}</option>`;
+        });
+        template += '</select>';
+        document.getElementById('fileSelection').innerHTML = template;
+        addEventCPDTSelect();
+    });
+}
 
 export const addEventMyProjects = (data) => {
     const myProjects = document.getElementById('myProjects');
@@ -712,6 +926,7 @@ export const addEventMyProjects = (data) => {
         if(myProjects.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         myProjects.classList.add('navbar-active');
+        const confluenceDiv = document.getElementById('confluenceDiv');
         confluenceDiv.innerHTML = await myProjectsTemplate(data);
 
         const elements = document.getElementsByClassName('getAllFileversions');

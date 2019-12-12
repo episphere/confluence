@@ -1,9 +1,8 @@
 import template from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
-import { template as dataSubmissionTemplate, dataSubmission, lazyload } from './src/pages/dataSubmission.js';
+import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { template as dataGovernanceTemplate, eventsDataSubmissions } from './src/pages/dataGovernance.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser } from './src/shared.js';

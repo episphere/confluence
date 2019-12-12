@@ -3,12 +3,12 @@ import { variables } from "./variables.js";
 
 export const getFolderItems = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = (await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
+    let r = await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    }))
+    })
     if(r.statusText=="Unauthorized"){
         sessionExpired();
     }else{
@@ -18,12 +18,12 @@ export const getFolderItems = async (id) => {
 
 export const getFolderInfo = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = (await fetch('https://api.box.com/2.0/folders/'+id,{
+    let r = await fetch('https://api.box.com/2.0/folders/'+id,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    }))
+    })
     if(r.statusText=="Unauthorized"){
         sessionExpired();
     }else{
@@ -124,6 +124,13 @@ export const storeAccessToken = async () => {
     }
 }
 
+export const permissionLevel = async (array) => {
+    for(let element of array){
+        const ID = element.id;
+        const type = element.type;
+    };
+}
+
 const searchParms = () => {
     let parms={}
     if(location.search.length>3){
@@ -169,7 +176,32 @@ export const createFolder = async (folderId, folderName) => {
         sessionExpired();
     }
     else if(response.status === 201){
-        return response.json();
+        return response;
+    }
+    else{
+        return {status: response.status, statusText: response.statusText};
+    };
+};
+
+export const copyFile = async (fileId, parentId) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let obj = {
+        "parent": {
+            "id": parentId
+        }
+    };
+    let response = await fetch(`https://api.box.com/2.0/files/${fileId}/copy`, {
+        method: "POST",
+        headers:{
+            Authorization:"Bearer "+access_token
+        },
+        body: JSON.stringify(obj)
+    });
+    if(response.statusText=="Unauthorized"){
+        sessionExpired();
+    }
+    else if(response.status === 201){
+        return response;
     }
     else{
         return {status: response.status, statusText: response.statusText};
@@ -596,7 +628,7 @@ export const getAllFileStructure = async (array) => {
 
 export const notificationTemplate = (top, header, body) => {
     return `
-        <div style="position: absolute; top: ${top}rem; right: 2rem;">
+        <div style="position: absolute; top: ${top}rem; right: 2rem; z-index: 9;">
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">${header}</strong>
@@ -610,4 +642,35 @@ export const notificationTemplate = (top, header, body) => {
             </div>
         </div>
         `;
+}
+
+export const consortiumSelection = async () => {
+    let template = '';
+    let array = await getValidConsortium();
+    if(array.length === 0) return '';
+    template += '<strong>Select consortium</strong><select id="CPCSelect" class="form-control" required>'
+    array.forEach((obj, index) => {
+        if(index === 0) template += '<option value=""> -- Select consortium -- </option>'
+        template += `<option value="${obj.id}">${obj.name}</option>`;
+    });
+    template += '</select>';
+    return template;
+}
+
+export const getValidConsortium = async () => {
+    const response = await getFolderItems(0);
+    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
+    return array;
+}
+
+export const filterStudies = (array) => {
+    return array.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies');
+}
+
+export const filterDataTypes = (array) => {
+    return array.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().trim() !== 'samples');
+}
+
+export const filterFiles = (array) => {
+    return array.filter(obj => obj.type === 'file');
 }

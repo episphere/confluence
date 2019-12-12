@@ -90,6 +90,15 @@ body {
     min-height: calc(100vh - 256px);
 }
 
+.h4-heading {
+    color: #000000;
+    font-weight: bold;
+}
+
+.confluence-notification {
+    position: relative;
+}
+
 .container {
     min-height: inherit;
     height: 100%;
@@ -219,9 +228,13 @@ label {
     padding: 0;
 }
 
+.create-project-btn {
+    margin-bottom: 1rem;
+}
+
 .background-white {
     background-color: #ffffff;
-    border-radius: 1rem;;
+    border-radius: 1rem;
 }
 
 .data-summary-count {
@@ -362,6 +375,7 @@ label {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
+    border-radius: 1rem;
 }
 
 .my-projects-div {
@@ -703,6 +717,7 @@ form {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
+    border-radius: 1rem;
 }
 
 .lazy-loading-spinner {

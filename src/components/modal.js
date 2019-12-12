@@ -72,16 +72,28 @@ export const shareFolderModal = () => {
     </div>`
 }
 
+export const createProjectModal = () => {
+    return `<div class="modal fade" id="createProjectModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <strong><i class="fas fa-project-diagram"></i> Create project</strong>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="createProjectModalBody"></div>
+            </div>
+        </div>
+    </div>`
+}
+
 export const fileVersionsModal = () => {
     return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header" id="modalFVHeader">
-                    
-                </div>
-                <div class="modal-body" id="modalFVBody">
-                    
-                </div>
+                <div class="modal-header" id="modalFVHeader"></div>
+                <div class="modal-body" id="modalFVBody"></div>
             </div>
         </div>
     </div>`
