@@ -733,7 +733,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             confluenceDiv.appendChild(notifcationDiv);
             // confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(divRow);
-            // dataGovernanceProjects();
+            dataGovernanceProjects();
         }
         else{
             confluenceDiv.innerHTML = ``;
