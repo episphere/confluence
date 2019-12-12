@@ -760,7 +760,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             dataGovernanceLazyLoad();
         }
         
-        addEventCreateProjectBtn();
+        // addEventCreateProjectBtn();
         dataGovernanceCollaboration();
         shareData();
     });
