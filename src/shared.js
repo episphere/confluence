@@ -342,12 +342,8 @@ export const addNewCollaborator = async (id, type, login, role) => {
     if(response.status === 401){
         sessionExpired();
     }
-    else if(response.status === 201){
+    else {
         return response;
-    }
-    else{
-        hideAnimation();
-        console.error(response);
     }
 }
 
@@ -362,12 +358,8 @@ export const removeBoxCollaborator = async (id) => {
     if(response.status === 401){
         sessionExpired();
     }
-    else if(response.status === 204){
-        return response;
-    }
     else{
-        hideAnimation();
-        console.error(response);
+        return response;
     }
 }
 
@@ -383,12 +375,8 @@ export const updateBoxCollaborator = async (id, role) => {
     if(response.status === 401){
         sessionExpired();
     }
-    else if(response.status === 200){
+    else {
         return response;
-    }
-    else{
-        hideAnimation();
-        console.error(response);
     }
 }
 
