@@ -9,10 +9,15 @@ export const getFolderItems = async (id) => {
             Authorization:"Bearer "+access_token
         }
     })
-    if(r.statusText=="Unauthorized"){
+    if(r.status === 401){
         sessionExpired();
-    }else{
+    }
+    else if(r.status === 200){
         return r.json()
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 }
 
@@ -24,10 +29,15 @@ export const getFolderInfo = async (id) => {
             Authorization:"Bearer "+access_token
         }
     })
-    if(r.statusText=="Unauthorized"){
+    if(r.status === 401){
         sessionExpired();
-    }else{
+    }
+    else if(r.status === 200){
         return r.json()
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 }
 
@@ -39,10 +49,15 @@ export const getFile = async (id) => {
             Authorization:"Bearer "+access_token
         }
     });
-    if(r.statusText=="Unauthorized"){
+    if(r.status === 401) {
         sessionExpired();
-    }else{
-        return r.text()
+    }
+    else if(r.status === 200) {
+        return r.text();
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 };
 
@@ -53,10 +68,15 @@ export const getFileJSON = async (id, access_token) => {
             Authorization:"Bearer "+access_token
         }
     });
-    if(r.statusText=="Unauthorized"){
-        return false;
-    }else{
-        return r.json();
+    if(r.status === 401){
+        sessionExpired();
+    }
+    else if(r.status === 200){
+        return r.json()
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 };
 
@@ -68,10 +88,15 @@ export const getFileInfo = async (id) => {
             Authorization:"Bearer "+access_token
         }
     })
-    if(r.statusText=="Unauthorized"){
+    if(r.status === 401){
         sessionExpired();
-    }else{
+    }
+    else if(r.status === 200){
         return r.json()
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 }
 
@@ -83,10 +108,15 @@ export const getFileVersions = async (id) => {
             Authorization:"Bearer "+access_token
         }
     })
-    if(r.statusText=="Unauthorized"){
+    if(r.status === 401){
         sessionExpired();
-    }else{
+    }
+    else if(r.status === 200){
         return r.json()
+    }
+    else{
+        hideAnimation();
+        console.error(r);
     }
 }
 
@@ -122,13 +152,6 @@ export const storeAccessToken = async () => {
             console.log('not logged in yet')
         }
     }
-}
-
-export const permissionLevel = async (array) => {
-    for(let element of array){
-        const ID = element.id;
-        const type = element.type;
-    };
 }
 
 const searchParms = () => {
@@ -172,7 +195,7 @@ export const createFolder = async (folderId, folderName) => {
         },
         body: JSON.stringify(obj)
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.state === 401){
         sessionExpired();
     }
     else if(response.status === 201){
@@ -197,7 +220,7 @@ export const copyFile = async (fileId, parentId) => {
         },
         body: JSON.stringify(obj)
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     else if(response.status === 201){
@@ -223,7 +246,7 @@ export const uploadFileBox = async (folderId, fileName, file) => {
         body: form,
         contentType: false
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.statusText === 401){
         sessionExpired();
     }
     else if(response.status === 201){
@@ -249,7 +272,7 @@ export const uploadFile = async (data, fileName, folderId) => {
         body: form,
         contentType: false
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.statusText === 401){
         sessionExpired();
     }
     else if(response.status === 201){
@@ -267,7 +290,7 @@ export const getCollaboration = async (id, type) => {
             Authorization:"Bearer "+access_token
         }
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.statusText === 401){
         sessionExpired();
     }
     if(response.status === 200){
@@ -285,7 +308,7 @@ export const getCurrentUser = async () => {
             Authorization: "Bearer "+access_token
         }
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     if(response.status === 200){
@@ -316,11 +339,15 @@ export const addNewCollaborator = async (id, type, login, role) => {
         },
         body: JSON.stringify(obj)
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
-    else{
+    else if(response.status === 201){
         return response;
+    }
+    else{
+        hideAnimation();
+        console.error(response);
     }
 }
 
@@ -332,11 +359,15 @@ export const removeBoxCollaborator = async (id) => {
             Authorization: "Bearer "+access_token
         }
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
-    else{
+    else if(response.status === 204){
         return response;
+    }
+    else{
+        hideAnimation();
+        console.error(response);
     }
 }
 
@@ -349,11 +380,15 @@ export const updateBoxCollaborator = async (id, role) => {
         },
         body: JSON.stringify({role: role})
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
-    else{
+    else if(response.status === 200){
         return response;
+    }
+    else{
+        hideAnimation();
+        console.error(response);
     }
 }
 
@@ -366,7 +401,7 @@ export const revokeAccessToken = async () => {
         },
         body: JSON.stringify({token: access_token})
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     else{
@@ -382,7 +417,7 @@ export const getAllWebHooks = async () => {
             Authorization: "Bearer "+access_token
         }
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     else{
@@ -405,7 +440,7 @@ export const createWebHook = async () => {
         },
         body: JSON.stringify(obj)
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     else{
@@ -428,7 +463,7 @@ export const updateWebHook = async () => {
         },
         body: JSON.stringify(obj)
     });
-    if(response.statusText=="Unauthorized"){
+    if(response.status === 401){
         sessionExpired();
     }
     else{

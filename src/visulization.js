@@ -60,10 +60,6 @@ export const getData = (studyEntries, studyIds, values) => {
 export const getFileContent = async (allIds) => {
     // const jsonData = await convertTextToJson(allIds);
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
-    if(!jsonData) {
-        sessionExpired();
-        return;
-    }
     const cf = getCrossFilter(jsonData);
     // let parameterList = document.getElementById('parameterList');
     // parameterList.innerHTML = parameterListTemplate();
