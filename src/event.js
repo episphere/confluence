@@ -316,7 +316,7 @@ export const addEventConsortiaSelect = () => {
         firstOption.value = '';
         firstOption.text = '-- Select study --'
         selectStudyUIS.appendChild(firstOption);
-        entries = entries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies');
+        entries = filterStudies(entries);
         for(let obj of entries){
             const option = document.createElement('option');
             option.value = obj.id;

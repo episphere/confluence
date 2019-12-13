@@ -1,11 +1,11 @@
 import { shareFolderModal } from "../components/modal.js";
 import { addEventShowAllCollaborator, addEventAddNewCollaborator } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects } from "../shared.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
+    const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
 
     let template = `
@@ -31,7 +31,7 @@ export const template = async () => {
 
 export const dataGovernanceProjects = async () => {
     const response = await getFolderItems(0);
-    const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
+    const projectArray = filterProjects(response.entries);
     const div = document.getElementById('dataGovernanceProjects');
     let template = `
         <h4 class="h4-heading">Project(s)</h4>
@@ -65,7 +65,7 @@ export const dataGovernanceLazyLoad = () => {
         if(status !== 'pending') return;
         const allEntries = (await getFolderItems(id)).entries;
         element.dataset.status = 'complete';
-        const entries = allEntries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies' && obj.name !== 'Samples');
+        const entries = filterStudiesDataTypes(allEntries);
         const fileEntries = allEntries.filter(obj => obj.type === 'file');
         if (entries.length > 0){
             const ul = document.createElement('ul');

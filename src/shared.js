@@ -584,7 +584,7 @@ export const getAllFileStructure = async (array) => {
         const studies = await getFolderItems(ID);
         
         if(studies.total_count && studies.total_count > 0){
-            const allStudies = studies.entries.filter(dt => dt.name !== "Confluence - CPSIII" && dt.name !== "Confluence - Documents for NCI Participating Studies");
+            const allStudies = filterStudies(studies.entries);
             for(let j = 0; j < allStudies.length; j++){
                 if(allStudies[j].type === 'folder'){
                     const studyId = allStudies[j].id;
@@ -659,8 +659,11 @@ export const consortiumSelection = async () => {
 
 export const getValidConsortium = async () => {
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
-    return array;
+    return filterConsortiums(response.entries);
+}
+
+export const filterConsortiums = (array) => {
+    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
 }
 
 export const filterStudies = (array) => {
@@ -671,6 +674,14 @@ export const filterDataTypes = (array) => {
     return array.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().trim() !== 'samples');
 }
 
+export const filterStudiesDataTypes = (array) => {
+    return array.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies' && obj.name !== 'Samples');
+}
+
 export const filterFiles = (array) => {
     return array.filter(obj => obj.type === 'file');
+}
+
+export const filterProjects = (array) => {
+    return array.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
 }

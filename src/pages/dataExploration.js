@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, filterConsortiums, filterProjects } from "../shared.js";
 import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt, getFileContent } from "../visulization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventDataGovernanceNavBar, addEventMyProjects } from "../event.js";
@@ -66,13 +66,9 @@ export const template = () => {
 }
 
 export const getSummary = async () => {
-    // getAllWebHooks();
-    // createWebHook();
-    // updateWebHook();
-    
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
-    const projectArray = response.entries.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
+    const array = filterConsortiums(response.entries);
+    const projectArray = filterProjects(response.entries);
 
     if(array.length > 0 && projectArray.length > 0){
         document.getElementById('governanceNav').innerHTML = `

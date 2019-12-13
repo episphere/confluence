@@ -1,4 +1,4 @@
-import { getFolderItems } from "../shared.js"
+import { getFolderItems, filterConsortiums } from "../shared.js"
 
 export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
@@ -103,7 +103,7 @@ export const fileVersionsModal = () => {
 const createConsortiaOptions = async () => {
     let template = ``;
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && (obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
+    const array = filterConsortiums(response.entries);
     for(let consortia of array){
         template += `<option value="${consortia.id}">${consortia.name}</option>`
     }

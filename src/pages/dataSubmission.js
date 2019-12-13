@@ -1,9 +1,9 @@
-import { getFolderItems } from "../shared.js";
+import { getFolderItems, filterStudiesDataTypes, filterConsortiums } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
+    const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
     let template = '';
@@ -36,7 +36,7 @@ export const lazyload = () => {
         if(status !== 'pending') return;
         const allEntries = (await getFolderItems(id)).entries;
         element.dataset.status = 'complete';
-        const entries = allEntries.filter(obj => obj.type === 'folder' && obj.name !== 'Confluence - CPSIII' && obj.name !== 'Confluence - Dikshit' && obj.name !== 'Confluence - Documents for NCI Participating Studies' && obj.name !== 'Samples');
+        const entries = filterStudiesDataTypes(allEntries);
         const fileEntries = allEntries.filter(obj => obj.type === 'file');
         if (entries.length > 0){
             const ul = document.createElement('ul');
