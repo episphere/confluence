@@ -1,7 +1,7 @@
 import { shareFolderModal } from "../components/modal.js";
 import { addEventShowAllCollaborator, addEventAddNewCollaborator } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel } from "../shared.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
@@ -19,9 +19,11 @@ export const template = async () => {
         let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}
-            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${consortiaName}" data-object-type=${type} href="#">
-            <i class="fas fa-share"></i> Share</a>
+        template += `<li>
+            <a class="${liClass}" href="#">
+                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
+            </a> ${consortiaName}
+            
         </li>
         `
     }
@@ -45,10 +47,10 @@ export const dataGovernanceProjects = async () => {
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `
-        <li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${projectName}
-            <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-permission-type="restrict" data-folder-id=${obj.id} data-folder-name="${projectName}" data-object-type=${type} href="#">
-                <i class="fas fa-share"></i> Share
-            </a>
+        <li>
+            <a class="${liClass}" href="#">
+                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+            </a> ${projectName}
         </li>
         `;
     }
@@ -62,6 +64,26 @@ export const dataGovernanceLazyLoad = () => {
     Array.from(spinners).forEach(async element => {
         const id = element.dataset.id;
         const status = element.dataset.status;
+        const type = element.dataset.type;
+        if(type && JSON.parse(localStorage.parms).login){
+            const bool = checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login);
+            if(bool === true){
+                const a = document.createElement('a');
+                a.dataset.toggle = 'modal';
+                a.dataset.target = '#modalShareFolder'
+                a.classList = ['share-folder'];
+                a.dataset.permissionType = 'restrict';
+                a.dataset.folderId = id;
+                a.dataset.folderName = element.dataset.folderName;
+                a.dataset.objectType = type;
+                a.href = '#';
+                a.innerHTML = `<i class="fas fa-share"></i> Share`
+                element.parentNode.parentNode.appendChild(a);
+            }
+            else{
+                element.dataset.sharable = 'no';
+            }
+        } 
         if(status !== 'pending') return;
         const allEntries = (await getFolderItems(id)).entries;
         element.dataset.status = 'complete';
@@ -77,8 +99,8 @@ export const dataGovernanceLazyLoad = () => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
-                    <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a>`;
+                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
+                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a>`}`;
                 ul.appendChild(li);
             }
 
@@ -96,8 +118,8 @@ export const dataGovernanceLazyLoad = () => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="#"><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name} 
-                    <a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type} href="#"><i class="fas fa-share"></i> Share</a>`;
+                li.innerHTML = `<a href="#"><i title="files" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i></a> ${obj.name} 
+                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type} href="#"><i class="fas fa-share"></i> Share</a>`}`;
                 ul.appendChild(li);
             }
 

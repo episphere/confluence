@@ -708,3 +708,16 @@ export const filterFiles = (array) => {
 export const filterProjects = (array) => {
     return array.filter(obj => obj.type === 'folder' && obj.name.toLowerCase().indexOf('confluence_') !== -1 && obj.name.toLowerCase().indexOf('_project') !== -1);
 }
+
+export const checkMyPermissionLevel = (data, login) => {
+    if(data.entries.length === 0) return null;
+    const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
+    if(array.length === 0){
+        const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);
+        if(newArray.length > 0) return true;
+    }
+    else if(array[0].role === 'editor' || array[0].role === 'co-owner'){
+        return true;
+    }
+    return false;
+}

@@ -679,9 +679,16 @@ span.icon {
     height: 100%;
 }
 
-#error {
-    padding: 15px !important;
-    color: red;
+.chart-interaction-msg {
+    margin: 0px !important;
+    position: absolute;
+    color: #553434;
+    opacity: 0.7;
+}
+
+.fa-info-circle {
+    padding-top: 4px;
+    margin-right: 5px;
 }
 
 .errorMsg {

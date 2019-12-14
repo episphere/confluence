@@ -6,7 +6,7 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 export const template = () => {
     return `
         <div class="main-summary-row">
-            <div class="row" id="error"></div>
+            <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
             <div class="main-summary-row dynamic-charts">
                 <div class="summary-inner-col col-md-3">
                     <div id="chartDiv7">

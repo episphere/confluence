@@ -1,9 +1,5 @@
-import { convertTextToJson, hideAnimation, disableCheckBox, removeActiveClass, showError, getFileJSON, sessionExpired } from './shared.js';
-import { parameterListTemplate } from './components/elements.js';
+import { hideAnimation, getFileJSON } from './shared.js';
 import { variables } from './variables.js';
-import { addEventShowAllVariables, addEventVariableItem, addEventShowPieChart } from './event.js';
-import { unHideDivs } from './pages/dataExploration.js';
-let oldParameter = '';
 
 const unique = arr => {
     let u={}
@@ -83,6 +79,8 @@ export const getFileContent = async (allIds) => {
     renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     dc.config.defaultColors(d3.schemeBrBG[6]);
     renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
+    // document.getElementById('chartInteractionMsg').innerHTML = `<i class="fas fa-info-circle"></i> Click on chart(s) for interaction!`;
+    // setTimeout(() => document.getElementById('chartInteractionMsg').innerHTML = ``, 5000);
     hideAnimation();
 };
 
