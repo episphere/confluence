@@ -710,7 +710,7 @@ export const filterProjects = (array) => {
 }
 
 export const checkMyPermissionLevel = (data, login) => {
-    if(data.entries.length === 0) return null;
+    if(data.entries.length === 0) return true;
     const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
     if(array.length === 0){
         const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);
