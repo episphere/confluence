@@ -755,7 +755,7 @@ export const inactivityTime = () => {
     const resetTimer = () => {
         clearTimeout(time);
         time = setTimeout(() => {
-            const r = confirm('You were inactive for 20 minutes, would you like to extend your session?');
+            const r = confirm('You were inactive for more than 20 minutes, would you like to extend your session?');
             if(r) {
     
             }
