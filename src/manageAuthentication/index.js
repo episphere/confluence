@@ -3,13 +3,18 @@ import { sessionExpired } from '../shared.js';
 
 export const checkAccessTokenValidity = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch('https://api.box.com/2.0/folders/0/items',{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try{
+        const response = await fetch('https://api.box.com/2.0/users/me',{
+           method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            sessionExpired();
         }
-    });
-    if(response.status === 401){
+    }
+    catch(error){
         sessionExpired();
     }
 }
