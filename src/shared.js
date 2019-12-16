@@ -154,6 +154,27 @@ export const storeAccessToken = async () => {
     }
 }
 
+
+export const refreshToken = async () => {
+    if(!localStorage.parms) return;
+    let clt={}
+    if(location.origin.indexOf('localhost') !== -1){
+        clt = config.iniAppDev;
+    }else if(location.origin.indexOf('episphere') !== -1){
+        clt = config.iniAppProd
+    }else if(location.origin.indexOf('observablehq') !== -1){
+        clt = config.iniObs
+    }
+    const refresh_token = JSON.parse(localStorage.parms).refresh_token+`464`;
+    
+    const response = await fetch(`https://api.box.com/oauth2/token/`, {
+        method:'POST',
+        body: `grant_type=refresh_token&refresh_token=${refresh_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+    });
+    console.log(response);
+    console.log(await response.json());
+}
+
 const searchParms = () => {
     let parms={}
     if(location.search.length>3){
@@ -409,7 +430,6 @@ export const getAllWebHooks = async () => {
         sessionExpired();
     }
     else{
-        console.log(await response.json());
         return response;
     }
 }

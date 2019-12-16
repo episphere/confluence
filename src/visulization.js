@@ -68,16 +68,16 @@ export const getFileContent = async (allIds) => {
     
     generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
 
-    dc.config.defaultColors(d3.schemeBrBG[4]);
+    dc.config.defaultColors(d3.schemePaired);
     renderPieChart(cf, jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     generateBarSingleSelect(cf, 'famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6')
     dc.config.defaultColors(d3.schemeBrBG[8]);
     renderPieChart(cf, jsonData, 'study', 'dataSummaryVizChart1', 'dataSummaryVizLabel1', 'selectedRange1', 'chartDiv1');
     dc.config.defaultColors(d3.schemeSet2);
     renderPieChart(cf, jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    dc.config.defaultColors(d3.schemeAccent);
+    dc.config.defaultColors(d3.schemePaired);
     renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
-    dc.config.defaultColors(d3.schemeBrBG[6]);
+    dc.config.defaultColors(d3.schemePastel1);
     renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     // document.getElementById('chartInteractionMsg').innerHTML = `<i class="fas fa-info-circle"></i> Click on chart(s) for interaction!`;
     // setTimeout(() => document.getElementById('chartInteractionMsg').innerHTML = ``, 5000);
