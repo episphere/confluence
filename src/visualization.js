@@ -134,6 +134,9 @@ const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chart
         .gap(5)
         .elasticX(true)
         .colorAccessor(function (d, i){return i;})
+        .label(function(c){
+            return `${c.key} (${c.value})`
+        })
         .render()
 
     rowChart.on('filtered', function(chart) {
