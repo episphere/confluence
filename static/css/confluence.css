@@ -471,6 +471,17 @@ label {
     max-width: 30%;
 }
 
+.dc-chart g.row text {
+    fill: #000000 !important;
+    font-style: italic;
+    font-family: cursive;
+}
+
+.pie-label-group {
+    font-style: italic;
+    font-family: cursive;
+}
+
 .content {
     padding: 0px 0px 0px 40px;
     max-height: 0;
