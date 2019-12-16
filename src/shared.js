@@ -1,5 +1,6 @@
 import { config } from "./config.js";
 import { variables } from "./variables.js";
+import { logOut } from "./manageAuthentication/index.js";
 
 export const getFolderItems = async (id) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -748,3 +749,23 @@ export const checkMyPermissionLevel = (data, login) => {
     }
     return false;
 }
+
+export const inactivityTime = () => {
+    let time;
+    const resetTimer = () => {
+        clearTimeout(time);
+        time = setTimeout(() => {
+            const r = confirm('You were inactive for 20 minutes, would you like to extend your session?');
+            if(r) {
+    
+            }
+            else {
+                logOut();
+            }
+        }, 1200000);
+    }
+
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+};

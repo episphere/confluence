@@ -5,7 +5,7 @@ import { template as dataSummary, getSummary } from './src/pages/dataExploration
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser, inactivityTime } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn } from './src/event.js';
 
 const confluence = async () => {
@@ -89,6 +89,7 @@ window.onload = async () => {
     confluenceDiv.innerHTML = "";
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
         await checkAccessTokenValidity();
+        inactivityTime();
     }
     confluence();
 }
