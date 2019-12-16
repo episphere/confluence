@@ -10,7 +10,7 @@ export const getFolderItems = async (id) => {
         }
     })
     if(r.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFolderItems(id);
     }
     else if(r.status === 200){
         return r.json()
@@ -30,7 +30,7 @@ export const getFolderInfo = async (id) => {
         }
     })
     if(r.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFolderInfo(id);
     }
     else if(r.status === 200){
         return r.json()
@@ -50,7 +50,7 @@ export const getFile = async (id) => {
         }
     });
     if(r.status === 401) {
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFile(id);
     }
     else if(r.status === 200) {
         return r.text();
@@ -69,7 +69,7 @@ export const getFileJSON = async (id, access_token) => {
         }
     });
     if(r.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
     }
     else if(r.status === 200){
         return r.json()
@@ -89,7 +89,7 @@ export const getFileInfo = async (id) => {
         }
     })
     if(r.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFileInfo(id);
     }
     else if(r.status === 200){
         return r.json()
@@ -109,7 +109,7 @@ export const getFileVersions = async (id) => {
         }
     })
     if(r.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getFileVersions(id);
     }
     else if(r.status === 200){
         return r.json()
@@ -156,6 +156,7 @@ export const storeAccessToken = async () => {
 
 
 export const refreshToken = async () => {
+    debugger;
     if(!localStorage.parms) return;
     const parms = JSON.parse(localStorage.parms);
     let clt={}
@@ -175,6 +176,7 @@ export const refreshToken = async () => {
         const newToken = await response.json()
         const newParms = { ...parms, ...newToken };
         localStorage.parms = JSON.stringify(newParms);
+        return true;
     }
     else{
         hideAnimation();
@@ -224,7 +226,7 @@ export const createFolder = async (folderId, folderName) => {
         body: JSON.stringify(obj)
     });
     if(response.state === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await createFolder(folderId, foldername);
     }
     else if(response.status === 201){
         return response;
@@ -249,7 +251,7 @@ export const copyFile = async (fileId, parentId) => {
         body: JSON.stringify(obj)
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await copyFile(fileId, parentId);
     }
     else if(response.status === 201){
         return response;
@@ -274,8 +276,8 @@ export const uploadFileBox = async (folderId, fileName, file) => {
         body: form,
         contentType: false
     });
-    if(response.statusText === 401){
-        sessionExpired();
+    if(response.status === 401){
+        if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file)
     }
     else if(response.status === 201){
         return response.json();
@@ -300,8 +302,8 @@ export const uploadFile = async (data, fileName, folderId) => {
         body: form,
         contentType: false
     });
-    if(response.statusText === 401){
-        sessionExpired();
+    if(response.status === 401){
+        if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
     }
     else if(response.status === 201){
         return response.json();
@@ -318,8 +320,8 @@ export const getCollaboration = async (id, type) => {
             Authorization:"Bearer "+access_token
         }
     });
-    if(response.statusText === 401){
-        sessionExpired();
+    if(response.status === 401){
+        if((await refreshToken()) === true) return await getCollaboration(id, type);
     }
     if(response.status === 200){
         return response.json();
@@ -337,7 +339,7 @@ export const getCurrentUser = async () => {
         }
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getCurrentUser();
     }
     if(response.status === 200){
         return response.json();
@@ -368,7 +370,7 @@ export const addNewCollaborator = async (id, type, login, role) => {
         body: JSON.stringify(obj)
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await addNewCollaborator(id, type, login, role);
     }
     else {
         return response;
@@ -384,7 +386,7 @@ export const removeBoxCollaborator = async (id) => {
         }
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return removeBoxCollaborator(id);
     }
     else{
         return response;
@@ -401,7 +403,7 @@ export const updateBoxCollaborator = async (id, role) => {
         body: JSON.stringify({role: role})
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
     }
     else {
         return response;
@@ -418,7 +420,7 @@ export const revokeAccessToken = async () => {
         body: JSON.stringify({token: access_token})
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await revokeAccessToken();
     }
     else{
         return response;
@@ -434,7 +436,7 @@ export const getAllWebHooks = async () => {
         }
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await getAllWebHooks();
     }
     else{
         return response;
@@ -456,10 +458,9 @@ export const createWebHook = async () => {
         body: JSON.stringify(obj)
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await createWebHook();
     }
     else{
-        console.log(response);
         return response;
     }
 }
@@ -479,10 +480,9 @@ export const updateWebHook = async () => {
         body: JSON.stringify(obj)
     });
     if(response.status === 401){
-        sessionExpired();
+        if((await refreshToken()) === true) return await updateWebHook();
     }
     else{
-        console.log(response);
         return response;
     }
 }

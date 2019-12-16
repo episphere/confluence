@@ -1,5 +1,5 @@
 import { config } from '../config.js'
-import { sessionExpired } from '../shared.js';
+import { sessionExpired, refreshToken } from '../shared.js';
 
 export const checkAccessTokenValidity = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -11,11 +11,11 @@ export const checkAccessTokenValidity = async () => {
             }
         });
         if(response.status === 401){
-            sessionExpired();
+            if((await refreshToken()) === true) return await checkAccessTokenValidity();
         }
     }
     catch(error){
-        sessionExpired();
+        if((await refreshToken()) === true) return await checkAccessTokenValidity();
     }
 }
 
