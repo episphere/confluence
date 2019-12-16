@@ -1,6 +1,6 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, filterConsortiums, filterProjects } from "../shared.js";
 import { studyDropDownTemplate } from "../components/elements.js";
-import { txt2dt, getFileContent } from "../visulization.js";
+import { txt2dt, getFileContent } from "../visualization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventDataGovernanceNavBar, addEventMyProjects } from "../event.js";
 
 export const template = () => {

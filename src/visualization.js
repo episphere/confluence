@@ -71,11 +71,11 @@ export const getFileContent = async (allIds) => {
     dc.config.defaultColors(d3.schemePaired);
     renderPieChart(cf, jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     generateBarSingleSelect(cf, 'famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6')
-    dc.config.defaultColors(d3.schemeBrBG[8]);
+    dc.config.defaultColors(d3.schemePaired);
     renderPieChart(cf, jsonData, 'study', 'dataSummaryVizChart1', 'dataSummaryVizLabel1', 'selectedRange1', 'chartDiv1');
     dc.config.defaultColors(d3.schemeSet2);
     renderPieChart(cf, jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    dc.config.defaultColors(d3.schemePaired);
+    dc.config.defaultColors(d3.schemeBrBG[8]);
     renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     dc.config.defaultColors(d3.schemePastel1);
     renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
