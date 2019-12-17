@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, filterConsortiums, filterProjects } from "../shared.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, filterConsortiums, filterProjects, checkMyPermissionLevel, getCollaboration, amIViewer } from "../shared.js";
 import { studyDropDownTemplate } from "../components/elements.js";
 import { txt2dt, getFileContent } from "../visualization.js";
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventDataGovernanceNavBar, addEventMyProjects } from "../event.js";
@@ -69,8 +69,14 @@ export const getSummary = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
     const projectArray = filterProjects(response.entries);
-
-    if(array.length > 0 && projectArray.length > 0){
+    let showProjects = false;
+    for(let obj of projectArray){
+        if(showProjects === false) {
+            const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+            if(bool === true) showProjects = true;
+        }
+    }
+    if(array.length > 0 && projectArray.length > 0 && showProjects === true){
         document.getElementById('governanceNav').innerHTML = `
             
             <div class="nav-item  grid-elements">
@@ -93,9 +99,9 @@ export const getSummary = async () => {
                 <a class="nav-link nav-menu-links" href="#" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
             </div>
         `;
-        addEventDataGovernanceNavBar();
+        addEventDataGovernanceNavBar(true);
     }
-    else if(projectArray.length > 0){
+    else if(projectArray.length > 0 && showProjects === true){
         document.getElementById('myProjectsNav').innerHTML = `
             
             <div class="nav-item  grid-elements">
