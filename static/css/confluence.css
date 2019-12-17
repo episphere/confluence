@@ -685,6 +685,10 @@ span.icon {
     text-align: center;
 }
 
+.allow-overflow {
+    overflow: auto;
+}
+
 .data-analysis {
     margin-left: 1rem !important;
 }
