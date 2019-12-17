@@ -17,9 +17,22 @@ export const myProjectsTemplate = async () => {
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${name}</li>`;
             if(type === 'folder'){
-                template += '<ul class="ul-list-style content">';
                 const response = await getFolderItems(data[i].id);
                 const files = response.entries;
+                template += `<ul class="ul-list-style content"><li>
+                        <table class="table table-bordered table-striped my-projects-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>File id</th>
+                                    <th>Created by</th>
+                                    <th>Created at</th>
+                                    <th>Last modified by</th>
+                                    <th>Last modified at</th>
+                                    <th>Latest version id</th>
+                                    <th>Older versions</th>
+                                </tr>
+                            </thead>`
                 for(let obj of files){
                     const fileInfo = await getFileInfo(obj.id);
                     type = obj.type;
@@ -27,20 +40,7 @@ export const myProjectsTemplate = async () => {
                     name = obj.name.slice(0, obj.name.lastIndexOf('.'));
                     expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
                     title = type === 'folder' ? 'Expand / Collapse' : '';
-                    template += `<li>
-                            <table class="table table-bordered table-striped my-projects-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>File id</th>
-                                        <th>Created by</th>
-                                        <th>Created at</th>
-                                        <th>Last modified by</th>
-                                        <th>Last modified at</th>
-                                        <th>Latest version id</th>
-                                        <th>Older versions</th>
-                                    </tr>
-                                </thead>
+                    template += `
                                 <tbody>
                                     <tr>
                                         <td title=${name}>${name.length > 20 ? `${name.slice(0, 17)}...` : `${name}` }</td>
@@ -53,10 +53,9 @@ export const myProjectsTemplate = async () => {
                                         <td><a data-toggle="modal" data-target="#modalFileVersions" href="#" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
                                     </tr>
                                 </tbody>
-                            </table>
-                        </li>`
+                            `
                 }
-                template += '</ul>'
+                template += '</table></li></ul>';
             }
         }
     }
