@@ -795,13 +795,13 @@ export const consortiumSelection = async () => {
     
     if(array.length === 0) return '';
     template += '<strong>Select consortium</strong><select id="CPCSelect" class="form-control" required>'
-    array.forEach((obj, index) => {
-        const bool = checkMyPermissionLevel(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
-        if(bool){
-            if(index === 0) template += '<option value=""> -- Select consortium -- </option>'
-            template += `<option value="${obj.id}">${obj.name}</option>`;
+    for(let obj = 0; obj < array.length; obj++){
+        const bool = checkMyPermissionLevel(await getCollaboration(array[obj].id, `${array[obj].type}s`), JSON.parse(localStorage.parms).login);
+        if(bool === true){
+            if(obj === 0) template += '<option value=""> -- Select consortium -- </option>'
+            template += `<option value="${array[obj].id}">${array[obj].name}</option>`;
         }
-    });
+    };
     template += '</select>';
     return template;
 }
