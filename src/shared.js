@@ -91,6 +91,11 @@ export const getFileJSON = async (id, access_token) => {
         else if(r.status === 200){
             return r.json()
         }
+        else if(r.status === 404){
+            hideAnimation();
+            console.error(r);
+            return null;
+        }
         else{
             hideAnimation();
             console.error(r);
