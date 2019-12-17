@@ -474,12 +474,12 @@ label {
 .dc-chart g.row text {
     fill: #000000 !important;
     font-style: italic;
-    font-family: cursive;
+    font-family: sans-serif;
 }
 
 .pie-label-group {
     font-style: italic;
-    font-family: cursive;
+    font-family: sans-serif;
 }
 
 .content {
