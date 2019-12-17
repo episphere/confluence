@@ -927,7 +927,7 @@ export const addEventMyProjects = (data) => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         myProjects.classList.add('navbar-active');
         const confluenceDiv = document.getElementById('confluenceDiv');
-        confluenceDiv.innerHTML = await myProjectsTemplate(data);
+        confluenceDiv.innerHTML = await myProjectsTemplate();
 
         const elements = document.getElementsByClassName('getAllFileversions');
         Array.from(elements).forEach(element => {

@@ -42,17 +42,20 @@ export const dataGovernanceProjects = async () => {
     template += '<div class="data-governance"><ul class="ul-list-style first-list-item">';
 
     for(let obj of projectArray){
-        const projectName = obj.name;
-        let type = obj.type;
-        let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-        let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `
-        <li>
-            <a class="${liClass}" href="#">
-                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
-            </a> ${projectName}
-        </li>
-        `;
+        const bool = checkMyPermissionLevel(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+        if(bool) {
+            const projectName = obj.name;
+            let type = obj.type;
+            let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
+            let title = type === 'folder' ? 'Expand / Collapse' : '';
+            template += `
+            <li>
+                <a class="${liClass}" href="#">
+                    <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+                </a> ${projectName}
+            </li>
+            `;
+        }
     }
     template += `</ul>${shareFolderModal()}</div>`
     div.innerHTML = template;

@@ -1,57 +1,63 @@
-import { getFolderItems, getFileInfo, getFileVersions } from "../shared.js";
+import { getFolderItems, getFileInfo, getFileVersions, filterProjects, amIViewer, getCollaboration } from "../shared.js";
 import { fileVersionsModal } from "../components/modal.js";
 
-export const myProjectsTemplate = async (data) => {
+export const myProjectsTemplate = async () => {
+    const response = await getFolderItems(0);
+    const data = filterProjects(response.entries);
+    if(data.length <= 0) return `No projects found!`;
     let template = `
         <div class="my-projects-div"><ul class="ul-list-style first-list-item">`;
     for(let i = 0 ; i < data.length; i++) {
-        let name = data[i].name;
-        let type = data[i].type;
-        let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-        let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-        let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${name}</li>`;
-        if(type === 'folder'){
-            template += '<ul class="ul-list-style content">';
-            const response = await getFolderItems(data[i].id);
-            const files = response.entries;
-            for(let obj of files){
-                const fileInfo = await getFileInfo(obj.id);
-                type = obj.type;
-                if(obj.type !== 'file') return;
-                name = obj.name.slice(0, obj.name.lastIndexOf('.'));
-                expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
-                title = type === 'folder' ? 'Expand / Collapse' : '';
-                template += `<li>
-                        <table class="table table-bordered table-striped my-projects-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>File id</th>
-                                    <th>Created by</th>
-                                    <th>Created at</th>
-                                    <th>Last modified by</th>
-                                    <th>Last modified at</th>
-                                    <th>Latest version id</th>
-                                    <th>Older versions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>${name}</td>
-                                    <td>${fileInfo.id} <a href="#" class="copy-file-api" title="Copy file id" data-file-id="${obj.id}"><i class="far fa-copy"></i></a></td>
-                                    <td>${fileInfo.created_by.name || fileInfo.created_by.login}</td>
-                                    <td>${new Date(fileInfo.created_at).toLocaleString()}</td>
-                                    <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
-                                    <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
-                                    <td>${fileInfo.file_version.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
-                                    <td><a data-toggle="modal" data-target="#modalFileVersions" href="#" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </li>`
+        const bool = amIViewer(await getCollaboration(data[i].id, `${data[i].type}s`), JSON.parse(localStorage.parms).login);
+        if(bool === true) {
+            let name = data[i].name;
+            let type = data[i].type;
+            let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
+            let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
+            let title = type === 'folder' ? 'Expand / Collapse' : '';
+            template += `<li><a class="${liClass}" href="#"><i title="${title}" class="${expandClass}"></i></a> ${name}</li>`;
+            if(type === 'folder'){
+                template += '<ul class="ul-list-style content">';
+                const response = await getFolderItems(data[i].id);
+                const files = response.entries;
+                for(let obj of files){
+                    const fileInfo = await getFileInfo(obj.id);
+                    type = obj.type;
+                    if(obj.type !== 'file') return;
+                    name = obj.name.slice(0, obj.name.lastIndexOf('.'));
+                    expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
+                    title = type === 'folder' ? 'Expand / Collapse' : '';
+                    template += `<li>
+                            <table class="table table-bordered table-striped my-projects-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>File id</th>
+                                        <th>Created by</th>
+                                        <th>Created at</th>
+                                        <th>Last modified by</th>
+                                        <th>Last modified at</th>
+                                        <th>Latest version id</th>
+                                        <th>Older versions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td title=${name}>${name.length > 20 ? `${name.slice(0, 17)}...` : `${name}` }</td>
+                                        <td>${fileInfo.id} <a href="#" class="copy-file-api" title="Copy file id" data-file-id="${obj.id}"><i class="far fa-copy"></i></a></td>
+                                        <td>${fileInfo.created_by.name || fileInfo.created_by.login}</td>
+                                        <td>${new Date(fileInfo.created_at).toLocaleString()}</td>
+                                        <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
+                                        <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
+                                        <td>${fileInfo.file_version.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
+                                        <td><a data-toggle="modal" data-target="#modalFileVersions" href="#" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </li>`
+                }
+                template += '</ul>'
             }
-            template += '</ul>'
         }
     }
     template += `</ul>${fileVersionsModal()}</div>`;

@@ -844,6 +844,15 @@ export const checkMyPermissionLevel = (data, login) => {
     return false;
 }
 
+export const amIViewer = (data, login) => {
+    if(data.entries.length === 0) return true;
+    const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
+    if(array[0].role === 'viewer'){
+        return true;
+    }
+    return false;
+}
+
 export const inactivityTime = () => {
     let time;
     const resetTimer = () => {
