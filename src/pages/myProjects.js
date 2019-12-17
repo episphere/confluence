@@ -33,7 +33,6 @@ export const myProjectsTemplate = async (data) => {
                                     <th>Last modified by</th>
                                     <th>Last modified at</th>
                                     <th>Latest version id</th>
-                                    <th>API</th>
                                     <th>Older versions</th>
                                 </tr>
                             </thead>
@@ -46,7 +45,6 @@ export const myProjectsTemplate = async (data) => {
                                     <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
                                     <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
                                     <td>${fileInfo.file_version.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
-                                    <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${obj.id}" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
                                     <td><a data-toggle="modal" data-target="#modalFileVersions" href="#" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
                                 </tr>
                             </tbody>
