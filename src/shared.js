@@ -3,121 +3,151 @@ import { variables } from "./variables.js";
 import { logOut } from "./manageAuthentication/index.js";
 
 export const getFolderItems = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        })
+        if(r.status === 401){
+            if((await refreshToken()) === true) return await getFolderItems(id);
         }
-    })
-    if(r.status === 401){
+        else if(r.status === 200){
+            return r.json()
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFolderItems(id);
-    }
-    else if(r.status === 200){
-        return r.json()
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 }
 
 export const getFolderInfo = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = await fetch('https://api.box.com/2.0/folders/'+id,{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch('https://api.box.com/2.0/folders/'+id,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        })
+        if(r.status === 401){
+            if((await refreshToken()) === true) return await getFolderInfo(id);
         }
-    })
-    if(r.status === 401){
+        else if(r.status === 200){
+            return r.json()
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFolderInfo(id);
-    }
-    else if(r.status === 200){
-        return r.json()
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 }
 
 export const getFile = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        if(r.status === 401) {
+            if((await refreshToken()) === true) return await getFile(id);
         }
-    });
-    if(r.status === 401) {
+        else if(r.status === 200) {
+            return r.text();
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFile(id);
-    }
-    else if(r.status === 200) {
-        return r.text();
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 };
 
 export const getFileJSON = async (id, access_token) => {
-    let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+    try{
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
         }
-    });
-    if(r.status === 401){
+        });
+        if(r.status === 401){
+            if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
+        }
+        else if(r.status === 200){
+            return r.json()
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
-    }
-    else if(r.status === 200){
-        return r.json()
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 };
 
 export const getFileInfo = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = await fetch('https://api.box.com/2.0/files/'+id,{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch('https://api.box.com/2.0/files/'+id,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        })
+        if(r.status === 401){
+            if((await refreshToken()) === true) return await getFileInfo(id);
         }
-    })
-    if(r.status === 401){
+        else if(r.status === 200){
+            return r.json()
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFileInfo(id);
-    }
-    else if(r.status === 200){
-        return r.json()
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 }
 
 export const getFileVersions = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let r = await fetch(`https://api.box.com/2.0/files/${id}/versions`,{
-        method:'GET',
-        headers:{
-            Authorization:"Bearer "+access_token
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/versions`,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        })
+        if(r.status === 401){
+            if((await refreshToken()) === true) return await getFileVersions(id);
         }
-    })
-    if(r.status === 401){
+        else if(r.status === 200){
+            return r.json()
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getFileVersions(id);
-    }
-    else if(r.status === 200){
-        return r.json()
-    }
-    else{
-        hideAnimation();
-        console.error(r);
     }
 }
 
@@ -211,279 +241,344 @@ export const downloadFileTxt = async (fileId, fileName) => {
 };
 
 export const createFolder = async (folderId, folderName) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let obj = {
-        "name": folderName,
-        "parent": {
-            "id": folderId
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let obj = {
+            "name": folderName,
+            "parent": {
+                "id": folderId
+            }
+        };
+        let response = await fetch("https://api.box.com/2.0/folders", {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: JSON.stringify(obj)
+        });
+        if(response.state === 401){
+            if((await refreshToken()) === true) return await createFolder(folderId, foldername);
         }
-    };
-    let response = await fetch("https://api.box.com/2.0/folders", {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+access_token
-        },
-        body: JSON.stringify(obj)
-    });
-    if(response.state === 401){
+        else if(response.status === 201){
+            return response;
+        }
+        else{
+            return {status: response.status, statusText: response.statusText};
+        };
+    }
+    catch {
         if((await refreshToken()) === true) return await createFolder(folderId, foldername);
     }
-    else if(response.status === 201){
-        return response;
-    }
-    else{
-        return {status: response.status, statusText: response.statusText};
-    };
 };
 
 export const copyFile = async (fileId, parentId) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let obj = {
-        "parent": {
-            "id": parentId
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let obj = {
+            "parent": {
+                "id": parentId
+            }
+        };
+        let response = await fetch(`https://api.box.com/2.0/files/${fileId}/copy`, {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: JSON.stringify(obj)
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await copyFile(fileId, parentId);
         }
-    };
-    let response = await fetch(`https://api.box.com/2.0/files/${fileId}/copy`, {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+access_token
-        },
-        body: JSON.stringify(obj)
-    });
-    if(response.status === 401){
+        else if(response.status === 201){
+            return response;
+        }
+        else{
+            return {status: response.status, statusText: response.statusText};
+        };
+    }
+    catch {
         if((await refreshToken()) === true) return await copyFile(fileId, parentId);
     }
-    else if(response.status === 201){
-        return response;
-    }
-    else{
-        return {status: response.status, statusText: response.statusText};
-    };
 };
 
 export const uploadFileBox = async (folderId, fileName, file) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const form = new FormData();
-    form.append('file', file);
-    form.append('name', fileName);
-    form.append('parent_id', folderId);
-
-    let response = await fetch("https://upload.box.com/api/2.0/files/content", {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+access_token
-        },
-        body: form,
-        contentType: false
-    });
-    if(response.status === 401){
-        if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file)
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const form = new FormData();
+        form.append('file', file);
+        form.append('name', fileName);
+        form.append('parent_id', folderId);
+    
+        let response = await fetch("https://upload.box.com/api/2.0/files/content", {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: form,
+            contentType: false
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file);
+        }
+        else if(response.status === 201){
+            return response.json();
+        }
+        else{
+            return {status: response.status, statusText: response.statusText};
+        };
     }
-    else if(response.status === 201){
-        return response.json();
+    catch {
+        if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file);
     }
-    else{
-        return {status: response.status, statusText: response.statusText};
-    };
 };
 
 export const uploadFile = async (data, fileName, folderId) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const form = new FormData();
-    const blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
-    form.append('file', blobData);
-    form.append('attributes', `{"name": "${fileName}", "parent": {"id": "${folderId}"}}`);
-
-    let response = await fetch("https://upload.box.com/api/2.0/files/content", {
-        method: "POST",
-        headers:{
-            Authorization:"Bearer "+access_token
-        },
-        body: form,
-        contentType: false
-    });
-    if(response.status === 401){
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const form = new FormData();
+        const blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
+        form.append('file', blobData);
+        form.append('attributes', `{"name": "${fileName}", "parent": {"id": "${folderId}"}}`);
+    
+        let response = await fetch("https://upload.box.com/api/2.0/files/content", {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: form,
+            contentType: false
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
+        }
+        else if(response.status === 201){
+            return response.json();
+        }
+        else{
+            return {status: response.status, statusText: response.statusText};
+        };
+    }
+    catch {
         if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
     }
-    else if(response.status === 201){
-        return response.json();
-    }
-    else{
-        return {status: response.status, statusText: response.statusText};
-    };
 }
 
 export const getCollaboration = async (id, type) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/2.0/${type}/${id}/collaborations`, {
-        headers:{
-            Authorization:"Bearer "+access_token
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/${type}/${id}/collaborations`, {
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await getCollaboration(id, type);
         }
-    });
-    if(response.status === 401){
+        if(response.status === 200){
+            return response.json();
+        }
+        else{
+            return null;
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getCollaboration(id, type);
-    }
-    if(response.status === 200){
-        return response.json();
-    }
-    else{
-        return null;
     }
 }
 
 export const getCurrentUser = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/2.0/users/me`, {
-        headers: {
-            Authorization: "Bearer "+access_token
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/users/me`, {
+            headers: {
+                Authorization: "Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await getCurrentUser();
         }
-    });
-    if(response.status === 401){
+        if(response.status === 200){
+            return response.json();
+        }
+        else{
+            return null;
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getCurrentUser();
-    }
-    if(response.status === 200){
-        return response.json();
-    }
-    else{
-        return null;
     }
 }
 
 export const addNewCollaborator = async (id, type, login, role) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const obj = {
-        item: {
-            type: type,
-            id: id
-        },
-        accessible_by: {
-            type: "user",
-            login: login
-        },
-        role: role
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const obj = {
+            item: {
+                type: type,
+                id: id
+            },
+            accessible_by: {
+                type: "user",
+                login: login
+            },
+            role: role
+        }
+        const response = await fetch(`https://api.box.com/2.0/collaborations`, {
+            method: 'POST',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify(obj)
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await addNewCollaborator(id, type, login, role);
+        }
+        else {
+            return response;
+        }
     }
-    const response = await fetch(`https://api.box.com/2.0/collaborations`, {
-        method: 'POST',
-        headers: {
-            Authorization: "Bearer "+access_token
-        },
-        body: JSON.stringify(obj)
-    });
-    if(response.status === 401){
+    catch {
         if((await refreshToken()) === true) return await addNewCollaborator(id, type, login, role);
-    }
-    else {
-        return response;
     }
 }
 
 export const removeBoxCollaborator = async (id) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: "Bearer "+access_token
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: "Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return removeBoxCollaborator(id);
         }
-    });
-    if(response.status === 401){
-        if((await refreshToken()) === true) return removeBoxCollaborator(id);
+        else{
+            return response;
+        }
     }
-    else{
-        return response;
+    catch {
+        if((await refreshToken()) === true) return removeBoxCollaborator(id);
     }
 }
 
 export const updateBoxCollaborator = async (id, role) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
-        method: 'PUT',
-        headers: {
-            Authorization: "Bearer "+access_token
-        },
-        body: JSON.stringify({role: role})
-    });
-    if(response.status === 401){
-        if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify({role: role})
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
+        }
+        else {
+            return response;
+        }
     }
-    else {
-        return response;
+    catch {
+        if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
     }
 }
 
 export const revokeAccessToken = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/oauth2/revoke`, {
-        method: 'POST',
-        headers: {
-            Authorization: "Bearer "+access_token
-        },
-        body: JSON.stringify({token: access_token})
-    });
-    if(response.status === 401){
-        if((await refreshToken()) === true) return await revokeAccessToken();
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/oauth2/revoke`, {
+            method: 'POST',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify({token: access_token})
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await revokeAccessToken();
+        }
+        else{
+            return response;
+        }
     }
-    else{
-        return response;
+    catch {
+        if((await refreshToken()) === true) return await revokeAccessToken();
     }
 }
 
 export const getAllWebHooks = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const response = await fetch(`https://api.box.com/2.0/webhooks`, {
-        method: 'GET',
-        headers: {
-            Authorization: "Bearer "+access_token
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/webhooks`, {
+            method: 'GET',
+            headers: {
+                Authorization: "Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await getAllWebHooks();
         }
-    });
-    if(response.status === 401){
+        else{
+            return response;
+        }
+    }
+    catch {
         if((await refreshToken()) === true) return await getAllWebHooks();
-    }
-    else{
-        return response;
-    }
+    }    
 }
 
 export const createWebHook = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const obj = {
-        address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
-        target: {id: '90879959998', type: "folder"}, 
-        triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const obj = {
+            address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
+            target: {id: '90879959998', type: "folder"}, 
+            triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+        }
+        const response = await fetch(`https://api.box.com/2.0/webhooks`, {
+            method: 'POST',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify(obj)
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await createWebHook();
+        }
+        else{
+            return response;
+        }
     }
-    const response = await fetch(`https://api.box.com/2.0/webhooks`, {
-        method: 'POST',
-        headers: {
-            Authorization: "Bearer "+access_token
-        },
-        body: JSON.stringify(obj)
-    });
-    if(response.status === 401){
+    catch {
         if((await refreshToken()) === true) return await createWebHook();
-    }
-    else{
-        return response;
     }
 }
 
 export const updateWebHook = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    const obj = {
-        address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
-        target: {id: '90879959998', type: "folder"}, 
-        triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const obj = {
+            address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
+            target: {id: '90879959998', type: "folder"}, 
+            triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
+        }
+        const response = await fetch(`https://api.box.com/2.0/webhooks/249492740`, {
+            method: 'PUT',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify(obj)
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await updateWebHook();
+        }
+        else{
+            return response;
+        }
     }
-    const response = await fetch(`https://api.box.com/2.0/webhooks/249492740`, {
-        method: 'PUT',
-        headers: {
-            Authorization: "Bearer "+access_token
-        },
-        body: JSON.stringify(obj)
-    });
-    if(response.status === 401){
+    catch {
         if((await refreshToken()) === true) return await updateWebHook();
-    }
-    else{
-        return response;
     }
 }
 
@@ -756,7 +851,7 @@ export const inactivityTime = () => {
         time = setTimeout(() => {
             const r = confirm('You were inactive for more than 20 minutes, would you like to extend your session?');
             if(r) {
-    
+                
             }
             else {
                 logOut();
