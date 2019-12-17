@@ -22,7 +22,7 @@ export const dataAnalysisTemplate = () => {
                             <li>Client Secret: <strong>gSKdYKLd65aQpZGrq9x4QVUNnn5C8qqm</strong></li>
                         </ul></li>
                         <li>Copy the file ID from <strong>My Projects</strong> tab</li>
-                        <li>x = box_read(<file ID from above step>)</li>
+                        <li>x = box_read(<strong>"file ID from previous step"</strong>)</li>
                         <li>Run analysis on the file</li>
                         <li>hist(x$bYear)</li>
                     </ol>
