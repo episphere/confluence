@@ -829,7 +829,8 @@ const addEventcreateProjectForm = () => {
                             const response = await addNewCollaborator(parent.id, 'folder', login, role.value.toLowerCase());
                             top = top+2;
                             if(response.status === 200 || response.status === 201) {
-                                template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${projectName} as ${role.value} successfully!`)
+                                template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${projectName} as ${role.value} successfully!`);
+                                dataGovernanceProjects();
                             }else{
                                 template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not add ${login} to ${projectName} as ${role.value}, <span class="errorMsg">${(await response.json()).message}</span>!!`);
                             }

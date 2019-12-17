@@ -52,7 +52,7 @@ export const dataGovernanceProjects = async () => {
                 </a> ${projectName}
             </li>
             `;
-            if(obj === 0 ) template += `</ul>${shareFolderModal()}</div>`
+            if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}</div>`
         }
     }
     div.innerHTML = template;
