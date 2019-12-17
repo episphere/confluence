@@ -7,6 +7,7 @@ import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser, inactivityTime } from './src/shared.js';
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn } from './src/event.js';
+import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 
 const confluence = async () => {
     const hash = decodeURIComponent(window.location.hash);
@@ -72,7 +73,7 @@ const confluence = async () => {
             if(dataAnalysisElement.classList.contains('navbar-active')) return;
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataAnalysisElement.classList.add('navbar-active');
-            confluenceDiv.innerHTML = dataRequestTemplate();
+            confluenceDiv.innerHTML = dataAnalysisTemplate();
         });
         dataSummaryElement.click();
     }

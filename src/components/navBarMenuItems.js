@@ -10,13 +10,11 @@ const template = () => {
         </div>
         <div id="governanceNav"></div>
         <div id="myProjectsNav"></div>
-        
-        <div class="nav-item  pages-coming-soon grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Request" id="dataRequest"><i class="fas fa-database"></i> Data Request</a>
-        </div>
-        
-        <div class="nav-item  pages-coming-soon grid-elements">
+        <div class="nav-item grid-elements">
             <a class="nav-link nav-menu-links" href="#" title="Data Analysis" id="dataAnalysis"><i class="fas fa-database"></i> Data Analysis</a>
+        </div>
+        <div class="nav-item pages-coming-soon grid-elements">
+            <a class="nav-link nav-menu-links" href="#" title="Data Request" id="dataRequest"><i class="fas fa-database"></i> Data Request</a>
         </div>
         
         <div class="navbar-nav ml-auto">
