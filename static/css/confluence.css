@@ -560,6 +560,10 @@ label {
     margin-left: 0.25rem;
 }
 
+.required {
+    color: red;
+}
+
 .filter-btn:hover {
     cursor: default;
 }

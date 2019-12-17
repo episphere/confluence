@@ -269,11 +269,11 @@ export const addEventStudyRadioBtn = () => {
                     const selectConsortiaUIS = document.getElementById('selectConsortiaUIS');
                     studyFormElements.innerHTML = `
                         <div class="form-group">
-                            <label for="selectStudyUIS">Select study</label>
+                            <label for="selectStudyUIS">Select study</label> <span class="required">*</span>
                             <select class="form-control" id="selectStudyUIS" name="selectedStudy" required></select>
                         </div>
                         <div class="form-group">
-                            <label for="uploadDataUIS">Upload data</label>
+                            <label for="uploadDataUIS">Upload data</label> <span class="required">*</span>
                             <input type="file" class="form-control-file" id="uploadDataUIS" name="dataFile" required>
                         </div>
                     `;
@@ -283,11 +283,11 @@ export const addEventStudyRadioBtn = () => {
                     const studyFormElements = document.getElementById('studyFormElements');
                     studyFormElements.innerHTML = `
                         <div class="form-group">
-                            <label for="newStudyName">Study Name</label>
+                            <label for="newStudyName">Study Name</label> <span class="required">*</span>
                             <input type="text" id="newStudyName" autocomplete="off" required class="form-control" placeholder="Enter study name">
                         </div>
                         <div class="form-group">
-                            <label for="uploadDataUIS">Upload data</label>
+                            <label for="uploadDataUIS">Upload data</label> <span class="required">*</span>
                             <input type="file" class="form-control-file" id="uploadDataUIS" name="dataFile" required>
                         </div>
                     `;
@@ -772,7 +772,7 @@ const addEventCreateProjectBtn = () => {
         const body = document.getElementById('createProjectModalBody');
         body.innerHTML = `
         <form id="createProjectForm" method="POST">
-            <label><strong>Project Name</strong>
+            <label><strong>Project Name</strong> <span class="required">*</span>
                 <div class="form-group">
                     <input type="text" class="form-control" id="newProjectName" placeholder="Enter project name" required>
                 </div>
@@ -784,7 +784,7 @@ const addEventCreateProjectBtn = () => {
             <div class="form-group" id="fileSelection"></div>
 
             <div class="form-group">
-                <strong>Add Collaborators</strong>
+                <strong>Add collaborator(s)</strong> <span class="required">*</span>
                 <div class="row" id="collaboratorEmails">
                     ${addFields(1, true)}
                 </div>
@@ -863,7 +863,7 @@ const addEventCPCSelect = () => {
         const array = filterStudies(response.entries);
         if(array.length === 0) return '';
         let template = '';
-        template += '<strong>Select study</strong><select id="CPSSelect" class="form-control" required>'
+        template += '<strong>Select study</strong> <span class="required">*</span><select id="CPSSelect" class="form-control" required>'
         array.forEach((obj, index) => {
             if(index === 0) template += '<option value=""> -- Select study -- </option>'
             template += `<option value="${obj.id}">${obj.name}</option>`;
@@ -887,7 +887,7 @@ const addEventCPSSelect = () => {
         const array = filterDataTypes(response.entries);
         if(array.length === 0) return '';
         let template = '';
-        template += '<strong>Select data type</strong><select id="CPDTSelect" class="form-control" required>'
+        template += '<strong>Select data type</strong> <span class="required">*</span><select id="CPDTSelect" class="form-control" required>'
         array.forEach((obj, index) => {
             if(index === 0) template += '<option value=""> -- Select data type -- </option>'
             template += `<option value="${obj.id}">${obj.name}</option>`;
@@ -910,7 +910,7 @@ const addEventCPDTSelect = () => {
         const array = filterFiles(response.entries);
         if(array.length === 0) return '';
         let template = '';
-        template += '<strong>Select file</strong><select id="CPFSelect" class="form-control" required>'
+        template += '<strong>Select file</strong> <span class="required">*</span><select id="CPFSelect" class="form-control" required>'
         array.forEach((obj, index) => {
             if(index === 0) template += '<option value=""> -- Select file -- </option>'
             template += `<option value="${obj.id}">${obj.name}</option>`;

@@ -13,14 +13,14 @@ export const uploadInStudy = async (id) => {
                 <form id="uploadStudyForm" method="POST">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="selectConsortiaUIS">Select consortia</label>
+                            <label for="selectConsortiaUIS">Select consortia</label> <span class="required">*</span>
                             <select class="form-control" name="selectedConsortia" id="selectConsortiaUIS" required>
                                 <option value="">-- Select consortia --</option>
                                 ${await createConsortiaOptions()}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Create new study? 
+                            <label>Create new study? <span class="required">*</span>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
                                         <input class="form-check-input" type="radio" required name="createStudyRadio" value="yes">Yes

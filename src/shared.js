@@ -794,7 +794,7 @@ export const consortiumSelection = async () => {
     let array = await getValidConsortium();
     
     if(array.length === 0) return '';
-    template += '<strong>Select consortium</strong><select id="CPCSelect" class="form-control" required>'
+    template += '<strong>Select consortium</strong> <span class="required">*</span><select id="CPCSelect" class="form-control" required>'
     for(let obj = 0; obj < array.length; obj++){
         const bool = checkMyPermissionLevel(await getCollaboration(array[obj].id, `${array[obj].type}s`), JSON.parse(localStorage.parms).login);
         if(bool === true){
