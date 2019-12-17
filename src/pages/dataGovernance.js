@@ -35,29 +35,26 @@ export const dataGovernanceProjects = async () => {
     const response = await getFolderItems(0);
     const projectArray = filterProjects(response.entries);
     const div = document.getElementById('dataGovernanceProjects');
-    let template = `
-        <h4 class="h4-heading">Project(s)</h4>
-    `;
+    let template = '';
     
-    template += '<div class="data-governance"><ul class="ul-list-style first-list-item">';
-
-    for(let obj of projectArray){
-        const bool = checkMyPermissionLevel(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+    for(let obj = 0; obj < projectArray.length; obj++){
+        const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
         if(bool) {
-            const projectName = obj.name;
-            let type = obj.type;
+            if(obj === 0) template += '<h4 class="h4-heading">Project(s)</h4><div class="data-governance"><ul class="ul-list-style first-list-item">';
+            const projectName = projectArray[obj].name;
+            let type = projectArray[obj].type;
             let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             template += `
             <li>
                 <a class="${liClass}" href="#">
-                    <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+                    <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                 </a> ${projectName}
             </li>
             `;
+            if(obj === 0 ) template += `</ul>${shareFolderModal()}</div>`
         }
     }
-    template += `</ul>${shareFolderModal()}</div>`
     div.innerHTML = template;
     dataGovernanceLazyLoad();
 }
