@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, shareData, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -14,7 +14,6 @@ export const addEventStudiesCheckBox = (dataObject, folderId) => {
             clearGraphAndParameters();
             const selectedValues = getAllSelectedStudies();
             if(selectedValues.length > 0){
-                showAnimation();
                 disableCheckBox(true);
                 countSpecificData(selectedValues, dataObject[folderId].studyEntries);
             }
@@ -55,7 +54,6 @@ const triggerEventStudies = (studyEntries) => {
     }
     else{
         clearGraphAndParameters();
-        showAnimation();
         disableCheckBox(true);
         let dataCount = 0;
         studyIds.forEach(id => {
@@ -121,7 +119,6 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
 
             if(element.checked){
                 values.push(value);
-                showAnimation();
                 disableCheckBox(true);
                 clearGraphAndParameters();
                 // getData(studyEntries, studyIds, values);
@@ -129,7 +126,6 @@ export const addEventDataTypeCheckBox = (studyEntries) => {
             else{
                 values.splice(values.indexOf(value), 1);
                 if(checkBoxchecker(dataTypeCheckBox) === true) {
-                    showAnimation();
                     disableCheckBox(true);
                     clearGraphAndParameters();
                     // getData(studyEntries, studyIds, values);
@@ -199,7 +195,6 @@ const dispatchEventDataTypeSelectAll = (studyEntries) => {
     }
     else{
         clearGraphAndParameters();
-        showAnimation();
         disableCheckBox(true);
         // getData(studyEntries, studyIds, values, null);
     }
@@ -700,6 +695,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
     const dataGovernanceElement = document.getElementById('dataGovernance');
     dataGovernanceElement.addEventListener('click', async () => {
         if(dataGovernanceElement.classList.contains('navbar-active')) return;
+        showAnimation();
         removeActiveClass('nav-menu-links', 'navbar-active');
         dataGovernanceElement.classList.add('navbar-active');
         const confluenceDiv = document.getElementById('confluenceDiv');
@@ -722,6 +718,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const div1 = document.createElement('div');
             div1.classList = ['col-md-6 align-left'];
             div1.innerHTML = await dataGovernanceTemplate();
+            hideAnimation();
             divRow.appendChild(div1);
     
             const div2 = document.createElement('div');
@@ -753,7 +750,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const div = document.createElement('div');
             div.classList = ['align-left'];
             div.innerHTML = await dataGovernanceTemplate();
-
+            hideAnimation();
             confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(div);
@@ -921,15 +918,16 @@ const addEventCPDTSelect = () => {
     });
 }
 
-export const addEventMyProjects = (data) => {
+export const addEventMyProjects = () => {
     const myProjects = document.getElementById('myProjects');
     myProjects.addEventListener('click', async () => {
         if(myProjects.classList.contains('navbar-active')) return;
+        showAnimation();
         removeActiveClass('nav-menu-links', 'navbar-active');
         myProjects.classList.add('navbar-active');
         const confluenceDiv = document.getElementById('confluenceDiv');
         confluenceDiv.innerHTML = await myProjectsTemplate();
-
+        hideAnimation();
         const elements = document.getElementsByClassName('getAllFileversions');
         Array.from(elements).forEach(element => {
             element.addEventListener('click', async () => {

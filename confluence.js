@@ -5,18 +5,11 @@ import { template as dataSummary, getSummary } from './src/pages/dataExploration
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser, inactivityTime } from './src/shared.js';
-import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn } from './src/event.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
+import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 
 const confluence = async () => {
-    const hash = decodeURIComponent(window.location.hash);
-    const index = hash.indexOf('?');
-    const parameters = index !== -1 ? getparameters(hash.slice(index+1, hash.length)) : {};
-    if(parameters.consortiaId){
-        localStorage.boxFolderId = JSON.stringify({folderId : parameters.consortiaId});
-    }
-    
     let confluenceDiv = document.getElementById('confluenceDiv');
     let confluenceLogoElement = document.getElementById('confluenceLogo');
     let navBarOptions = document.getElementById('navBarOptions');
@@ -45,6 +38,7 @@ const confluence = async () => {
 
         dataSubmissionElement.addEventListener('click', async () => {
             if(dataSubmissionElement.classList.contains('navbar-active')) return;
+            showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = await dataSubmissionTemplate();
@@ -52,30 +46,79 @@ const confluence = async () => {
             addEventStudyRadioBtn();
             addEventConsortiaSelect();
             addEventUploadStudyForm();
+            hideAnimation();
         });
         dataSummaryElement.addEventListener('click', () => {
             if(dataSummaryElement.classList.contains('navbar-active')) return;
+            showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary();
             getSummary();
-            showAnimation();
-            
         });
         dataRequestElement.addEventListener('click', () => {
             if(dataRequestElement.classList.contains('navbar-active')) return;
+            showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataRequestElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataRequestTemplate();
+            hideAnimation();
         });
         
         dataAnalysisElement.addEventListener('click', () => {
             if(dataAnalysisElement.classList.contains('navbar-active')) return;
+            showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataAnalysisElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataAnalysisTemplate();
+            hideAnimation();
         });
-        dataSummaryElement.click();
+
+        const folders = await getFolderItems(0);
+        const array = filterConsortiums(folders.entries);
+        const projectArray = filterProjects(folders.entries);
+        let showProjects = false;
+        for(let obj of projectArray){
+            if(showProjects === false) {
+                const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+                if(bool === true) showProjects = true;
+            }
+        }
+        if(array.length > 0 && projectArray.length > 0 && showProjects === true){
+            document.getElementById('governanceNav').innerHTML = `
+                
+                <div class="nav-item  grid-elements">
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                </div>
+            `;
+            document.getElementById('myProjectsNav').innerHTML = `
+                
+                <div class="nav-item  grid-elements">
+                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                </div>
+            `;
+            addEventDataGovernanceNavBar(true);
+            addEventMyProjects(projectArray);
+        }
+        else if(array.length > 0) {
+            document.getElementById('governanceNav').innerHTML = `
+                
+                <div class="nav-item  grid-elements">
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                </div>
+            `;
+            addEventDataGovernanceNavBar(true);
+        }
+        else if(projectArray.length > 0 && showProjects === true){
+            document.getElementById('myProjectsNav').innerHTML = `
+                
+                <div class="nav-item  grid-elements">
+                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                </div>
+            `;
+            addEventMyProjects(projectArray);
+        }
+        manageHash();
     }
     if(localStorage.parms === undefined){
         confluenceDiv.innerHTML = homePage();
@@ -86,6 +129,53 @@ const confluence = async () => {
     }
 }
 
+const manageHash = () => {
+    const hash = decodeURIComponent(window.location.hash);
+    if(hash === '' || hash === '#' || hash === '#data_exploration') {
+        const element = document.getElementById('dataSummary');
+        if(element.classList.contains('navbar-active')) return;
+        showAnimation();
+        element.click();
+    }
+    else if (hash === '#data_analysis') {
+        const element = document.getElementById('dataAnalysis');
+        if(element.classList.contains('navbar-active')) return;
+        showAnimation();
+        element.click();
+    }
+    else if (hash === '#data_request') {
+        const element = document.getElementById('dataRequest');
+        if(element.classList.contains('navbar-active')) return;
+        showAnimation();
+        element.click();
+    }
+    else if (hash === '#data_submission') {
+        const element = document.getElementById('dataSubmission');
+        if(element.classList.contains('navbar-active')) return;
+        showAnimation();
+        element.click();
+    }
+    else if (hash === '#data_governance') {
+        const element = document.getElementById('dataGovernance');
+        if (element) {
+            if(element.classList.contains('navbar-active')) return;
+            showAnimation();
+            element.click();
+        }
+        else window.location.hash = '#';
+    }
+    else if (hash === '#my_projects') {
+        const element = document.getElementById('myProjects');
+        if (element) {
+            if(element.classList.contains('navbar-active')) return;
+            showAnimation();
+            element.click();
+        }
+        else window.location.hash = '#';
+    }
+    else window.location.hash = '#';
+}
+
 window.onload = async () => {
     confluenceDiv.innerHTML = "";
     if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
@@ -93,4 +183,8 @@ window.onload = async () => {
         inactivityTime();
     }
     confluence();
+}
+
+window.onhashchange = () => {
+    manageHash();
 }

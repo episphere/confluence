@@ -2,19 +2,19 @@ const template = () => {
     return `
         
         <div class="nav-item  grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Exploration" id="dataSummary"><i class="fas fa-chart-bar"></i> Data Exploration</a>
+            <a class="nav-link nav-menu-links" href="#data_exploration" title="Data Exploration" id="dataSummary"><i class="fas fa-chart-bar"></i> Data Exploration</a>
         </div>
         
         <div class="nav-item  grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Submission" id="dataSubmission"><i class="fas fa-upload"></i> Data Submission</a>
+            <a class="nav-link nav-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"><i class="fas fa-upload"></i> Data Submission</a>
         </div>
         <div id="governanceNav"></div>
         <div id="myProjectsNav"></div>
         <div class="nav-item grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Analysis" id="dataAnalysis"><i class="fas fa-database"></i> Data Analysis</a>
+            <a class="nav-link nav-menu-links" href="#data_analysis" title="Data Analysis" id="dataAnalysis"><i class="fas fa-database"></i> Data Analysis</a>
         </div>
         <div class="nav-item pages-coming-soon grid-elements">
-            <a class="nav-link nav-menu-links" href="#" title="Data Request" id="dataRequest"><i class="fas fa-database"></i> Data Request</a>
+            <a class="nav-link nav-menu-links" href="#data_request" title="Data Request" id="dataRequest"><i class="fas fa-database"></i> Data Request</a>
         </div>
         
         <div class="navbar-nav ml-auto">

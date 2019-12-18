@@ -56,6 +56,7 @@ export const getData = (studyEntries, studyIds, values) => {
 export const getFileContent = async (allIds) => {
     // const jsonData = await convertTextToJson(allIds);
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
+    hideAnimation();
     if(!jsonData) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please ask NCI for the access.`
         return;
@@ -85,7 +86,6 @@ export const getFileContent = async (allIds) => {
     renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     // document.getElementById('chartInteractionMsg').innerHTML = `<i class="fas fa-info-circle"></i> Click on chart(s) for interaction!`;
     // setTimeout(() => document.getElementById('chartInteractionMsg').innerHTML = ``, 5000);
-    hideAnimation();
 };
 
 export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {

@@ -23,7 +23,6 @@ export const template = async () => {
             <a class="${liClass}" href="#">
                 <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
             </a> ${consortiaName}
-            
         </li>
         `
     }
@@ -36,25 +35,34 @@ export const dataGovernanceProjects = async () => {
     const projectArray = filterProjects(response.entries);
     const div = document.getElementById('dataGovernanceProjects');
     let template = '';
-    
+    let checker = false;
     for(let obj = 0; obj < projectArray.length; obj++){
-        const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
-        if(bool) {
+        if(checker === false) {
+            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
+            if(bool === true) checker = true;
+        }
+    }
+    if(checker === true) {
+        for(let obj = 0; obj < projectArray.length; obj++){
+            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
             if(obj === 0) template += '<h4 class="h4-heading">Project(s)</h4><div class="data-governance"><ul class="ul-list-style first-list-item">';
-            const projectName = projectArray[obj].name;
-            let type = projectArray[obj].type;
-            let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-            let title = type === 'folder' ? 'Expand / Collapse' : '';
-            template += `
-            <li>
-                <a class="${liClass}" href="#">
-                    <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
-                </a> ${projectName}
-            </li>
-            `;
+            if(bool === true) {
+                const projectName = projectArray[obj].name;
+                let type = projectArray[obj].type;
+                let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
+                let title = type === 'folder' ? 'Expand / Collapse' : '';
+                template += `
+                <li>
+                    <a class="${liClass}" href="#">
+                        <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+                    </a> ${projectName}
+                </li>
+                `;
+            }
             if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}</div>`
         }
     }
+    
     div.innerHTML = template;
     dataGovernanceLazyLoad();
 }

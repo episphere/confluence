@@ -261,7 +261,7 @@ export const createFolder = async (folderId, folderName) => {
             },
             body: JSON.stringify(obj)
         });
-        if(response.state === 401){
+        if(response.status === 401){
             if((await refreshToken()) === true) return await createFolder(folderId, foldername);
         }
         else if(response.status === 201){
@@ -686,11 +686,11 @@ export const sessionExpired = () => {
 }
 
 export const showAnimation = () => {
-    document.getElementById('loadingAnimation').hidden = false;
+    document.getElementById('loadingAnimation').style.display = '';
 }
 
 export const hideAnimation = () => {
-    document.getElementById('loadingAnimation').hidden = true;
+    document.getElementById('loadingAnimation').style.display = 'none';
 }
 
 export const showError = (errorMessage) => {
@@ -881,3 +881,7 @@ export const inactivityTime = () => {
     document.onmousemove = resetTimer;
     document.onkeypress = resetTimer;
 };
+
+export const canCreateProject = () => {
+    
+}
