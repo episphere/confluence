@@ -25,12 +25,12 @@ const template = () => {
                         <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
                     </a>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item nav-link nav-menu-links" href="#" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                        <a class="dropdown-item nav-link nav-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                     </div>
                 </div>
             ` : `
                 <div class="nav-item grid-elements">
-                    <a class="nav-link nav-menu-links" href="#" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    <a class="nav-link nav-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                 </div>
             `}
             

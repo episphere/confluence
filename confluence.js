@@ -173,6 +173,10 @@ const manageHash = () => {
         }
         else window.location.hash = '#';
     }
+    else if (hash === '#logout'){
+        const element = document.getElementById('logOutBtn');
+        element.click();
+    }
     else window.location.hash = '#';
 }
 

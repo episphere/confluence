@@ -195,7 +195,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
             },
             function(p){return 0}
         )
-        pieChart.innerRadius(80)
+        pieChart.innerRadius(70)
             .dimension(data)
             .group(G_status2)
             .externalRadiusPadding(10)
