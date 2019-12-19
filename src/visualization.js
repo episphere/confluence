@@ -58,7 +58,7 @@ export const getFileContent = async (allIds) => {
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
     hideAnimation();
     if(!jsonData) {
-        document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please ask NCI for the access.`
+        document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
     const cf = getCrossFilter(jsonData);
@@ -176,70 +176,49 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
     // });
     let data_reduce = valUnique(parameter, 0, jsonData);
 
-    // If there are less then 10 unique value render pie chart else render bar chart
-    if(Object.keys(data_reduce).length < 10){
-        // document.getElementById('showPieChart').childNodes[0].checked = false;
-        // document.getElementById('showPieChart').style.display = 'none';
-        document.getElementById(id).innerHTML = '';
-        let pieChart = dc.pieChart(`#${id}`);
-        let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
-        
-        let G_status2 = data.group().reduce(
-            function(p,v){
-                data_reduce[v[parameter]] += 1
-                return data_reduce[v[parameter]]
-            },
-            function(p,v){
-                data_reduce[v[parameter]] -= 1
-                return data_reduce[v[parameter]]
-            },
-            function(p){return 0}
-        )
-        pieChart.innerRadius(70)
-            .dimension(data)
-            .group(G_status2)
-            .externalRadiusPadding(10)
-            .label(function(c){
-                return `${c.key} (${c.value})`
-            });
-
-        pieChart.render();
-        pieChart.on('filtered', function(chart) {
-            const filters = chart.filters();
-            if(filters.length) {
-                let selection = '';
-                filters.forEach((dt) => {
-                    selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
-                });
-                document.getElementById(rangeLabelID).innerHTML = selection;
-                // const filterBtn = document.getElementsByClassName('filter-btn');
-                // Array.from(filterBtn).forEach(btn => {
-                //     btn.addEventListener('click', () => {
-                //         chart.filter(null);
-                //     })
-                // });
-            }else{
-                document.getElementById(rangeLabelID).innerHTML = ``;
-            }
+    document.getElementById(id).innerHTML = '';
+    let pieChart = dc.pieChart(`#${id}`);
+    let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
+    
+    let G_status2 = data.group().reduce(
+        function(p,v){
+            data_reduce[v[parameter]] += 1
+            return data_reduce[v[parameter]]
+        },
+        function(p,v){
+            data_reduce[v[parameter]] -= 1
+            return data_reduce[v[parameter]]
+        },
+        function(p){return 0}
+    )
+    pieChart
+        .dimension(data)
+        .group(G_status2)
+        .externalRadiusPadding(10)
+        .label(function(c){
+            return `${c.key} (${c.value})`
         });
-    }
-    else{
-        // document.getElementById('showPieChart').style.display = 'block';
-        document.getElementById('dataSummaryVizChart2').innerHTML = '';
-        const { min, max } = getMinMax(jsonData, parameter);
-        let barChart = dc.barChart('#dataSummaryVizChart2');
-        let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : "";});
-        let ageCount = age.group().reduceCount();
-        barChart.dimension(age)
-            .group(ageCount)
-            .x(d3.scaleLinear().domain([min, max]))
-            .xAxisLabel(parameter)
-            .yAxisLabel(function(){
-                return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
-            })
-            .elasticY(true);
-        barChart.render();
-    };
+
+    if(parameter !== 'study') pieChart.innerRadius(70);
+    pieChart.render();
+    pieChart.on('filtered', function(chart) {
+        const filters = chart.filters();
+        if(filters.length) {
+            let selection = '';
+            filters.forEach((dt) => {
+                selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
+            });
+            document.getElementById(rangeLabelID).innerHTML = selection;
+            // const filterBtn = document.getElementsByClassName('filter-btn');
+            // Array.from(filterBtn).forEach(btn => {
+            //     btn.addEventListener('click', () => {
+            //         chart.filter(null);
+            //     })
+            // });
+        }else{
+            document.getElementById(rangeLabelID).innerHTML = ``;
+        }
+    });
     
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
