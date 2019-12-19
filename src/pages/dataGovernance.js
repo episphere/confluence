@@ -62,8 +62,14 @@ export const dataGovernanceProjects = async () => {
             if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}</div>`
         }
     }
+    const divRow = document.getElementById('dataGovernanceMain');
+    const div2 = document.createElement('div');
+    div2.classList = ['col-md-6 align-left'];
+    div2.id = 'dataGovernanceProjects';
+    div2.innerHTML = template;
     
-    div.innerHTML = template;
+    divRow.appendChild(div2);
+    
     dataGovernanceLazyLoad();
 }
 

@@ -709,6 +709,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const divRow = document.createElement('div');
             divRow.classList = ['row'];
+            divRow.id = 'dataGovernanceMain'
     
             const notifcationDiv = document.createElement('div');
             notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
@@ -720,12 +721,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             div1.innerHTML = await dataGovernanceTemplate();
             hideAnimation();
             divRow.appendChild(div1);
-    
-            const div2 = document.createElement('div');
-            div2.classList = ['col-md-6 align-left'];
-            div2.id = 'dataGovernanceProjects';
-            
-            divRow.appendChild(div2);
+
             confluenceDiv.innerHTML = ``;
             confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
