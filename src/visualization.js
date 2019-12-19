@@ -199,7 +199,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
             return `${c.key} (${c.value})`
         });
 
-    if(parameter !== 'study') pieChart.innerRadius(70);
+    pieChart.innerRadius(70);
     pieChart.render();
     pieChart.on('filtered', function(chart) {
         const filters = chart.filters();
