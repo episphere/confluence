@@ -65,7 +65,7 @@ export const getFileContent = async (allIds) => {
     // let parameterList = document.getElementById('parameterList');
     // parameterList.innerHTML = parameterListTemplate();
     // addEventVariableItem(cf, jsonData);
-    // document.getElementById('showAllVariables').innerHTML = '<a href="#" id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
+    // document.getElementById('showAllVariables').innerHTML = '<a id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
     // addEventShowAllVariables(cf, jsonData);
     // document.getElementById('showPieChart').innerHTML = '<input type="checkbox"> Show pie chart'
     // addEventShowPieChart(cf, jsonData);

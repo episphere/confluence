@@ -21,7 +21,7 @@ export const template = async () => {
         let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li><a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}</li>`
+        template += `<li><a class="${liClass}"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}</li>`
     }
 
     template += '</ul></div>';
@@ -48,7 +48,7 @@ export const lazyload = () => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
+                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
                 ul.appendChild(li);
             }
 
@@ -65,7 +65,7 @@ export const lazyload = () => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="#"><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name}`;
+                li.innerHTML = `<a><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name}`;
                 ul.appendChild(li);
             }
 

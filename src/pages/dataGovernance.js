@@ -20,7 +20,7 @@ export const template = async () => {
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li>
-            <a class="${liClass}" href="#">
+            <a class="${liClass}">
                 <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
             </a> ${consortiaName}
         </li>
@@ -53,7 +53,7 @@ export const dataGovernanceProjects = async () => {
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 template += `
                 <li>
-                    <a class="${liClass}" href="#">
+                    <a class="${liClass}">
                         <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                     </a> ${projectName}
                 </li>
@@ -62,13 +62,8 @@ export const dataGovernanceProjects = async () => {
             if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}</div>`
         }
     }
-    const divRow = document.getElementById('dataGovernanceMain');
-    const div2 = document.createElement('div');
-    div2.classList = ['col-md-6 align-left'];
-    div2.id = 'dataGovernanceProjects';
-    div2.innerHTML = template;
     
-    divRow.appendChild(div2);
+    div.innerHTML = template;
     
     dataGovernanceLazyLoad();
 }
@@ -113,8 +108,8 @@ export const dataGovernanceLazyLoad = () => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}" href="#"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
-                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type} href="#"><i class="fas fa-share"></i> Share</a>`}`;
+                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
+                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type}><i class="fas fa-share"></i> Share</a>`}`;
                 ul.appendChild(li);
             }
 
@@ -132,8 +127,10 @@ export const dataGovernanceLazyLoad = () => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="#"><i title="files" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i></a> ${obj.name} 
-                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type} href="#"><i class="fas fa-share"></i> Share</a>`}`;
+                li.innerHTML = `<a>
+                        <i title="file" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i>
+                        </a> <span title="${obj.name}">${obj.name.length > 20 ? `${obj.name.slice(0, 20)}...` : `${obj.name}`}</span>
+                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type}><i class="fas fa-share"></i> Share</a>`}`;
                 ul.appendChild(li);
             }
 

@@ -17,6 +17,27 @@ p,li,div {
     font-family:sans-serif;
 }
 
+.fa-copy, .getAllFileversions, .fa-folder-minus {
+    color: #0085c8 !important;
+    cursor: pointer !important;
+}
+
+.share-folder, .fa-user-minus {
+    color: #899298 !important;
+    cursor: pointer !important;
+}
+
+.lazy-loading-spinner {
+    color: #982e27;
+}
+
+.fa-file-alt {
+    color: rgb(201, 137, 27);
+}
+
+.fa-check {
+    color: #578837;
+}
 
 button {
     background-color: white;

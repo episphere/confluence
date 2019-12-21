@@ -516,7 +516,7 @@ export const addEventShowAllCollaborator = () => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
                 table += `<tr><td>${name}</td><td>${email}</td><td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
                         <select data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
-                    ` : `${role}`}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" href="#" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
+                    ` : `${role}`}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
             });
             table += `</tbody></table>`
         }
@@ -721,6 +721,11 @@ export const addEventDataGovernanceNavBar = (bool) => {
             div1.innerHTML = await dataGovernanceTemplate();
             hideAnimation();
             divRow.appendChild(div1);
+
+            const div2 = document.createElement('div');
+            div2.classList = ['col-md-6 align-left'];
+            div2.id = 'dataGovernanceProjects';
+            divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
             confluenceDiv.appendChild(notifcationDiv);
@@ -939,11 +944,10 @@ export const addEventMyProjects = () => {
                 versions.entries.forEach(dt => {
                     template += `
                     <tr>
-                        <td>${ID} <a href="#" class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
+                        <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
                         <td>${dt.modified_by.name || dt.modified_by.login}</td>
                         <td>${new Date(dt.modified_at).toLocaleString()}</td>
-                        <td>${dt.id} <a href="#" class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
-                        <td><a href="#" class="copy-file-api" title="Copy API" data-file-id="${ID}" data-version-id="${dt.id}"><i class="far fa-copy"></a></td>
+                        <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
                     </tr>
                     `
                 })
@@ -955,7 +959,6 @@ export const addEventMyProjects = () => {
                                 <th>Modified by</th>
                                 <th>Modified at</th>
                                 <th>Version id</th>
-                                <th>API</th>
                             </tr>
                         </thead>
                         <tbody>${template}</tbody>
@@ -987,7 +990,7 @@ const addEventCopyToClipboard = () => {
                     textArea.select();
                     const copied = document.execCommand('copy');
                     if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        elem.innerHTML = `<i class="fas fa-check"></i>`;
                         setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
                     }
                     document.body.removeChild(textArea);
@@ -1010,7 +1013,7 @@ const addEventCopyToClipboard = () => {
                     textArea.select();
                     const copied = document.execCommand('copy');
                     if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        elem.innerHTML = `<i class="fas fa-check"></i>`;
                         setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
                     }
                     document.body.removeChild(textArea);
@@ -1034,7 +1037,7 @@ const addEventCopyToClipboard = () => {
                     textArea.select();
                     const copied = document.execCommand('copy');
                     if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"> Copied!</i>`;
+                        elem.innerHTML = `<i class="fas fa-check"></i>`;
                         setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
                     }
                     document.body.removeChild(textArea);
