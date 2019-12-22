@@ -941,17 +941,18 @@ export const addEventMyProjects = () => {
                     </button>
                 `;
                 let template = '';
-                versions.entries.forEach(dt => {
-                    template += `
-                    <tr>
-                        <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
-                        <td>${dt.modified_by.name || dt.modified_by.login}</td>
-                        <td>${new Date(dt.modified_at).toLocaleString()}</td>
-                        <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
-                    </tr>
-                    `
-                })
-                document.getElementById('modalFVBody').innerHTML = `
+                if(versions.entries.length !== 0) {
+                    versions.entries.forEach(dt => {
+                        template += `
+                        <tr>
+                            <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
+                            <td>${dt.modified_by.name || dt.modified_by.login}</td>
+                            <td>${new Date(dt.modified_at).toLocaleString()}</td>
+                            <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
+                        </tr>
+                        `
+                    })
+                    document.getElementById('modalFVBody').innerHTML = `
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
@@ -963,7 +964,11 @@ export const addEventMyProjects = () => {
                         </thead>
                         <tbody>${template}</tbody>
                     </table>
-                `;
+                    `;
+                }
+                else{
+                    document.getElementById('modalFVBody').innerHTML = 'No older version found!';
+                }   
                 addEventCopyToClipboard();
             })
         });

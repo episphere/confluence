@@ -383,6 +383,7 @@ label {
 .ul-list-style {
     list-style-type:none;
     margin-top: 1rem;
+    margin-right: 1rem;
 }
 
 .ul-data-exploration {
