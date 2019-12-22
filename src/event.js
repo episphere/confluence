@@ -702,7 +702,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
         if(bool){
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -738,7 +738,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -953,9 +953,9 @@ export const addEventMyProjects = () => {
                         `
                     })
                     document.getElementById('modalFVBody').innerHTML = `
-                    <table class="table table-bordered table-striped">
+                    <table class="table table-striped">
                         <thead>
-                            <tr>
+                            <tr class="table-no-wrap">
                                 <th>File id</th>
                                 <th>Modified by</th>
                                 <th>Modified at</th>

@@ -1,6 +1,6 @@
 export const dataAnalysisTemplate = () => {
     return `
-        <div class="data-submission">
+        <div class="data-submission div-shadow">
             <div class="row data-analysis">
                 <div class="col-sm-6">
                     <h4>Video explaining how to connect Box backend for Confluence researchers</h4>

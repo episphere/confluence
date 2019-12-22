@@ -9,12 +9,12 @@ export const template = async () => {
     let template = '';
     
     template += `<div class="row create-study">
-                <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light"><i class="fas fa-upload"></i> Upload data</button></div>
+                <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light div-shadow"><i class="fas fa-upload"></i> Upload data</button></div>
             </div>`;
 
     template += await uploadInStudy('uploadInStudy');
     
-    template += '<div class="data-submission"><ul class="ul-list-style first-list-item">';
+    template += '<div class="data-submission div-shadow"><ul class="ul-list-style first-list-item">';
 
     for(let obj of array){
         const consortiaName = obj.name;

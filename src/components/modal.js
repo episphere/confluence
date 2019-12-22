@@ -3,7 +3,7 @@ import { getFolderItems, filterConsortiums, checkMyPermissionLevel, getCollabora
 export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
+            <div class="modal-content div-shadow">
                 <div class="modal-header">
                 <h5 class="modal-title">Upload in existing study</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -48,7 +48,7 @@ export const uploadInStudy = async (id) => {
 export const shareFolderModal = () => {
     return `<div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
+            <div class="modal-content div-shadow">
                 <div class="modal-header">
                     <div id="folderToShare"></div>
                     <ul class="nav nav-tabs">
@@ -75,7 +75,7 @@ export const shareFolderModal = () => {
 export const createProjectModal = () => {
     return `<div class="modal fade" id="createProjectModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
+            <div class="modal-content div-shadow">
                 <div class="modal-header">
                     <strong><i class="fas fa-project-diagram"></i> Create project</strong>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -91,7 +91,7 @@ export const createProjectModal = () => {
 export const fileVersionsModal = () => {
     return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
+            <div class="modal-content div-shadow">
                 <div class="modal-header" id="modalFVHeader"></div>
                 <div class="modal-body" id="modalFVBody"></div>
             </div>

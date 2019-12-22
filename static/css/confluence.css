@@ -146,6 +146,7 @@ body {
     margin: auto;
     background-color: #fff;
     padding-bottom: 0.5rem;
+    border-radius: 0.5rem;
 }
 
 .main-container {
@@ -255,7 +256,7 @@ label {
 
 .background-white {
     background-color: #ffffff;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
 }
 
 .data-summary-count {
@@ -397,7 +398,7 @@ label {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
 }
 
 .my-projects-div {
@@ -405,7 +406,7 @@ label {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
 }
 
 .btn-copy {
@@ -633,6 +634,15 @@ label {
 .about-confluence {
     background-color: #fff;
     padding-top: 1rem;
+    border-radius: 0.5rem;
+}
+
+.table-no-wrap {
+    white-space: nowrap;
+}
+
+.div-shadow {
+    box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
 }
 
 .nav-menu-links:hover {
@@ -770,7 +780,7 @@ form {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
 }
 
 .lazy-loading-spinner {
