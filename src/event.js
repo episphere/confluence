@@ -1070,12 +1070,12 @@ export const addEventFileStats = (element) => {
         const response = await getFileAccessStats(ID);
         document.getElementById('modalFileStatsBody').innerHTML = `
             <div class="row file-stats-row">
-                <div class="col" title="File download counts"><i class="fas fa-5x fa-download file-stats-icon"></i> <span class="fa-3x">${response.download_count}</span></div>
-                <div class="col" title="File edit counts"><i class="fas fa-5x fa-edit file-stats-icon"></i> <span class="fa-3x">${response.edit_count}</span></div>
+                <div class="col" title="File download counts"><i class="fas fa-5x fa-download file-stats-icon"></i> <span class="fa-3x"> ${response.download_count}</span></div>
+                <div class="col" title="File edit counts"><i class="fas fa-5x fa-edit file-stats-icon"></i> <span class="fa-3x"> ${response.edit_count}</span></div>
             </div>
             <div class="row file-stats-row">
-                <div class="col" title="File preview counts"><i class="fas fa-5x fa-file-alt file-stats-icon"></i> <span class="fa-3x">${response.preview_count}</span></div>
-                <div class="col" title="File comment counts"><i class="fas fa-5x fa-comments file-stats-icon"></i> <span class="fa-3x">${response.comment_count}</span></div>
+                <div class="col" title="File preview counts"><i class="fas fa-5x fa-file-alt file-stats-icon"></i> <span class="fa-3x"> ${response.preview_count}</span></div>
+                <div class="col" title="File comment counts"><i class="fas fa-5x fa-comments file-stats-icon"></i> <span class="fa-3x"> ${response.comment_count}</span></div>
             </div>
         `
     });
