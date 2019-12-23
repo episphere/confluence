@@ -12,7 +12,7 @@ export const template = async () => {
         <h4 class="h4-heading">Consortium(s)</h4>
     `;
     
-    template += '<div class="data-governance div-shadow"><ul class="ul-list-style first-list-item">';
+    template += '<div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item">';
 
     for(let obj of array){
         const consortiaName = obj.name;
@@ -45,7 +45,7 @@ export const dataGovernanceProjects = async () => {
     if(checker === true) {
         for(let obj = 0; obj < projectArray.length; obj++){
             const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
-            if(obj === 0) template += '<h4 class="h4-heading">Project(s)</h4><div class="data-governance div-shadow"><ul class="ul-list-style first-list-item">';
+            if(obj === 0) template += '<h4 class="h4-heading">Project(s)</h4><div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item">';
             if(bool === true) {
                 const projectName = projectArray[obj].name;
                 let type = projectArray[obj].type;

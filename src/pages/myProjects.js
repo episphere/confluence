@@ -6,7 +6,7 @@ export const myProjectsTemplate = async () => {
     const data = filterProjects(response.entries);
     if(data.length <= 0) return `No projects found!`;
     let template = `
-        <div class="my-projects-div div-shadow"><ul class="ul-list-style first-list-item">`;
+        <div class="my-projects-div sub-div-shadow"><ul class="ul-list-style first-list-item">`;
     for(let i = 0 ; i < data.length; i++) {
         const bool = amIViewer(await getCollaboration(data[i].id, `${data[i].type}s`), JSON.parse(localStorage.parms).login);
         if(bool === true) {
@@ -20,7 +20,7 @@ export const myProjectsTemplate = async () => {
                 const response = await getFolderItems(data[i].id);
                 const files = response.entries;
                 template += `<ul class="ul-list-style content allow-overflow"><li>
-                        <table class="table table-striped my-projects-table div-shadow">
+                        <table class="table table-striped my-projects-table sub-div-shadow">
                             <thead>
                                 <tr class="table-no-wrap">
                                     <th>Name</th>

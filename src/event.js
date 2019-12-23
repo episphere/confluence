@@ -702,7 +702,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
         if(bool){
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -738,7 +738,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;

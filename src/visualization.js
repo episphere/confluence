@@ -102,7 +102,7 @@ export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabe
         })
         .elasticY(true)
         .render();
-    document.getElementById(id).parentNode.classList.add('div-shadow');
+    document.getElementById(id).parentNode.classList.add('sub-div-shadow');
     barChart.on('filtered', function(chart) {
         const filters = chart.filters();
         if(filters.length) {
@@ -142,7 +142,7 @@ const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chart
             return `${c.key} (${c.value})`
         })
         .render()
-    document.getElementById(id).parentNode.classList.add('div-shadow');
+    document.getElementById(id).parentNode.classList.add('sub-div-shadow');
     rowChart.on('filtered', function(chart) {
         const filters = chart.filters();
         if(filters.length) {
@@ -201,7 +201,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
 
     pieChart.innerRadius(70);
     pieChart.render();
-    document.getElementById(id).parentNode.classList.add('div-shadow');
+    document.getElementById(id).parentNode.classList.add('sub-div-shadow');
     pieChart.on('filtered', function(chart) {
         const filters = chart.filters();
         if(filters.length) {

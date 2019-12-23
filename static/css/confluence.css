@@ -150,7 +150,7 @@ body {
 }
 
 .main-container {
-    background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(201, 227, 235) 48%, rgb(131, 186, 244) 100%);
+    background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(183, 226, 238) 48%, rgb(143, 193, 247) 100%);
     height: inherit;
     padding: 1rem;
     min-height: inherit;
@@ -641,8 +641,17 @@ label {
     white-space: nowrap;
 }
 
-.div-shadow {
+.sub-div-shadow {
     box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+}
+
+.confluence-div-shadow {
+    box-shadow: 10px 0 13px -7px rgba(0, 0, 0, 0.12), -10px 0 13px -7px rgba(0, 0, 0, 0.24);
+}
+
+.navbar-shadow, #logOutBtn {
+    z-index: 9;
+    box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 6px 0px;
 }
 
 .nav-menu-links:hover {
@@ -668,7 +677,6 @@ span.icon {
 }
 
 #footer {
-    border-top: 0 solid #2d2d2d;
     font-size: 0.9em;
     bottom: 0;
     width: 100%;
@@ -676,10 +684,10 @@ span.icon {
 
 .footer-content {
     text-align:center;
-    border-top: 1px solid #574F4F;
+    border-top: 0.25px solid #574F4F;
     width: 100%;
     background-color: #fff;
-    margin: 0 !important;
+    margin: 0px !important;
 }
 
 .footer-links {
@@ -796,7 +804,7 @@ form {
 }
 
 .my-projects-table {
-    width: 50% !important;
+    width: 97% !important;
 }
 
 .share-folder{
