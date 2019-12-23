@@ -87,7 +87,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 a.title = 'Manage collaboration';
                 a.dataset.folderName = element.dataset.folderName;
                 a.dataset.objectType = type;
-                a.innerHTML = `<i class="fas fa-share"></i> Share`
+                a.innerHTML = `<i class="fas fa-share"></i>`
                 element.parentNode.parentNode.appendChild(a);
                 shareData(a);
             }
@@ -121,7 +121,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a.dataset.folderName = obj.name;
                     a.dataset.objectType = type;
                     a.title = 'Manage collaboration';
-                    a.innerHTML = `<i class="fas fa-share"></i> Share`;
+                    a.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(a);
                     shareData(a);
                 }
@@ -155,7 +155,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a1.dataset.folderName = obj.name;
                     a1.dataset.objectType = obj.type;
                     a1.title = 'Manage collaboration';
-                    a1.innerHTML = `<i class="fas fa-share"></i> Share`;
+                    a1.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(a1);
                     shareData(a1);
 
@@ -167,7 +167,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a2.dataset.fileName = obj.name;
                     a2.dataset.objectType = obj.type;
                     a2.title = 'File access stats';
-                    a2.innerHTML = `<i class="fas fa-info-circle"></i>File access stats`;
+                    a2.innerHTML = `<i class="fas fa-info-circle"></i>`;
                     li.appendChild(a2);
                     addEventFileStats(a2);
                 }
