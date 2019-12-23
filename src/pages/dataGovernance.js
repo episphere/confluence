@@ -68,8 +68,9 @@ export const dataGovernanceProjects = async () => {
     dataGovernanceLazyLoad();
 }
 
-export const dataGovernanceLazyLoad = () => {
-    const spinners = document.getElementsByClassName('lazy-loading-spinner');
+export const dataGovernanceLazyLoad = (element) => {
+    let spinners = document.getElementsByClassName('lazy-loading-spinner');
+    if(element) spinners = element.parentNode.querySelectorAll('.lazy-loading-spinner');
     Array.from(spinners).forEach(async element => {
         const id = element.dataset.id;
         const status = element.dataset.status;
@@ -83,11 +84,12 @@ export const dataGovernanceLazyLoad = () => {
                 a.classList = ['share-folder'];
                 a.dataset.permissionType = 'restrict';
                 a.dataset.folderId = id;
+                a.title = 'Manage collaboration';
                 a.dataset.folderName = element.dataset.folderName;
                 a.dataset.objectType = type;
-                a.href = '#';
                 a.innerHTML = `<i class="fas fa-share"></i> Share`
                 element.parentNode.parentNode.appendChild(a);
+                shareData(a);
             }
             else{
                 element.dataset.sharable = 'no';
@@ -108,8 +110,21 @@ export const dataGovernanceLazyLoad = () => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name} 
-                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${type}><i class="fas fa-share"></i> Share</a>`}`;
+                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
+
+                if(!element.dataset.sharable){
+                    const a = document.createElement('a');
+                    a.dataset.toggle = 'modal';
+                    a.dataset.target = '#modalShareFolder';
+                    a.classList = ['share-folder'];
+                    a.dataset.folderId = obj.id;
+                    a.dataset.folderName = obj.name;
+                    a.dataset.objectType = type;
+                    a.title = 'Manage collaboration';
+                    a.innerHTML = `<i class="fas fa-share"></i> Share`;
+                    li.appendChild(a);
+                    shareData(a);
+                }
                 ul.appendChild(li);
             }
 
@@ -118,7 +133,6 @@ export const dataGovernanceLazyLoad = () => {
             element.classList.add('fa-folder-plus');
             element.parentNode.parentNode.appendChild(ul);
             eventsDataSubmissions(element.parentNode);
-            shareData();
         }
         else if(fileEntries.length > 0) {
             const ul = document.createElement('ul');
@@ -130,7 +144,21 @@ export const dataGovernanceLazyLoad = () => {
                 li.innerHTML = `<a>
                         <i title="file" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i>
                         </a> <span title="${obj.name}">${obj.name.length > 20 ? `${obj.name.slice(0, 20)}...` : `${obj.name}`}</span>
-                    ${element.dataset.sharable && element.dataset.sharable === 'no' ? `` : `<a data-toggle="modal" data-target="#modalShareFolder" class="share-folder" data-folder-id=${obj.id} data-folder-name="${obj.name}" data-object-type=${obj.type}><i class="fas fa-share"></i> Share</a>`}`;
+                    `;
+
+                if(!element.dataset.sharable){
+                    const a1 = document.createElement('a');
+                    a1.dataset.toggle = 'modal';
+                    a1.dataset.target = '#modalShareFolder';
+                    a1.classList = ['share-folder'];
+                    a1.dataset.folderId = obj.id;
+                    a1.dataset.folderName = obj.name;
+                    a1.dataset.objectType = obj.type;
+                    a1.title = 'Manage collaboration';
+                    a1.innerHTML = `<i class="fas fa-share"></i> Share`;
+                    li.appendChild(a1);
+                    shareData(a1);
+                }
                 ul.appendChild(li);
             }
 
@@ -139,7 +167,6 @@ export const dataGovernanceLazyLoad = () => {
             element.classList.add('fa-folder-plus');
             element.parentNode.parentNode.appendChild(ul);
             eventsDataSubmissions(element.parentNode);
-            shareData();
         }
     });
 }
@@ -158,7 +185,7 @@ export const eventsDataSubmissions = (element) => {
             element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
             content.style.maxHeight = "1000px";
             if(document.getElementsByClassName('lazy-loading-spinner').length !== 0){
-                dataGovernanceLazyLoad();
+                dataGovernanceLazyLoad(element);
             }
         } 
     });
@@ -171,22 +198,16 @@ export const dataGovernanceCollaboration = () => {
     });
 }
 
-export const shareData = () => {
-    const shareFolder = document.getElementsByClassName('share-folder');
+export const shareData = (element) => {
     const btn1 = document.getElementById('addNewCollaborators');
-    
     const folderToShare = document.getElementById('folderToShare');
-    
     addEventAddNewCollaborator();
     addEventShowAllCollaborator();
-    
-    Array.from(shareFolder).forEach(element => {
-        element.addEventListener('click', () => {
-            folderToShare.dataset.folderId = element.dataset.folderId;
-            folderToShare.dataset.folderName = element.dataset.folderName;
-            folderToShare.dataset.objectType = element.dataset.objectType;
-            btn1.dispatchEvent(new Event('click'));
-        });
+    element.addEventListener('click', () => {
+        folderToShare.dataset.folderId = element.dataset.folderId;
+        folderToShare.dataset.folderName = element.dataset.folderName;
+        folderToShare.dataset.objectType = element.dataset.objectType;
+        btn1.dispatchEvent(new Event('click'));
     });
 }
 

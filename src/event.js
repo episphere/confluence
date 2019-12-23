@@ -760,7 +760,6 @@ export const addEventDataGovernanceNavBar = (bool) => {
         
         addEventCreateProjectBtn();
         dataGovernanceCollaboration();
-        shareData();
     });
 };
 
