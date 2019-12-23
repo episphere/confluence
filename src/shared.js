@@ -1,6 +1,7 @@
 import { config } from "./config.js";
 import { variables } from "./variables.js";
 import { logOut } from "./manageAuthentication/index.js";
+import { confluence } from '../confluence.js'
 
 export const getFolderItems = async (id) => {
     try{
@@ -176,7 +177,10 @@ export const storeAccessToken = async () => {
             body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
         });
         localStorage.parms = JSON.stringify(await response.json());
-        location.search = '';
+        window.history.replaceState({},'', './');
+        confluence();
+        document.getElementById('loginBoxAppDev').hidden = true;
+        document.getElementById('loginBoxAppProd').hidden = true;
     }else{
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)

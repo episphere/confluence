@@ -9,7 +9,7 @@ import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getC
 import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 
-const confluence = async () => {
+export const confluence = async () => {
     let confluenceDiv = document.getElementById('confluenceDiv');
     let confluenceLogoElement = document.getElementById('confluenceLogo');
     let navBarOptions = document.getElementById('navBarOptions');
@@ -121,6 +121,7 @@ const confluence = async () => {
         manageHash();
     }
     if(localStorage.parms === undefined){
+        window.location.hash = '#';
         confluenceDiv.innerHTML = homePage();
         homePageVisualization();
         if(location.origin.match('localhost')) loginBoxAppDev.hidden = false;
@@ -133,6 +134,7 @@ const manageHash = () => {
     const hash = decodeURIComponent(window.location.hash);
     if(hash === '' || hash === '#' || hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
+        if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         showAnimation();
         element.click();
