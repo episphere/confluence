@@ -1,8 +1,8 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
-import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, shareData, dataGovernanceProjects } from './pages/dataGovernance.js';
+import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate, expandProjects } from './pages/myProjects.js';
 import { createProjectModal } from './components/modal.js';
 
@@ -1055,5 +1055,28 @@ const addEventCopyToClipboard = () => {
             }
         });
     });
-
 }
+
+export const addEventFileStats = (element) => {
+    element.addEventListener('click', async () => {
+        const ID = element.dataset.fileId;
+        const name = element.dataset.fileName;
+        document.getElementById('modalFileStatsHeader').innerHTML = `
+            <h5 class="modal-title">${name}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        `;
+        const response = await getFileAccessStats(ID);
+        document.getElementById('modalFileStatsBody').innerHTML = `
+            <div class="row file-stats-row">
+                <div class="col" title="File download counts"><i class="fas fa-5x fa-download file-stats-icon"></i> <span class="fa-3x">${response.download_count}</span></div>
+                <div class="col" title="File edit counts"><i class="fas fa-5x fa-edit file-stats-icon"></i> <span class="fa-3x">${response.edit_count}</span></div>
+            </div>
+            <div class="row file-stats-row">
+                <div class="col" title="File preview counts"><i class="fas fa-5x fa-file-alt file-stats-icon"></i> <span class="fa-3x">${response.preview_count}</span></div>
+                <div class="col" title="File comment counts"><i class="fas fa-5x fa-comments file-stats-icon"></i> <span class="fa-3x">${response.comment_count}</span></div>
+            </div>
+        `
+    });
+};

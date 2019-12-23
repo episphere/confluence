@@ -1,5 +1,5 @@
-import { shareFolderModal } from "../components/modal.js";
-import { addEventShowAllCollaborator, addEventAddNewCollaborator } from "../event.js";
+import { shareFolderModal, fileAccessStatsModal } from "../components/modal.js";
+import { addEventShowAllCollaborator, addEventAddNewCollaborator, addEventFileStats } from "../event.js";
 import { boxRoles } from "../config.js";
 import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel } from "../shared.js";
 
@@ -26,7 +26,7 @@ export const template = async () => {
         </li>
         `
     }
-    template += `</ul>${shareFolderModal()}</div>`
+    template += `</ul>${shareFolderModal()}${fileAccessStatsModal()}</div>`
     return template;
 }
 
@@ -59,7 +59,7 @@ export const dataGovernanceProjects = async () => {
                 </li>
                 `;
             }
-            if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}</div>`
+            if(obj === projectArray.length - 1 ) template += `</ul>${shareFolderModal()}${fileAccessStatsModal()}</div>`
         }
     }
     
@@ -158,6 +158,18 @@ export const dataGovernanceLazyLoad = (element) => {
                     a1.innerHTML = `<i class="fas fa-share"></i> Share`;
                     li.appendChild(a1);
                     shareData(a1);
+
+                    const a2 = document.createElement('a');
+                    a2.dataset.toggle = 'modal';
+                    a2.dataset.target = '#modalFileAccessStats';
+                    a2.classList = ['file-access-stats'];
+                    a2.dataset.fileId = obj.id;
+                    a2.dataset.fileName = obj.name;
+                    a2.dataset.objectType = obj.type;
+                    a2.title = 'File access stats';
+                    a2.innerHTML = `<i class="fas fa-info-circle"></i>File access stats`;
+                    li.appendChild(a2);
+                    addEventFileStats(a2);
                 }
                 ul.appendChild(li);
             }

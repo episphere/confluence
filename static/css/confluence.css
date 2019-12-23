@@ -22,11 +22,6 @@ p,li,div {
     cursor: pointer !important;
 }
 
-.share-folder, .fa-user-minus {
-    color: #899298 !important;
-    cursor: pointer !important;
-}
-
 .lazy-loading-spinner {
     color: #982e27;
 }
@@ -807,9 +802,11 @@ form {
     width: 97% !important;
 }
 
-.share-folder{
+
+.share-folder, .fa-user-minus, .file-access-stats {
+    color: #899298 !important;
+    cursor: pointer !important;
     padding: 2px 4px !important;
-    color: #a79292;
 }
 
 .share-folder:focus {
@@ -820,6 +817,14 @@ form {
 .share-folder:hover {
     color: #332b2b;
     text-decoration: none;
+}
+
+.file-stats-icon {
+    color: #80c6e6;
+}
+
+.file-stats-row {
+    margin-bottom: 1rem;
 }
 
 .collaborator-table{

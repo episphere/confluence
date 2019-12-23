@@ -88,6 +88,17 @@ export const createProjectModal = () => {
     </div>`
 }
 
+export const fileAccessStatsModal = () => {
+    return `<div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content sub-div-shadow">
+                <div class="modal-header" id="modalFileStatsHeader"></div>
+                <div class="modal-body" id="modalFileStatsBody"></div>
+            </div>
+        </div>
+    </div>`
+}
+
 export const fileVersionsModal = () => {
     return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
