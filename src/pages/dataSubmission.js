@@ -28,8 +28,9 @@ export const template = async () => {
     return template;
 };
 
-export const lazyload = () => {
-    const spinners = document.getElementsByClassName('lazy-loading-spinner');
+export const lazyload = (element) => {
+    let spinners = document.getElementsByClassName('lazy-loading-spinner');
+    if(element) spinners = element.parentNode.querySelectorAll('.lazy-loading-spinner');
     Array.from(spinners).forEach(async element => {
         const id = element.dataset.id;
         const status = element.dataset.status;
@@ -92,7 +93,7 @@ export const dataSubmission = (element) => {
             element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
             content.style.maxHeight = "1000px";
             if(document.getElementsByClassName('lazy-loading-spinner').length !== 0){
-                lazyload();
+                lazyload(element);
             }
         }
     });
