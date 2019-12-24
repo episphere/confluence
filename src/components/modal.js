@@ -6,7 +6,7 @@ export const uploadInStudy = async (id) => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header">
                 <h5 class="modal-title">Upload in existing study</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close" title="Close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -36,8 +36,8 @@ export const uploadInStudy = async (id) => {
                         <div id="studyFormElements"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+                        <button type="submit" title="Submit" class="btn btn-light sub-div-shadow" id="submitBtn">Submit</button>
+                        <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -53,15 +53,15 @@ export const shareFolderModal = () => {
                     <div id="folderToShare"></div>
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <button class="nav-link" id="addNewCollaborators">Add collaborator</button>
+                            <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
                         </li>
                         
                         <li class="nav-item">
-                            <button class="nav-link" id="listCollaborators">All collaborators</button>
+                            <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
                         </li>
                     </ul>
                     
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -78,7 +78,7 @@ export const createProjectModal = () => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header">
                     <strong><i class="fas fa-project-diagram"></i> Create project</strong>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

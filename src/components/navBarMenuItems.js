@@ -21,7 +21,7 @@ const template = () => {
             
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="nav-item  grid-elements dropdown">
-                    <a class="nav-link nav-menu-links dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link nav-menu-links dropdown-toggle"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
                     </a>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
@@ -30,7 +30,7 @@ const template = () => {
                 </div>
             ` : `
                 <div class="nav-item grid-elements">
-                    <a class="nav-link nav-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    <a class="nav-link nav-menu-links" title="Log Out" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                 </div>
             `}
             

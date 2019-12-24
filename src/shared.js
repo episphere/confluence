@@ -809,7 +809,7 @@ export const notificationTemplate = (top, header, body) => {
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">${header}</strong>
-                    <button type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                    <button title="Close" type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

@@ -12,21 +12,21 @@ export const template = () => {
                     <div id="chartDiv7">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label><label class="dataSummary-selected-range" id="selectedRange7"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange7"></label></span>
                     </div>
                 </div>
                 <div class="summary-inner-col col-md-3">
                     <div id="chartDiv1">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel1"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart1"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel1"></label><label class="dataSummary-selected-range" id="selectedRange1"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange1"></label></span>
                     </div>
                 </div>
                 <div class="summary-inner-col col-md-3">
                     <div id="chartDiv2">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label><label class="dataSummary-selected-range" id="selectedRange2"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange2"></label></span>
                     </div>
                 </div>
                 <div class="summary-inner-col col-md-3">
@@ -43,21 +43,21 @@ export const template = () => {
                     <div id="chartDiv3">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label><label class="dataSummary-selected-range" id="selectedRange3"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange3"></label></span>
                     </div>
                 </div>
                 <div class="summary-inner-col col-md-4">
                     <div id="chartDiv6">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label><label class="dataSummary-selected-range" id="selectedRange6"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange6"></label></span>
                     </div>
                 </div>
                 <div class="summary-inner-col col-md-4">
                     <div id="chartDiv4">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label><label class="dataSummary-selected-range" id="selectedRange4"></label></span>
+                        <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange4"></label></span>
                     </div>
                 </div>
             </div>

@@ -469,12 +469,12 @@ export const addEventShowAllCollaborator = () => {
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
     btn2.addEventListener('click', async () => {
-        if(btn2.classList.contains('active')) return;
+        if(btn2.classList.contains('active-tab')) return;
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
-        btn2.classList.add('active');
-        btn1.classList.remove('active');
+        btn2.classList.add('active-tab');
+        btn1.classList.remove('active-tab');
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = ``;
         const response = await getCollaboration(ID,`${type}s`);
@@ -498,7 +498,7 @@ export const addEventShowAllCollaborator = () => {
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
             table += `<strong>${name}</strong><br><br>
-                <table class="table table-borderless table-striped collaborator-table">
+                <table class="table table-borderless table-striped collaborator-table sub-div-shadow">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -514,9 +514,17 @@ export const addEventShowAllCollaborator = () => {
             `;
             allEntries.forEach(entry => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
-                table += `<tr><td>${name}</td><td>${email}</td><td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
-                        <select data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
-                    ` : `${role}`}</td><td>${status}</td><td>${addedBy}</td><td>${addedAt}</td><td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td></tr>`
+                table += `<tr>
+                            <td>${name}</td>
+                            <td>${email}</td>
+                            <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
+                            <select data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
+                        ` : `${role}`}</td>
+                            <td>${status}</td>
+                            <td>${addedBy}</td>
+                            <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
+                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td>
+                        </tr>`
             });
             table += `</tbody></table>`
         }
@@ -526,7 +534,7 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body">${table}</div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
             </div>
         `;
         addEventRemoveCollaborator();
@@ -614,12 +622,12 @@ export const addEventAddNewCollaborator = () => {
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
     btn1.addEventListener('click', () => {
-        if(btn1.classList.contains('active')) return;
+        if(btn1.classList.contains('active-tab')) return;
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
-        btn1.classList.add('active');
-        btn2.classList.remove('active');
+        btn1.classList.add('active-tab');
+        btn2.classList.remove('active-tab');
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = `
             <form id="addCollaborationForm" method="POST">
@@ -630,12 +638,14 @@ export const addEventAddNewCollaborator = () => {
                         ${addFields(1)}
                     </div>
                     <div class="row">
-                        <div class="col"><button class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                        <div class="col">
+                            <button class="btn btn-light sub-div-shadow" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
+                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
                 </div>
             </form>
         `;
@@ -702,7 +712,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
         if(bool){
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -738,7 +748,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -788,13 +798,13 @@ const addEventCreateProjectBtn = () => {
             </div>
                 
             <div class="row">
-                <div class="col"><button class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                <div class="col"><button title="Add more collaborators" class="btn btn-light sub-div-shadow" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
             </div>
             </br>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
+            <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
         </form>
         `
         addEventCPCSelect();
@@ -935,7 +945,7 @@ export const addEventMyProjects = () => {
                 const versions = await getFileVersions(ID);
                 document.getElementById('modalFVHeader').innerHTML = `
                     <h5 class="modal-title">${element.dataset.fileName}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 `;
@@ -1063,19 +1073,19 @@ export const addEventFileStats = (element) => {
         const name = element.dataset.fileName;
         document.getElementById('modalFileStatsHeader').innerHTML = `
             <h5 class="modal-title">${name}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         `;
         const response = await getFileAccessStats(ID);
         document.getElementById('modalFileStatsBody').innerHTML = `
             <div class="row file-stats-row">
-                <div class="col" title="File download counts"><i class="fas fa-5x fa-download file-stats-icon"></i> <span class="fa-3x"> ${response.download_count}</span></div>
-                <div class="col" title="File edit counts"><i class="fas fa-5x fa-edit file-stats-icon"></i> <span class="fa-3x"> ${response.edit_count}</span></div>
+                <div class="col" title="File download counts"><i class="fas fa-4x fa-download file-stats-icon"></i> <span class="fa-3x"> ${response.download_count}</span></div>
+                <div class="col" title="File edit counts"><i class="fas fa-4x fa-edit file-stats-icon"></i> <span class="fa-3x"> ${response.edit_count}</span></div>
             </div>
             <div class="row file-stats-row">
-                <div class="col" title="File preview counts"><i class="fas fa-5x fa-file-alt file-stats-icon"></i> <span class="fa-3x"> ${response.preview_count}</span></div>
-                <div class="col" title="File comment counts"><i class="fas fa-5x fa-comments file-stats-icon"></i> <span class="fa-3x"> ${response.comment_count}</span></div>
+                <div class="col" title="File preview counts"><i class="fas fa-4x fa-file-alt file-stats-icon"></i> <span class="fa-3x"> ${response.preview_count}</span></div>
+                <div class="col" title="File comment counts"><i class="fas fa-4x fa-comments file-stats-icon"></i> <span class="fa-3x"> ${response.comment_count}</span></div>
             </div>
         `
     });

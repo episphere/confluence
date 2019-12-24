@@ -4,8 +4,7 @@ export const dataAnalysisTemplate = () => {
             <div class="row data-analysis">
                 <div class="col-sm-6">
                     <h4>Video explaining how to connect Box backend for Confluence researchers</h4>
-                    
-                    <iframe width="100%" height="400px" src="https://www.youtube.com/embed/YtmpNfkvjdI" frameborder="0" 
+                    <iframe class="sub-div-shadow" width="100%" height="400px" src="https://www.youtube.com/embed/YtmpNfkvjdI" frameborder="0" 
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="col-sm-6">

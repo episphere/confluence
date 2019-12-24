@@ -9,7 +9,11 @@ export const template = async () => {
     let template = '';
     
     template += `<div class="row create-study">
-                <div class="upload-in-study"><button data-toggle="modal" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow"><i class="fas fa-upload"></i> Upload data</button></div>
+                <div class="upload-in-study">
+                    <button data-toggle="modal" title="Upload data" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow">
+                        <i class="fas fa-upload"></i> Upload data
+                    </button>
+                </div>
             </div>`;
 
     template += await uploadInStudy('uploadInStudy');

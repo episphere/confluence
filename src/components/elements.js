@@ -85,7 +85,7 @@ export const renderForm = () => {
                         <input type="text" class="form-control" required id="boxFolderId" placeholder="Enter Consortia ID / Box Folder ID" title="Consortia ID / Box Folder ID">
                     </div>
                     <div class="form-group">
-                        <button id="submit" class="btn btn-dark" title="Submit">Submit</button>
+                        <button id="submit" title="Submit" class="btn btn-light sub-div-shadow" title="Submit">Submit</button>
                     </div>
                 </label>
             </form>

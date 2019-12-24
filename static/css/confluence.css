@@ -97,6 +97,11 @@ body {
     background-color: #aaaaaa;
 }
 
+.active-tab {
+    color: #000000;
+    font-weight: bold;
+}
+
 .collapse {
     height: inherit;
 }
@@ -543,7 +548,7 @@ label {
 }
 
 .dataSummary-chart {
-    min-height: 380px;
+    min-height: 360px;
 }
 
 .dataSummary-label{
@@ -572,9 +577,9 @@ label {
     border: 1px solid transparent;
     border-radius: 1rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    color: #fff;
+    color: #000000;
     font-size: 0.75rem;
-    background-color: #12345a;
+    background-color: #ffffff;
     margin-bottom: 0.25rem;
     margin-left: 0.25rem;
 }
@@ -651,6 +656,7 @@ label {
 
 .nav-menu-links:hover {
     text-decoration: none;
+    cursor: pointer;
 }
 
 .grid-elements:hover {
@@ -820,7 +826,7 @@ form {
 }
 
 .file-stats-icon {
-    color: #9da9ee;
+    color: #8bc1e8;
 }
 
 .file-stats-row {
@@ -829,6 +835,7 @@ form {
 
 .collaborator-table{
     font-size: 0.75rem;
+    overflow: auto;
 }
 
 .avatar {

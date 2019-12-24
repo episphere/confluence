@@ -109,7 +109,7 @@ export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabe
             const range = filters[0];
             const bottomRange = Math.ceil(range[0]);
             const topRange = Math.ceil(range[1]);
-            document.getElementById(rangeLabelID).innerHTML = `<button class="filter-btn"><i class="fas fa-filter"></i> ${bottomRange} - ${topRange} years </button>`;
+            document.getElementById(rangeLabelID).innerHTML = `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${bottomRange} - ${topRange} years </button>`;
             // const filterBtn = document.getElementsByClassName('filter-btn');
             // Array.from(filterBtn).forEach(btn => {
             //     btn.addEventListener('click', () => {
@@ -148,7 +148,7 @@ const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chart
         if(filters.length) {
             let selection = '';
             filters.forEach((dt) => {
-                selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
+                selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
             });
             document.getElementById(rangeLabelID).innerHTML = selection;
             // const filterBtn = document.getElementsByClassName('filter-btn');
@@ -207,7 +207,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
         if(filters.length) {
             let selection = '';
             filters.forEach((dt) => {
-                selection += `<button class="filter-btn"><i class="fas fa-filter"></i> ${dt} </button>`
+                selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
             });
             document.getElementById(rangeLabelID).innerHTML = selection;
             // const filterBtn = document.getElementsByClassName('filter-btn');
