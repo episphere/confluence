@@ -962,7 +962,7 @@ export const addEventMyProjects = () => {
                         `
                     })
                     document.getElementById('modalFVBody').innerHTML = `
-                    <table class="table table-striped">
+                    <table class="table table-borderless table-striped sub-div-shadow">
                         <thead>
                             <tr class="table-no-wrap">
                                 <th>File id</th>
