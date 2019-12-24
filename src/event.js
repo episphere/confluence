@@ -807,6 +807,13 @@ const addEventCreateProjectBtn = () => {
             <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
         </form>
         `
+        const addMoreEmail = document.getElementById('addMoreEmail');
+        addMoreEmail.addEventListener('click', () => {
+            const counter = parseInt(addMoreEmail.dataset.counter)+1;
+            addMoreEmail.dataset.counter = counter;
+            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            if(counter === 5) addMoreEmail.disabled = true;
+        });
         addEventCPCSelect();
         addEventcreateProjectForm();
     });
