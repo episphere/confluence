@@ -2,6 +2,7 @@ import { config } from "./config.js";
 import { variables } from "./variables.js";
 import { logOut } from "./manageAuthentication/index.js";
 import { confluence } from '../confluence.js'
+import { generateAllCharts } from "./visualization.js";
 
 export const getFolderItems = async (id) => {
     try{
@@ -909,6 +910,13 @@ export const inactivityTime = () => {
     document.onkeypress = resetTimer;
 };
 
-export const canCreateProject = () => {
-    
+export const reSizeCharts = (cf, jsonData) => {
+    let time;
+    const resetTimer = () => {
+        clearTimeout(time);
+        time = setTimeout(() => {
+            generateAllCharts(cf, jsonData);
+        }, 500);
+    }
+    window.onresize = resetTimer;
 }

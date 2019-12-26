@@ -1,4 +1,4 @@
-import { hideAnimation, getFileJSON } from './shared.js';
+import { hideAnimation, getFileJSON, reSizeCharts } from './shared.js';
 import { variables } from './variables.js';
 
 const unique = arr => {
@@ -53,7 +53,7 @@ export const getData = (studyEntries, studyIds, values) => {
     getFileContent(allIds);
 }
 
-export const getFileContent = async (allIds) => {
+export const getFileContent = async () => {
     // const jsonData = await convertTextToJson(allIds);
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
     hideAnimation();
@@ -62,15 +62,12 @@ export const getFileContent = async (allIds) => {
         return;
     }
     const cf = getCrossFilter(jsonData);
-    // let parameterList = document.getElementById('parameterList');
-    // parameterList.innerHTML = parameterListTemplate();
-    // addEventVariableItem(cf, jsonData);
-    // document.getElementById('showAllVariables').innerHTML = '<a id="toggleVariable">Show All <i class="fas fa-caret-down"></i></a>'
-    // addEventShowAllVariables(cf, jsonData);
-    // document.getElementById('showPieChart').innerHTML = '<input type="checkbox"> Show pie chart'
-    // addEventShowPieChart(cf, jsonData);
-    
-    
+ 
+    generateAllCharts(cf, jsonData);
+    reSizeCharts(cf, jsonData);
+};
+
+export const generateAllCharts = (cf, jsonData) => {
     generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
 
     dc.config.defaultColors(d3.schemePaired);
@@ -84,9 +81,8 @@ export const getFileContent = async (allIds) => {
     renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     dc.config.defaultColors(d3.schemeSet3);
     renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
-    // document.getElementById('chartInteractionMsg').innerHTML = `<i class="fas fa-info-circle"></i> Click on chart(s) for interaction!`;
-    // setTimeout(() => document.getElementById('chartInteractionMsg').innerHTML = ``, 5000);
-};
+    
+}
 
 export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
     document.getElementById(chartDiv).classList.add('background-white');
@@ -198,8 +194,9 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
         .label(function(c){
             return `${c.key} (${c.value})`
         });
-
-    pieChart.innerRadius(70);
+    
+    let ir = Math.ceil((window.innerWidth*70)/1536);
+    pieChart.innerRadius(ir);
     pieChart.render();
     document.getElementById(id).parentNode.classList.add('sub-div-shadow');
     pieChart.on('filtered', function(chart) {

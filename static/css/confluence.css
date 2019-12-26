@@ -385,6 +385,8 @@ label {
     list-style-type:none;
     margin-top: 1rem;
     margin-right: 1rem;
+    -webkit-transition: max-height 0.35s ease-in-out !important; 
+    transition: max-height 0.35s ease-in-out !important;
 }
 
 .ul-data-exploration {
@@ -510,7 +512,6 @@ label {
     padding: 0px 0px 0px 40px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.2s ease-in-out;
     margin: 0;
 }
 
