@@ -518,7 +518,7 @@ export const addEventShowAllCollaborator = () => {
                             <td>${name}</td>
                             <td>${email}</td>
                             <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
-                            <select data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
+                            <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                         ` : `${role}`}</td>
                             <td>${status}</td>
                             <td>${addedBy}</td>
