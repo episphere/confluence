@@ -64,7 +64,7 @@ export const getFileContent = async () => {
     const cf = getCrossFilter(jsonData);
  
     generateAllCharts(cf, jsonData);
-    reSizeCharts(cf, jsonData);
+    // reSizeCharts(cf, jsonData);
 };
 
 export const generateAllCharts = (cf, jsonData) => {
@@ -106,12 +106,6 @@ export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabe
             const bottomRange = Math.ceil(range[0]);
             const topRange = Math.ceil(range[1]);
             document.getElementById(rangeLabelID).innerHTML = `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${bottomRange} - ${topRange} years </button>`;
-            // const filterBtn = document.getElementsByClassName('filter-btn');
-            // Array.from(filterBtn).forEach(btn => {
-            //     btn.addEventListener('click', () => {
-            //         chart.filter(null);
-            //     })
-            // });
         }else{
             document.getElementById(rangeLabelID).innerHTML = ``;
         }
@@ -163,13 +157,6 @@ const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chart
 
 const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
     document.getElementById(chartDiv).classList.add('background-white');
-    // let variableItem = document.getElementsByClassName('variableItem');
-    // Array.from(variableItem).forEach(element => {
-    //     if(element.innerHTML === parameter) {
-    //         removeActiveClass('variableItem', 'active');
-    //         element.classList.add('active');
-    //     }
-    // });
     let data_reduce = valUnique(parameter, 0, jsonData);
 
     document.getElementById(id).innerHTML = '';
@@ -187,16 +174,20 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
         },
         function(p){return 0}
     )
+    const ir = Math.ceil((window.innerWidth*65)/1536);
+    const erp = Math.ceil((window.innerWidth*10)/1536);
     pieChart
         .dimension(data)
         .group(G_status2)
-        .externalRadiusPadding(10)
+        .minAngleForLabel(0.35)
+        .externalRadiusPadding(erp)
+        .innerRadius(ir)
+        .radius(ir+80)
+        .drawPaths(true)
         .label(function(c){
             return `${c.key} (${c.value})`
         });
     
-    let ir = Math.ceil((window.innerWidth*70)/1536);
-    pieChart.innerRadius(ir);
     pieChart.render();
     document.getElementById(id).parentNode.classList.add('sub-div-shadow');
     pieChart.on('filtered', function(chart) {
