@@ -174,7 +174,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
         },
         function(p){return 0}
     )
-    const ir = Math.ceil((window.innerWidth*65)/1536);
+    const ir = Math.ceil((window.innerWidth*45)/1536);
     const erp = Math.ceil((window.innerWidth*10)/1536);
     pieChart
         .dimension(data)
@@ -182,7 +182,7 @@ const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, char
         .minAngleForLabel(0.35)
         .externalRadiusPadding(erp)
         .innerRadius(ir)
-        .radius(ir+80)
+        .radius(ir+100)
         .drawPaths(true)
         .label(function(c){
             return `${c.key} (${c.value})`
