@@ -872,3 +872,7 @@ form {
     font-size: inherit !important;
     font-weight: normal !important;
 }
+
+.file-stats-heading {
+    font-size: 1.25rem;
+}

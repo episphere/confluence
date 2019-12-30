@@ -988,13 +988,11 @@ export const addEventMyProjects = () => {
                 addEventCopyToClipboard();
             })
         });
-
-        addEventCopyToClipboard();
         expandProjects();
     });
 }
 
-const addEventCopyToClipboard = () => {
+export const addEventCopyToClipboard = () => {
     const copyFileApi = document.getElementsByClassName('copy-file-api');
     Array.from(copyFileApi).forEach(elem => {
         elem.addEventListener('click', () => {
@@ -1087,12 +1085,24 @@ export const addEventFileStats = (element) => {
         const response = await getFileAccessStats(ID);
         document.getElementById('modalFileStatsBody').innerHTML = `
             <div class="row file-stats-row">
-                <div class="col" title="File download counts"><i class="fas fa-4x fa-download file-stats-icon"></i> <span class="fa-3x"> ${response.download_count}</span></div>
-                <div class="col" title="File edit counts"><i class="fas fa-4x fa-edit file-stats-icon"></i> <span class="fa-3x"> ${response.edit_count}</span></div>
+                <div class="col" title="File download count">
+                    <span class="file-stats-heading">Download count</span></br>
+                    <i class="fas fa-4x fa-download file-stats-icon"></i> <span class="fa-3x"> ${response.download_count}</span>
+                </div>
+                <div class="col" title="File edit count">
+                    <span class="file-stats-heading">Edit count</span></br>
+                    <i class="fas fa-4x fa-edit file-stats-icon"></i> <span class="fa-3x"> ${response.edit_count}</span>
+                </div>
             </div>
             <div class="row file-stats-row">
-                <div class="col" title="File preview counts"><i class="fas fa-4x fa-file-alt file-stats-icon"></i> <span class="fa-3x"> ${response.preview_count}</span></div>
-                <div class="col" title="File comment counts"><i class="fas fa-4x fa-comments file-stats-icon"></i> <span class="fa-3x"> ${response.comment_count}</span></div>
+                <div class="col" title="File preview count">
+                    <span class="file-stats-heading">Preview count</span></br>
+                    <i class="fas fa-4x fa-file-alt file-stats-icon"></i> <span class="fa-3x"> ${response.preview_count}</span>
+                </div>
+                <div class="col" title="File comment count">
+                    <span class="file-stats-heading">Comment count</span></br>
+                    <i class="fas fa-4x fa-comments file-stats-icon"></i> <span class="fa-3x"> ${response.comment_count}</span>
+                </div>
             </div>
         `
     });
