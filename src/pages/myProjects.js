@@ -1,4 +1,4 @@
-import { getFolderItems, getFileInfo, getFileVersions, filterProjects, amIViewer, getCollaboration } from "../shared.js";
+import { getFolderItems, getFileInfo, filterProjects, amIViewer, getCollaboration } from "../shared.js";
 import { fileVersionsModal } from "../components/modal.js";
 import { addEventCopyToClipboard } from "../event.js";
 

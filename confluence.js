@@ -5,8 +5,8 @@ import { template as dataSummary, getSummary } from './src/pages/dataExploration
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getparameters, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
-import { addEventConsortiaSelect, addEventCreateStudyForm, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
+import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 
 export const confluence = async () => {

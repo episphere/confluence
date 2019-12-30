@@ -1,4 +1,4 @@
-import { hideAnimation, getFileJSON, reSizeCharts } from './shared.js';
+import { hideAnimation, getFileJSON } from './shared.js';
 import { variables } from './variables.js';
 
 const unique = arr => {

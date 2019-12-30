@@ -321,10 +321,6 @@ export const addEventConsortiaSelect = () => {
     });
 }
 
-export const addEventCreateStudyForm = () => {
-    
-}
-
 export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
     form.addEventListener('submit', async (e) => {
