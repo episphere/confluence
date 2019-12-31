@@ -20,7 +20,7 @@ export const myProjectsTemplate = async () => {
             if(type === 'folder'){
                 const response = await getFolderItems(data[i].id);
                 const files = response.entries;
-                template += `<ul class="ul-list-style content allow-overflow"><li>
+                template += `<ul class="ul-list-style content allow-overflow"><li class="my-prjects-list-item">
                         <table class="table table-borderless table-striped my-projects-table sub-div-shadow">
                             <thead>
                                 <tr class="table-no-wrap">

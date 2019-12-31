@@ -876,3 +876,7 @@ form {
 .file-stats-heading {
     font-size: 1.25rem;
 }
+
+.my-prjects-list-item {
+    margin-top: 3px;
+}
