@@ -56,7 +56,6 @@ export const myProjectsTemplate = async () => {
                                 </tbody>
                             `
                 }
-                addEventCopyToClipboard();
                 template += '</table></li></ul>';
             }
         }

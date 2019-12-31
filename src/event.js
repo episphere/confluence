@@ -940,6 +940,7 @@ export const addEventMyProjects = () => {
         myProjects.classList.add('navbar-active');
         const confluenceDiv = document.getElementById('confluenceDiv');
         confluenceDiv.innerHTML = await myProjectsTemplate();
+        addEventCopyToClipboard();
         hideAnimation();
         const elements = document.getElementsByClassName('getAllFileversions');
         Array.from(elements).forEach(element => {

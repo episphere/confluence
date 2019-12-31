@@ -3,9 +3,9 @@ import { variables } from './variables.js';
 
 const unique = arr => {
     let u={}
-    arr.forEach(v=>{
-        if(v=='888'||v=='777'||v==""){v=undefined} // 888 undefined code
-        if(!u[v]){u[v]=0}
+    arr.forEach(v => {
+        if (v=='888' || v=='777' || v=="" ) v = undefined // 888 undefined code
+        if (!u[v]) u[v] = 0
         u[v]++
     })
     return u
