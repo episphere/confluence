@@ -1,4 +1,4 @@
-const template = () => {
+export const template = () => {
     return `
         
         <div class="nav-item  grid-elements">
@@ -36,6 +36,4 @@ const template = () => {
             
         </div>
     `;
-}
-
-export default template;
+};

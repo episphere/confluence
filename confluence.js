@@ -1,4 +1,4 @@
-import template from './src/components/navBarMenuItems.js';
+import { template } from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
