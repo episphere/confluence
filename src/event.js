@@ -940,10 +940,9 @@ export const addEventMyProjects = () => {
         myProjects.classList.add('navbar-active');
         const confluenceDiv = document.getElementById('confluenceDiv');
         confluenceDiv.innerHTML = await myProjectsTemplate();
-        addEventCopyToClipboard();
         hideAnimation();
         const elements = document.getElementsByClassName('getAllFileversions');
-        Array.from(elements).forEach(element => {
+        for(let element of Array.from(elements)){
             element.addEventListener('click', async () => {
                 const ID = element.dataset.fileId;
                 const versions = await getFileVersions(ID);
@@ -955,7 +954,7 @@ export const addEventMyProjects = () => {
                 `;
                 let template = '';
                 if(versions.entries.length !== 0) {
-                    versions.entries.forEach(dt => {
+                    for(let dt of versions.entries){
                         template += `
                         <tr>
                             <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
@@ -964,7 +963,7 @@ export const addEventMyProjects = () => {
                             <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
                         </tr>
                         `
-                    })
+                    }
                     document.getElementById('modalFVBody').innerHTML = `
                     <table class="table table-borderless table-striped sub-div-shadow">
                         <thead>
@@ -981,10 +980,11 @@ export const addEventMyProjects = () => {
                 }
                 else{
                     document.getElementById('modalFVBody').innerHTML = 'No older version found!';
-                }   
+                }
                 addEventCopyToClipboard();
-            })
-        });
+            });
+            addEventCopyToClipboard();
+        }
         expandProjects();
     });
 }
@@ -995,70 +995,23 @@ export const addEventCopyToClipboard = () => {
         elem.addEventListener('click', () => {
             const fileId = elem.dataset.fileId;
             const versionId = elem.dataset.versionId;
-
-            if(fileId && !versionId){
-                if (!navigator.clipboard) {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = fileId;
-                    textArea.style.position="fixed";  //avoid scrolling to bottom
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    const copied = document.execCommand('copy');
-                    if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"></i>`;
-                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
-                    }
-                    document.body.removeChild(textArea);
-                }
-                navigator.clipboard.writeText(fileId).then(function() {
+            const data = fileId && !versionId ? fileId : versionId;
+            if (!navigator.clipboard) {
+                const textArea = document.createElement("textarea");
+                textArea.value = data;
+                textArea.style.position="fixed";  //avoid scrolling to bottom
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const copied = document.execCommand('copy');
+                if(copied){
                     elem.innerHTML = `<i class="fas fa-check"></i>`;
                     setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
-                }, function(err) {
-                    console.error('Async: Could not copy text: ', err);
-                });
-            }
-
-            if(!fileId && versionId){
-                if (!navigator.clipboard) {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = versionId;
-                    textArea.style.position="fixed";  //avoid scrolling to bottom
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    const copied = document.execCommand('copy');
-                    if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"></i>`;
-                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
-                    }
-                    document.body.removeChild(textArea);
                 }
-                navigator.clipboard.writeText(versionId).then(function() {
-                    elem.innerHTML = `<i class="fas fa-check"></i>`;
-                    setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
-                }, function(err) {
-                    console.error('Async: Could not copy text: ', err);
-                });
+                document.body.removeChild(textArea);
             }
-
-            if(fileId && versionId){
-                const api = `https://api.box.com/2.0/files/${fileId}/versions/${versionId}`;
-                if (!navigator.clipboard) {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = api;
-                    textArea.style.position="fixed";  //avoid scrolling to bottom
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    const copied = document.execCommand('copy');
-                    if(copied){
-                        elem.innerHTML = `<i class="fas fa-check"></i>`;
-                        setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
-                    }
-                    document.body.removeChild(textArea);
-                }
-                navigator.clipboard.writeText(api).then(function() {
+            else {
+                navigator.clipboard.writeText(data).then(function() {
                     elem.innerHTML = `<i class="fas fa-check"></i>`;
                     setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
                 }, function(err) {
@@ -1068,6 +1021,7 @@ export const addEventCopyToClipboard = () => {
         });
     });
 }
+
 
 export const addEventFileStats = (element) => {
     element.addEventListener('click', async () => {
