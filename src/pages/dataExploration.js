@@ -1,7 +1,7 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile } from "../shared.js";
-import { studyDropDownTemplate } from "../components/elements.js";
-import { txt2dt, getFileContent } from "../visualization.js";
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from "../event.js";
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile } from '../shared.js';
+import { studyDropDownTemplate } from '../components/elements.js';
+import { txt2dt } from '../visualization.js';
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
 
 export const template = () => {
     return `
@@ -63,10 +63,6 @@ export const template = () => {
             </div>
         </div>
     `;  
-}
-
-export const getSummary = async () => {
-    getFileContent();
 }
 
 const generateConfluenceSummaryLevelData = async () => {

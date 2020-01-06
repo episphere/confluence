@@ -1,6 +1,6 @@
 import { config } from "./config.js";
 import { variables } from "./variables.js";
-import { logOut } from "./manageAuthentication/index.js";
+import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js'
 import { generateAllCharts } from "./visualization.js";
 
@@ -24,7 +24,7 @@ export const getFolderItems = async (id) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFolderItems(id);
     }
 }
@@ -49,7 +49,7 @@ export const getFolderInfo = async (id) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFolderInfo(id);
     }
 }
@@ -74,7 +74,7 @@ export const getFile = async (id) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFile(id);
     }
 };
@@ -103,7 +103,7 @@ export const getFileJSON = async (id, access_token) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
     }
 };
@@ -128,7 +128,7 @@ export const getFileInfo = async (id) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFileInfo(id);
     }
 }
@@ -153,7 +153,7 @@ export const getFileVersions = async (id) => {
             console.error(r);
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getFileVersions(id);
     }
 }
@@ -277,7 +277,7 @@ export const createFolder = async (folderId, folderName) => {
             return {status: response.status, statusText: response.statusText};
         };
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await createFolder(folderId, foldername);
     }
 };
@@ -307,7 +307,7 @@ export const copyFile = async (fileId, parentId) => {
             return {status: response.status, statusText: response.statusText};
         };
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await copyFile(fileId, parentId);
     }
 };
@@ -338,7 +338,7 @@ export const uploadFileBox = async (folderId, fileName, file) => {
             return {status: response.status, statusText: response.statusText};
         };
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file);
     }
 };
@@ -369,7 +369,7 @@ export const uploadFile = async (data, fileName, folderId) => {
             return {status: response.status, statusText: response.statusText};
         };
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
     }
 }
@@ -392,7 +392,7 @@ export const getCollaboration = async (id, type) => {
             return null;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getCollaboration(id, type);
     }
 }
@@ -415,7 +415,7 @@ export const getFileAccessStats = async (id) => {
             return null;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getCollaboration(id, type);
     }
 }
@@ -438,7 +438,7 @@ export const getCurrentUser = async () => {
             return null;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getCurrentUser();
     }
 }
@@ -471,7 +471,7 @@ export const addNewCollaborator = async (id, type, login, role) => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await addNewCollaborator(id, type, login, role);
     }
 }
@@ -492,7 +492,7 @@ export const removeBoxCollaborator = async (id) => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return removeBoxCollaborator(id);
     }
 }
@@ -514,7 +514,7 @@ export const updateBoxCollaborator = async (id, role) => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
     }
 }
@@ -536,7 +536,7 @@ export const revokeAccessToken = async () => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await revokeAccessToken();
     }
 }
@@ -557,7 +557,7 @@ export const getAllWebHooks = async () => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await getAllWebHooks();
     }    
 }
@@ -584,7 +584,7 @@ export const createWebHook = async () => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await createWebHook();
     }
 }
@@ -611,7 +611,7 @@ export const updateWebHook = async () => {
             return response;
         }
     }
-    catch {
+    catch(err) {
         if((await refreshToken()) === true) return await updateWebHook();
     }
 }

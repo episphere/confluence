@@ -54,16 +54,13 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 export const getFileContent = async () => {
-    // const jsonData = await convertTextToJson(allIds);
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
-    // dataBinning(jsonData, 10);
     hideAnimation();
     if(!jsonData) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
     const cf = getCrossFilter(jsonData);
- 
     generateAllCharts(cf, jsonData);
     // reSizeCharts(cf, jsonData);
 };

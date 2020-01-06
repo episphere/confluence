@@ -1,13 +1,14 @@
 import { template } from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
-import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
+import { template as dataSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
-import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication/index.js';
+import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
+import { getFileContent } from './src/visualization.js';
 
 export const confluence = async () => {
     const confluenceDiv = document.getElementById('confluenceDiv');
@@ -62,7 +63,7 @@ export const confluence = async () => {
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataSummary();
-            getSummary();
+            getFileContent();
         });
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
@@ -177,7 +178,6 @@ const manageHash = () => {
 };
 
 window.onload = async () => {
-    console.log('confluence.js loaded');
     const confluenceDiv = document.getElementById('confluenceDiv');
     confluenceDiv.innerHTML = '';
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
@@ -188,6 +188,5 @@ window.onload = async () => {
 };
 
 window.onhashchange = () => {
-    console.log('hash changed')
     manageHash();
 };
