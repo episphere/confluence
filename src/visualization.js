@@ -47,15 +47,16 @@ export const getData = (studyEntries, studyIds, values) => {
 
         selectedDataIds.forEach(dataId => {
             let fileEntries = dataEntries[dataId].fileEntries;
-            allIds = {...allIds, ...fileEntries};
+            // allIds = {...allIds, ...fileEntries};
         });
     });
-    getFileContent(allIds);
+    // getFileContent(allIds);
 }
 
 export const getFileContent = async () => {
     // const jsonData = await convertTextToJson(allIds);
     const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
+    // dataBinning(jsonData, 10);
     hideAnimation();
     if(!jsonData) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
@@ -66,6 +67,26 @@ export const getFileContent = async () => {
     generateAllCharts(cf, jsonData);
     // reSizeCharts(cf, jsonData);
 };
+
+// const dataBinning = (data, binSize) => {
+//     const ageArray = [];
+//     const ageBinned = [];
+//     for(let obj of data){
+//         ageArray.push(parseInt(obj.ageInt));
+//     }
+//     ageArray.sort();
+//     for(let i = 0; i <ageArray.length; i=i+binSize ){
+//         let avg = 0;
+//         let counter = 0;
+//         while(counter < binSize){
+//             avg = avg+ageArray[i+counter];
+//             counter++;
+//         }
+//         avg = avg/binSize;
+//         ageBinned.push(Math.floor(avg));
+//     }
+//     console.log(ageBinned)
+// }
 
 export const generateAllCharts = (cf, jsonData) => {
     generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
@@ -236,5 +257,6 @@ const getMinMax = (jsonData, parameter) => {
             values.push(parseInt(data[parameter]));
         }
     });
-    return {min: Math.min(...values), max: Math.max(...values)}
+    return {min: Math.min.apply(null, values), max: Math.max.apply(null, values)}
+
 }

@@ -42,12 +42,6 @@ export const template = () => {
     `;
 }
 
-export const confluenceLogo = () => {
-    return `<a href="#" title="Home" rel="home">
-                <img src="./static/images/image.png" height="40px" width="300px" alt="NCI Confluence Data Platform Logo" class="banner-logo">
-            </a>`;
-}
-
 export const homePageVisualization = async () => {
     const fileData = await fetch('./data.json');
     fileData.json().then(data => {
@@ -82,7 +76,6 @@ export const homePageVisualization = async () => {
             }
         };
         Plotly.newPlot('barChart', [trace], layout, {responsive: true, displayModeBar: false});
-
 
         const ethnicity = data.ethnicity;
 

@@ -1,6 +1,5 @@
 import { getFolderItems, getFileInfo, filterProjects, amIViewer, getCollaboration } from "../shared.js";
 import { fileVersionsModal } from "../components/modal.js";
-import { addEventCopyToClipboard } from "../event.js";
 
 export const myProjectsTemplate = async () => {
     const response = await getFolderItems(0);

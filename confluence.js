@@ -1,5 +1,5 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization, confluenceLogo } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, getSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
@@ -10,24 +10,32 @@ import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 
 export const confluence = async () => {
-    let confluenceDiv = document.getElementById('confluenceDiv');
-    let confluenceLogoElement = document.getElementById('confluenceLogo');
-    let navBarOptions = document.getElementById('navBarOptions');
+    const confluenceDiv = document.getElementById('confluenceDiv');
+    const navBarOptions = document.getElementById('navBarOptions');
 
-    document.getElementById('loginBoxAppDev').onclick = loginAppDev;
-    document.getElementById('loginBoxAppProd').onclick = loginAppProd;
-    
-    confluenceLogoElement.innerHTML = confluenceLogo();
+    document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
+    document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
+
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
-    
-    if(localStorage.parms && JSON.parse(localStorage.parms).access_token) {
+    if (localStorage.parms === undefined) {
+        window.location.hash = '#';
+        confluenceDiv.innerHTML = homePage();
+        await homePageVisualization();
+        const loginBoxAppDev = document.getElementById('loginBoxAppDev');
+        const loginBoxAppProd = document.getElementById('loginBoxAppProd');
+        if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
+        if (location.origin.match('episphere')) loginBoxAppProd.hidden = false;
+        storeAccessToken();
+    }
+    if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         const response = await getCurrentUser();
 
-        if(response){
+        if (response) {
             const lclStr = JSON.parse(localStorage.parms);
-            localStorage.parms = JSON.stringify({...lclStr, ...response});
-        };
+            // localStorage.parms = JSON.stringify({ ...lclStr, ...response });
+            localStorage.parms = JSON.stringify(Object.assign(lclStr, response));
+        }
         navBarOptions.innerHTML = template();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
@@ -37,7 +45,7 @@ export const confluence = async () => {
         const dataAnalysisElement = document.getElementById('dataAnalysis');
 
         dataSubmissionElement.addEventListener('click', async () => {
-            if(dataSubmissionElement.classList.contains('navbar-active')) return;
+            if (dataSubmissionElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
@@ -49,7 +57,7 @@ export const confluence = async () => {
             hideAnimation();
         });
         dataSummaryElement.addEventListener('click', () => {
-            if(dataSummaryElement.classList.contains('navbar-active')) return;
+            if (dataSummaryElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
@@ -57,16 +65,15 @@ export const confluence = async () => {
             getSummary();
         });
         dataRequestElement.addEventListener('click', () => {
-            if(dataRequestElement.classList.contains('navbar-active')) return;
+            if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataRequestElement.classList.add('navbar-active');
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
-        
         dataAnalysisElement.addEventListener('click', () => {
-            if(dataAnalysisElement.classList.contains('navbar-active')) return;
+            if (dataAnalysisElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataAnalysisElement.classList.add('navbar-active');
@@ -78,13 +85,13 @@ export const confluence = async () => {
         const array = filterConsortiums(folders.entries);
         const projectArray = filterProjects(folders.entries);
         let showProjects = false;
-        for(let obj of projectArray){
-            if(showProjects === false) {
+        for (let obj of projectArray) {
+            if (showProjects === false) {
                 const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
-                if(bool === true) showProjects = true;
+                if (bool === true) showProjects = true;
             }
         }
-        if(array.length > 0 && projectArray.length > 0 && showProjects === true){
+        if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
@@ -99,8 +106,7 @@ export const confluence = async () => {
             `;
             addEventDataGovernanceNavBar(true);
             addEventMyProjects(projectArray);
-        }
-        else if(array.length > 0) {
+        } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
@@ -108,8 +114,7 @@ export const confluence = async () => {
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
-        }
-        else if(projectArray.length > 0 && showProjects === true){
+        } else if (projectArray.length > 0 && showProjects === true) {
             document.getElementById('myProjectsNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
@@ -120,15 +125,7 @@ export const confluence = async () => {
         }
         manageHash();
     }
-    if(localStorage.parms === undefined){
-        window.location.hash = '#';
-        confluenceDiv.innerHTML = homePage();
-        homePageVisualization();
-        if(location.origin.match('localhost')) loginBoxAppDev.hidden = false;
-        if(location.origin.match('episphere')) loginBoxAppProd.hidden = false;
-        storeAccessToken();
-    }
-}
+};
 
 const manageHash = () => {
     const hash = decodeURIComponent(window.location.hash);
@@ -169,28 +166,28 @@ const manageHash = () => {
     else if (hash === '#my_projects') {
         const element = document.getElementById('myProjects');
         if (element) {
-            if(element.classList.contains('navbar-active')) return;
+            if (element.classList.contains('navbar-active')) return;
             showAnimation();
             element.click();
-        }
-        else window.location.hash = '#';
-    }
-    else if (hash === '#logout'){
+        } else window.location.hash = '#';
+    } else if (hash === '#logout') {
         const element = document.getElementById('logOutBtn');
         element.click();
-    }
-    else window.location.hash = '#';
-}
+    } else window.location.hash = '#';
+};
 
 window.onload = async () => {
-    confluenceDiv.innerHTML = "";
-    if(localStorage.parms && JSON.parse(localStorage.parms).access_token){
+    console.log('confluence.js loaded');
+    const confluenceDiv = document.getElementById('confluenceDiv');
+    confluenceDiv.innerHTML = '';
+    if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         await checkAccessTokenValidity();
         inactivityTime();
     }
-    confluence();
-}
+    await confluence();
+};
 
 window.onhashchange = () => {
+    console.log('hash changed')
     manageHash();
-}
+};

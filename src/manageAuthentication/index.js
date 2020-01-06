@@ -12,6 +12,11 @@ export const checkAccessTokenValidity = async () => {
         });
         if(response.status === 401){
             if((await refreshToken()) === true) return await checkAccessTokenValidity();
+        } if(response.status === 200){
+            return response.json();
+        }
+        else{
+            return null;
         }
     }
     catch(error){

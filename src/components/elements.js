@@ -47,7 +47,8 @@ export const parameterListTemplate = (jsonData) => {
     else{
         const parametersLength = jsonData.map(d => Object.keys(d).length);
         if(parametersLength.length === 0) return;
-        let maximumparameters = Math.max(...parametersLength);
+        // let maximumparameters = Math.max(...parametersLength);
+        let maximumparameters = Math.max.apply(parametersLength);
         parameters = Object.keys(jsonData[parametersLength.indexOf(maximumparameters)]);
         parameters.sort();
         

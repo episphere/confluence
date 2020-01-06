@@ -207,14 +207,11 @@ export const clearGraphAndParameters = () => {
     document.getElementById('dataSummaryVizBarChart').innerHTML = '';
     document.getElementById('dataSummaryVizPieChart').hidden = true;
     document.getElementById('dataSummaryVizChart2').innerHTML = '';
-//     document.getElementById('dataSummaryParameter').hidden = true;
     document.getElementById('barChartLabel').innerHTML = '';
     document.getElementById('pieChartLabel').innerHTML = '';
     document.getElementById('statusPieChart').innerHTML = '';
-    // document.getElementById('showPieChart').style.display = 'none';
 }
 
 export const unHideDivs = () => {
     document.getElementById('dataSummaryVizPieChart').hidden = false;
-//     document.getElementById('dataSummaryParameter').hidden = false;
 }
