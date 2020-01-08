@@ -4,8 +4,7 @@
   "theme_color": "#c02269",
   "background_color": "#ffffff",
   "display": "standalone",
-  "Scope": "/",
-  "start_url": "/",
+  "start_url": "/confluence/",
   "icons": [
     {
       "src": "static/images/icons/icon-72x72.png",
