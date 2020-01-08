@@ -201,4 +201,5 @@ window.onhashchange = () => {
 
 window.onstorage = () => {
     if(localStorage.parms === undefined) logOut();
+    else confluence();
   };
