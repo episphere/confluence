@@ -190,3 +190,7 @@ window.onload = async () => {
 window.onhashchange = () => {
     manageHash();
 };
+
+window.onstorage = () => {
+    if(localStorage.parms === undefined) logOut();
+  };

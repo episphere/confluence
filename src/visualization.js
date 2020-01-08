@@ -54,7 +54,7 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 export const getFileContent = async () => {
-    const jsonData = await getFileJSON(558252350024, JSON.parse(localStorage.parms).access_token); // Get summary level data
+    const jsonData = await getFileJSON(558252350024); // Get summary level data
     hideAnimation();
     if(!jsonData) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`

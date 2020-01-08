@@ -79,16 +79,16 @@ export const getFile = async (id) => {
     }
 };
 
-export const getFileJSON = async (id, access_token) => {
+export const getFileJSON = async (id) => {
     try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
         let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
-        method:'GET',
         headers:{
             Authorization:"Bearer "+access_token
-        }
+            }
         });
         if(r.status === 401){
-            if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
+            if((await refreshToken()) === true) return await getFileJSON(id);
         }
         else if(r.status === 200){
             return r.json()
@@ -104,7 +104,9 @@ export const getFileJSON = async (id, access_token) => {
         }
     }
     catch(err) {
-        if((await refreshToken()) === true) return await getFileJSON(id, JSON.parse(localStorage.parms).access_token);
+        if(err.message !== 'Failed to fetch'){
+            if((await refreshToken()) === true) return await getFileJSON(id);
+        }
     }
 };
 
@@ -710,7 +712,7 @@ export const convertTextToJson = async (fileIds) => {
 }
 
 export const sessionExpired = () => {
-    localStorage.clear();
+    delete localStorage.parms;
     alert('session expired, reloading');
     location.reload();
 }
