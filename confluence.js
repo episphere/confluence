@@ -201,5 +201,9 @@ window.onhashchange = () => {
 
 window.onstorage = () => {
     if(localStorage.parms === undefined) logOut();
-    else confluence();
-  };
+    else {
+        confluence();
+        document.getElementById('loginBoxAppDev').hidden = true;
+        document.getElementById('loginBoxAppProd').hidden = true;
+    }
+};
