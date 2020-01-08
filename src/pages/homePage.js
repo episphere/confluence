@@ -1,30 +1,30 @@
 export const template = () => {
     return `
     <div class="main-summary-row home-page-stats sub-div-shadow">
-        <div class="summary-inner-col">
+        <div class="col">
             <span class="data-summary-label">Consortia</span></br>
             <span><i class="fas fa-3x fa-layer-group"></i></span>
-            <span class="data-summary-count">1</span></br>
-        </div></br>
-        <div class="summary-inner-col">
+            <span class="data-summary-count">1</span>
+        </div>
+        <div class="col">
             <span class="data-summary-label">Studies</span></br>
             <span><i class="fas fa-3x fa-university"></i></span>
-            <span class="data-summary-count">4</span></br>
-        </div></br>
-        <div class="summary-inner-col">
+            <span class="data-summary-count">4</span>
+        </div>
+        <div class="col">
             <span class="data-summary-label">Cases</span></br>
             <span><i class="fas fa-3x fa-user"></i></span>
             <span class="data-summary-count" id="publicCaseCount">0</span>
-        </div></br>
-        <div class="summary-inner-col">
+        </div>
+        <div class="col">
             <span class="data-summary-label">Controls</span></br>
             <span><i class="fas fa-3x fa-user"></i></span>
             <span class="data-summary-count" id="publicControlCount">0</span>
         </div>
     </div>
     <div class="main-summary-row">
-        <div class="summary-inner-col col-md-8" id="barChart"></div>
-        <div class="summary-inner-col col-md-4" id="pieChart"></div>
+        <div class="col-md-8" id="barChart"></div>
+        <div class="col-md-4" id="pieChart"></div>
     </div>
     <div class="main-summary-row about-confluence sub-div-shadow">
         <div class="col-md-3"><img height="100px" width="180px" src="https://dceg.cancer.gov/sites/g/files/xnrzdm236/files/styles/cgov_article/public/cgov_contextual_image/100/300/5/files/Confluence_Logo.png?itok=9FBxTnpk" alt="Confluence Logo"></div>
