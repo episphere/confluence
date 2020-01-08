@@ -11,6 +11,14 @@ import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 
 export const confluence = async () => {
+    if('serviceWorker' in navigator){
+        try {
+            navigator.serviceWorker.register('./serviceWorker.js');
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
 
