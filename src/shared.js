@@ -179,11 +179,13 @@ export const storeAccessToken = async () => {
             method:'POST',
             body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
         });
-        localStorage.parms = JSON.stringify(await response.json());
-        window.history.replaceState({},'', './');
-        confluence();
-        document.getElementById('loginBoxAppDev').hidden = true;
-        document.getElementById('loginBoxAppProd').hidden = true;
+        if(response.status && response.status === 200) {
+            localStorage.parms = JSON.stringify(await response.json());
+            window.history.replaceState({},'', './');
+            confluence();
+            document.getElementById('loginBoxAppDev').hidden = true;
+            document.getElementById('loginBoxAppProd').hidden = true;
+        }
     }else{
         if(localStorage.parms){
             confluence.parms=JSON.parse(localStorage.parms)
@@ -518,28 +520,6 @@ export const updateBoxCollaborator = async (id, role) => {
     }
     catch(err) {
         if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
-    }
-}
-
-export const revokeAccessToken = async () => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        const response = await fetch(`https://api.box.com/oauth2/revoke`, {
-            method: 'POST',
-            headers: {
-                Authorization: "Bearer "+access_token
-            },
-            body: JSON.stringify({token: access_token})
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await revokeAccessToken();
-        }
-        else{
-            return response;
-        }
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await revokeAccessToken();
     }
 }
 
