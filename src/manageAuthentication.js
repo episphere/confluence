@@ -37,21 +37,21 @@ export const loginAppProd = () => {
 }
 
 export const logOut = async () => {
-    if(!localStorage.parms) return;
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let clt={}
-    if(location.origin.indexOf('localhost') !== -1){
-        clt = config.iniAppDev;
-    }else if(location.origin.indexOf('episphere') !== -1){
-        clt = config.iniAppProd
-    }else if(location.origin.indexOf('observablehq') !== -1){
-        clt = config.iniObs
-    }
+    // if(!localStorage.parms) return;
+    // const access_token = JSON.parse(localStorage.parms).access_token;
+    // let clt={}
+    // if(location.origin.indexOf('localhost') !== -1){
+    //     clt = config.iniAppDev;
+    // }else if(location.origin.indexOf('episphere') !== -1){
+    //     clt = config.iniAppProd
+    // }else if(location.origin.indexOf('observablehq') !== -1){
+    //     clt = config.iniObs
+    // }
 
-    const response = await fetch(`https://api.box.com/oauth2/revoke`, {
-        method:'POST',
-        body: `token=${access_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
-    });
+    // const response = await fetch(`https://api.box.com/oauth2/revoke`, {
+    //     method:'POST',
+    //     body: `token=${access_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+    // });
     delete localStorage.parms;
     location.reload();
 }

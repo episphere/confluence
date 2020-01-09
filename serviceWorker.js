@@ -22,6 +22,7 @@ self.addEventListener('activate', event => {
   
 self.addEventListener('fetch', event => {
     const request = event.request;
+    if(request.method === 'POST') return;
     const url = new URL(request.url);
     if (url.origin === location.origin) {
         event.respondWith(cacheFirst(request));
