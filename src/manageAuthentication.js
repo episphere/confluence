@@ -36,7 +36,22 @@ export const loginAppProd = () => {
     document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppProd.stateIni}`
 }
 
-export const logOut = () => {
+export const logOut = async () => {
+    if(!localStorage.parms) return;
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    let clt={}
+    if(location.origin.indexOf('localhost') !== -1){
+        clt = config.iniAppDev;
+    }else if(location.origin.indexOf('episphere') !== -1){
+        clt = config.iniAppProd
+    }else if(location.origin.indexOf('observablehq') !== -1){
+        clt = config.iniObs
+    }
+
+    const response = await fetch(`https://api.box.com/oauth2/revoke`, {
+        method:'POST',
+        body: `token=${access_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+    });
     delete localStorage.parms;
     location.reload();
 }
