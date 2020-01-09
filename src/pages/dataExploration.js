@@ -39,21 +39,21 @@ export const template = () => {
             </div>
 
             <div class="main-summary-row">
-                <div class="summary-inner-col col-md-4">
+                <div class="summary-inner-col data-exploration-charts col-md-4">
                     <div id="chartDiv3">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
                         <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange3"></label></span>
                     </div>
                 </div>
-                <div class="summary-inner-col col-md-4">
+                <div class="summary-inner-col data-exploration-charts col-md-4">
                     <div id="chartDiv6">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
                         <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange6"></label></span>
                     </div>
                 </div>
-                <div class="summary-inner-col col-md-4">
+                <div class="summary-inner-col data-exploration-charts col-md-4">
                     <div id="chartDiv4">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
