@@ -64,8 +64,8 @@ export const homePageVisualization = async () => {
             }
         }
         var layout = {
-            xaxis: {title:`Age`, font: {size: 16}},
-            yaxis: {title:`Count`, font: {size: 16}},
+            xaxis: {title:`Age`, font: {size: 16}, fixedrange: true},
+            yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             title: {
