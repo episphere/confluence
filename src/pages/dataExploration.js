@@ -5,31 +5,31 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 
 export const template = () => {
     return `
-        <div class="main-summary-row">
+        <div class="main-summary-row data-exploration-div">
             <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
-            <div class="main-summary-row dynamic-charts">
-                <div class="summary-inner-col col-md-3">
+            <div class="main-summary-row">
+                <div class="summary-inner-col data-exploration-charts col-md-3">
                     <div id="chartDiv7">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
                         <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange7"></label></span>
                     </div>
                 </div>
-                <div class="summary-inner-col col-md-3">
+                <div class="summary-inner-col data-exploration-charts col-md-3">
                     <div id="chartDiv1">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel1"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart1"></div>
                         <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange1"></label></span>
                     </div>
                 </div>
-                <div class="summary-inner-col col-md-3">
+                <div class="summary-inner-col data-exploration-charts col-md-3">
                     <div id="chartDiv2">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
                         <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange2"></label></span>
                     </div>
                 </div>
-                <div class="summary-inner-col col-md-3">
+                <div class="summary-inner-col data-exploration-charts col-md-3">
                     <div id="chartDiv5">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
                         <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
@@ -38,7 +38,7 @@ export const template = () => {
                 </div>
             </div>
 
-            <div class="main-summary-row dynamic-charts">
+            <div class="main-summary-row">
                 <div class="summary-inner-col col-md-4">
                     <div id="chartDiv3">
                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>

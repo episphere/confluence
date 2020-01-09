@@ -102,6 +102,15 @@ body {
     font-weight: bold;
 }
 
+.data-exploration-charts {
+    margin-bottom: 30px;
+}
+
+.data-exploration-div {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 .collapse {
     height: inherit;
 }
