@@ -741,7 +741,8 @@ span.icon {
 }
 
 .data-analysis {
-    margin-left: 1rem !important;
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
 }
 
 .login-btn {
@@ -815,6 +816,7 @@ form {
 
 .my-projects-table {
     width: 97% !important;
+    overflow: auto;
 }
 
 
