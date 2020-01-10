@@ -21,14 +21,14 @@ export const template = async () => {
 
     template += await uploadInStudy('uploadInStudy');
     
-    template += '<div class="data-submission sub-div-shadow"><ul class="ul-list-style first-list-item">';
+    template += '<div class="data-submission sub-div-shadow"><ul class="ul-list-style first-list-item collapsible-items">';
 
     for(let obj of array){
         const consortiaName = obj.name;
         let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li><a class="${liClass}"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}</li>`
+        template += `<li class="collapsible-items"><a class="${liClass}"><i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i></a> ${consortiaName}</li>`
     }
 
     template += '</ul></div>';
@@ -53,6 +53,7 @@ export const lazyload = (element) => {
 
             for(const obj of entries){
                 const li = document.createElement('li');
+                li.classList = ['collapsible-items'];
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
@@ -73,6 +74,7 @@ export const lazyload = (element) => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
+                li.classList = ['collapsible-items'];
                 li.innerHTML = `<a><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> ${obj.name}`;
                 ul.appendChild(li);
             }

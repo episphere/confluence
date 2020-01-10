@@ -15,11 +15,11 @@ export const myProjectsTemplate = async () => {
             let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
             let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
             let title = type === 'folder' ? 'Expand / Collapse' : '';
-            template += `<li><a class="${liClass}"><i title="${title}" class="${expandClass}"></i></a> ${name}</li>`;
+            template += `<li><a class="${liClass} allow-overflow"><i title="${title}" class="${expandClass}"></i></a> ${name}</li>`;
             if(type === 'folder'){
                 const response = await getFolderItems(data[i].id);
                 const files = response.entries;
-                template += `<ul class="ul-list-style content allow-overflow"><li class="my-prjects-list-item">
+                template += `<ul class="ul-list-style content collapsible-items"><li class="my-prjects-list-item allow-overflow">
                         <table class="table table-borderless table-striped my-projects-table sub-div-shadow">
                             <thead>
                                 <tr class="table-no-wrap">

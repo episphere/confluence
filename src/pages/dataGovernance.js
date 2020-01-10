@@ -12,14 +12,14 @@ export const template = async () => {
         <h4 class="h4-heading">Consortium(s)</h4>
     `;
     
-    template += '<div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item">';
+    template += '<div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item collapsible-items">';
 
     for(let obj of array){
         const consortiaName = obj.name;
         let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li>
+        template += `<li class="collapsible-items">
             <a class="${liClass}">
                 <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
             </a> ${consortiaName}
@@ -52,7 +52,7 @@ export const dataGovernanceProjects = async () => {
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 template += `
-                <li>
+                <li class="collapsible-items">
                     <a class="${liClass}">
                         <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                     </a> ${projectName}
@@ -107,6 +107,7 @@ export const dataGovernanceLazyLoad = (element) => {
 
             for(const obj of entries){
                 const li = document.createElement('li');
+                li.classList = ['collapsible-items'];
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
@@ -141,6 +142,7 @@ export const dataGovernanceLazyLoad = (element) => {
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
+                li.classList = ['collapsible-items'];
                 li.innerHTML = `<a>
                         <i title="file" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i>
                         </a> <span title="${obj.name}">${obj.name.length > 20 ? `${obj.name.slice(0, 20)}...` : `${obj.name}`}</span>
