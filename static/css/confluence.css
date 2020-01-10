@@ -739,6 +739,11 @@ span.icon {
     overflow: auto;
 }
 
+.modal-body {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+}
+
 #loadingAnimation {
     position:fixed;
     width:100%;

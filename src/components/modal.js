@@ -11,7 +11,7 @@ export const uploadInStudy = async (id) => {
                     </button>
                 </div>
                 <form id="uploadStudyForm" method="POST">
-                    <div class="modal-body">
+                    <div class="modal-body allow-overflow">
                         <div class="form-group">
                             <label for="selectConsortiaUIS">Select consortia</label> <span class="required">*</span>
                             <select class="form-control" name="selectedConsortia" id="selectConsortiaUIS" required>
@@ -82,7 +82,7 @@ export const createProjectModal = () => {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" id="createProjectModalBody"></div>
+                <div class="modal-body allow-overflow" id="createProjectModalBody"></div>
             </div>
         </div>
     </div>`
@@ -93,7 +93,7 @@ export const fileAccessStatsModal = () => {
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header" id="modalFileStatsHeader"></div>
-                <div class="modal-body" id="modalFileStatsBody"></div>
+                <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
             </div>
         </div>
     </div>`
@@ -104,7 +104,7 @@ export const fileVersionsModal = () => {
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header" id="modalFVHeader"></div>
-                <div class="modal-body" id="modalFVBody"></div>
+                <div class="modal-body allow-overflow" id="modalFVBody"></div>
             </div>
         </div>
     </div>`

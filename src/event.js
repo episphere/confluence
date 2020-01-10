@@ -528,7 +528,7 @@ export const addEventShowAllCollaborator = () => {
             table = 'Collaborators not found!'
         }
         collaboratorModalBody.innerHTML = `
-            <div class="modal-body">${table}</div>
+            <div class="modal-body allow-overflow">${table}</div>
             <div class="modal-footer">
                 <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
             </div>
@@ -627,7 +627,7 @@ export const addEventAddNewCollaborator = () => {
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = `
             <form id="addCollaborationForm" method="POST">
-                <div class="modal-body">
+                <div class="modal-body allow-overflow">
                     <div><h5 class="modal-title">Share <strong>${name}</strong></h5></div>
                     <br>
                     <div class="row" id="collaboratorEmails">
