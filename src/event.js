@@ -948,7 +948,7 @@ export const addEventMyProjects = () => {
                 const versions = await getFileVersions(ID);
                 document.getElementById('modalFVHeader').innerHTML = `
                     <h5 class="modal-title">${element.dataset.fileName}</h5>
-                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 `;
@@ -1029,7 +1029,7 @@ export const addEventFileStats = (element) => {
         const name = element.dataset.fileName;
         document.getElementById('modalFileStatsHeader').innerHTML = `
             <h5 class="modal-title">${name}</h5>
-            <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         `;

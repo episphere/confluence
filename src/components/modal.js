@@ -6,7 +6,7 @@ export const uploadInStudy = async (id) => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header allow-overflow">
                 <h5 class="modal-title">Upload in existing study</h5>
-                    <button type="button" title="Close" class="close" title="Close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" title="Close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -51,7 +51,7 @@ export const shareFolderModal = () => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header allow-overflow">
                     <div id="folderToShare"></div>
-                    <ul class="nav nav-tabs">
+                    <ul class="nav nav-tabs allow-overflow">
                         <li class="nav-item">
                             <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
                         </li>
@@ -61,7 +61,7 @@ export const shareFolderModal = () => {
                         </li>
                     </ul>
                     
-                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -78,7 +78,7 @@ export const createProjectModal = () => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header allow-overflow">
                     <strong><i class="fas fa-project-diagram"></i> Create project</strong>
-                    <button type="button" title="Close" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

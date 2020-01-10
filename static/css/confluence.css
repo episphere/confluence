@@ -744,6 +744,14 @@ span.icon {
     overflow: auto;
 }
 
+.modal-close-btn {
+    position: absolute;
+    right: 0.75rem;
+    background-color: #ffffff !important;
+    margin: -1rem -0.75rem -1rem auto !important;
+    opacity: 1 !important;
+}
+
 .modal-body {
     margin-left: 0.25rem;
     margin-right: 0.25rem;
