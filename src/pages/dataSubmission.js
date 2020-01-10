@@ -1,10 +1,13 @@
-import { getFolderItems, filterStudiesDataTypes, filterConsortiums } from "../shared.js";
+import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
-    if(array.length <= 0) return;
+    if(array.length <= 0) {
+        hideAnimation();
+        return 'No folder found for Data Submission';
+    };
     
     let template = '';
     
