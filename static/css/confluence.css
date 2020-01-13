@@ -745,7 +745,7 @@ span.icon {
 }
 
 .modal-close-btn {
-    position: absolute;
+    /* position: absolute; */
     right: 0.75rem;
     background-color: #ffffff !important;
     margin: -1rem -0.75rem -1rem auto !important;
@@ -866,6 +866,8 @@ form {
 .my-projects-table {
     width: 97% !important;
     overflow: auto;
+    margin-left: 2px;
+    margin-top: 2px;
 }
 
 
