@@ -51,7 +51,7 @@ export const shareFolderModal = () => {
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header allow-overflow">
                     <div id="folderToShare"></div>
-                    <ul class="nav nav-tabs allow-overflow">
+                    <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
                         </li>
@@ -60,7 +60,6 @@ export const shareFolderModal = () => {
                             <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
                         </li>
                     </ul>
-                    
                     <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

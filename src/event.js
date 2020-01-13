@@ -618,7 +618,6 @@ export const addEventAddNewCollaborator = () => {
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
     btn1.addEventListener('click', () => {
-        if(btn1.classList.contains('active-tab')) return;
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
