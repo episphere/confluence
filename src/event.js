@@ -1,9 +1,9 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, getFileVersions, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
-import { myProjectsTemplate, expandProjects } from './pages/myProjects.js';
+import { myProjectsTemplate } from './pages/myProjects.js';
 import { createProjectModal } from './components/modal.js';
 
 let top = 0;
@@ -937,54 +937,8 @@ export const addEventMyProjects = () => {
         showAnimation();
         removeActiveClass('nav-menu-links', 'navbar-active');
         myProjects.classList.add('navbar-active');
-        const confluenceDiv = document.getElementById('confluenceDiv');
-        confluenceDiv.innerHTML = await myProjectsTemplate();
-        hideAnimation();
-        const elements = document.getElementsByClassName('getAllFileversions');
-        for(let element of Array.from(elements)){
-            element.addEventListener('click', async () => {
-                const ID = element.dataset.fileId;
-                const versions = await getFileVersions(ID);
-                document.getElementById('modalFVHeader').innerHTML = `
-                    <h5 class="modal-title">${element.dataset.fileName}</h5>
-                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                `;
-                let template = '';
-                if(versions.entries.length !== 0) {
-                    for(let dt of versions.entries){
-                        template += `
-                        <tr>
-                            <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
-                            <td>${dt.modified_by.name || dt.modified_by.login}</td>
-                            <td>${new Date(dt.modified_at).toLocaleString()}</td>
-                            <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
-                        </tr>
-                        `
-                    }
-                    document.getElementById('modalFVBody').innerHTML = `
-                    <table class="table table-borderless table-striped sub-div-shadow">
-                        <thead>
-                            <tr class="table-no-wrap">
-                                <th>File id</th>
-                                <th>Modified by</th>
-                                <th>Modified at</th>
-                                <th>Version id</th>
-                            </tr>
-                        </thead>
-                        <tbody>${template}</tbody>
-                    </table>
-                    `;
-                }
-                else{
-                    document.getElementById('modalFVBody').innerHTML = 'No older version found!';
-                }
-                addEventCopyToClipboard();
-            });
-            addEventCopyToClipboard();
-        }
-        expandProjects();
+        myProjectsTemplate();
+        
     });
 }
 
@@ -1026,6 +980,7 @@ export const addEventFileStats = (element) => {
     element.addEventListener('click', async () => {
         const ID = element.dataset.fileId;
         const name = element.dataset.fileName;
+        document.getElementById('modalFileStatsBody').innerHTML = '';
         document.getElementById('modalFileStatsHeader').innerHTML = `
             <h5 class="modal-title">${name}</h5>
             <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">

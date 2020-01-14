@@ -114,7 +114,7 @@ export const confluence = async () => {
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
-            addEventMyProjects(projectArray);
+            addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
                 
@@ -130,7 +130,7 @@ export const confluence = async () => {
                     <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
-            addEventMyProjects(projectArray);
+            addEventMyProjects();
         }
         manageHash();
     }
