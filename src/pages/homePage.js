@@ -68,6 +68,7 @@ export const homePageVisualization = async () => {
             yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
+            hovermode: false,
             title: {
                 text: "Age Distribution Chart",
                 font: {

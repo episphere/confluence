@@ -150,7 +150,5 @@ export const expandProjects = () => {
     });
     
     let consortiaFolder = document.getElementsByClassName('consortia-folder');
-    Array.from(consortiaFolder).forEach(element => {
-        element.dispatchEvent(new Event('click'));
-    });
+    Array.from(consortiaFolder)[0].dispatchEvent(new Event('click'));
 }
