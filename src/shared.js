@@ -693,7 +693,6 @@ export const convertTextToJson = async (fileIds) => {
 
 export const sessionExpired = () => {
     delete localStorage.parms;
-    alert('session expired, reloading');
     location.reload();
 }
 

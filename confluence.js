@@ -138,6 +138,7 @@ export const confluence = async () => {
 
 const manageHash = () => {
     const hash = decodeURIComponent(window.location.hash);
+    if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
     if(hash === '' || hash === '#' || hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
