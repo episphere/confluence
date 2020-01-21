@@ -1,9 +1,10 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
 
 export const template = () => {
+    // dataBinning();
     return `
         <div class="main-summary-row data-exploration-div">
             <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
@@ -63,6 +64,39 @@ export const template = () => {
             </div>
         </div>
     `;  
+}
+
+const dataBinning = async () => {
+    const fileId = 558252350024;
+    const response = await getFileJSON(fileId);
+    const newArray = [];
+    response.forEach(obj => {
+        const age = parseInt(obj.ageInt)
+        let range = '';
+        if(age >= 0 && age <= 9) range = '0-9';
+        if(age >= 10 && age <= 19) range = '10-19';
+        if(age >= 20 && age <= 29) range = '20-29';
+        if(age >= 30 && age <= 39) range = '30-39';
+        if(age >= 40 && age <= 49) range = '40-49';
+        if(age >= 50 && age <= 59) range = '50-59';
+        if(age >= 60 && age <= 69) range = '60-69';
+        if(age >= 70 && age <= 79) range = '70-79';
+        if(age >= 80 && age <= 89) range = '80-89';
+        if(age >= 90 && age <= 99) range = '90-99';
+        if(age >= 100 && age <= 109) range = '100-109';
+        if(age >= 110 && age <= 119) range = '110-119';
+        newArray.push({
+            consortium: obj.consortium,
+            status: obj.status,
+            ageInt: range,
+            ethnicityClass: obj.ethnicityClass,
+            famHist: obj.famHist,
+            fhnumber: obj.fhnumber,
+            study: obj.study,
+            ER_statusIndex: obj.ER_statusIndex
+        })
+    })
+    // uploadFile(newArray, 'summary_data.json', 100898103650);
 }
 
 const generateConfluenceSummaryLevelData = async () => {

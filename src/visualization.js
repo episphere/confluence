@@ -86,7 +86,8 @@ export const getFileContent = async () => {
 // }
 
 export const generateAllCharts = (cf, jsonData) => {
-    generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
+    // generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
+    generateBarChart(cf, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
 
     dc.config.defaultColors(d3.schemePaired);
     renderPieChart(cf, jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
@@ -102,35 +103,38 @@ export const generateAllCharts = (cf, jsonData) => {
     
 }
 
-export const generateBarChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+export const generateBarChart = (cf, parameter, id, labelID, rangeLabelID, chartDiv) => {
     document.getElementById(chartDiv).classList.add('background-white');
-    let barChart = dc.barChart(`#${id}`);
-    const { min, max } = getMinMax(jsonData, parameter);
+    let rowChart = dc.rowChart(`#${id}`);
     let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
-    let ageCount = age.group().reduceCount();
-    barChart.dimension(age)
+    let ageCount = age.group().reduceSum(function(d) {return +1});
+    
+    rowChart
+        .dimension(age)
         .group(ageCount)
-        .x(d3.scaleLinear().domain([min, max]))
-        .yAxisLabel(function(){
-            return `Count (${barChart.data()[0].domainValues.map(d=>d.y).reduce((a,b)=>a+b)})`
+        .x(d3.scaleBand())
+        .gap(5)
+        .elasticX(true)
+        .colorAccessor(function (d, i){return i;})
+        .label(function(c){
+            return `${c.key} (${c.value})`
         })
-        .elasticY(true)
-        .render();
+        .render()
     document.getElementById(id).parentNode.classList.add('sub-div-shadow');
-    barChart.on('filtered', function(chart) {
+    rowChart.on('filtered', function(chart) {
         const filters = chart.filters();
         if(filters.length) {
-            const range = filters[0];
-            const bottomRange = Math.ceil(range[0]);
-            const topRange = Math.ceil(range[1]);
-            document.getElementById(rangeLabelID).innerHTML = `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${bottomRange} - ${topRange} years </button>`;
+            let selection = '';
+            filters.forEach((dt) => {
+                selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
+            });
+            document.getElementById(rangeLabelID).innerHTML = selection;
         }else{
             document.getElementById(rangeLabelID).innerHTML = ``;
         }
     });
+
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
-    // unHideDivs();
-    // disableCheckBox(false);
 }
 
 const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -159,12 +163,6 @@ const generateBarSingleSelect = (cf, parameter, id, labelID, rangeLabelID, chart
                 selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
             });
             document.getElementById(rangeLabelID).innerHTML = selection;
-            // const filterBtn = document.getElementsByClassName('filter-btn');
-            // Array.from(filterBtn).forEach(btn => {
-            //     btn.addEventListener('click', () => {
-            //         chart.filter(null);
-            //     })
-            // });
         }else{
             document.getElementById(rangeLabelID).innerHTML = ``;
         }

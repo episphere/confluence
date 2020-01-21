@@ -21,7 +21,7 @@ export const template = async () => {
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
             <a class="${liClass}">
-                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
+                <i title="${title}" data-toggle="tooltip" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
             </a> ${consortiaName}
         </li>
         `
@@ -54,7 +54,7 @@ export const dataGovernanceProjects = async () => {
                 template += `
                 <li class="collapsible-items">
                     <a class="${liClass}">
-                        <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+                        <i title="${title}" data-toggle="tooltip" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                     </a> ${projectName}
                 </li>
                 `;
@@ -87,6 +87,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 a.title = 'Manage collaboration';
                 a.dataset.folderName = element.dataset.folderName;
                 a.dataset.objectType = type;
+                a.dataset.toggle = "tooltip";
                 a.innerHTML = `<i class="fas fa-share"></i>`
                 element.parentNode.parentNode.appendChild(a);
                 shareData(a);
@@ -111,7 +112,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
+                li.innerHTML = `<a class="${liClass}"><i data-toggle="tooltip" title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
 
                 if(!element.dataset.sharable){
                     const a = document.createElement('a');
@@ -122,6 +123,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a.dataset.folderName = obj.name;
                     a.dataset.objectType = type;
                     a.title = 'Manage collaboration';
+                    a.dataset.toggle = "tooltip";
                     a.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(a);
                     shareData(a);
@@ -144,7 +146,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 const li = document.createElement('li');
                 li.classList = ['collapsible-items'];
                 li.innerHTML = `<a>
-                        <i title="file" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i>
+                        <i data-toggle="tooltip" title="file" data-id="${obj.id}" data-status="pending"${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} class="fas fa-file-alt"></i>
                         </a> <span title="${obj.name}">${obj.name.length > 20 ? `${obj.name.slice(0, 20)}...` : `${obj.name}`}</span>
                     `;
 
@@ -157,6 +159,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a1.dataset.folderName = obj.name;
                     a1.dataset.objectType = obj.type;
                     a1.title = 'Manage collaboration';
+                    a1.dataset.toggle = "tooltip";
                     a1.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(a1);
                     shareData(a1);
@@ -169,6 +172,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     a2.dataset.fileName = obj.name;
                     a2.dataset.objectType = obj.type;
                     a2.title = 'File access stats';
+                    a2.dataset.toggle = "tooltip";
                     a2.innerHTML = `<i class="fas fa-info-circle"></i>`;
                     li.appendChild(a2);
                     addEventFileStats(a2);
