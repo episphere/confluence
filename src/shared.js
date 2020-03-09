@@ -176,6 +176,9 @@ export const storeAccessToken = async () => {
         let url = `https://api.box.com/oauth2/token/`;
         
         const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
             method:'POST',
             body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
         });
