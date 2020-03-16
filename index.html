@@ -37,8 +37,16 @@
                     <div class="collapse navbar-collapse" id="navbarToggler">
                         <div class="navbar-nav grid" id="navBarOptions">
                             
-                            <div class="nav-item navbar-active grid-elements">
-                                <a class="nav-link nav-menu-links" href="#" title="Confluence" id="homePage"><i class="fas fa-home"></i> Confluence</a>
+                            
+                            <div class="nav-item navbar-active grid-elements dropdown">
+                                <a class="nav-link nav-menu-links dropdown-toggle"  href="#" title="Confluence" id="homePage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-home"></i> Home
+                                </a>
+                                <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> About</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> Resources</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> Contact</a>
+                                </div>
                             </div>
                             
                         </div>
@@ -53,6 +61,24 @@
             </div>
             <div id="maincontainer">
                 <div class="container">
+                    <div class="confluence-color" style="height: 120px;padding: 0.5rem 1rem;"><img src="./static/images/confluence_logo_white.png" alt=""></div>
+                    <div class="modal" tabindex="-1" role="dialog" id="confluenceMainModal">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header" id="confluenceModalHeader">
+                                    <!-- <h5 class="modal-title">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button> -->
+                                </div>
+                                <div class="modal-body" id="confluenceModalBody"></div>
+                                <!-- <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
                     <div class="main-container confluence-div-shadow" id="confluenceDiv"></div>
                     <div class="main-summary-row" id="loadingAnimation" role="status" style="display: none;"></div>
                 </div>
@@ -65,7 +91,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/3.0.12/dc.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/3.2.1/dc.min.js" defer></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
     </body>
 </html>

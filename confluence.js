@@ -1,5 +1,5 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization, addEventAboutConfluence } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
@@ -30,6 +30,7 @@ export const confluence = async () => {
     if (localStorage.parms === undefined) {
         window.location.hash = '#';
         confluenceDiv.innerHTML = homePage();
+        addEventAboutConfluence();
         await homePageVisualization();
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
