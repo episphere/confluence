@@ -90,7 +90,7 @@ body {
 }
 
 .navbar-active {
-    background-color: #2f2a2a;
+    background-color: #2f2a2a !important;
 }
 
 .active {

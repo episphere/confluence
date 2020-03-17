@@ -105,13 +105,13 @@ export const confluence = async () => {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
@@ -120,7 +120,7 @@ export const confluence = async () => {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
@@ -128,7 +128,7 @@ export const confluence = async () => {
             document.getElementById('myProjectsNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
             addEventMyProjects();
@@ -143,6 +143,7 @@ const manageHash = () => {
     if(hash === '' || hash === '#' || hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
+        console.log(element)
         if(element.classList.contains('navbar-active')) return;
         showAnimation();
         element.click();
