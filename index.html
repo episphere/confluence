@@ -36,8 +36,6 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarToggler">
                         <div class="navbar-nav grid" id="navBarOptions">
-                            
-                            
                             <div class="nav-item navbar-active grid-elements dropdown">
                                 <a class="nav-link nav-menu-links dropdown-toggle"  href="#" title="Confluence" id="homePage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-home"></i> Home
@@ -48,7 +46,11 @@
                                     <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> Contact</a>
                                 </div>
                             </div>
-                            
+                            <div class="nav-item grid-elements">
+                                <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
+                                    <i class="fas fa-bug"></i> Report issue
+                                </a>
+                            </div>
                         </div>
                         <div class="navbar-nav ml-auto">
                             <div class="nav-item grid-elements">
@@ -61,7 +63,10 @@
             </div>
             <div id="maincontainer">
                 <div class="container">
-                    <div class="confluence-color" style="height: 120px;padding: 0.5rem 1rem;"><img src="./static/images/confluence_logo_white.png" alt=""></div>
+                    <div class="confluence-color row" style="height: 120px;padding: 0.5rem 1rem;">
+                        <img src="./static/images/confluence_logo_white.png" alt="Confluence logo">
+                        <h3 id="tabHeading"></h3>
+                    </div>
                     <div class="modal" tabindex="-1" role="dialog" id="confluenceMainModal">
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content sub-div-shadow">

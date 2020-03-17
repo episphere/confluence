@@ -145,24 +145,28 @@ const manageHash = () => {
         if(!element) return;
         console.log(element)
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Exploration';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Analysis';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_request') {
         const element = document.getElementById('dataRequest');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Request';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Submission';
         showAnimation();
         element.click();
     }
@@ -170,6 +174,7 @@ const manageHash = () => {
         const element = document.getElementById('dataGovernance');
         if (element) {
             if(element.classList.contains('navbar-active')) return;
+            // document.getElementById('tabHeading').innerHTML = 'Data Governance';
             showAnimation();
             element.click();
         }
@@ -179,6 +184,7 @@ const manageHash = () => {
         const element = document.getElementById('myProjects');
         if (element) {
             if (element.classList.contains('navbar-active')) return;
+            // document.getElementById('tabHeading').innerHTML = 'My Projects';
             showAnimation();
             element.click();
         } else window.location.hash = '#';

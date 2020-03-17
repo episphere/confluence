@@ -741,6 +741,10 @@ label {
     background-color: #74103A !important;
 }
 
+#tabHeading {
+    color: #ffffff;
+}
+
 .filter-studies {
     margin-right: 0px !important;
 }

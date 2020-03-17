@@ -238,6 +238,9 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
                     jsonData.map(dt => parseInt(dt['80-89'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['90-99'])).reduce((a,b) => a+b)
             ],
+            marker:{
+                color: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F']
+            },
           type: 'bar'
         }
     ];
@@ -291,6 +294,9 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
                     jsonData.map(dt => parseInt(dt['famHist_DK\r'])).reduce((a,b) => a+b)
                     
             ],
+            marker:{
+                color: ['#BF1B61', '#7F7F7F','#BF1B61']
+            },
           type: 'bar'
         }
     ];
@@ -351,8 +357,11 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_NA'])).reduce((a,b) => a+b)
             ],
-          type: 'pie',
-          hole: .4
+            type: 'pie',
+            marker:{
+                colors: ['#BF1B61', '#7F7F7F', '#BF1B61', '#7F7F7F']
+            },
+            hole: .4
         }
     ];
     const layout = {
@@ -384,8 +393,11 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
         {
             labels: ['Case', 'Control'],
             values: [countStatus('case', jsonData), countStatus('control', jsonData)],
-          type: 'pie',
-          hole: .4
+            type: 'pie',
+            marker:{
+                colors: ['#BF1B61', '#7F7F7F']
+            },
+            hole: .4
         }
     ];
     const layout = {
@@ -416,8 +428,11 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
         {
             labels: getUniqueConsortium(jsonData),
             values: valueCount,
-          type: 'pie',
-          hole: .4
+            type: 'pie',
+            hole: .4,
+            marker:{
+                colors: ['#BF1B61']
+            },
         }
     ];
     const layout = {
@@ -448,7 +463,10 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
         {
             x: ['European', 'Hispanic', 'African', 'Asian', 'South East Asian', 'Other', 'DK'],
             y: [countEthnicity('European', jsonData), countEthnicity('Hispanic', jsonData), countEthnicity('African', jsonData), countEthnicity('Asian', jsonData), countEthnicity('South East Asian', jsonData), countEthnicity('Other', jsonData), countEthnicity('DK', jsonData)],
-          type: 'bar'
+            type: 'bar',
+            marker:{
+                color: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61']
+            },
         }
     ];
     const layout = {

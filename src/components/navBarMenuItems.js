@@ -19,6 +19,11 @@ export const template = () => {
         <div class="nav-item grid-elements">
             <a class="nav-link nav-menu-links" title="Confluence Tutorials" id="platformTutorial"><i class="fas fa-file-video"></i> Tutorials</a>
         </div>
+        <div class="nav-item grid-elements">
+            <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
+                <i class="fas fa-bug"></i> Report issue
+            </a>
+        </div>
         <div class="navbar-nav ml-auto">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="nav-item grid-elements dropdown">
