@@ -4,7 +4,7 @@ export const template = () => {
         <div class="nav-item grid-elements dropdown">
             <a class="nav-link nav-menu-links dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-database"></i> Data</a>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_exploration" title="Data Exploration" id="dataSummary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="dropdown-item nav-link nav-menu-links" href="#data_exploration" title="Data Exploration" id="dataSummary">
                     <i class="fas fa-chart-bar"></i> Explore
                 </a>
                 <a class="dropdown-item nav-link nav-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
