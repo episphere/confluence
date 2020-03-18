@@ -216,6 +216,9 @@ export const refreshToken = async () => {
     }
 
     const response = await fetch(`https://api.box.com/oauth2/token/`, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
         method:'POST',
         body: `grant_type=refresh_token&refresh_token=${parms.refresh_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
     });
@@ -905,4 +908,34 @@ export const reSizeCharts = (cf, jsonData) => {
         }, 500);
     }
     window.onresize = resetTimer;
+}
+
+export const csvJSON = (csv) => {
+    const lines=csv.split("\n");
+    const result = [];
+    const headers=lines[0].split(",");
+  
+    for(let i=1; i < lines.length; i++){
+        const obj = {};
+        const currentline = lines[i].split(",");
+        for(let j = 0; j<headers.length; j++){
+            let value = headers[j];
+            if(value === 'age20:29') value = '20-29';
+            if(value === 'age30:39') value = '30-39';
+            if(value === 'age40:49') value = '40-49';
+            if(value === 'age50:59') value = '50-59';
+            if(value === 'age60:69') value = '60-69';
+            if(value === 'age70:79') value = '70-79';
+            if(value === 'age80:89') value = '80-89';
+            if(value === 'age90:99') value = '90-99';
+            obj[value] = currentline[j];
+        }
+        if(obj.status !== undefined) {
+            result.push(obj);
+        }
+    }
+    for(let obj of result){
+        obj.total = parseInt(obj['20-29']) + parseInt(obj['30-39'])+ parseInt(obj['40-49']) + parseInt(obj['50-59']) + parseInt(obj['60-69']) + parseInt(obj['70-79']) + parseInt(obj['80-89']) + parseInt(obj['90-99']);
+    }
+    return result;
 }

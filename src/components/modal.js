@@ -45,31 +45,6 @@ export const uploadInStudy = async (id) => {
     </div>`
 }
 
-export const shareFolderModal = () => {
-    return `<div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content sub-div-shadow">
-                <div class="modal-header allow-overflow">
-                    <div id="folderToShare"></div>
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
-                            <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
-                        </li>
-                    </ul>
-                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div id="collaboratorModalBody"></div>
-            </div>
-        </div>
-    </div>`
-}
 
 export const createProjectModal = () => {
     return `<div class="modal fade" id="createProjectModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
@@ -87,19 +62,6 @@ export const createProjectModal = () => {
     </div>`
 }
 
-export const fileAccessStatsModal = () => {
-    return `<div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content sub-div-shadow">
-                <div class="modal-header allow-overflow" id="modalFileStatsHeader"></div>
-                <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
-                <div class="modal-footer">
-                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>`
-}
 
 export const fileVersionsModal = () => {
     return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">

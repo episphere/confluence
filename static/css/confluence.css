@@ -90,7 +90,7 @@ body {
 }
 
 .navbar-active {
-    background-color: #2f2a2a;
+    background-color: #2f2a2a !important;
 }
 
 .active {
@@ -128,6 +128,11 @@ body {
     position: relative;
 }
 
+#cardContent {
+    max-height: 800px;
+    overflow: auto;
+}
+
 .container {
     min-height: inherit;
     height: 100%;
@@ -151,14 +156,58 @@ body {
 }
 
 .home-page-stats {
-    margin: auto;
     background-color: #fff;
     padding-bottom: 0.5rem;
     border-radius: 0.5rem;
+    margin-bottom: 1rem;
 }
 
+.confluence-color {
+    background-color: #74103A !important;
+}
+
+.info-confluence {
+    margin-bottom: 1rem;
+    margin-top: 4rem;
+}
+
+#confluenceInfo {
+    margin-top: -50px !important;
+}
+
+.white-font {
+    color: #ffffff;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* [data-tooltip]:before {
+    content: attr(data-tooltip);
+    position: absolute;
+    opacity: 0;
+    transition: all 0.15s ease;
+    padding: 10px;
+    color: #ffffff;
+    border-radius: 10px;   
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+[data-tooltip]:hover:before {
+    opacity: 1;
+    background: #000000;
+    margin-top: 0px;
+    margin-left: 20px;    
+}
+
+[data-tooltip]:not([data-tooltip-persistent]):before {
+    pointer-events: none;
+} */
+
 .main-container {
-    background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(183, 226, 238) 48%, rgb(143, 193, 247) 100%);
+    /* background-image: radial-gradient(at center center, rgb(159, 222, 239) 0%, rgb(183, 226, 238) 48%, rgb(143, 193, 247) 100%); */
     height: inherit;
     padding: 1rem;
     min-height: inherit;
@@ -265,6 +314,7 @@ label {
 .background-white {
     background-color: #ffffff;
     border-radius: 0.5rem;
+    min-height: 250px;
 }
 
 .data-summary-count {
@@ -557,12 +607,14 @@ label {
 }
 
 .dataSummary-chart {
-    min-height: 360px;
+    /* min-height: 360px; */
+    /* height: 360px; */
 }
 
 .dataSummary-label{
     color: #531e1a;
     font-weight: bold;
+    font-size: small;
 }
 
 .dataSummary-selected-range {
@@ -650,6 +702,73 @@ label {
     white-space: nowrap;
 }
 
+.remove-padding-right {
+    padding-right: 0px;
+}
+
+.remove-padding-left {
+    padding-left: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.consortium-selection:hover {
+    cursor: pointer;
+    background-color: #c9c9c9;
+    border-radius: 0.5rem;
+}
+
+.filter-studies:hover {
+    cursor: pointer;
+    background-color: #c9c9c9;
+    border-radius: 0.5rem;
+}
+
+.filter-studies {
+    padding: 0px 5px;
+    margin: 1px 0px;
+}
+
+.active-filter {
+    background-color: #e7bcbc;
+    border-radius: 0.5rem;
+}
+
+.custom-borders {
+    border-bottom: 0.5px solid #bcbdbe;
+}
+
+.consortia-total {
+    background-color: #74103A !important;
+}
+
+#tabHeading {
+    color: #ffffff;
+}
+
+.filter-studies {
+    margin-right: 0px !important;
+}
+
+.custom-margin {
+    background-color: #3e4086;
+    color: #ffffff;
+    padding: 0px 3px;
+}
+
+.custom-padding {
+    padding-left: 1rem;;
+}
+
+.consortium-selection {
+    list-style-type: none;
+    padding: 0px 5px;
+}
+
+.card {
+    border-radius: 0.5rem;
+    margin-bottom: 30px;
+}
+
 .sub-div-shadow {
     box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
 }
@@ -694,10 +813,31 @@ span.icon {
 
 .footer-content {
     text-align: center;
-    box-shadow: 0px -8px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px -3px 6px rgba(0, 0, 0, 0.12);
     width: 100%;
     background-color: #fff;
     margin: 0px !important;
+}
+
+.dc-select-menu {
+    display: block;
+    width: 100%;
+    height: calc(2.5em + 2.75rem + 2px);
+    padding: .375rem .375rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+}
+
+.selection-group {
+    margin-bottom: 30px;
 }
 
 .footer-links {

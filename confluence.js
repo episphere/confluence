@@ -1,5 +1,5 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization, addEventAboutConfluence } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
@@ -30,6 +30,7 @@ export const confluence = async () => {
     if (localStorage.parms === undefined) {
         window.location.hash = '#';
         confluenceDiv.innerHTML = homePage();
+        addEventAboutConfluence();
         await homePageVisualization();
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
@@ -104,13 +105,13 @@ export const confluence = async () => {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
@@ -119,7 +120,7 @@ export const confluence = async () => {
             document.getElementById('governanceNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-database"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
@@ -127,7 +128,7 @@ export const confluence = async () => {
             document.getElementById('myProjectsNav').innerHTML = `
                 
                 <div class="nav-item  grid-elements">
-                    <a class="nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
+                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
             addEventMyProjects();
@@ -142,25 +143,30 @@ const manageHash = () => {
     if(hash === '' || hash === '#' || hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
+        console.log(element)
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Exploration';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Analysis';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_request') {
         const element = document.getElementById('dataRequest');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Request';
         showAnimation();
         element.click();
     }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
         if(element.classList.contains('navbar-active')) return;
+        // document.getElementById('tabHeading').innerHTML = 'Data Submission';
         showAnimation();
         element.click();
     }
@@ -168,6 +174,7 @@ const manageHash = () => {
         const element = document.getElementById('dataGovernance');
         if (element) {
             if(element.classList.contains('navbar-active')) return;
+            // document.getElementById('tabHeading').innerHTML = 'Data Governance';
             showAnimation();
             element.click();
         }
@@ -177,6 +184,7 @@ const manageHash = () => {
         const element = document.getElementById('myProjects');
         if (element) {
             if (element.classList.contains('navbar-active')) return;
+            // document.getElementById('tabHeading').innerHTML = 'My Projects';
             showAnimation();
             element.click();
         } else window.location.hash = '#';

@@ -104,7 +104,7 @@ export const variables = {
             5: 'South-East Asian',
             6: 'Other',
             888: "Don't Know",
-            'label': 'Ethnic origin'
+            'label': 'Ancestory'
         },
         ethnicitySubClass: {
             1: 'Northern European',
