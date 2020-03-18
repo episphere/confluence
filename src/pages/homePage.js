@@ -73,37 +73,37 @@ export const homePageVisualization = async () => {
         {
             posx: 110,
             posy: 170,
-            img: "../../static/images/mutation_carriers.png",
+            img: "./../../static/images/mutation_carriers.png",
         },
         {
             posx: 215,
             posy: 120,
-            img: "../../static/images/african_gwas.png",
+            img: "./../../static/images/african_gwas.png",
         },
         {
             posx: 320,
             posy: 170,
-            img: "../../static/images/european_gwas.png",
+            img: "./../../static/images/european_gwas.png",
         }, 
         {
             posx: 215,
             posy: 225,    
-            img: "../../static/images/confluence.png"
+            img: "./../../static/images/confluence.png"
         },
         {
             posx: 315,
             posy: 280,    
-            img: "../../static/images/latina_gwas.png"
+            img: "./../../static/images/latina_gwas.png"
         }, 
         {
             posx: 220,
             posy: 330,    
-            img: "../../static/images/asian_gwas.png"
+            img: "./../../static/images/asian_gwas.png"
         }, 
         {
             posx: 115,
             posy: 285,    
-            img: "../../static/images/male_bc_gwas.png"
+            img: "./../../static/images/male_bc_gwas.png"
         }
     ]
     data.forEach(function(d, i) {
