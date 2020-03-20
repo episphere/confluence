@@ -40,7 +40,7 @@ export const confluence = async () => {
     }
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         const response = await getCurrentUser();
-
+        showAnimation();
         if (response) {
             const lclStr = JSON.parse(localStorage.parms);
             // localStorage.parms = JSON.stringify({ ...lclStr, ...response });

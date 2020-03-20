@@ -224,7 +224,7 @@ const generateSelectionMenu = (cf, parameter, id) => {
 }
 
 export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     
     const data = [
         {
@@ -285,7 +285,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
             x: ['Yes', 'No', 'Don\'t know'],
@@ -340,7 +340,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -381,7 +381,7 @@ const countEthnicity = (value, jsonData) => {
 }
 
 const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -408,7 +408,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
 }
 
 const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -451,7 +451,7 @@ const getUniqueConsortium = (jsonData) => {
 }
 
 const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
+    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -478,88 +478,87 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white sub-div-shadow'];
-    let data_reduce = valUnique(parameter, 0, jsonData);
+// const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+//     document.getElementById(chartDiv).classList = ['background-white'];
+//     let data_reduce = valUnique(parameter, 0, jsonData);
 
-    document.getElementById(id).innerHTML = '';
-    let pieChart = dc.pieChart(`#${id}`);
-    let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
+//     document.getElementById(id).innerHTML = '';
+//     let pieChart = dc.pieChart(`#${id}`);
+//     let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
     
-    let G_status2 = data.group().reduce(
-        function(p,v){
-            data_reduce[v[parameter]] += 1
-            return data_reduce[v[parameter]]
-        },
-        function(p,v){
-            data_reduce[v[parameter]] -= 1
-            return data_reduce[v[parameter]]
-        },
-        function(p){return 0}
-    )
-    const ir = Math.ceil((window.innerWidth*45)/1536);
-    const erp = Math.ceil((window.innerWidth*10)/1536);
-    pieChart
-        .dimension(data)
-        .group(G_status2)
-        .minAngleForLabel(0.35)
-        .externalRadiusPadding(erp)
-        .innerRadius(ir)
-        .radius(ir+100)
-        .drawPaths(true)
-        .label(function(c){
-            return `${c.key}`
-        });
+//     let G_status2 = data.group().reduce(
+//         function(p,v){
+//             data_reduce[v[parameter]] += 1
+//             return data_reduce[v[parameter]]
+//         },
+//         function(p,v){
+//             data_reduce[v[parameter]] -= 1
+//             return data_reduce[v[parameter]]
+//         },
+//         function(p){return 0}
+//     )
+//     const ir = Math.ceil((window.innerWidth*45)/1536);
+//     const erp = Math.ceil((window.innerWidth*10)/1536);
+//     pieChart
+//         .dimension(data)
+//         .group(G_status2)
+//         .minAngleForLabel(0.35)
+//         .externalRadiusPadding(erp)
+//         .innerRadius(ir)
+//         .radius(ir+100)
+//         .drawPaths(true)
+//         .label(function(c){
+//             return `${c.key}`
+//         });
     
-    pieChart.render();
-    pieChart.filter = function() {};
-    document.getElementById(id).parentNode.classList.add('sub-div-shadow');
-    pieChart.on('filtered', function(chart) {
-        const filters = chart.filters();
-        if(filters.length) {
-            let selection = '';
-            filters.forEach((dt) => {
-                selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
-            });
-            document.getElementById(rangeLabelID).innerHTML = selection;
-            // const filterBtn = document.getElementsByClassName('filter-btn');
-            // Array.from(filterBtn).forEach(btn => {
-            //     btn.addEventListener('click', () => {
-            //         chart.filter(null);
-            //     })
-            // });
-        }else{
-            document.getElementById(rangeLabelID).innerHTML = ``;
-        }
-    });
+//     pieChart.render();
+//     pieChart.filter = function() {};
+//     document.getElementById(id).parentNode.classList.add('sub-div-shadow');
+//     pieChart.on('filtered', function(chart) {
+//         const filters = chart.filters();
+//         if(filters.length) {
+//             let selection = '';
+//             filters.forEach((dt) => {
+//                 selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
+//             });
+//             document.getElementById(rangeLabelID).innerHTML = selection;
+//             // const filterBtn = document.getElementsByClassName('filter-btn');
+//             // Array.from(filterBtn).forEach(btn => {
+//             //     btn.addEventListener('click', () => {
+//             //         chart.filter(null);
+//             //     })
+//             // });
+//         }else{
+//             document.getElementById(rangeLabelID).innerHTML = ``;
+//         }
+//     });
     
-    let pieLabel = ''
-    if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
-        pieLabel = variables.BCAC[parameter]['label'];
-    }else{
-        pieLabel = parameter;
-    }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
-}
+//     let pieLabel = ''
+//     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
+//         pieLabel = variables.BCAC[parameter]['label'];
+//     }else{
+//         pieLabel = parameter;
+//     }
+//     document.getElementById(labelID).innerHTML = `${pieLabel}`;
+// }
 
 const getCrossFilter = (jsonData) => crossfilter(jsonData);
 
-const valUnique=function(k,v, jsonData){
-    var u={}
-    jsonData.forEach(d=>{
-        if(d[k] === "") return;
-        u[d[k]]=v
-    })
-    return u
-}
+// const valUnique=function(k,v, jsonData){
+//     var u={}
+//     jsonData.forEach(d=>{
+//         if(d[k] === "") return;
+//         u[d[k]]=v
+//     })
+//     return u
+// }
 
-const getMinMax = (jsonData, parameter) => {
-    let values = [];
-    jsonData.forEach(data => {
-        if(data[parameter] && data[parameter] !== "" && data[parameter] !== "Don't Know"){
-            values.push(parseInt(data[parameter]));
-        }
-    });
-    return {min: Math.min.apply(null, values), max: Math.max.apply(null, values)}
-
-}
+// const getMinMax = (jsonData, parameter) => {
+//     let values = [];
+//     jsonData.forEach(data => {
+//         if(data[parameter] && data[parameter] !== "" && data[parameter] !== "Don't Know"){
+//             values.push(parseInt(data[parameter]));
+//         }
+//     });
+//     return {min: Math.min.apply(null, values), max: Math.max.apply(null, values)}
+// }

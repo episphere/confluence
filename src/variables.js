@@ -73,7 +73,7 @@ export const variables = {
         },
         ageInt: {
             888: "Don't Know",
-            'label': 'Age at interview/questionnaire for controls and cases'
+            'label': 'Age at interview/questionnaire'
         },
         intDate : {
             '08/08/8000': "Don't Know",
@@ -155,7 +155,7 @@ export const variables = {
             0: 'No',
             1: 'Yes',
             888: "Don't Know",
-            'label': 'Family history of  breast cancer in a first degree relative'
+            'label': 'Family history of breast cancer'
         },
         fhnumber: {
             888: "Don't Know",
@@ -165,7 +165,7 @@ export const variables = {
             0: 'negative',
             1: 'positive',
             888: "Don't Know",
-            'label': 'Estrogen receptor status of index tumour'
+            'label': 'Estrogen receptor status'
         },
         eduCat: {
             'label': 'Highest level of education received'
@@ -501,7 +501,7 @@ export const variables = {
             0: 'negative',
             1: 'positive',
             888: "Don't Know",
-            'label': 'Estrogen receptor status of index tumour'
+            'label': 'ER status of index tumour'
         },
         ER_status1_source: {
             0: 'clinical records',

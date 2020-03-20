@@ -7,11 +7,10 @@ export const template = async () => {
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
 
-    let template = `
-        <h4 class="h4-heading">Consortium(s)</h4>
-    `;
     
-    template += '<div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item collapsible-items">';
+    let template = `<div class="card border sub-div-shadow"><div class="card-header"><strong>Consortium(s)</strong></div>`;
+    
+    template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
 
     for(let obj of array){
         const consortiaName = obj.name;
@@ -25,7 +24,7 @@ export const template = async () => {
         </li>
         `
     }
-    template += `</ul></div>`
+    template += `</ul></div></div>`
     return template;
 }
 
@@ -44,7 +43,11 @@ export const dataGovernanceProjects = async () => {
     if(checker === true) {
         for(let obj = 0; obj < projectArray.length; obj++){
             const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
-            if(obj === 0) template += '<h4 class="h4-heading">Project(s)</h4><div class="data-governance sub-div-shadow"><ul class="ul-list-style first-list-item">';
+            if(obj === 0) template += `<div class="card border sub-div-shadow"><div class="card-header">
+                                            <strong>Project(s)</strong>
+                                        </div> 
+                                        <div class="card-body data-governance">
+                                            <ul class="ul-list-style first-list-item">`;
             if(bool === true) {
                 const projectName = projectArray[obj].name;
                 let type = projectArray[obj].type;
@@ -58,7 +61,7 @@ export const dataGovernanceProjects = async () => {
                 </li>
                 `;
             }
-            if(obj === projectArray.length - 1 ) template += `</ul></div>`
+            if(obj === projectArray.length - 1 ) template += `</ul></div></div>`
         }
     }
     

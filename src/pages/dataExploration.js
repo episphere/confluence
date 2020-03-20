@@ -20,46 +20,76 @@ export const template = () => {
                     <div class="main-summary-row">
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv7">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange7"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv2">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange2"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv5">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange5"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="main-summary-row">
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv3">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange3"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv6">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange6"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv4">
-                                <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
-                                <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                                <span class="data-summary-label-wrap"><label class="dataSummary-selected-range" id="selectedRange4"></label></span>
+                                <div class="card border sub-div-shadow">
+                                    <div class="card-header">
+                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -607,14 +607,12 @@ label {
 }
 
 .dataSummary-chart {
-    /* min-height: 360px; */
-    /* height: 360px; */
+    max-height: 360px;
 }
 
 .dataSummary-label{
     color: #531e1a;
     font-weight: bold;
-    font-size: small;
 }
 
 .dataSummary-selected-range {
