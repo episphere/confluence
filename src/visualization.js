@@ -109,7 +109,7 @@ export const generateAllCharts = (cf, jsonData) => {
     renderEthnicityBarChart(jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     renderPlotlyPieChart(jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    renderConsortiumPieChart(jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+    renderConsortiumPieChart(jsonData, 'Consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     getSelectionOptions(jsonData);
 }
 
