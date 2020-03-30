@@ -300,6 +300,8 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_NA'])).reduce((a,b) => a+b)
             ],
             type: 'pie',
+            textinfo: 'label+value',
+            showlegend: false,
             marker:{
                 colors: ['#BF1B61', '#cb4880', '#d876a0', '#e5a3bf']
             },
@@ -370,6 +372,8 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             values: valueCount,
             type: 'pie',
             hole: .4,
+            textinfo: 'label+value',
+            showlegend: false,
             marker:{
                 colors: ['#BF1B61']
             },
