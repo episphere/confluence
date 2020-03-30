@@ -14,7 +14,7 @@ export const template = () => {
                 <div id="cardContent" class="card-body">
                     <div class="row" style="margin-bottom:1rem">
                         <div class="col">Consortia</br><h3>1</h3></div>
-                        <div class="col">Study</br><h3>4</h3></div>
+                        <div class="col">Studies</br><h3>4</h3></div>
                     </div>
                     <div class="row">
                         <div class="col">Cases</br><span id="publicCaseCount"></span></div>
@@ -69,7 +69,7 @@ export const addEventAboutConfluence = () => {
     element.addEventListener('click', () => {
         const header = document.getElementById('confluenceModalHeader');
         const body = document.getElementById('confluenceModalBody');
-        header.innerHTML = `<h5 class="modal-title">European Data Summary Variable Definitions</h5>
+        header.innerHTML = `<h5 class="modal-title">Definitions</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
