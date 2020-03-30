@@ -375,7 +375,7 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             textinfo: 'label+value',
             showlegend: false,
             marker:{
-                colors: ['#BF1B61']
+                colors: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61']
             },
         }
     ];
