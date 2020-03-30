@@ -333,13 +333,12 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoStatusPieChart" data-toggle="modal" data-target="#"></i>`;
     const data = [
         {
-            labels: ['Case', 'Control'],
-            values: [countStatus('case', jsonData), countStatus('control', jsonData)],
-            type: 'pie',
+            x: ['Case', 'Control'],
+            y: [countStatus('case', jsonData), countStatus('control', jsonData)],
+            type: 'bar',
             marker:{
-                colors: ['#BF1B61', '#7F7F7F']
-            },
-            hole: .4
+                color: ['#BF1B61', '#7F7F7F']
+            }
         }
     ];
     const layout = {

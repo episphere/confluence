@@ -501,7 +501,7 @@ export const variables = {
             0: 'negative',
             1: 'positive',
             888: "Don't Know",
-            'label': 'ER status of index tumour'
+            'label': 'ER status for cases'
         },
         ER_status1_source: {
             0: 'clinical records',
