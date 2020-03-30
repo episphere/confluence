@@ -6,9 +6,12 @@ import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
-import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects } from './src/event.js';
+import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
+import { aboutConfluence } from './src/pages/about.js';
+import { confluenceResources } from './src/pages/resources.js';
+import { confluenceContactPage } from './src/pages/contact.js';
 
 export const confluence = async () => {
     if('serviceWorker' in navigator){
@@ -28,15 +31,13 @@ export const confluence = async () => {
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
     if (localStorage.parms === undefined) {
-        window.location.hash = '#';
-        confluenceDiv.innerHTML = homePage();
-        addEventAboutConfluence();
-        await homePageVisualization();
+        const confluenceDiv = document.getElementById('confluenceDiv');
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppProd.hidden = false;
         storeAccessToken();
+        manageRouter();
     }
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         const response = await getCurrentUser();
@@ -137,13 +138,58 @@ export const confluence = async () => {
     }
 };
 
-const manageHash = () => {
+const manageRouter = async () => {
+    if(localStorage.parms !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
+    if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
+    
+    if(hash === '' || hash === '#'){
+        const element = document.getElementById('homePage');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = homePage();
+        addEventAboutConfluence();
+        await homePageVisualization();
+    }
+    else if(hash === '#about'){
+        const element = document.getElementById('aboutConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = aboutConfluence();
+        addEventAboutList();
+        document.getElementById('item1').click();
+    }
+    else if(hash === '#resources'){
+        const element = document.getElementById('resourcesConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = confluenceResources();
+    }
+    else if(hash === '#contact'){
+        const element = document.getElementById('contactConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = confluenceContactPage();
+    }
+    else window.location.hash = '#';
+}
+
+const manageHash = () => {
+    if(localStorage.parms === undefined) return;
+    const hash = decodeURIComponent(window.location.hash);
+    if(hash === '#about' || hash === '#resources' || hash === '#contact') window.location.hash = '#'
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
     if(hash === '' || hash === '#' || hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
-        console.log(element)
         if(element.classList.contains('navbar-active')) return;
         // document.getElementById('tabHeading').innerHTML = 'Data Exploration';
         showAnimation();
@@ -188,10 +234,12 @@ const manageHash = () => {
             showAnimation();
             element.click();
         } else window.location.hash = '#';
-    } else if (hash === '#logout') {
+    } 
+    else if (hash === '#logout') {
         const element = document.getElementById('logOutBtn');
         element.click();
-    } else window.location.hash = '#';
+    }
+    else window.location.hash = '#';
 };
 
 window.onload = async () => {
@@ -206,6 +254,7 @@ window.onload = async () => {
 
 window.onhashchange = () => {
     manageHash();
+    manageRouter();
 };
 
 window.onstorage = () => {

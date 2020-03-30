@@ -56,6 +56,7 @@ export const getData = (studyEntries, studyIds, values) => {
 export const getFileContent = async () => {
     // const jsonData = await getFileJSON(558252350024); // Get summary level data
     const jsonData = csvJSON(await getFile(631427327364)); // Get summary level data
+    
     hideAnimation();
     if(!jsonData) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
@@ -225,7 +226,6 @@ const generateSelectionMenu = (cf, parameter, id) => {
 
 export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
     document.getElementById(chartDiv).classList = ['background-white'];
-    
     const data = [
         {
             x: ['20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
@@ -239,7 +239,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
                     jsonData.map(dt => parseInt(dt['90-99'])).reduce((a,b) => a+b)
             ],
             marker:{
-                color: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F']
+                color: ['#BF1B61', '#BF1B61','#BF1B61', '#BF1B61','#BF1B61', '#BF1B61','#BF1B61', '#BF1B61']
             },
           type: 'bar'
         }
@@ -251,37 +251,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    
-    // let rowChart = dc.rowChart(`#${id}`);
-    // let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
-    // let ageCount = age.group().reduceSum(function(d) {return +1});
-    
-    // rowChart
-    //     .dimension(age)
-    //     .group(ageCount)
-    //     .x(d3.scaleBand())
-    //     .gap(5)
-    //     .elasticX(true)
-    //     .colorAccessor(function (d, i){return i;})
-    //     .label(function(c){
-    //         return `${c.key} (${c.value})`
-    //     })
-    //     .render()
-    // document.getElementById(id).parentNode.classList.add('sub-div-shadow');
-    // rowChart.on('filtered', function(chart) {
-    //     const filters = chart.filters();
-    //     if(filters.length) {
-    //         let selection = '';
-    //         filters.forEach((dt) => {
-    //             selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
-    //         });
-    //         document.getElementById(rangeLabelID).innerHTML = selection;
-    //     }else{
-    //         document.getElementById(rangeLabelID).innerHTML = ``;
-    //     }
-    // });
-
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer" id="infoBarChart" data-toggle="modal" data-target="#"></i>`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -307,36 +277,8 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    // let rowChart = dc.rowChart(`#${id}`);
-    // let age = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
-    // let ageCount = age.group().reduceSum(function(d) {return +1});
-    
-    // rowChart
-    //     .dimension(age)
-    //     .group(ageCount)
-    //     .x(d3.scaleBand())
-    //     .gap(5)
-    //     .elasticX(true)
-    //     .colorAccessor(function (d, i){return i;})
-    //     .label(function(c){
-    //         return `${c.key} (${c.value})`
-    //     })
-    //     .render()
-    // document.getElementById(id).parentNode.classList.add('sub-div-shadow');
-    // rowChart.on('filtered', function(chart) {
-    //     const filters = chart.filters();
-    //     if(filters.length) {
-    //         let selection = '';
-    //         filters.forEach((dt) => {
-    //             selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
-    //         });
-    //         document.getElementById(rangeLabelID).innerHTML = selection;
-    //     }else{
-    //         document.getElementById(rangeLabelID).innerHTML = ``;
-    //     }
-    // });
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer" id="infoBarChartSingle" data-toggle="modal" data-target="#"></i>`;
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -347,7 +289,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoPieChart" data-toggle="modal" data-target="#"></i>`;
 
     const data = [
         {
@@ -359,7 +301,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
             ],
             type: 'pie',
             marker:{
-                colors: ['#BF1B61', '#7F7F7F', '#BF1B61', '#7F7F7F']
+                colors: ['#BF1B61', '#cb4880', '#d876a0', '#e5a3bf']
             },
             hole: .4
         }
@@ -388,7 +330,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoStatusPieChart" data-toggle="modal" data-target="#"></i>`;
     const data = [
         {
             labels: ['Case', 'Control'],
@@ -415,7 +357,7 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoConsortiumPieChart" data-toggle="modal" data-target="#"></i>`;
     
     
     const allLabels = getUniqueConsortium(jsonData);
@@ -458,7 +400,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoEthnicityBarChart" data-toggle="modal" data-target="#"></i>`;
     const data = [
         {
             x: ['European', 'Hispanic', 'African', 'Asian', 'South East Asian', 'Other', 'DK'],
@@ -478,87 +420,4 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-// const renderPieChart = (cf, jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
-//     document.getElementById(chartDiv).classList = ['background-white'];
-//     let data_reduce = valUnique(parameter, 0, jsonData);
-
-//     document.getElementById(id).innerHTML = '';
-//     let pieChart = dc.pieChart(`#${id}`);
-//     let data = cf.dimension(function(d){return d[parameter] ? d[parameter] : ""});
-    
-//     let G_status2 = data.group().reduce(
-//         function(p,v){
-//             data_reduce[v[parameter]] += 1
-//             return data_reduce[v[parameter]]
-//         },
-//         function(p,v){
-//             data_reduce[v[parameter]] -= 1
-//             return data_reduce[v[parameter]]
-//         },
-//         function(p){return 0}
-//     )
-//     const ir = Math.ceil((window.innerWidth*45)/1536);
-//     const erp = Math.ceil((window.innerWidth*10)/1536);
-//     pieChart
-//         .dimension(data)
-//         .group(G_status2)
-//         .minAngleForLabel(0.35)
-//         .externalRadiusPadding(erp)
-//         .innerRadius(ir)
-//         .radius(ir+100)
-//         .drawPaths(true)
-//         .label(function(c){
-//             return `${c.key}`
-//         });
-    
-//     pieChart.render();
-//     pieChart.filter = function() {};
-//     document.getElementById(id).parentNode.classList.add('sub-div-shadow');
-//     pieChart.on('filtered', function(chart) {
-//         const filters = chart.filters();
-//         if(filters.length) {
-//             let selection = '';
-//             filters.forEach((dt) => {
-//                 selection += `<button class="filter-btn sub-div-shadow"><i class="fas fa-filter"></i> ${dt} </button>`
-//             });
-//             document.getElementById(rangeLabelID).innerHTML = selection;
-//             // const filterBtn = document.getElementsByClassName('filter-btn');
-//             // Array.from(filterBtn).forEach(btn => {
-//             //     btn.addEventListener('click', () => {
-//             //         chart.filter(null);
-//             //     })
-//             // });
-//         }else{
-//             document.getElementById(rangeLabelID).innerHTML = ``;
-//         }
-//     });
-    
-//     let pieLabel = ''
-//     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
-//         pieLabel = variables.BCAC[parameter]['label'];
-//     }else{
-//         pieLabel = parameter;
-//     }
-//     document.getElementById(labelID).innerHTML = `${pieLabel}`;
-// }
-
 const getCrossFilter = (jsonData) => crossfilter(jsonData);
-
-// const valUnique=function(k,v, jsonData){
-//     var u={}
-//     jsonData.forEach(d=>{
-//         if(d[k] === "") return;
-//         u[d[k]]=v
-//     })
-//     return u
-// }
-
-// const getMinMax = (jsonData, parameter) => {
-//     let values = [];
-//     jsonData.forEach(data => {
-//         if(data[parameter] && data[parameter] !== "" && data[parameter] !== "Don't Know"){
-//             values.push(parseInt(data[parameter]));
-//         }
-//     });
-//     return {min: Math.min.apply(null, values), max: Math.max.apply(null, values)}
-// }

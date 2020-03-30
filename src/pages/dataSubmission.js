@@ -42,7 +42,12 @@ export const lazyload = (element) => {
         const id = element.dataset.id;
         const status = element.dataset.status;
         if(status !== 'pending') return;
-        const allEntries = (await getFolderItems(id)).entries;
+        let allEntries = (await getFolderItems(id)).entries;
+        if(allEntries.length === 0){
+            element.classList = ['fas fa-exclamation-circle'];
+            element.title = 'Empty folder'
+        }
+        allEntries = allEntries.filter(dt => dt.name !== 'Study Documents');
         element.dataset.status = 'complete';
         const entries = filterStudiesDataTypes(allEntries);
         const fileEntries = allEntries.filter(obj => obj.type === 'file');

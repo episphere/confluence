@@ -184,7 +184,7 @@ export const storeAccessToken = async () => {
         });
         if(response.status && response.status === 200) {
             localStorage.parms = JSON.stringify(await response.json());
-            window.history.replaceState({},'', './');
+            window.history.replaceState({},'', './#data_exploration');
             confluence();
             document.getElementById('loginBoxAppDev').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;
@@ -196,8 +196,6 @@ export const storeAccessToken = async () => {
                 localStorage.clear();
                 alert('access token not found, please contact system administrator')
             }
-        }else{
-            console.log('not logged in yet')
         }
     }
 }
@@ -834,7 +832,7 @@ export const getValidConsortium = async () => {
 }
 
 export const filterConsortiums = (array) => {
-    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC'));
+    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC' || obj.name === 'Confluence_LAGENO'));
 }
 
 export const filterStudies = (array) => {
@@ -911,10 +909,9 @@ export const reSizeCharts = (cf, jsonData) => {
 }
 
 export const csvJSON = (csv) => {
-    const lines=csv.split("\n");
+    const lines = csv.split("\n");
     const result = [];
-    const headers=lines[0].split(",");
-  
+    const headers = lines[0].split(",");
     for(let i=1; i < lines.length; i++){
         const obj = {};
         const currentline = lines[i].split(",");
@@ -930,7 +927,7 @@ export const csvJSON = (csv) => {
             if(value === 'age90:99') value = '90-99';
             obj[value] = currentline[j];
         }
-        if(obj.status !== undefined) {
+        if(obj.study !== undefined) {
             result.push(obj);
         }
     }

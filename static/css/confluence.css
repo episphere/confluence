@@ -1,4 +1,4 @@
-h2,h3 {
+h2 {
     color:maroon;
     font-family:sans-serif;
 }
@@ -166,13 +166,67 @@ body {
     background-color: #74103A !important;
 }
 
+.fa-exclamation-circle {
+    color: #ffd663;
+}
+
+.list-group-item {
+    background-color: #D0CECE !important;
+    text-align: left !important;
+    margin: 1px;
+    border: 1px solid #ffffff !important;
+}
+
+#aboutContent {
+    padding: 10px;
+    text-align: left;
+    font-size: 1.35rem;
+    align-content: center;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.confluence-resources {
+    padding: 10px;
+    text-align: left;
+    font-size: 1.35rem;
+    align-content: center;
+    background-color: #ffffff;
+}
+
+.list-group-item:hover {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.list-group-item-active:hover {
+    color: #ffffff !important;
+}
+
+.confluence-pink {
+    color: #C22169;
+    font-weight: bold;
+}
+
+.list-group-item-active {
+    color: #ffffff !important;
+    background-color: #4E5051 !important;
+}
+
 .info-confluence {
     margin-bottom: 1rem;
-    margin-top: 4rem;
+    margin-top: 3rem;
 }
 
 #confluenceInfo {
-    margin-top: -50px !important;
+    margin: 2.5rem 0;
+    max-height: 400px;
+}
+
+#map1, #map2, #map3, #map4, #map5, #map6 {
+    cursor: pointer;
 }
 
 .white-font {
@@ -612,6 +666,11 @@ label {
 
 .dataSummary-label{
     font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.side-panel-header {
+    font-size: 1.2rem;
 }
 
 .dataSummary-selected-range {

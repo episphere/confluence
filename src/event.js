@@ -304,7 +304,14 @@ export const addEventConsortiaSelect = () => {
             })
             return;
         }
+        
         let entries = (await getFolderItems(value)).entries;
+        
+        // check if study document exists
+        const documentExists = entries.filter(dt => dt.name === 'Confluence data from studies');
+        if(documentExists.length === 1){
+            entries = (await getFolderItems(documentExists[0].id)).entries;
+        }
         
         selectStudyUIS.innerHTML = '';
         const firstOption = document.createElement('option');
@@ -867,8 +874,13 @@ const addEventCPCSelect = () => {
         document.getElementById('fileSelection').innerHTML = '';
         if(select.value === "") return;
         const ID = select.value;
-        const response = await getFolderItems(ID);
+        let response = await getFolderItems(ID);
         if(response.entries.length === 0) return;
+        // check if study document exists
+        const documentExists = response.entries.filter(dt => dt.name === 'Confluence data from studies');
+        if(documentExists.length === 1){
+            response = (await getFolderItems(documentExists[0].id));
+        }
         const array = filterStudies(response.entries);
         if(array.length === 0) return '';
         let template = '';
@@ -1012,3 +1024,177 @@ export const addEventFileStats = (element) => {
         `
     });
 };
+
+export const addEventAboutList = () => {
+    const element1 = document.getElementById('item1');
+    const element2 = document.getElementById('item2');
+    const element3 = document.getElementById('item3');
+    const element4 = document.getElementById('item4');
+    const element5 = document.getElementById('item5');
+    const element6 = document.getElementById('item6');
+    const element7 = document.getElementById('item7');
+    const element8 = document.getElementById('item8');
+    const element9 = document.getElementById('item9');
+    const element10 = document.getElementById('item10');
+    const element11 = document.getElementById('item11');
+    const aboutContent = document.getElementById('aboutContent');
+
+    element1.addEventListener('click', () => {
+        if(element1.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element1.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Confluence</span> is an international research project-a consortium of 
+            consortia-that aims to build a large collaborative platform for <span class="confluence-pink">germline genetic 
+            studies of breast cancer</span> throughthe confluence of existing and new genome-wide genotyping data. 
+            It is funded by the U.S. National Cancer Institute (NCI), 
+            and coordinated by the Division of Cancer Epidemiologyand Genetics (DCEG) at NCI.
+        `
+    });
+
+    element2.addEventListener('click', () => {
+        if(element2.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element2.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Conduct a large, multi-ancestry genome-wide association study to:</span>
+            <ul>
+                <li>Discover variants for breast cancer risk overall and by subtype</li>
+                <li>Develop multi-ancestry polygenic risk scores for personalized risk assessment</li>
+                <li>Discover variants for breast cancer survival, pharmacogenomics, and second cancers</li>
+            </ul>
+        `
+    });
+
+    element3.addEventListener('click', () => {
+        if(element3.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element3.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Target Size</span></br>
+            <img alt="Study target size - 300 cases and 300 controls" height="200px" width="100%" src="./static/images/target_size.png">
+        `
+    });
+
+    element4.addEventListener('click', () => {
+        if(element4.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element4.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">What studies can participate</span></br>
+            Case-control, case series, or clinical trials with:
+            <ul>
+                <li>Invasive or in situ breast cancer cases (female or male)</li>
+                <li>Genome-wide genotyping data or germline DNA for genotyping</li>
+                <li>Ethics approval and consent for germline genetic testing</li>
+            </ul>
+        `
+    });
+
+    element5.addEventListener('click', () => {
+        if(element5.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element5.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Data and Sample Request to Participate</span>
+            <ul>
+                <li>Germline DNA (blood buccal): 500-1000ng by dsDNA quantitation (e.g. PicoGreen)</li>
+                <li>Genotype/sequencing data: genome-wide or mutation testing (if available)</li>
+                <li>Phenotype data: age, pathology, treatement/toxicity, risk factors (if available)</li>
+            </ul>
+        `
+    });
+
+    element6.addEventListener('click', () => {
+        if(element6.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element6.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">How to Participate</span>
+            <ul>
+                <li>Trough collaborating Consortia (see next page) OR</li>
+                <li>Collaborating directly with the NCI Coordinating Center at DCEG</li>
+            </ul>
+        `
+    });
+
+    element7.addEventListener('click', () => {
+        if(element7.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element7.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Costs Covered by Confuence</span>
+            <ul>
+                <li>Data coordinating centers for study and data management</li>
+                <li>Shipment of samples and materials (plates/tubes)</li>
+                <li>DNA extractions at DCEG/NCI (if needed)</li>
+                <li>Genotyping at DCEG/NCI (USA) or Cambridge University (UK) laboratories</li>
+                <li>Return of lef-over DNA (if available and requested)</li>
+                <li>Return of genotype data to studies</li>
+                <li>Cloud-based Collaborative Data Platform for data access and analyses</li>
+            </ul>
+        `
+    });
+
+    element8.addEventListener('click', () => {
+        if(element8.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element8.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Data Sharing Principles</span>
+            <ul>
+                <li>Broad data access through a secure, Cloud-based Collaborative Data Platform</li>
+                <li>Data ownership stays with studies</li>
+                <li>Data governed by Data Access Coordinating Committees and Data Use Agreements between data centers (NCI or Collaborating Consortia) and study institutions</li>
+                <li>Sharing of expertise, data, and analysis code</li>
+                <li>Co-leadership in collaborative analyses and publications</li>
+                <li>Leverage infrastructure for additional initiatives</li>
+                <li>Compliance with NIH Genomic Data Sharing Policy for new genotyping <a href="https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/" target="_blank">https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/</a></li>
+            </ul>
+        `
+    });
+
+    element9.addEventListener('click', () => {
+        if(element9.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element9.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Collaborating Breast Cancer Consortia</span>
+            <ul>
+                <li>Breast Cancer Association Consortium (BCAC)</li>
+                <li>African Ancestry Breast Cancer Genetic Study (AABCGS)</li>
+                <li>Latin America Genomics Breast Cancer Consortium (LAGENO-BC) </li>
+                <li>Asia Breast Cancer Consortium (ABCC)</li>
+                <li>Consortium of Investigators of Modifers of BRCA1/2 (CIMBA)</li>
+                <li>Evidence-based Network for the Interpretation of Germline Mutant Alleles (ENIGMA)</li>
+                <li>BRCA Refined Analysis of Sequence Tests: Risk of Penetrance (BRA-STRAP)</li>
+                <li>Male Breast Cancer GWAS Consortium</li>
+            </ul>
+        `
+    });
+
+    element10.addEventListener('click', () => {
+        if(element10.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element10.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <span class="confluence-pink">Timeline</span>
+            <img alt="Confluence study timeline image" height="200px" width="100%" src="./static/images/timeline.png">
+        `
+    });
+
+    element11.addEventListener('click', () => {
+        if(element11.classList.contains('list-group-item-active')) return;
+        removeActiveClass('list-group-item', 'list-group-item-active')
+        element11.classList.add('list-group-item-active');
+        aboutContent.innerHTML = `
+            <img alt="Confluence study learn more" height="250px" width="100%" src="./static/images/learn_more.png">
+            <span class="confluence-pink">Links to:</span>
+            <ul>
+                <li>Study protocol</li>
+                <li>PowerPoint presentation</li>
+                <li><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project">DCEG Confluence page</a></li>
+            </ul>
+        `
+    });
+}

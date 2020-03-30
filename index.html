@@ -36,14 +36,15 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarToggler">
                         <div class="navbar-nav grid" id="navBarOptions">
-                            <div class="nav-item navbar-active grid-elements dropdown">
-                                <a class="nav-link nav-menu-links dropdown-toggle"  href="#" title="Confluence" id="homePage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-home"></i> Home
+                            <div class="nav-item grid-elements dropdown">
+                                <a class="nav-link nav-menu-links dropdown-toggle" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-home"></i> Confluence
                                 </a>
                                 <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> About</a>
-                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> Resources</a>
-                                    <a class="dropdown-item nav-link nav-menu-links" id="aboutConfluence"> Contact</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#" id="homePage"> Home</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#resources" id="resourcesConfluence"> Resources</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
                                 </div>
                             </div>
                             <div class="nav-item grid-elements">
@@ -64,7 +65,7 @@
             <div id="maincontainer">
                 <div class="container">
                     <div class="confluence-color row" style="height: 120px;padding: 0.5rem 1rem;">
-                        <img src="./static/images/confluence_logo_white.png" alt="Confluence logo">
+                        <img src="./static/images/logo_all_white.png" height="170px" width="250px" alt="Confluence logo">
                         <h3 id="tabHeading"></h3>
                     </div>
                     <div class="modal" tabindex="-1" role="dialog" id="confluenceMainModal">

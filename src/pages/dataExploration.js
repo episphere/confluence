@@ -11,8 +11,8 @@ export const template = () => {
 
             <div class="main-summary-row">
                 <div class="col-md-2">
-                    <div class="card border sub-div-shadow">
-                        <div class="card-header"><strong>Studies</strong></div>
+                    <div class="card sub-div-shadow">
+                        <div class="card-header"><strong class="side-panel-header">Studies</strong></div>
                         <div id="cardContent" class="card-body"></div>
                     </div>
                 </div>
@@ -20,7 +20,7 @@ export const template = () => {
                     <div class="main-summary-row">
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv7">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                                     </div>
@@ -32,7 +32,7 @@ export const template = () => {
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv2">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                                     </div>
@@ -44,7 +44,7 @@ export const template = () => {
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv5">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
                                     </div>
@@ -58,7 +58,7 @@ export const template = () => {
                     <div class="main-summary-row">
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv3">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
                                     </div>
@@ -70,7 +70,7 @@ export const template = () => {
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv6">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
                                     </div>
@@ -82,7 +82,7 @@ export const template = () => {
                         </div>
                         <div class="data-exploration-charts col-md-4">
                             <div id="chartDiv4">
-                                <div class="card border sub-div-shadow">
+                                <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
                                     </div>
