@@ -1129,7 +1129,7 @@ export const addEventAboutList = () => {
                 <li>Shipment of samples and materials (plates/tubes)</li>
                 <li>DNA extractions at DCEG/NCI (if needed)</li>
                 <li>Genotyping at DCEG/NCI (USA) or Cambridge University (UK) laboratories</li>
-                <li>Return of lef-over DNA (if available and requested)</li>
+                <li>Return of left-over DNA (if available and requested)</li>
                 <li>Return of genotype data to studies</li>
                 <li>Cloud-based Collaborative Data Platform for data access and analyses</li>
             </ul>
