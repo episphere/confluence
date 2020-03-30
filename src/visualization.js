@@ -110,7 +110,7 @@ export const generateAllCharts = (cf, jsonData) => {
     renderEthnicityBarChart(jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     renderPlotlyPieChart(jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    renderConsortiumPieChart(jsonData, 'Consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+    renderConsortiumPieChart(jsonData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     getSelectionOptions(jsonData);
 }
 
@@ -196,7 +196,7 @@ const addEventFilterCharts = (jsonData) => {
             renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
             renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
             renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-            renderConsortiumPieChart(finalData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+            renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
         });
     });
 }
@@ -358,16 +358,15 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     }
     document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoConsortiumPieChart" data-toggle="modal" data-target="#"></i>`;
     
-    
-    const allLabels = getUniqueConsortium(jsonData);
+    const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
-    for(let consortium of allLabels){
-        valueCount.push(jsonData.filter(dt => {if(dt['consortium'] === consortium) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
+    for(let studyDesign of allLabels){
+        valueCount.push(jsonData.filter(dt => {if(dt['studyDesign'] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
     }
     
     const data = [
         {
-            labels: getUniqueConsortium(jsonData),
+            labels: allLabels,
             values: valueCount,
             type: 'pie',
             hole: .4,
@@ -383,10 +382,10 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const getUniqueConsortium = (jsonData) => {
+const getUniqueConsortium = (jsonData, parameter) => {
     let array = [];
     for(let obj of jsonData){
-        if(array.indexOf(obj['consortium']) === -1) array.push(obj['consortium']);
+        if(array.indexOf(obj[parameter]) === -1) array.push(obj[parameter]);
     }
     return array;
 }

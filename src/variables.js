@@ -1,5 +1,8 @@
 export const variables = {
     BCAC: {
+        studyDesign: {
+            'label': 'Study design'
+        },
         contrType: {
             1: 'population-based',
             2: 'hospital-based',
