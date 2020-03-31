@@ -151,7 +151,7 @@ const manageRouter = async () => {
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = homePage();
         addEventAboutConfluence();
-        await homePageVisualization();
+        homePageVisualization();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');

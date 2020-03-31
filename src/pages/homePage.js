@@ -29,12 +29,12 @@ export const template = () => {
         <div class="col-sm-5" id="confluenceInfo">
             <img id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%" usemap="#consortiamap">
             <map name="consortiamap">
-                <area shape="circle" href="1.html" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
-                <area shape="circle" href="1.html" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
-                <area shape="circle" href="1.html" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
-                <area shape="circle" href="1.html" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
-                <area shape="circle" href="1.html" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
-                <area shape="circle" href="1.html" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
+                <area shape="circle" data-image="consortia_1.png" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
+                <area shape="circle" data-image="consortia_2.png" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
+                <area shape="circle" data-image="consortia_3.png" class="consortia-circle" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
+                <area shape="circle" data-image="consortia_4.png" class="consortia-circle" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
+                <area shape="circle" data-image="consortia_5.png" class="consortia-circle" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
+                <area shape="circle" data-image="consortia_6.png" class="consortia-circle" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
             </map>
         </div>
     </div>
@@ -85,6 +85,18 @@ export const addEventAboutConfluence = () => {
 };
 
 export const homePageVisualization = async () => {
+    const elements = document.getElementsByClassName('consortia-circle');
+    const mainImage = document.getElementById('consortiaCircle');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('mouseover', () => {
+            const imageName = element.dataset.image;
+            mainImage.src = `./static/images/${imageName}`;
+        });
+        element.addEventListener('mouseout', () => {
+            const imageName = element.dataset.image;
+            mainImage.src = `./static/images/home_page_circle.png`;
+        })
+    });
     // const config = {
     //     "avatar_size": 110 //define the size of teh circle radius
     // }
