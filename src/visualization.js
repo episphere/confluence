@@ -297,9 +297,10 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
             values: [jsonData.map(dt => parseInt(dt['ER_statusIndex_pos'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_neg'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b)
-            ],
+                ],
             type: 'pie',
-            textinfo: 'label+value',
+            textinfo: 'label+percent',
+            hoverinfo: 'label+percent',
             showlegend: false,
             marker:{
                 colors: ['#BF1B61', '#cb4880', '#d876a0', '#e5a3bf']
