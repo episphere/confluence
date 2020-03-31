@@ -203,6 +203,7 @@ body {
 
 .list-group-item-active:hover {
     color: #ffffff !important;
+    font-weight: bold;
 }
 
 .confluence-pink {
@@ -213,6 +214,7 @@ body {
 .list-group-item-active {
     color: #ffffff !important;
     background-color: #4E5051 !important;
+    font-weight: bold;
 }
 
 .info-confluence {
