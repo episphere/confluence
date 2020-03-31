@@ -1071,8 +1071,8 @@ export const addEventAboutList = () => {
         removeActiveClass('list-group-item', 'list-group-item-active')
         element3.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
-            <span class="confluence-pink">Target Size</span></br>
-            <img alt="Study target size - 300 cases and 300 controls" height="200px" width="100%" src="./static/images/target_size.png">
+            <span class="confluence-pink">Target Size</span></br></br>
+            <img alt="Study target size - 300 cases and 300 controls" height="175px" width="100%" src="./static/images/target_size.png">
         `
     });
 
@@ -1178,7 +1178,7 @@ export const addEventAboutList = () => {
         removeActiveClass('list-group-item', 'list-group-item-active')
         element10.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
-            <span class="confluence-pink">Timeline</span>
+            <span class="confluence-pink">Timeline</span></br></br>
             <img alt="Confluence study timeline image" height="200px" width="100%" src="./static/images/timeline.png">
         `
     });
