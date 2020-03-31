@@ -3,7 +3,7 @@ export const template = () => {
     <div class="main-summary-row home-page-stats sub-div-shadow">
         <div class="col-sm-7">
             <div class="align-left info-confluence">
-                <span style="color:#74103A;font-weight:bold">Confluence</span> is an international research project-a consortium of consortia-that aims to build a large collaborative platform for germline genetic studies of breast cancer through the confluence of existing and new
+                <span style="color:#74103A;font-weight:bold">Confluence</span> is an international research project - a consortium of consortia-that aims to build a large collaborative platform for germline genetic studies of breast cancer through the confluence of existing and new
                 genome-wide genotyping data.
             </div>
             
