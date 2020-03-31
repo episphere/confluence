@@ -293,11 +293,10 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
 
     const data = [
         {
-            labels: ['Positive', 'Negative', 'Don\'t know', 'Not available'],
+            labels: ['Positive', 'Negative', 'Don\'t know'],
             values: [jsonData.map(dt => parseInt(dt['ER_statusIndex_pos'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['ER_statusIndex_neg'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['ER_statusIndex_NA'])).reduce((a,b) => a+b)
+                    jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b)
             ],
             type: 'pie',
             textinfo: 'label+value',
