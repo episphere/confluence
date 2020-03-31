@@ -29,12 +29,12 @@ export const template = () => {
         <div class="col-sm-5" id="confluenceInfo">
             <img id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%" usemap="#consortiamap">
             <map name="consortiamap">
-                <area shape="circle" coords="275,50,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
-                <area shape="circle" coords="397,115,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
-                <area shape="circle" coords="397,250,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
-                <area shape="circle" coords="275,318,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
-                <area shape="circle" coords="153,250,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
-                <area shape="circle" coords="153,115,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
+                <area shape="circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
+                <area shape="circle" coords="385,105,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
+                <area shape="circle" coords="385,230,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
+                <area shape="circle" coords="275,290,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
+                <area shape="circle" coords="162,230,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
+                <area shape="circle" coords="162,105,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
             </map>
         </div>
     </div>
@@ -51,17 +51,17 @@ window.onresize = () => {
     const width = document.getElementById('consortiaCircle').width;
     const radius = (height * width) / 5450;
     const map1 = document.getElementById('map1');
-    map1.coords = `${width/2},${height/7.36},${radius}`;
+    map1.coords = `${width/1.99},${height/7.87},${radius}`;
     const map2 = document.getElementById('map2');
-    map2.coords = `${width/1.38},${height/3.2},${radius}`;
+    map2.coords = `${width/1.42},${height/3.37},${radius}`;
     const map3 = document.getElementById('map3');
-    map3.coords = `${width/1.38},${height/1.47},${radius}`;
+    map3.coords = `${width/1.42},${height/1.54},${radius}`;
     const map4 = document.getElementById('map4');
-    map4.coords = `${width/2},${height/1.15},${radius}`;
+    map4.coords = `${width/1.99},${height/1.22},${radius}`;
     const map5 = document.getElementById('map5');
-    map5.coords = `${width/3.58},${height/1.47},${radius}`;
+    map5.coords = `${width/3.39},${height/1.54},${radius}`;
     const map6 = document.getElementById('map6');
-    map6.coords = `${width/3.58},${height/3.2},${radius}`;
+    map6.coords = `${width/3.39},${height/3.37},${radius}`;
 }
 
 export const addEventAboutConfluence = () => {
