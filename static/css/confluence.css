@@ -216,12 +216,19 @@ body {
 }
 
 .info-confluence {
-    margin-bottom: 1rem;
-    margin-top: 3rem;
+    margin: 1rem 0;
+}
+
+.info-confluence-bottom {
+    margin: 1rem 0;
+}
+
+.card {
+    margin: 0px !important;
 }
 
 #confluenceInfo {
-    margin: 2.5rem 0;
+    margin: 1rem 0;
     max-height: 400px;
 }
 
