@@ -93,7 +93,6 @@ export const homePageVisualization = async () => {
             mainImage.src = `./static/images/${imageName}`;
         });
         element.addEventListener('mouseout', () => {
-            const imageName = element.dataset.image;
             mainImage.src = `./static/images/home_page_circle.png`;
         })
     });
