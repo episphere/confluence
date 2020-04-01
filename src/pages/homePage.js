@@ -12,9 +12,10 @@ export const template = () => {
                     <i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion" data-toggle="modal" data-target="#confluenceMainModal"></i>
                 </div>
                 <div id="cardContent" class="card-body">
+                    <div class="row" style="margin-bottom:0.5rem;text-align:center"><div class="col" id="displayConsortiaName"></div></div>
                     <div class="row" style="margin-bottom:1rem">
-                        <div class="col">Consortia</br><h3>1</h3></div>
-                        <div class="col">Studies</br><h3>4</h3></div>
+                        <div class="col">Consortia</br><span id="publicConsortiaCount"></span></div>
+                        <div class="col">Studies</br><span id="publicStudiesCount"></span></div>
                     </div>
                     <div class="row">
                         <div class="col">Cases</br><span id="publicCaseCount"></span></div>
@@ -29,12 +30,12 @@ export const template = () => {
         <div class="col-sm-5" id="confluenceInfo">
             <img id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%" usemap="#consortiamap">
             <map name="consortiamap">
-                <area shape="circle" data-image="consortia_1.png" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
-                <area shape="circle" data-image="consortia_2.png" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
-                <area shape="circle" data-image="consortia_3.png" class="consortia-circle" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
-                <area shape="circle" data-image="consortia_4.png" class="consortia-circle" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
-                <area shape="circle" data-image="consortia_5.png" class="consortia-circle" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
-                <area shape="circle" data-image="consortia_6.png" class="consortia-circle" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
+                <area shape="circle" data-image="consortia_1.png" data-consortia-name="BCAC" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
+                <area shape="circle" data-image="consortia_2.png" data-consortia-name="NCI-DCEG" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
+                <area shape="circle" data-image="consortia_3.png" data-consortia-name="AABCGS" class="consortia-circle" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
+                <area shape="circle" data-image="consortia_4.png" data-consortia-name="LAGENO-BC" class="consortia-circle" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
+                <area shape="circle" data-image="consortia_5.png" data-consortia-name="CIMBA" class="consortia-circle" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
+                <area shape="circle" data-image="consortia_6.png" data-consortia-name="MALE-BC" class="consortia-circle" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
             </map>
         </div>
     </div>
@@ -85,17 +86,6 @@ export const addEventAboutConfluence = () => {
 };
 
 export const homePageVisualization = async () => {
-    const elements = document.getElementsByClassName('consortia-circle');
-    const mainImage = document.getElementById('consortiaCircle');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('mouseover', () => {
-            const imageName = element.dataset.image;
-            mainImage.src = `./static/images/${imageName}`;
-        });
-        element.addEventListener('mouseout', () => {
-            mainImage.src = `./static/images/home_page_circle.png`;
-        })
-    });
     // const config = {
     //     "avatar_size": 110 //define the size of teh circle radius
     // }
@@ -168,10 +158,34 @@ export const homePageVisualization = async () => {
 
     
 
-    const fileData = await fetch('./data.json');
-    fileData.json().then(data => {
-        document.getElementById('publicCaseCount').innerHTML = `<h3>${data.cases}</h3>`;
-        document.getElementById('publicControlCount').innerHTML = `<h3>${data.controls}</h3>`;
+    const response = await fetch('./data.json');
+    const data = await response.json();
+    const elements = document.getElementsByClassName('consortia-circle');
+    const mainImage = document.getElementById('consortiaCircle');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('mouseover', () => {
+            const imageName = element.dataset.image;
+            const consortiaName = element.dataset.consortiaName;
+            mainImage.src = `./static/images/${imageName}`;
+            document.getElementById('displayConsortiaName').innerHTML = `<strong>${element.title}</strong>`;
+            document.getElementById('publicConsortiaCount').innerHTML = `<h3>1</h3>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.studies).reduce((a,b) => a+b) : 0}</h3>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.cases).reduce((a,b) => a+b) : 0}</h3>`;
+            document.getElementById('publicControlCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b) : 0}</h3>`;
+        });
+        element.addEventListener('mouseout', () => {
+            mainImage.src = `./static/images/home_page_circle.png`;
+            document.getElementById('displayConsortiaName').innerHTML = '';
+            document.getElementById('publicConsortiaCount').innerHTML = `<h3>${Object.keys(data).length}</h3>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h3>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h3>`;
+            document.getElementById('publicControlCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h3>`;
+        })
+    });
+    document.getElementById('publicConsortiaCount').innerHTML = `<h3>${Object.keys(data).length}</h3>`;
+    document.getElementById('publicStudiesCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h3>`;
+    document.getElementById('publicCaseCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h3>`;
+    document.getElementById('publicControlCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h3>`;
 
     //     const ageData = data.age;        
     //     var trace = {
@@ -227,5 +241,4 @@ export const homePageVisualization = async () => {
     //     };
         
     //     Plotly.newPlot('pieChart', pieData, pieLayout, {responsive: true, displayModeBar: false});
-    });
 }
