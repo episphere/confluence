@@ -9,7 +9,7 @@ export const confluenceContactPage = () => {
                 </br>
                 <span class="text-bold">Have questions?</span></br>
                 <strong>Email:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
-                </br>
+                </br></br>'
                 <span class="text-bold">Confluence Project Manager</span></br>
                 Dr. Thomas Ahearn</br>
                 Division of Cancer Epidemiology and Genetics, National Cancer Institute
