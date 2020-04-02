@@ -1,6 +1,16 @@
 export const template = () => {
     return `
-
+        <div class="nav-item grid-elements dropdown">
+            <a class="nav-link nav-menu-links dropdown-toggle" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-home"></i> Confluence
+            </a>
+            <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item nav-link nav-menu-links" href="#home" id="homePage"> Home</a>
+                <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
+                <a class="dropdown-item nav-link nav-menu-links" href="#resources" id="resourcesConfluence"> Resources</a>
+                <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
+            </div>
+        </div>
         <div class="nav-item grid-elements dropdown">
             <a class="nav-link nav-menu-links dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-database"></i> Data</a>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">

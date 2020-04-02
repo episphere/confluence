@@ -143,7 +143,7 @@ const manageRouter = async () => {
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
     
-    if(hash === '' || hash === '#'){
+    if(hash === '#home'){
         const element = document.getElementById('homePage');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
@@ -179,15 +179,14 @@ const manageRouter = async () => {
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = confluenceContactPage();
     }
-    else window.location.hash = '#';
+    else window.location.hash = '#home';
 }
 
 const manageHash = () => {
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
-    if(hash === '#about' || hash === '#resources' || hash === '#contact') window.location.hash = '#'
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
-    if(hash === '' || hash === '#' || hash === '#data_exploration') {
+    if(hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
@@ -239,7 +238,43 @@ const manageHash = () => {
         const element = document.getElementById('logOutBtn');
         element.click();
     }
-    else window.location.hash = '#';
+    else if(hash === '#home'){
+        const element = document.getElementById('homePage');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = homePage();
+        addEventAboutConfluence();
+        homePageVisualization();
+    }
+    else if(hash === '#about'){
+        const element = document.getElementById('aboutConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = aboutConfluence();
+        addEventAboutList();
+        document.getElementById('item1').click();
+    }
+    else if(hash === '#resources'){
+        const element = document.getElementById('resourcesConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = confluenceResources();
+    }
+    else if(hash === '#contact'){
+        const element = document.getElementById('contactConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        element.classList.add('navbar-active');
+        confluenceDiv.innerHTML = confluenceContactPage();
+    }
+    else window.location.hash = '#data_exploration';
 };
 
 window.onload = async () => {

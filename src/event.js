@@ -1072,7 +1072,7 @@ export const addEventAboutList = () => {
         element3.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
             <span class="confluence-pink">Target Size</span></br></br>
-            <img alt="Study target size - 300 cases and 300 controls" height="155px" width="100%" src="./static/images/target_size.png">
+            <img alt="Study target size - 300 cases and 300 controls" height="40%" width="100%" src="./static/images/target_size.png">
         `
     });
 
@@ -1179,7 +1179,7 @@ export const addEventAboutList = () => {
         element10.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
             <span class="confluence-pink">Timeline</span></br></br>
-            <img alt="Confluence study timeline image" height="200px" width="100%" src="./static/images/timeline.png">
+            <img alt="Confluence study timeline image" height="40%" width="100%" src="./static/images/timeline.png">
         `
     });
 
