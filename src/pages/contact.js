@@ -8,11 +8,15 @@ export const confluenceContactPage = () => {
                 <span>Complete the study application form.</span></br>
                 </br>
                 <span class="text-bold">Have questions?</span></br>
-                <span><a href="mailto:thomas.ahearn@nih.gov">Thomas Ahearn</a> – Confluence project manager</span></br>
+                <strong>Email :</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
                 </br>
-                <span class="text-bold">Principal Investigators</span></br>
-                </br>
-                <span class="text-bold">Other Senior Investigators</span></br>
+                <span class="text-bold">Confluence Project Manager</span></br>
+                Dr. Thomas Ahearn</br>
+                Division of Cancer Epidemiology and Genetics, National Cancer Institute
+                </br></br>
+                <span class="text-bold">Principal Investigator</span></br>
+                Dr. Montserrat Garcia-Closas</br>
+                Division of Cancer Epidemiology and Genetics, National Cancer Institute
             </div>
         </div>
     `;
