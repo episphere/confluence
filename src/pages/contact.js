@@ -5,10 +5,10 @@ export const confluenceContactPage = () => {
                 <span class="confluence-pink">Contacts:</span></br>
                 </br>
                 <span class="text-bold">Interested in participating in Confluence?</span></br>
-                <span>Complete the study application form.</span></br>
+                <strong>Email to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>
                 </br>
                 <span class="text-bold">Have questions?</span></br>
-                <strong>Email :</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                <strong>Email:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
                 </br>
                 <span class="text-bold">Confluence Project Manager</span></br>
                 Dr. Thomas Ahearn</br>
