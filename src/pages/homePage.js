@@ -12,7 +12,9 @@ export const template = () => {
                     <i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion" data-toggle="modal" data-target="#confluenceMainModal"></i>
                 </div>
                 <div id="cardContent" class="card-body">
-                    <div class="row" style="margin-bottom:0.5rem;text-align:center"><div class="col" id="displayConsortiaName"></div></div>
+                    <div class="row" style="margin-bottom:0.5rem;text-align:center">
+                        <div class="col" id="displayConsortiaName"></br></div>
+                    </div>
                     <div class="row" style="margin-bottom:1rem">
                         <div class="col">Consortia</br><span id="publicConsortiaCount"></span></div>
                         <div class="col">Studies</br><span id="publicStudiesCount"></span></div>
@@ -77,10 +79,8 @@ export const addEventAboutConfluence = () => {
         body.innerHTML = `
             <span><strong>Consortia:</strong> total number of breast cancer consortia contributing data to Confluence.</span></br>
             <span><strong>Studies:</strong> total number of breast cancer studies contributing data to Confluence.</span></br>
-            <span><strong>Ancestries:</strong> total number of breast cancer ancestries contributing to Confluence.</span></br>
-            <span><strong>Cases:</strong> total number of breast cancer cases.</span></br>
-            <span><strong>Controls:</strong> total number of breast cancer controls.</span></br>
-            <span><strong>Carriers:</strong> total number of breast cancer carriers contributing to Confluence.</span></br>
+            <span><strong>Cases:</strong> total number of subjects with breast.</span></br>
+            <span><strong>Controls:</strong> total number of subjects without breast cancer.</span></br>
         `;
     });
 };
@@ -175,7 +175,7 @@ export const homePageVisualization = async () => {
         });
         element.addEventListener('mouseout', () => {
             mainImage.src = `./static/images/home_page_circle.png`;
-            document.getElementById('displayConsortiaName').innerHTML = '';
+            document.getElementById('displayConsortiaName').innerHTML = '</br>';
             document.getElementById('publicConsortiaCount').innerHTML = `<h3>${Object.keys(data).length}</h3>`;
             document.getElementById('publicStudiesCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h3>`;
             document.getElementById('publicCaseCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h3>`;
