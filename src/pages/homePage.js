@@ -79,7 +79,7 @@ export const addEventAboutConfluence = () => {
         body.innerHTML = `
             <span><strong>Consortia:</strong> total number of breast cancer consortia contributing data to Confluence.</span></br>
             <span><strong>Studies:</strong> total number of breast cancer studies contributing data to Confluence.</span></br>
-            <span><strong>Cases:</strong> total number of subjects with breast.</span></br>
+            <span><strong>Cases:</strong> total number of subjects with breast cancer.</span></br>
             <span><strong>Controls:</strong> total number of subjects without breast cancer.</span></br>
         `;
     });
