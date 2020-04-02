@@ -1072,7 +1072,7 @@ export const addEventAboutList = () => {
         element3.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
             <span class="confluence-pink">Target Size</span></br></br>
-            <img alt="Study target size - 300 cases and 300 controls" height="175px" width="100%" src="./static/images/target_size.png">
+            <img alt="Study target size - 300 cases and 300 controls" height="155px" width="100%" src="./static/images/target_size.png">
         `
     });
 
@@ -1112,7 +1112,7 @@ export const addEventAboutList = () => {
         aboutContent.innerHTML = `
             <span class="confluence-pink">How to Participate</span>
             <ul>
-                <li>Trough collaborating Consortia (see next page) OR</li>
+                <li>Trough collaborating Consortia OR</li>
                 <li>Collaborating directly with the NCI Coordinating Center at DCEG</li>
             </ul>
         `
