@@ -2,7 +2,7 @@ import { config } from '../config.js'
 import { refreshToken } from '../shared.js';
 
 export const checkAccessTokenValidity = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
+    const access_token = getAccessToken();
     try{
         const response = await fetch('https://api.box.com/2.0/users/me',{
            method:'GET',

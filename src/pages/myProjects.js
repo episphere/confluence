@@ -10,7 +10,7 @@ export const myProjectsTemplate = async () => {
     const ul =  document.createElement('ul');
     ul.classList = ['ul-list-style first-list-item'];
     for(let i = 0 ; i < data.length; i++) {
-        const bool = amIViewer(await getCollaboration(data[i].id, `${data[i].type}s`), JSON.parse(localStorage.parms).login);
+        const bool = amIViewer(await getCollaboration(data[i].id, `${data[i].type}s`), getEpiBoxToken().login);
         if(bool === true) {
             let name = data[i].name;
             let type = data[i].type;

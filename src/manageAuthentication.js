@@ -1,8 +1,8 @@
 import { config } from './config.js'
-import { refreshToken } from './shared.js';
+import { refreshToken, getAccessToken } from './shared.js';
 
 export const checkAccessTokenValidity = async () => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
+    const access_token = getAccessToken();
     try{
         const response = await fetch('https://api.box.com/2.0/users/me',{
            method:'GET',
@@ -29,7 +29,8 @@ export const loginObs = () => {
 }
 
 export const loginAppDev = () => {
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=${location.origin+location.pathname}?state=${config.iniAppDev.stateIni}`
+    epibox.login();
+    // document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=${location.origin+location.pathname}?state=${config.iniAppDev.stateIni}`
 }
 
 export const loginAppProd = () => {
@@ -37,8 +38,8 @@ export const loginAppProd = () => {
 }
 
 export const logOut = async () => {
-    if(!localStorage.parms) return;
-    const access_token = JSON.parse(localStorage.parms).access_token;
+    if(!getEpiBoxToken()) return;
+    const access_token = getAccessToken();
     let clt={}
     if(location.origin.indexOf('localhost') !== -1){
         clt = config.iniAppDev;
@@ -53,6 +54,6 @@ export const logOut = async () => {
         mode: 'no-cors',
         body: `token=${access_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
     });
-    delete localStorage.parms;
+    delete localStorage.epiBoxToken;
     location.reload();
 }

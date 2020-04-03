@@ -6,7 +6,7 @@ import { generateAllCharts } from "./visualization.js";
 
 export const getFolderItems = async (id) => {
     try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch('https://api.box.com/2.0/folders/'+id+'/items',{
             method:'GET',
             headers:{
@@ -31,7 +31,7 @@ export const getFolderItems = async (id) => {
 
 export const getFolderInfo = async (id) => {
     try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch('https://api.box.com/2.0/folders/'+id,{
             method:'GET',
             headers:{
@@ -56,7 +56,7 @@ export const getFolderInfo = async (id) => {
 
 export const getFile = async (id) => {
     try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
             method:'GET',
             headers:{
@@ -81,7 +81,7 @@ export const getFile = async (id) => {
 
 export const getFileJSON = async (id) => {
     try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
         headers:{
             Authorization:"Bearer "+access_token
@@ -112,7 +112,7 @@ export const getFileJSON = async (id) => {
 
 export const getFileInfo = async (id) => {
     try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch('https://api.box.com/2.0/files/'+id,{
             method:'GET',
             headers:{
@@ -137,7 +137,7 @@ export const getFileInfo = async (id) => {
 
 export const getFileVersions = async (id) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let r = await fetch(`https://api.box.com/2.0/files/${id}/versions`,{
             method:'GET',
             headers:{
@@ -189,14 +189,6 @@ export const storeAccessToken = async () => {
             document.getElementById('loginBoxAppDev').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;
         }
-    }else{
-        if(localStorage.parms){
-            confluence.parms=JSON.parse(localStorage.parms)
-            if(confluence.parms.access_token === undefined){
-                localStorage.clear();
-                alert('access token not found, please contact system administrator')
-            }
-        }
     }
 }
 
@@ -245,7 +237,7 @@ const searchParms = () => {
 };
 
 export const downloadFileTxt = async (fileId, fileName) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
+    const access_token = getAccessToken();
     let fileData = await getFile(fileId, access_token);
     let element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileData));
@@ -261,7 +253,7 @@ export const downloadFileTxt = async (fileId, fileName) => {
 
 export const createFolder = async (folderId, folderName) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let obj = {
             "name": folderName,
             "parent": {
@@ -292,7 +284,7 @@ export const createFolder = async (folderId, folderName) => {
 
 export const copyFile = async (fileId, parentId) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         let obj = {
             "parent": {
                 "id": parentId
@@ -322,7 +314,7 @@ export const copyFile = async (fileId, parentId) => {
 
 export const uploadFileBox = async (folderId, fileName, file) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const form = new FormData();
         form.append('file', file);
         form.append('name', fileName);
@@ -353,7 +345,7 @@ export const uploadFileBox = async (folderId, fileName, file) => {
 
 export const uploadFile = async (data, fileName, folderId) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const form = new FormData();
         const blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
         form.append('file', blobData);
@@ -384,7 +376,7 @@ export const uploadFile = async (data, fileName, folderId) => {
 
 export const getCollaboration = async (id, type) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/${type}/${id}/collaborations`, {
             headers:{
                 Authorization:"Bearer "+access_token
@@ -407,7 +399,7 @@ export const getCollaboration = async (id, type) => {
 
 export const getFileAccessStats = async (id) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/file_access_stats/${id}`, {
             headers:{
                 Authorization:"Bearer "+access_token
@@ -430,7 +422,7 @@ export const getFileAccessStats = async (id) => {
 
 export const getCurrentUser = async () => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/users/me`, {
             headers: {
                 Authorization: "Bearer "+access_token
@@ -453,7 +445,7 @@ export const getCurrentUser = async () => {
 
 export const addNewCollaborator = async (id, type, login, role) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const obj = {
             item: {
                 type: type,
@@ -486,7 +478,7 @@ export const addNewCollaborator = async (id, type, login, role) => {
 
 export const removeBoxCollaborator = async (id) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
             method: 'DELETE',
             headers: {
@@ -507,7 +499,7 @@ export const removeBoxCollaborator = async (id) => {
 
 export const updateBoxCollaborator = async (id, role) => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
             method: 'PUT',
             headers: {
@@ -529,7 +521,7 @@ export const updateBoxCollaborator = async (id, role) => {
 
 export const getAllWebHooks = async () => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const response = await fetch(`https://api.box.com/2.0/webhooks`, {
             method: 'GET',
             headers: {
@@ -550,7 +542,7 @@ export const getAllWebHooks = async () => {
 
 export const createWebHook = async () => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const obj = {
             address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
             target: {id: '90879959998', type: "folder"}, 
@@ -577,7 +569,7 @@ export const createWebHook = async () => {
 
 export const updateWebHook = async () => {
     try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
+        const access_token = getAccessToken();
         const obj = {
             address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
             target: {id: '90879959998', type: "folder"}, 
@@ -816,7 +808,7 @@ export const consortiumSelection = async () => {
     if(array.length === 0) return '';
     template += '<strong>Select consortium</strong> <span class="required">*</span><select id="CPCSelect" class="form-control" required>'
     for(let obj = 0; obj < array.length; obj++){
-        const bool = checkMyPermissionLevel(await getCollaboration(array[obj].id, `${array[obj].type}s`), JSON.parse(localStorage.parms).login);
+        const bool = checkMyPermissionLevel(await getCollaboration(array[obj].id, `${array[obj].type}s`), getEpiBoxToken().login);
         if(bool === true){
             if(obj === 0) template += '<option value=""> -- Select consortium -- </option>'
             template += `<option value="${array[obj].id}">${array[obj].name}</option>`;
@@ -936,3 +928,7 @@ export const csvJSON = (csv) => {
     }
     return result;
 }
+
+export const getAccessToken = () => JSON.parse(localStorage.epiBoxToken).access_token;
+
+export const getEpiBoxToken = () => localStorage.epiBoxToken ? JSON.parse(localStorage.epiBoxToken) : undefined;

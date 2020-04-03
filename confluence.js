@@ -5,7 +5,7 @@ import { template as dataSummary } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
+import { removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, getAccessToken, getEpiBoxToken } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -24,31 +24,31 @@ export const confluence = async () => {
     }
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
-
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
 
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
-    if (localStorage.parms === undefined) {
+    if (localStorage.epiBoxToken === undefined) {
+        epibox.readParms()
+        if(epibox.parms && epibox.parms.code) epibox.login()
         const confluenceDiv = document.getElementById('confluenceDiv');
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppProd.hidden = false;
-        storeAccessToken();
+        // storeAccessToken();
         manageRouter();
     }
-    if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
+    if (localStorage.epiBoxToken && getAccessToken()) {
         const response = await getCurrentUser();
         showAnimation();
         if (response) {
-            const lclStr = JSON.parse(localStorage.parms);
-            // localStorage.parms = JSON.stringify({ ...lclStr, ...response });
-            localStorage.parms = JSON.stringify(Object.assign(lclStr, response));
+            const lclStr = JSON.parse(localStorage.epiBoxToken);
+            localStorage.epiBoxToken = JSON.stringify(Object.assign(lclStr, response));
         }
         navBarOptions.innerHTML = template();
-        document.getElementById('logOutBtn').addEventListener('click', logOut);
+        document.getElementById('logOutBtn').addEventListener('click', () => epibox.logout());
 
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
@@ -98,7 +98,7 @@ export const confluence = async () => {
         let showProjects = false;
         for (let obj of projectArray) {
             if (showProjects === false) {
-                const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+                const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), getEpiBoxToken().login);
                 if (bool === true) showProjects = true;
             }
         }
@@ -139,7 +139,7 @@ export const confluence = async () => {
 };
 
 const manageRouter = async () => {
-    if(localStorage.parms !== undefined) return;
+    if(localStorage.epiBoxToken !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
     
@@ -183,7 +183,7 @@ const manageRouter = async () => {
 }
 
 const manageHash = () => {
-    if(localStorage.parms === undefined) return;
+    if(localStorage.epiBoxToken === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
     if(hash === '#data_exploration') {
@@ -284,7 +284,7 @@ const manageHash = () => {
 window.onload = async () => {
     const confluenceDiv = document.getElementById('confluenceDiv');
     confluenceDiv.innerHTML = '';
-    if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
+    if (localStorage.epiBoxToken && getAccessToken()) {
         await checkAccessTokenValidity();
         inactivityTime();
     }
@@ -297,7 +297,7 @@ window.onhashchange = () => {
 };
 
 window.onstorage = () => {
-    if(localStorage.parms === undefined) logOut();
+    if(localStorage.epiBoxToken === undefined) logOut();
     else {
         confluence();
         document.getElementById('loginBoxAppDev').hidden = true;

@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, getEpiBoxToken } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -520,13 +520,13 @@ export const addEventShowAllCollaborator = () => {
                 table += `<tr>
                             <td>${name}</td>
                             <td>${email}</td>
-                            <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
+                            <td>${email !== getEpiBoxToken().login && userPermission && updatePermissionsOptions(userPermission, role) ? `
                             <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                         ` : `${role}`}</td>
                             <td>${status}</td>
                             <td>${addedBy}</td>
                             <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
-                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td>
+                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== getEpiBoxToken().login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td>
                         </tr>`
             });
             table += `</tbody></table>`
@@ -608,7 +608,7 @@ const addEventRemoveCollaborator = () => {
 
 const checkPermissionLevel = (data) => {
     if(data.entries.length === 0) return null;
-    const login = localStorage.parms && JSON.parse(localStorage.parms).login ? JSON.parse(localStorage.parms).login : undefined;
+    const login = getEpiBoxToken() && getEpiBoxToken().login ? getEpiBoxToken().login : undefined;
     const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
     if(array.length === 0){
         const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);

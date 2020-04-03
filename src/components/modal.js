@@ -1,4 +1,4 @@
-import { getFolderItems, filterConsortiums, checkMyPermissionLevel, getCollaboration } from "../shared.js"
+import { getFolderItems, filterConsortiums, checkMyPermissionLevel, getCollaboration, getEpiBoxToken } from "../shared.js"
 
 export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
@@ -83,7 +83,7 @@ const createConsortiaOptions = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
     for(let consortia of array){
-        const bool = checkMyPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), JSON.parse(localStorage.parms).login);
+        const bool = checkMyPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), getEpiBoxToken().login);
         if(bool === true) template += `<option value="${consortia.id}">${consortia.name}</option>`
     }
     return template;

@@ -1,6 +1,6 @@
 import { addEventShowAllCollaborator, addEventAddNewCollaborator, addEventFileStats } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel, getEpiBoxToken } from "../shared.js";
 
 export const template = async () => {
     const response = await getFolderItems(0);
@@ -35,13 +35,13 @@ export const dataGovernanceProjects = async () => {
     let checker = false;
     for(let obj = 0; obj < projectArray.length; obj++){
         if(checker === false) {
-            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
+            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), getEpiBoxToken().login);
             if(bool === true) checker = true;
         }
     }
     if(checker === true) {
         for(let obj = 0; obj < projectArray.length; obj++){
-            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
+            const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), getEpiBoxToken().login);
             if(obj === 0) template += `<div class="card border sub-div-shadow"><div class="card-header">
                                             <strong>Project(s)</strong>
                                         </div> 
@@ -76,8 +76,8 @@ export const dataGovernanceLazyLoad = (element) => {
         const id = element.dataset.id;
         const status = element.dataset.status;
         const type = element.dataset.type;
-        if(type && JSON.parse(localStorage.parms).login){
-            const bool = checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login);
+        if(type && getEpiBoxToken().login){
+            const bool = checkMyPermissionLevel(await getCollaboration(id, `${type}s`), getEpiBoxToken().login);
             if(bool === true){
                 const a = document.createElement('a');
                 a.dataset.toggle = 'modal';
