@@ -441,6 +441,14 @@ label {
     color: #4d4d4d !important;
 }
 
+.margin-bottom {
+    margin-bottom: 30px;
+}
+
+.viz-card-body {
+    padding: 0px !important;
+}
+
 .element-invisible {
     position: absolute !important;
     clip: rect(1px 1px 1px 1px);

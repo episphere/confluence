@@ -10,45 +10,45 @@ export const template = () => {
             <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
 
             <div class="main-summary-row">
-                <div class="col-md-2">
+                <div class="col-lg-2 margin-bottom">
                     <div class="card sub-div-shadow">
                         <div class="card-header"><strong class="side-panel-header">Studies</strong></div>
                         <div id="cardContent" class="card-body"></div>
                     </div>
                 </div>
-                <div class="col-md-10">
+                <div class="col-lg-10 margin-bottom">
                     <div class="main-summary-row">
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv7">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv2">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv5">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
                                     </div>
                                 </div>
@@ -56,37 +56,37 @@ export const template = () => {
                         </div>
                     </div>
                     <div class="main-summary-row">
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv3">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv6">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-md-4">
+                        <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv4">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
                                         <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body viz-card-body">
                                         <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
                                     </div>
                                 </div>
