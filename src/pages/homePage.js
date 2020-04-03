@@ -1,7 +1,7 @@
 export const template = () => {
     return `
     <div class="main-summary-row home-page-stats sub-div-shadow">
-        <div class="col-sm-7">
+        <div class="col-lg-7">
             <div class="align-left info-confluence">
                 <span style="color:#74103A;font-weight:bold">Confluence</span> is an international research project - a consortium of consortia-that aims to build a large collaborative platform for germline genetic studies of breast cancer through the confluence of existing and new
                 genome-wide genotyping data.
@@ -29,7 +29,7 @@ export const template = () => {
                 <span style="color:#74103A;font-weight:bold">Confluence</span> is funded by the U.S. National Cancer Institute (NCI), and coordinated by the Division of Cancer Epidemiology and Genetics (DCEG) at NCI.
             </div>
         </div>
-        <div class="col-sm-5" id="confluenceInfo">
+        <div class="col-lg-5" id="confluenceInfo">
             <img id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%" usemap="#consortiamap">
             <map name="consortiamap">
                 <area shape="circle" data-image="consortia_1.png" data-consortia-name="BCAC" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">

@@ -373,6 +373,7 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             type: 'pie',
             hole: .4,
             textinfo: 'label+value',
+            textposition: 'inside',
             showlegend: false,
             marker:{
                 colors: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61']

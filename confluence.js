@@ -247,6 +247,7 @@ const manageHash = () => {
         confluenceDiv.innerHTML = homePage();
         addEventAboutConfluence();
         homePageVisualization();
+        hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
@@ -257,6 +258,7 @@ const manageHash = () => {
         confluenceDiv.innerHTML = aboutConfluence();
         addEventAboutList();
         document.getElementById('item1').click();
+        hideAnimation();
     }
     else if(hash === '#resources'){
         const element = document.getElementById('resourcesConfluence');
@@ -265,6 +267,7 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = confluenceResources();
+        hideAnimation();
     }
     else if(hash === '#contact'){
         const element = document.getElementById('contactConfluence');
@@ -273,6 +276,7 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = confluenceContactPage();
+        hideAnimation();
     }
     else window.location.hash = '#data_exploration';
 };
