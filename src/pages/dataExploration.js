@@ -16,7 +16,7 @@ export const template = () => {
                         <div id="cardContent" class="card-body"></div>
                     </div>
                 </div>
-                <div class="col-lg-10 margin-bottom">
+                <div class="col-lg-10">
                     <div class="main-summary-row">
                         <div class="data-exploration-charts col-lg-4">
                             <div id="chartDiv7">
