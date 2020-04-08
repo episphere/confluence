@@ -245,7 +245,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         }
     ];
     const layout = {
-        xaxis: {title:`Age`, font: {size: 16}, fixedrange: true},
+        xaxis: {title:`Age`, font: {size: 16}, fixedrange: true, automargin: true},
         yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -271,7 +271,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true},
+        xaxis: {fixedrange: true, automargin: true},
         yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -406,7 +406,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoEthnicityBarChart" data-toggle="modal" data-target="#"></i>`;
     const data = [
         {
-            x: ['European', 'Hispanic', 'African', 'Asian', 'South East Asian', 'Other', 'DK'],
+            x: ['European', 'Hispanic', 'African', 'Asian', 'South East Asian', 'Other', 'Don\'t know'],
             y: [countEthnicity('European', jsonData), countEthnicity('Hispanic', jsonData), countEthnicity('African', jsonData), countEthnicity('Asian', jsonData), countEthnicity('South East Asian', jsonData), countEthnicity('Other', jsonData), countEthnicity('DK', jsonData)],
             type: 'bar',
             marker:{
@@ -415,7 +415,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true},
+        xaxis: {fixedrange: true, automargin: true},
         yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
