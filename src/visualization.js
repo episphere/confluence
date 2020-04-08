@@ -265,7 +265,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
                     
             ],
             marker:{
-                color: ['#BF1B61', '#7F7F7F','#BF1B61']
+                color: ['#BF1B61', '#f7b6d2', '#7F7F7F']
             },
           type: 'bar'
         }
@@ -303,7 +303,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
             hoverinfo: 'label+percent',
             showlegend: false,
             marker:{
-                colors: ['#BF1B61', '#cb4880', '#d876a0', '#e5a3bf']
+                colors: ['#BF1B61', '#f7b6d2', '#7F7F7F']
             },
             hole: .4
         }
@@ -410,7 +410,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
             y: [countEthnicity('European', jsonData), countEthnicity('Hispanic', jsonData), countEthnicity('African', jsonData), countEthnicity('Asian', jsonData), countEthnicity('South East Asian', jsonData), countEthnicity('Other', jsonData), countEthnicity('DK', jsonData)],
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61']
+                color: ['#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F']
             },
         }
     ];
