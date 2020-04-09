@@ -245,8 +245,8 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         }
     ];
     const layout = {
-        xaxis: {title:`Age`, font: {size: 16}, fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
+        xaxis: {title:`Age`, fixedrange: true, automargin: true},
+        yaxis: {title:`Count`, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -272,7 +272,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -344,6 +344,8 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
         }
     ];
     const layout = {
+        xaxis: {fixedrange: true, automargin: true},
+        yaxis: {title:`Count`, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -416,7 +418,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };

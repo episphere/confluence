@@ -12,7 +12,7 @@ export const template = () => {
             <div class="main-summary-row">
                 <div class="col-lg-2 margin-bottom">
                     <div class="card sub-div-shadow">
-                        <div class="card-header"><strong class="side-panel-header">Studies</strong></div>
+                        <div class="card-header"><strong class="side-panel-header">Studies <i class="fas fa-question-circle cursor-pointer" title="Select Consortia or Studies to Display"></i></strong></div>
                         <div id="cardContent" class="card-body"></div>
                     </div>
                 </div>
