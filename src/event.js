@@ -1044,10 +1044,9 @@ export const addEventAboutList = () => {
         removeActiveClass('list-group-item', 'list-group-item-active')
         element1.classList.add('list-group-item-active');
         aboutContent.innerHTML = `
-            <span class="confluence-pink">Confluence</span> is an international research project-a consortium of 
-            consortia-that aims to build a large collaborative platform for <span class="confluence-pink">germline genetic 
-            studies of breast cancer</span> throughthe confluence of existing and new genome-wide genotyping data. 
-            It is funded by the U.S. National Cancer Institute (NCI), 
+            <span class="confluence-pink">Confluence</span> is a large international project to study breast cancer 
+            genetic susceptibility in women and men of multiple ancestries, 
+            by integrating existing and new genome-wide genetic data. It is funded by the U.S. National Cancer Institute (NCI), 
             and coordinated by the Division of Cancer Epidemiologyand Genetics (DCEG) at NCI.
         `
     });

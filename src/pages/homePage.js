@@ -3,8 +3,10 @@ export const template = () => {
     <div class="main-summary-row home-page-stats sub-div-shadow">
         <div class="col-lg-7">
             <div class="align-left info-confluence">
-                <span style="color:#74103A;font-weight:bold">Confluence</span> is an international research project - a consortium of consortia-that aims to build a large collaborative platform for germline genetic studies of breast cancer through the confluence of existing and new
-                genome-wide genotyping data.
+                <span style="color:#74103A;font-weight:bold">
+                    Confluence
+                </span> is a large international project to study breast cancer genetic susceptibility in women
+                 and men of multiple ancestries, by integrating existing and new genome-wide genetic data.
             </div>
             
             <div class="card border sub-div-shadow">
