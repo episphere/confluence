@@ -1,8 +1,7 @@
 import { config } from "./config.js";
 import { variables } from "./variables.js";
 import { logOut } from "./manageAuthentication.js";
-import { confluence } from '../confluence.js'
-import { generateAllCharts } from "./visualization.js";
+import { confluence } from '../confluence.js';
 
 export const getFolderItems = async (id) => {
     try{
@@ -896,17 +895,6 @@ export const inactivityTime = () => {
     document.onmousemove = resetTimer;
     document.onkeypress = resetTimer;
 };
-
-export const reSizeCharts = (cf, jsonData) => {
-    let time;
-    const resetTimer = () => {
-        clearTimeout(time);
-        time = setTimeout(() => {
-            generateAllCharts(cf, jsonData);
-        }, 500);
-    }
-    window.onresize = resetTimer;
-}
 
 export const csvJSON = (csv) => {
     const lines = csv.split("\n");

@@ -51,7 +51,6 @@ export const getData = (studyEntries, studyIds, values) => {
             // allIds = {...allIds, ...fileEntries};
         });
     });
-    // getFileContent(allIds);
 }
 
 export const getFileContent = async () => {
@@ -63,44 +62,12 @@ export const getFileContent = async () => {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
-    generateAllCharts(jsonData);
-    // reSizeCharts(cf, jsonData);
+    renderAllCharts(jsonData, true);
 };
 
-// const dataBinning = (data, binSize) => {
-//     const ageArray = [];
-//     const ageBinned = [];
-//     for(let obj of data){
-//         ageArray.push(parseInt(obj.ageInt));
-//     }
-//     ageArray.sort();
-//     for(let i = 0; i <ageArray.length; i=i+binSize ){
-//         let avg = 0;
-//         let counter = 0;
-//         while(counter < binSize){
-//             avg = avg+ageArray[i+counter];
-//             counter++;
-//         }
-//         avg = avg/binSize;
-//         ageBinned.push(Math.floor(avg));
-//     }
-//     console.log(ageBinned)
-// }
-
-export const generateAllCharts = (jsonData) => {
-    renderAllCharts(jsonData, true);
-}
-
-const getSelectionOptions = (jsonData) => {
-    let obj = {};
-    for(let value of jsonData){
-        if(obj[value.consortium] === undefined) obj[value.consortium] = {};
-        if(obj[value.consortium]){
-            obj[value.consortium]['consortiumTotal'] = jsonData.filter(dt => {if(dt.consortium === value.consortium) return dt}).map(dt => dt.total).reduce((a,b) => a+b)
-            if(obj[value.consortium][value.study] === undefined) obj[value.consortium][value.study] = { total : jsonData.filter(dt => {if(dt.study === value.study) return dt}).map(dt => dt.total).reduce((a,b) => a+b)};
-        }
-    }
-    let template = '<div class="align-left">';
+const chipFilter = (jsonData) => {
+    
+    let template = '';
     template += `<div class="row genotype-select">
                     Genotyping chip &nbsp;<span><i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='chip' data-toggle="modal" data-target="#confluenceMainModal"></i></span>
                 </div>
@@ -114,24 +81,53 @@ const getSelectionOptions = (jsonData) => {
                     <button class="filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn" data-genotyped="Both">All arrays</button>
                 </div>
                 <div class="custom-hr row"></div>`
+    
+    document.getElementById('chipContent').innerHTML = template;
+    addEventGenotypeBtnSelection(jsonData);
+}
+
+const aggegrateData = (jsonData) => {
+    let obj = {};
+    for(let value of jsonData){
+        if(obj[value.consortium] === undefined) obj[value.consortium] = {};
+        if(obj[value.consortium]){
+            obj[value.consortium]['consortiumTotal'] = jsonData.filter(dt => {if(dt.consortium === value.consortium) return dt}).map(dt => dt.total).reduce((a,b) => a+b)
+            if(obj[value.consortium][value.study] === undefined) obj[value.consortium][value.study] = { total : jsonData.filter(dt => {if(dt.study === value.study) return dt}).map(dt => dt.total).reduce((a,b) => a+b)};
+        }
+    }
+    return obj;
+}
+
+const filterByStudy = (jsonData) => {
+    const obj = aggegrateData(jsonData);
+    let template = '';
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
-                        <li class="row consortium-selection custom-borders"><div class="consortia-name">${consortium}</div>
-                        <div class="ml-auto"><div class="filter-btn custom-margin consortia-total sub-div-shadow">${obj[consortium].consortiumTotal}</div> <i class="fas fa-caret-down"></i></div></li>
+                        <li class="row consortium-selection custom-borders">
+                            <div class="consortia-name">${consortium}</div>
+                            <div class="ml-auto">
+                                <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
+                                    ${obj[consortium].consortiumTotal}
+                                </div> <i class="fas fa-caret-down"></i>
+                            </div>
+                        </li>
                         <ul class="ul-list-style content custom-padding">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
-                template += `<li class="row collapsible-items filter-studies" data-consortium=${consortium} data-study=${study}><div class="study-name">${study}</div>
-                    <div class="ml-auto"><div class="filter-btn custom-margin study-total sub-div-shadow">${total}</div></div></li>`;
+                template += `<li class="row collapsible-items filter-studies" data-consortium=${consortium} data-study=${study}>
+                    <div class="study-name">${study}</div>
+                    <div class="ml-auto">
+                        <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
+                            ${total}
+                        </div>
+                    </div></li>`;
             }
         }   
         template += `</ul></ul>`;
     }
-    template += '</div>'
-    document.getElementById('cardContent').innerHTML = template;
+    document.getElementById('studyFilter').innerHTML = template;
     addEventConsortiumSelect();
-    addEventGenotypeBtnSelection(jsonData);
     addEventFilterCharts(jsonData);
     document.getElementsByClassName('consortium-selection')[0].click();
 }
@@ -146,30 +142,46 @@ const addEventGenotypeBtnSelection = (jsonData) => {
             let array = getSelectedStudies();
             const genotyped = element.dataset.genotyped;
             if(array.length === 0){
-                if(genotyped === 'Yes') renderAllCharts(jsonData.filter(dt => dt.chip === 'Confluence chip'));
-                else if(genotyped === 'No') renderAllCharts(jsonData.filter(dt => dt.chip === 'Other chip'));
-                else renderAllCharts(jsonData)
+                if(genotyped === 'Yes') {
+                    const filteredData = jsonData.filter(dt => dt.chip === 'Confluence chip');
+                    updateCounts(filteredData);
+                    renderAllCharts(filteredData);
+                }
+                else if(genotyped === 'No') {
+                    const filteredData = jsonData.filter(dt => dt.chip === 'Other chip');
+                    updateCounts(filteredData)
+                    renderAllCharts(filteredData);
+                } 
+                else {
+                    updateCounts(jsonData)
+                    renderAllCharts(jsonData)
+                }
             }
             else{
                 let finalData = [];
+                let dataUpdateCount = [];
                 if(genotyped === 'Yes'){
+                    dataUpdateCount = jsonData.filter(dt => dt.chip === 'Confluence chip');
                     for(let value of array){
                         const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Confluence chip')
                         finalData = finalData.concat(filteredData);
                     }
                 }
                 else if (genotyped === 'No') {
+                    dataUpdateCount = jsonData.filter(dt => dt.chip === 'Other chip');
                     for(let value of array){
                         const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Other chip')
                         finalData = finalData.concat(filteredData);
                     }
                 }
                 else {
+                    dataUpdateCount = jsonData;
                     for(let value of array){
                         const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
                         finalData = finalData.concat(filteredData);
                     }
                 }
+                updateCounts(dataUpdateCount);
                 renderAllCharts(finalData);
             }
         });
@@ -237,7 +249,7 @@ const addEventFilterCharts = (jsonData) => {
                     }
                 }
             }
-            renderAllCharts(finalData);
+            renderAllCharts(finalData, false);
         });
     });
 }
@@ -249,8 +261,25 @@ const renderAllCharts = (finalData, showFilter) => {
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
     renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
-    if(showFilter) getSelectionOptions(finalData);
+    if(showFilter) chipFilter(finalData);
+    if(showFilter) filterByStudy(finalData)
     addEventVariableDefinitions();
+}
+
+const updateCounts = (data) => {
+    const obj = aggegrateData(data);
+    for(let consortia in obj){
+        const elements = document.querySelectorAll(`[data-consortia="${consortia}"]`);
+        Array.from(elements).forEach(element => {
+            element.innerHTML = obj[consortia].consortiumTotal;
+        });
+        for(let study in obj[consortia]){
+            const studyElements = document.querySelectorAll(`[data-consortia-study="${consortia}@#$${study}"]`);
+            Array.from(studyElements).forEach(element => {
+                element.innerHTML = obj[consortia][study].total;
+            });
+        };
+    };
 }
 
 const getSelectedStudies = () => {
@@ -264,17 +293,6 @@ const getSelectedStudies = () => {
     })
     return array;
 };
-
-const generateSelectionMenu = (cf, parameter, id) => {
-    let dimension = cf.dimension(function(d) {return d[parameter] ? d[parameter] : ""});
-    const selection = dc.selectMenu(`#${id}`)
-    selection.dimension(dimension)
-        .multiple(true)
-        .group(dimension.group())
-        .controlsUseVisibility(true)
-        .title(function (d){ return `${d.key}`})
-        .render();
-}
 
 export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
     document.getElementById(chartDiv).classList = ['background-white'];
@@ -297,7 +315,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         }
     ];
     const layout = {
-        xaxis: {title:`Age`, fixedrange: true, automargin: true},
+        xaxis: {fixedrange: true, automargin: true},
         yaxis: {title:`Count`, fixedrange: true},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'

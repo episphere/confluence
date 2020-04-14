@@ -13,7 +13,10 @@ export const template = () => {
                 <div class="col-xl-2 margin-bottom">
                     <div class="card sub-div-shadow">
                         <div class="card-header"><strong class="side-panel-header">Studies <i class="fas fa-question-circle cursor-pointer" title="Select Consortia or Studies to Display"></i></strong></div>
-                        <div id="cardContent" class="card-body"></div>
+                        <div id="cardContent" class="card-body">
+                            <div id="chipContent" class="align-left"></div>
+                            <div id="studyFilter" class="align-left"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-xl-10">
