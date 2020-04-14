@@ -1211,7 +1211,7 @@ export const addEventVariableDefinitions = () => {
             }
             if(variable === 'status') {
                 variableName = 'Case-control status'; 
-                definition = "Number of subjects with a reported diagnosis of invasive breast cancer or in situ breast cancer and number of subjects free of breast cancer";
+                definition = "Number of subjects with a reported diagnosis of invasive breast cancer or in situ breast cancer and number of subjects without a breast cancer diagnosis";
             }
             if(variable === 'ethnicityClass') {
                 variableName = 'Ancestry'; 
