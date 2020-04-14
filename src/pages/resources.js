@@ -15,7 +15,7 @@ export const confluenceResources = () => {
                 <ul>
                     <li><a href="http://research.nhgri.nih.gov/bic/" target="_blank">Breast Cancer Information Core (BIC)</a></li>
                     <li><a href="http://www.1000genomes.org/" target="_blank">1000 Genomes Project</a></li>
-                    <li><a href="http://www.hapmap.org/" target="_blank">International HapMap Project</a></li>
+                    <li><a href="https://www.genome.gov/10001688/international-hapmap-project" target="_blank">International HapMap Project</a></li>
                     <li><a href="http://www.ncbi.nlm.nih.gov/" target="_blank">National Center for Biotechnology Information (NCBI)</a></li>
                 </ul>
             </div>
