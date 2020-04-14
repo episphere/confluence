@@ -116,14 +116,14 @@ const getSelectionOptions = (jsonData) => {
                 <div class="custom-hr row"></div>`
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
-                        <li class="row consortium-selection custom-borders"><div>${consortium}</div>
-                        <div class="ml-auto"><div class="filter-btn custom-margin consortia-total">${obj[consortium].consortiumTotal}</div> <i class="fas fa-caret-down"></i></div></li>
+                        <li class="row consortium-selection custom-borders"><div class="consortia-name">${consortium}</div>
+                        <div class="ml-auto"><div class="filter-btn custom-margin consortia-total sub-div-shadow">${obj[consortium].consortiumTotal}</div> <i class="fas fa-caret-down"></i></div></li>
                         <ul class="ul-list-style content custom-padding">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
-                template += `<li class="row collapsible-items filter-studies" data-consortium=${consortium} data-study=${study}><div>${study}</div>
-                    <div class="ml-auto"><div class="filter-btn custom-margin">${total}</div></div></li>`;
+                template += `<li class="row collapsible-items filter-studies" data-consortium=${consortium} data-study=${study}><div class="study-name">${study}</div>
+                    <div class="ml-auto"><div class="filter-btn custom-margin study-total sub-div-shadow">${total}</div></div></li>`;
             }
         }   
         template += `</ul></ul>`;

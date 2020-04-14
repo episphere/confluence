@@ -707,8 +707,7 @@ label {
     color: #000000;
     font-size: 0.75rem;
     background-color: #ffffff;
-    margin-bottom: 0.25rem;
-    margin-left: 0.25rem;
+    margin: 0.25rem 0;
     cursor: pointer !important;
 }
 
@@ -820,10 +819,6 @@ label {
     border-bottom: 1px solid rgba(0,0,0,.1);
 }
 
-.consortia-total {
-    background-color: #74103A !important;
-}
-
 #tabHeading {
     color: #ffffff;
 }
@@ -833,9 +828,23 @@ label {
 }
 
 .custom-margin {
-    background-color: #3e4086;
-    color: #ffffff;
     padding: 0px 3px;
+}
+
+.study-total {
+    background-color: #ffffff;
+    color: #3e4086;
+    font-weight: bold;
+}
+
+.consortia-total {
+    color: #74103A !important;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+.consortia-name, .study-name {
+    margin: 0.125rem 0;
 }
 
 .custom-padding {
