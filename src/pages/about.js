@@ -1,8 +1,8 @@
 export const aboutConfluence = () => {
     return `
         <div class="main-summary-row home-page-stats sub-div-shadow">
-            <div class="col-sm-6" id="aboutContent"></div>
-            <div class="col-sm-6">
+            <div class="col-lg-6" id="aboutContent"></div>
+            <div class="col-lg-6">
                 <ul class="list-group">
                     <li class="list-group-item" id="item1">Welcome to Confluence</li>
                     <li class="list-group-item" id="item2">Goals</li>

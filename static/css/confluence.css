@@ -1,8 +1,3 @@
-h2 {
-    color:maroon;
-    font-family:sans-serif;
-}
-
 h4 {
     color:gray;
     font-family:sans-serif;
@@ -335,7 +330,6 @@ label {
     height: inherit;
     width: inherit;
     text-align: center;
-    min-height: inherit;
 }
 
 .data-summary-label {
@@ -707,15 +701,31 @@ label {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    background-color: transparent;
-    border: 1px solid transparent;
-    border-radius: 1rem;
+    border: 0.5px solid black;
+    border-radius: 0.5rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     color: #000000;
     font-size: 0.75rem;
     background-color: #ffffff;
     margin-bottom: 0.25rem;
     margin-left: 0.25rem;
+    cursor: pointer !important;
+}
+
+.genotype-active-btn {
+    background-color: #e7bcbc;
+    border-radius: 0.5rem;
+}
+
+.custom-hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,.3);
+}
+
+.genotype-select {
+    padding: 0 5px;
 }
 
 .required {
@@ -807,7 +817,7 @@ label {
 }
 
 .custom-borders {
-    border-bottom: 0.5px solid #bcbdbe;
+    border-bottom: 1px solid rgba(0,0,0,.1);
 }
 
 .consortia-total {

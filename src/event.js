@@ -729,13 +729,13 @@ export const addEventDataGovernanceNavBar = (bool) => {
             </div>`;
             
             const div1 = document.createElement('div');
-            div1.classList = ['col-md-6 align-left'];
+            div1.classList = ['col-lg-6 align-left'];
             div1.innerHTML = await dataGovernanceTemplate();
             hideAnimation();
             divRow.appendChild(div1);
 
             const div2 = document.createElement('div');
-            div2.classList = ['col-md-6 align-left'];
+            div2.classList = ['col-lg-6 align-left'];
             div2.id = 'dataGovernanceProjects';
             divRow.appendChild(div2);
 
@@ -1195,5 +1195,52 @@ export const addEventAboutList = () => {
                 <li><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project">DCEG Confluence page</a></li>
             </ul>
         `
+    });
+}
+
+export const addEventVariableDefinitions = () => {
+    const elements = document.getElementsByClassName('variable-definition');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            const variable = element.dataset.variable;
+            let variableName = '';
+            let definition = '';
+            if(variable === 'studyDesign') {
+                variableName = 'Study design'; 
+                definition = "Study type classified as ‘population based’ or ‘non-population based’";
+            }
+            if(variable === 'status') {
+                variableName = 'Case-control status'; 
+                definition = "Number of subjects with a reported diagnosis of invasive breast cancer or in situ breast cancer and number of subjects free of breast cancer";
+            }
+            if(variable === 'ethnicityClass') {
+                variableName = 'Ancestry'; 
+                definition = "Ethnic descent";
+            }
+            if(variable === 'ageInt') {
+                variableName = 'Age'; 
+                definition = "Age at interview/questionnaire for controls and cases";
+            }
+            if(variable === 'famHist') {
+                variableName = 'Family history'; 
+                definition = "Family history of breast cancer in a first degree relative";
+            }
+            if(variable === 'ER_statusIndex') {
+                variableName = 'ER status'; 
+                definition = "Estrogen receptor status of breast cancer tumor";
+            }
+            if(variable === 'chip') {
+                variableName = 'Genotyping chip'; 
+                definition = "Filter data according to subjects genotyped by the confluence chips or other genotyping chips";
+            }
+            
+            const header = document.getElementById('confluenceModalHeader');
+            const body = document.getElementById('confluenceModalBody');
+            header.innerHTML = `<h5 class="modal-title">${variableName}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>`;
+            body.innerHTML = `<span>${definition}</span>`;
+        });
     });
 }

@@ -1,5 +1,6 @@
-import { hideAnimation, getFileJSON, getFile, csvJSON } from './shared.js';
+import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass } from './shared.js';
 import { variables } from './variables.js';
+import { addEventVariableDefinitions } from './event.js';
 
 const unique = arr => {
     let u={}
@@ -62,8 +63,7 @@ export const getFileContent = async () => {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
-    const cf = getCrossFilter(jsonData);
-    generateAllCharts(cf, jsonData);
+    generateAllCharts(jsonData);
     // reSizeCharts(cf, jsonData);
 };
 
@@ -87,31 +87,8 @@ export const getFileContent = async () => {
 //     console.log(ageBinned)
 // }
 
-export const generateAllCharts = (cf, jsonData) => {
-    // generateBarChart(cf, jsonData, 'ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3');
-    // generateSelectionMenu(cf, 'consortium', 'select1');
-    // generateSelectionMenu(cf, 'study', 'select2');
-    // generateSelectionMenu(cf, 'status', 'select3');
-    // generateSelectionMenu(cf, 'consortium', 'select1');
-
-    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', jsonData);
-    // dc.config.defaultColors(d3.schemePaired);
-    // renderPieChart(cf, jsonData, 'consortium', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
-    
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6', jsonData)
-    // dc.config.defaultColors(d3.schemePastel1);
-    // renderPieChart(cf, jsonData, 'study', 'dataSummaryVizChart1', 'dataSummaryVizLabel1', 'selectedRange1', 'chartDiv1');
-    // dc.config.defaultColors(d3.schemeSet2);
-    // renderPieChart(cf, jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    // dc.config.defaultColors(d3.schemeBrBG[8]);
-    // renderPieChart(cf, jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
-    // dc.config.defaultColors(d3.schemeSet3);
-    // renderPieChart(cf, jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
-    renderEthnicityBarChart(jsonData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
-    renderPlotlyPieChart(jsonData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
-    renderStatusPieChart(jsonData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    renderConsortiumPieChart(jsonData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
-    getSelectionOptions(jsonData);
+export const generateAllCharts = (jsonData) => {
+    renderAllCharts(jsonData, true);
 }
 
 const getSelectionOptions = (jsonData) => {
@@ -124,6 +101,19 @@ const getSelectionOptions = (jsonData) => {
         }
     }
     let template = '<div class="align-left">';
+    template += `<div class="row genotype-select">
+                    Genotyping chip &nbsp;<span><i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='chip' data-toggle="modal" data-target="#confluenceMainModal"></i></span>
+                </div>
+                <div class="row genotype-select">
+                    <button class="filter-btn sub-div-shadow genotype-selection-btn" data-genotyped="Yes">Confluence array</button>
+                </div>
+                <div class="row genotype-select">
+                    <button class="filter-btn sub-div-shadow genotype-selection-btn" data-genotyped="No">Other arrays</button>
+                </div>
+                <div class="row genotype-select">
+                    <button class="filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn" data-genotyped="Both">All arrays</button>
+                </div>
+                <div class="custom-hr row"></div>`
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
                         <li class="row consortium-selection custom-borders"><div>${consortium}</div>
@@ -140,17 +130,56 @@ const getSelectionOptions = (jsonData) => {
     }
     template += '</div>'
     document.getElementById('cardContent').innerHTML = template;
-
     addEventConsortiumSelect();
+    addEventGenotypeBtnSelection(jsonData);
     addEventFilterCharts(jsonData);
     document.getElementsByClassName('consortium-selection')[0].click();
+}
+
+const addEventGenotypeBtnSelection = (jsonData) => {
+    const elements = document.getElementsByClassName('genotype-selection-btn');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('genotype-active-btn')) return
+            removeActiveClass('genotype-selection-btn', 'genotype-active-btn');
+            element.classList.add('genotype-active-btn');
+            let array = getSelectedStudies();
+            const genotyped = element.dataset.genotyped;
+            if(array.length === 0){
+                if(genotyped === 'Yes') renderAllCharts(jsonData.filter(dt => dt.chip === 'Confluence chip'));
+                else if(genotyped === 'No') renderAllCharts(jsonData.filter(dt => dt.chip === 'Other chip'));
+                else renderAllCharts(jsonData)
+            }
+            else{
+                let finalData = [];
+                if(genotyped === 'Yes'){
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Confluence chip')
+                        finalData = finalData.concat(filteredData);
+                    }
+                }
+                else if (genotyped === 'No') {
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Other chip')
+                        finalData = finalData.concat(filteredData);
+                    }
+                }
+                else {
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
+                        finalData = finalData.concat(filteredData);
+                    }
+                }
+                renderAllCharts(finalData);
+            }
+        });
+    })
 }
 
 const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            
             let content = element.nextElementSibling;
             if (content.style.maxHeight){
                 content.style.maxHeight = null;
@@ -162,8 +191,7 @@ const addEventConsortiumSelect = () => {
                 element.lastElementChild.lastElementChild.classList.add('fa-caret-up');
                 element.lastElementChild.lastElementChild.classList.remove('fa-caret-down');
             }
-        })
-        
+        });
     });
 }
 
@@ -172,6 +200,9 @@ const addEventFilterCharts = (jsonData) => {
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
             let array = []
+            const genotypeSelected = document.getElementsByClassName('genotype-active-btn');
+            const genotyped = genotypeSelected[0].dataset.genotyped;
+            
             if(element.classList.contains('active-filter')){
                 element.classList.remove('active-filter');
                 array = getSelectedStudies();
@@ -182,23 +213,44 @@ const addEventFilterCharts = (jsonData) => {
             }
             let finalData = [];
             if(array.length === 0){
-                finalData = jsonData;
+                if(genotyped === 'Yes') finalData = jsonData.filter(dt => dt.chip === 'Confluence chip');
+                else if(genotyped === 'No') finalData = jsonData.filter(dt => dt.chip === 'Other chip');
+                else finalData = jsonData;
             }
             else {
-                for(let value of array){
-                    const filteredData = jsonData.filter(dt => { if(dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1]) return dt})
-                    finalData = finalData.concat(filteredData);
+                if(genotyped === 'Yes'){
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Confluence chip')
+                        finalData = finalData.concat(filteredData);
+                    }
+                }
+                else if (genotyped === 'No') {
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Other chip')
+                        finalData = finalData.concat(filteredData);
+                    }
+                }
+                else {
+                    for(let value of array){
+                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
+                        finalData = finalData.concat(filteredData);
+                    }
                 }
             }
-            
-            generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', finalData);
-            generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6', finalData)
-            renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
-            renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
-            renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-            renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+            renderAllCharts(finalData);
         });
     });
+}
+
+const renderAllCharts = (finalData, showFilter) => {
+    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', finalData);
+    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6', finalData)
+    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
+    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
+    renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
+    renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+    if(showFilter) getSelectionOptions(finalData);
+    addEventVariableDefinitions();
 }
 
 const getSelectedStudies = () => {
@@ -251,7 +303,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer" id="infoBarChart" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -278,7 +330,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer" id="infoBarChartSingle" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -289,7 +341,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoPieChart" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
 
     const data = [
         {
@@ -300,7 +352,9 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
                 ],
             type: 'pie',
             textinfo: 'label+percent',
-            hoverinfo: 'label+percent',
+            hoverinfo: 'label+value+percent',
+            textposition: 'outside',
+            automargin: true,
             showlegend: false,
             marker:{
                 colors: ['#BF1B61', '#f7b6d2', '#7F7F7F']
@@ -332,14 +386,14 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoStatusPieChart" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
     const data = [
         {
             x: ['Case', 'Control'],
             y: [countStatus('case', jsonData), countStatus('control', jsonData)],
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#7F7F7F']
+                color: ['#BF1B61', '#f7b6d2']
             }
         }
     ];
@@ -360,12 +414,12 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoConsortiumPieChart" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
     
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
-        valueCount.push(jsonData.filter(dt => {if(dt['studyDesign'] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
+        valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
     }
     
     const data = [
@@ -375,10 +429,14 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             type: 'pie',
             hole: .4,
             textinfo: 'label+value',
-            textposition: 'inside',
+            textposition: 'outside',
+            text: {
+                font: '10px'
+            },
             showlegend: false,
+            automargin: true,
             marker:{
-                colors: ['#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61']
+                colors: ['#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61']
             },
         }
     ];
@@ -405,14 +463,19 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer" id="infoEthnicityBarChart" data-toggle="modal" data-target="#"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    const allLabels = getUniqueConsortium(jsonData, parameter);
+    const valueCount = [];
+    for(let studyDesign of allLabels){
+        valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
+    }
     const data = [
         {
-            x: ['European', 'Hispanic', 'African', 'Asian', 'South East Asian', 'Other', 'Don\'t know'],
-            y: [countEthnicity('European', jsonData), countEthnicity('Hispanic', jsonData), countEthnicity('African', jsonData), countEthnicity('Asian', jsonData), countEthnicity('South East Asian', jsonData), countEthnicity('Other', jsonData), countEthnicity('DK', jsonData)],
+            x: allLabels,
+            y: valueCount,
             type: 'bar',
             marker:{
-                color: ['#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F','#BF1B61', '#7F7F7F']
+                color: ['#BF1B61', '#cb4880', '#d876a0','#e5a3bf', '#BF1B61', '#cb4880', '#7F7F7F']
             },
         }
     ];
@@ -424,5 +487,3 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
-
-const getCrossFilter = (jsonData) => crossfilter(jsonData);

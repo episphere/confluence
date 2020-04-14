@@ -32,7 +32,7 @@ export const template = () => {
             </div>
         </div>
         <div class="col-lg-5" id="confluenceInfo">
-            <img id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%" usemap="#consortiamap">
+            <img usemap="#consortiamap" id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%">
             <map name="consortiamap">
                 <area shape="circle" data-image="consortia_1.png" data-consortia-name="BCAC" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
                 <area shape="circle" data-image="consortia_2.png" data-consortia-name="NCI-DCEG" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
@@ -43,30 +43,26 @@ export const template = () => {
             </map>
         </div>
     </div>
-    <div class="main-summary-row">
-        <div class="col-md-8" id="barChart"></div>
-        <div class="col-md-4" id="pieChart"></div>
-    </div>
     `;
 }
 
 window.onresize = () => {
-    if(!document.getElementById('consortiaCircle')) return;
-    const height = document.getElementById('consortiaCircle').height;
-    const width = document.getElementById('consortiaCircle').width;
-    const radius = (height * width) / 5450;
-    const map1 = document.getElementById('map1');
-    map1.coords = `${width/1.99},${height/8.22},${radius}`;
-    const map2 = document.getElementById('map2');
-    map2.coords = `${width/1.42},${height/3.36},${radius}`;
-    const map3 = document.getElementById('map3');
-    map3.coords = `${width/1.42},${height/1.54},${radius}`;
-    const map4 = document.getElementById('map4');
-    map4.coords = `${width/1.99},${height/1.21},${radius}`;
-    const map5 = document.getElementById('map5');
-    map5.coords = `${width/3.39},${height/1.54},${radius}`;
-    const map6 = document.getElementById('map6');
-    map6.coords = `${width/3.39},${height/3.36},${radius}`;
+    // if(!document.getElementById('consortiaCircle')) return;
+    // const height = document.getElementById('consortiaCircle').height;
+    // const width = document.getElementById('consortiaCircle').width;
+    // const radius = (height * width) / 5450;
+    // const map1 = document.getElementById('map1');
+    // map1.coords = `${width/1.99},${height/8.22},${radius}`;
+    // const map2 = document.getElementById('map2');
+    // map2.coords = `${width/1.42},${height/3.36},${radius}`;
+    // const map3 = document.getElementById('map3');
+    // map3.coords = `${width/1.42},${height/1.54},${radius}`;
+    // const map4 = document.getElementById('map4');
+    // map4.coords = `${width/1.99},${height/1.21},${radius}`;
+    // const map5 = document.getElementById('map5');
+    // map5.coords = `${width/3.39},${height/1.54},${radius}`;
+    // const map6 = document.getElementById('map6');
+    // map6.coords = `${width/3.39},${height/3.36},${radius}`;
 }
 
 export const addEventAboutConfluence = () => {
@@ -170,24 +166,24 @@ export const homePageVisualization = async () => {
             const consortiaName = element.dataset.consortiaName;
             mainImage.src = `./static/images/${imageName}`;
             document.getElementById('displayConsortiaName').innerHTML = `<strong>${element.title}</strong>`;
-            document.getElementById('publicConsortiaCount').innerHTML = `<h3>1</h3>`;
-            document.getElementById('publicStudiesCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.studies).reduce((a,b) => a+b) : 0}</h3>`;
-            document.getElementById('publicCaseCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.cases).reduce((a,b) => a+b) : 0}</h3>`;
-            document.getElementById('publicControlCount').innerHTML = `<h3>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b) : 0}</h3>`;
+            document.getElementById('publicConsortiaCount').innerHTML = `<h2>1</h2>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.studies).reduce((a,b) => a+b) : 0}</h2>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.cases).reduce((a,b) => a+b) : 0}</h2>`;
+            document.getElementById('publicControlCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b) : 0}</h2>`;
         });
         element.addEventListener('mouseout', () => {
             mainImage.src = `./static/images/home_page_circle.png`;
             document.getElementById('displayConsortiaName').innerHTML = '</br>';
-            document.getElementById('publicConsortiaCount').innerHTML = `<h3>${Object.keys(data).length}</h3>`;
-            document.getElementById('publicStudiesCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h3>`;
-            document.getElementById('publicCaseCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h3>`;
-            document.getElementById('publicControlCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h3>`;
+            document.getElementById('publicConsortiaCount').innerHTML = `<h2>${Object.keys(data).length}</h2>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h2>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h2>`;
+            document.getElementById('publicControlCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h2>`;
         })
     });
-    document.getElementById('publicConsortiaCount').innerHTML = `<h3>${Object.keys(data).length}</h3>`;
-    document.getElementById('publicStudiesCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h3>`;
-    document.getElementById('publicCaseCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h3>`;
-    document.getElementById('publicControlCount').innerHTML = `<h3>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h3>`;
+    document.getElementById('publicConsortiaCount').innerHTML = `<h2>${Object.keys(data).length}</h2>`;
+    document.getElementById('publicStudiesCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h2>`;
+    document.getElementById('publicCaseCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h2>`;
+    document.getElementById('publicControlCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h2>`;
 
     //     const ageData = data.age;        
     //     var trace = {

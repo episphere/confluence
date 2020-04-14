@@ -10,15 +10,15 @@ export const template = () => {
             <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
 
             <div class="main-summary-row">
-                <div class="col-lg-2 margin-bottom">
+                <div class="col-xl-2 margin-bottom">
                     <div class="card sub-div-shadow">
                         <div class="card-header"><strong class="side-panel-header">Studies <i class="fas fa-question-circle cursor-pointer" title="Select Consortia or Studies to Display"></i></strong></div>
                         <div id="cardContent" class="card-body"></div>
                     </div>
                 </div>
-                <div class="col-lg-10">
+                <div class="col-xl-10">
                     <div class="main-summary-row">
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv7">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
@@ -30,7 +30,7 @@ export const template = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv2">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
@@ -42,7 +42,7 @@ export const template = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv5">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
@@ -56,7 +56,7 @@ export const template = () => {
                         </div>
                     </div>
                     <div class="main-summary-row">
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv3">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
@@ -68,7 +68,7 @@ export const template = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv6">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">
@@ -80,7 +80,7 @@ export const template = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class="data-exploration-charts col-lg-4">
+                        <div class="data-exploration-charts col-xl-4">
                             <div id="chartDiv4">
                                 <div class="card sub-div-shadow">
                                     <div class="card-header">

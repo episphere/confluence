@@ -7,7 +7,7 @@ export const template = async () => {
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
-    let template = `<div class="card border sub-div-shadow"><div class="card-header"><strong>Consortium(s)</strong></div>`;
+    let template = `<div class="card border sub-div-shadow"><div class="card-header"><label class="dataSummary-label">Consortium(s)</label></div>`;
     
     template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
 
@@ -43,7 +43,7 @@ export const dataGovernanceProjects = async () => {
         for(let obj = 0; obj < projectArray.length; obj++){
             const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
             if(obj === 0) template += `<div class="card border sub-div-shadow"><div class="card-header">
-                                            <strong>Project(s)</strong>
+                                            <label class="dataSummary-label">Project(s)</label>
                                         </div> 
                                         <div class="card-body data-governance">
                                             <ul class="ul-list-style first-list-item">`;
@@ -234,10 +234,10 @@ export const shareData = (element) => {
 export const addFields = (id, bool) => {
     let template = '';
     template += `
-    <div class="form-group col-sm-9">
+    <div class="form-group col-lg-9">
         <textarea id="shareFolderEmail${id}" required class="form-control" placeholder="Enter comma separated email addresses" require  rows="2"></textarea>
     </div>
-    <div class="form-group col-sm-3">
+    <div class="form-group col-lg-3">
     <select class="form-control" required id="folderRole${id}">
         <option value=""> -- Select role -- </option>
     `;

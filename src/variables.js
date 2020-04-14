@@ -76,7 +76,7 @@ export const variables = {
         },
         ageInt: {
             888: "Don't Know",
-            'label': 'Age at interview/questionnaire'
+            'label': 'Age'
         },
         intDate : {
             '08/08/8000': "Don't Know",
