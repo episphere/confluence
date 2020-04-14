@@ -353,7 +353,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
             type: 'pie',
             textinfo: 'label+percent',
             hoverinfo: 'label+value+percent',
-            textposition: 'outside',
+            textposition: 'inside',
             automargin: true,
             showlegend: false,
             marker:{
@@ -429,7 +429,7 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             type: 'pie',
             hole: .4,
             textinfo: 'label+value',
-            textposition: 'outside',
+            textposition: 'inside',
             text: {
                 font: '10px'
             },
