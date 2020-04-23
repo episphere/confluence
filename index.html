@@ -23,117 +23,113 @@
         <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     </head>
     <body>
-        <main>
-            <div id="page">
-                <div id="header" class="header header-wrapper">
-                    <div class="container">
-                        <div id="alertMessage"></div>
-                        <div class="row">
-                            <div class="col">
-                                <a href="#" title="Home" rel="home">
-                                    <img src="./static/images/image.png" height="40px" width="300px" alt="NCI Confluence Data Platform Logo" class="banner-logo">
+        <ul class="skip-links">
+            <li><a href="#confluenceNav">Skip to navigation</a></li>
+            <li><a href="#confluenceMain">Skip to the main content</a></li>
+        </ul>
+        <header role="banner">
+            <div id="header" class="header header-wrapper">
+                <div class="container">
+                    <div id="alertMessage"></div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="#" title="Home" rel="home">
+                                <img src="./static/images/image.png" height="40px" width="300px" alt="NCI Confluence Data Platform Logo" class="banner-logo">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="navbar navbar-expand-xl navbar-dark navbar-shadow" role="navigation" id="confluenceNav">
+                <div class="container">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" id="navBarBtn" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarToggler">
+                        <div class="navbar-nav grid" id="navBarOptions">
+                            <div class="nav-item grid-elements dropdown">
+                                <a class="nav-link nav-menu-links dropdown-toggle" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-home"></i> Confluence
+                                </a>
+                                <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#" id="homePage"> Home</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#resources" id="resourcesConfluence"> Resources</a>
+                                    <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
+                                </div>
+                            </div>
+                            <div class="nav-item grid-elements">
+                                <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
+                                    <i class="fas fa-bug"></i> Report issue
                                 </a>
                             </div>
                         </div>
+                        <div class="navbar-nav ml-auto">
+                            <div class="nav-item grid-elements">
+                                <a hidden=true class="nav-link nav-menu-links" href="#" title="Login Dev" id="loginBoxAppDev"><i class="fas fa-sign-in-alt"></i> Login Dev</a>
+                                <a hidden=true class="nav-link nav-menu-links" href="#" title="Login" id="loginBoxAppProd"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </nav>
+        </header>
+        <main role="main" id="confluenceMain">
+            <div id="maincontainer">
+                <div class="container">
+                    <div class="confluence-color row" style="height: 120px;padding: 0.5rem 1rem;">
+                        <img src="./static/images/logo_all_white.png" height="100px" width="250px" alt="Confluence logo">
+                    </div>
+                    <div class="modal" tabindex="-1" role="dialog" id="confluenceMainModal">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header" id="confluenceModalHeader"></div>
+                                <div class="modal-body" id="confluenceModalBody"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header allow-overflow">
+                                    <div id="folderToShare"></div>
+                                    <ul class="nav nav-tabs">
+                                        <li class="nav-item">
+                                            <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
+                                        </li>
+                                        
+                                        <li class="nav-item">
+                                            <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
+                                        </li>
+                                    </ul>
+                                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                 
-                <div class="navbar navbar-expand-xl navbar-dark navbar-shadow">
-                    <div class="container">
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" id="navBarBtn" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarToggler">
-                            <div class="navbar-nav grid" id="navBarOptions">
-                                <div class="nav-item grid-elements dropdown">
-                                    <a class="nav-link nav-menu-links dropdown-toggle" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-home"></i> Confluence
-                                    </a>
-                                    <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item nav-link nav-menu-links" href="#" id="homePage"> Home</a>
-                                        <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
-                                        <a class="dropdown-item nav-link nav-menu-links" href="#resources" id="resourcesConfluence"> Resources</a>
-                                        <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
-                                    </div>
-                                </div>
-                                <div class="nav-item grid-elements">
-                                    <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
-                                        <i class="fas fa-bug"></i> Report issue
-                                    </a>
-                                </div>
+                                <div id="collaboratorModalBody"></div>
                             </div>
-                            <div class="navbar-nav ml-auto">
-                                <div class="nav-item grid-elements">
-                                    <a hidden=true class="nav-link nav-menu-links" href="#" title="Login Dev" id="loginBoxAppDev"><i class="fas fa-sign-in-alt"></i> Login Dev</a>
-                                    <a hidden=true class="nav-link nav-menu-links" href="#" title="Login" id="loginBoxAppProd"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header allow-overflow" id="modalFileStatsHeader"></div>
+                                <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
+                                <div class="modal-footer">
+                                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="main-container confluence-div-shadow" id="confluenceDiv"></div>
+                    <div class="main-summary-row" id="loadingAnimation" role="status" style="display: none;"></div>
                 </div>
-                <div id="maincontainer">
-                    <div class="container">
-                        <div class="confluence-color row" style="height: 120px;padding: 0.5rem 1rem;">
-                            <img src="./static/images/logo_all_white.png" height="100px" width="250px" alt="Confluence logo">
-                        </div>
-                        <div class="modal" tabindex="-1" role="dialog" id="confluenceMainModal">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content sub-div-shadow">
-                                    <div class="modal-header" id="confluenceModalHeader">
-                                        <!-- <h5 class="modal-title">Modal title</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button> -->
-                                    </div>
-                                    <div class="modal-body" id="confluenceModalBody"></div>
-                                    <!-- <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary">Save changes</button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    </div> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                <div class="modal-content sub-div-shadow">
-                                    <div class="modal-header allow-overflow">
-                                        <div id="folderToShare"></div>
-                                        <ul class="nav nav-tabs">
-                                            <li class="nav-item">
-                                                <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
-                                            </li>
-                                            
-                                            <li class="nav-item">
-                                                <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
-                                            </li>
-                                        </ul>
-                                        <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                    
-                                    <div id="collaboratorModalBody"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                <div class="modal-content sub-div-shadow">
-                                    <div class="modal-header allow-overflow" id="modalFileStatsHeader"></div>
-                                    <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
-                                    <div class="modal-footer">
-                                        <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="main-container confluence-div-shadow" id="confluenceDiv"></div>
-                        <div class="main-summary-row" id="loadingAnimation" role="status" style="display: none;"></div>
-                    </div>
-                </div>
-                <div id="footer"></div>
             </div>
         </main>
+        <footer role="contentinfo">
+            <div id="footer"></div>
+        </footer>
         <script type="module" src="./confluence.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" defer></script>

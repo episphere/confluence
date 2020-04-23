@@ -141,6 +141,7 @@ const manageRouter = async () => {
         const element = document.getElementById('homePage');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence Data Platform';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = homePage();
@@ -151,6 +152,7 @@ const manageRouter = async () => {
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - About';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = aboutConfluence();
@@ -161,6 +163,7 @@ const manageRouter = async () => {
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Resources';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = confluenceResources();
@@ -169,6 +172,7 @@ const manageRouter = async () => {
         const element = document.getElementById('contactConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Contact';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         confluenceDiv.innerHTML = confluenceContactPage();
@@ -184,6 +188,7 @@ const manageHash = () => {
         const element = document.getElementById('dataSummary');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Data Explore';
         // document.getElementById('tabHeading').innerHTML = 'Data Exploration';
         showAnimation();
         element.click();
@@ -191,6 +196,7 @@ const manageHash = () => {
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
         if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Data Analysis';
         // document.getElementById('tabHeading').innerHTML = 'Data Analysis';
         showAnimation();
         element.click();
@@ -199,6 +205,7 @@ const manageHash = () => {
         const element = document.getElementById('dataRequest');
         if(element.classList.contains('navbar-active')) return;
         // document.getElementById('tabHeading').innerHTML = 'Data Request';
+        document.title = 'Confluence - Data Request';
         showAnimation();
         element.click();
     }
@@ -206,6 +213,7 @@ const manageHash = () => {
         const element = document.getElementById('dataSubmission');
         if(element.classList.contains('navbar-active')) return;
         // document.getElementById('tabHeading').innerHTML = 'Data Submission';
+        document.title = 'Confluence - Data Submit';
         showAnimation();
         element.click();
     }
@@ -214,6 +222,7 @@ const manageHash = () => {
         if (element) {
             if(element.classList.contains('navbar-active')) return;
             // document.getElementById('tabHeading').innerHTML = 'Data Governance';
+            document.title = 'Confluence - Data Governance';
             showAnimation();
             element.click();
         }
@@ -224,6 +233,7 @@ const manageHash = () => {
         if (element) {
             if (element.classList.contains('navbar-active')) return;
             // document.getElementById('tabHeading').innerHTML = 'My Projects';
+            document.title = 'Confluence - My Projects';
             showAnimation();
             element.click();
         } else window.location.hash = '#';

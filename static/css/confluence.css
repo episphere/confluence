@@ -861,6 +861,28 @@ label {
     margin-bottom: 30px;
 }
 
+.skip-links {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+.skip-links a {
+    position:absolute;
+    top:-3rem;
+}
+
+.skip-links a:focus, .skip-links a:active {
+    top: 0;
+    color: #636363;
+    padding:5px;
+    height: auto;
+    text-align:center;
+    font-size:1rem;
+    z-index:99;
+    background-color: white;
+}
+
 .sub-div-shadow {
     box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
 }
