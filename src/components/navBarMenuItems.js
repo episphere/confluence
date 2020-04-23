@@ -45,9 +45,9 @@ export const template = () => {
         <div class="navbar-nav ml-auto">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="grid-elements dropdown">
-                    <a class="nav-link nav-menu-links dropdown-toggle"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
-                    </a>
+                    </button>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item nav-link nav-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                     </div>

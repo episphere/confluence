@@ -17,9 +17,9 @@ export const template = async () => {
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
-            <a class="${liClass}">
+            <button class="${liClass}">
                 <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
-            </a> ${consortiaName}
+            </button> ${consortiaName}
         </li>
         `
     }
@@ -54,9 +54,9 @@ export const dataGovernanceProjects = async () => {
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 template += `
                 <li class="collapsible-items">
-                    <a class="${liClass}">
+                    <button class="${liClass}">
                         <i title="${title}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
-                    </a> ${projectName}
+                    </button> ${projectName}
                 </li>
                 `;
             }
@@ -79,7 +79,7 @@ export const dataGovernanceLazyLoad = (element) => {
         if(type && JSON.parse(localStorage.parms).login){
             const bool = checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login);
             if(bool === true){
-                const a = document.createElement('a');
+                const a = document.createElement('button');
                 a.dataset.toggle = 'modal';
                 a.dataset.target = '#modalShareFolder'
                 a.classList = ['share-folder'];
@@ -117,10 +117,10 @@ export const dataGovernanceLazyLoad = (element) => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<a class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></a> ${obj.name}`;
+                li.innerHTML = `<button class="${liClass}"><i title="${title}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i></button> ${obj.name}`;
 
                 if(!element.dataset.sharable){
-                    const a = document.createElement('a');
+                    const a = document.createElement('button');
                     a.dataset.toggle = 'modal';
                     a.dataset.target = '#modalShareFolder';
                     a.classList = ['share-folder'];
@@ -155,7 +155,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     `;
 
                 if(!element.dataset.sharable){
-                    const a1 = document.createElement('a');
+                    const a1 = document.createElement('button');
                     a1.dataset.toggle = 'modal';
                     a1.dataset.target = '#modalShareFolder';
                     a1.classList = ['share-folder'];
@@ -167,7 +167,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     li.appendChild(a1);
                     shareData(a1);
 
-                    const a2 = document.createElement('a');
+                    const a2 = document.createElement('button');
                     a2.dataset.toggle = 'modal';
                     a2.dataset.target = '#modalFileAccessStats';
                     a2.classList = ['file-access-stats'];

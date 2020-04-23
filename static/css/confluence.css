@@ -180,8 +180,6 @@ body {
 
 .confluence-about-topics:focus {
     cursor: pointer;
-    font-weight: bold;
-    color: #000000;
 }
 
 #aboutContent {
@@ -809,6 +807,12 @@ label {
     margin: 0px -18px;
 }
 
+.consortia-folder, .share-folder, .file-access-stats {
+    border: 0px;
+    background-color: #ffffff;
+    padding: 0px;
+}
+
 .filter-studies:hover, .filter-studies:focus {
     cursor: pointer;
     background-color: #c9c9c9;
@@ -942,7 +946,7 @@ label {
 }
 
 .nav-menu-links:focus {
-    background-color: #2f2a2a !important;
+    background-color: #574F4F !important;
 }
 
 .grid-elements:hover {
