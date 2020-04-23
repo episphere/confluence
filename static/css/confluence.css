@@ -901,6 +901,10 @@ label {
     cursor: pointer;
 }
 
+.nav-menu-links:focus {
+    background-color: #2f2a2a !important;
+}
+
 .grid-elements:hover {
     text-decoration: none;
     color:#fff;
