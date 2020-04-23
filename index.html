@@ -47,10 +47,10 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarToggler">
                         <div class="navbar-nav grid" id="navBarOptions">
-                            <div class="nav-item grid-elements dropdown">
-                                <a class="nav-link nav-menu-links dropdown-toggle" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="grid-elements dropdown">
+                                <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn" role="button" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-home"></i> Confluence
-                                </a>
+                                </button>
                                 <div class="dropdown-menu navbar-dropdown">
                                     <a class="dropdown-item nav-link nav-menu-links" href="#" id="homePage"> Home</a>
                                     <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
@@ -58,14 +58,14 @@
                                     <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
                                 </div>
                             </div>
-                            <div class="nav-item grid-elements">
+                            <div class="grid-elements">
                                 <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
                                     <i class="fas fa-bug"></i> Report issue
                                 </a>
                             </div>
                         </div>
                         <div class="navbar-nav ml-auto">
-                            <div class="nav-item grid-elements">
+                            <div class="grid-elements">
                                 <a hidden=true class="nav-link nav-menu-links" href="#" title="Login Dev" id="loginBoxAppDev"><i class="fas fa-sign-in-alt"></i> Login Dev</a>
                                 <a hidden=true class="nav-link nav-menu-links" href="#" title="Login" id="loginBoxAppProd"><i class="fas fa-sign-in-alt"></i> Login</a>
                             </div>
@@ -94,11 +94,11 @@
                                 <div class="modal-header allow-overflow">
                                     <div id="folderToShare"></div>
                                     <ul class="nav nav-tabs">
-                                        <li class="nav-item">
+                                        <li>
                                             <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
                                         </li>
                                         
-                                        <li class="nav-item">
+                                        <li>
                                             <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
                                         </li>
                                     </ul>

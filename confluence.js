@@ -51,6 +51,7 @@ export const confluence = async () => {
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataRequestElement = document.getElementById('dataRequest');
+        const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
 
         dataSubmissionElement.addEventListener('click', async () => {
@@ -81,6 +82,14 @@ export const confluence = async () => {
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
+        platformTutorialElement.addEventListener('click', () => {
+            if (platformTutorialElement.classList.contains('navbar-active')) return;
+            showAnimation();
+            removeActiveClass('nav-menu-links', 'navbar-active');
+            platformTutorialElement.classList.add('navbar-active');
+            confluenceDiv.innerHTML = dataRequestTemplate();
+            hideAnimation();
+        });
         dataAnalysisElement.addEventListener('click', () => {
             if (dataAnalysisElement.classList.contains('navbar-active')) return;
             showAnimation();
@@ -102,12 +111,12 @@ export const confluence = async () => {
         }
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
-                <div class="nav-item  grid-elements">
+                <div class="grid-elements">
                     <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="nav-item  grid-elements">
+                <div class="grid-elements">
                     <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
@@ -115,14 +124,14 @@ export const confluence = async () => {
             addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
-                <div class="nav-item  grid-elements">
+                <div class="grid-elements">
                     <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="nav-item  grid-elements">
+                <div class="grid-elements">
                     <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
             `;
@@ -204,8 +213,14 @@ const manageHash = () => {
     else if (hash === '#data_request') {
         const element = document.getElementById('dataRequest');
         if(element.classList.contains('navbar-active')) return;
-        // document.getElementById('tabHeading').innerHTML = 'Data Request';
         document.title = 'Confluence - Data Request';
+        showAnimation();
+        element.click();
+    }
+    else if (hash === '#tutorials') {
+        const element = document.getElementById('platformTutorial');
+        if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence Platform Tutorials';
         showAnimation();
         element.click();
     }

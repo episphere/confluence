@@ -29,10 +29,6 @@ p,li,div {
     color: #578837;
 }
 
-button {
-    background-color: white;
-}
-
 .statistics {
     color:blue
 }
@@ -168,8 +164,24 @@ body {
 .list-group-item {
     background-color: #D0CECE !important;
     text-align: left !important;
-    margin: 1px;
     border: 1px solid #ffffff !important;
+}
+
+.about-list-item {
+    margin: 0.25px 0px;
+}
+
+.confluence-about-topics {
+    border: 0px;
+    height: 100%;
+    width: 100% !important;
+    margin: 0px;
+}
+
+.confluence-about-topics:focus {
+    cursor: pointer;
+    font-weight: bold;
+    color: #000000;
 }
 
 #aboutContent {
@@ -650,7 +662,7 @@ label {
 
 .nav-menu-links {
     text-decoration: none !important;
-    color:#fff !important;
+    color:#ffffff !important;
     padding: 0.5rem 1rem !important;
 }
 
@@ -743,6 +755,7 @@ label {
     padding: 0.25rem 1.25rem !important;
     width: inherit;
     color: #495057;
+    margin: 1;
 }
 
 .list-group-item.active{
@@ -768,6 +781,7 @@ label {
 .list-group{
     margin-top: .25rem;
     margin-bottom: 0.32rem !important;
+    list-style-type: none;
 }
 
 #dataSummaryVizBarChart {
@@ -899,6 +913,12 @@ label {
 .nav-menu-links:hover {
     text-decoration: none;
     cursor: pointer;
+    background-color: #2f2a2a !important;
+}
+
+.dropdown-btn {
+    background-color: #574F4F !important;
+    border: 0px;
 }
 
 .nav-menu-links:focus {
