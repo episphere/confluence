@@ -103,25 +103,30 @@ const filterByStudy = (jsonData) => {
     let template = '';
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
-                        <li class="row consortium-selection custom-borders">
-                            <div class="consortia-name">${consortium}</div>
-                            <div class="ml-auto">
-                                <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
-                                    ${obj[consortium].consortiumTotal}
-                                </div> <i class="fas fa-caret-down"></i>
-                            </div>
+                        <li class="custom-borders">
+                            <button class="row consortium-selection consortium-selection-btn">
+                                <div class="consortia-name">${consortium}</div>
+                                <div class="ml-auto">
+                                    <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
+                                        ${obj[consortium].consortiumTotal}
+                                    </div> <i class="fas fa-caret-down"></i>
+                                </div>
+                            </button>
                         </li>
                         <ul class="ul-list-style content custom-padding">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
-                template += `<li class="row collapsible-items filter-studies" data-consortium=${consortium} data-study=${study}>
-                    <div class="study-name">${study}</div>
-                    <div class="ml-auto">
-                        <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
-                            ${total}
-                        </div>
-                    </div></li>`;
+                template += `<li class="filter-list-item">
+                                <button class="row collapsible-items filter-studies filter-studies-btn" data-consortium=${consortium} data-study=${study}>
+                                    <div class="study-name">${study}</div>
+                                    <div class="ml-auto">
+                                        <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
+                                            ${total}
+                                        </div>
+                                    </div>
+                                </button>
+                            </li>`;
             }
         }   
         template += `</ul></ul>`;
@@ -192,7 +197,7 @@ const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            let content = element.nextElementSibling;
+            let content = element.parentNode.nextElementSibling;
             if (content.style.maxHeight){
                 content.style.maxHeight = null;
                 element.lastElementChild.lastElementChild.classList.add('fa-caret-down');
@@ -283,7 +288,7 @@ const updateCounts = (data) => {
 }
 
 const getSelectedStudies = () => {
-    const elements = document.querySelectorAll(`[class="row collapsible-items filter-studies active-filter"]`);
+    const elements = document.querySelectorAll(`[class="row collapsible-items filter-studies filter-studies-btn active-filter"]`);
     const array = [];
     Array.from(elements).forEach(element => {
         const consortium = element.dataset.consortium;

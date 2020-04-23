@@ -805,23 +805,29 @@ label {
 .remove-padding-left {
     padding-left: 0px !important;
     margin-bottom: 0px !important;
+    list-style-type: none;
+    margin: 0px -18px;
 }
 
-.consortium-selection:hover {
+.filter-studies:hover, .filter-studies:focus {
     cursor: pointer;
     background-color: #c9c9c9;
-    border-radius: 0.5rem;
-}
-
-.filter-studies:hover {
-    cursor: pointer;
-    background-color: #c9c9c9;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem !important;
 }
 
 .filter-studies {
-    padding: 0px 5px;
     margin: 1px 0px;
+    border-radius: 0.5rem !important;
+}
+
+.filter-list-item {
+    padding: 0px 5px !important;
+}
+
+.filter-studies-btn {
+    border: 0px;
+    width: 100% !important;
+    background-color: #ffffff;
 }
 
 .active-filter {
@@ -868,6 +874,20 @@ label {
 .consortium-selection {
     list-style-type: none;
     padding: 0px 5px;
+}
+
+.consortium-selection:hover, .consortium-selection:focus {
+    cursor: pointer;
+    background-color: #c9c9c9;
+    border-radius: 0.5rem;
+}
+
+.consortium-selection-btn {
+    border: 0px;
+    width: 100% !important;
+    margin: 0.5px 0px !important;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
 }
 
 .card {
