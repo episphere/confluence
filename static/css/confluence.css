@@ -813,6 +813,12 @@ label {
     padding: 0px !important;
 }
 
+.copy-file-api, .getAllFileversions {
+    border: 0px;
+    background-color: transparent;
+    padding: 0px !important;
+}
+
 .filter-studies:hover, .filter-studies:focus {
     cursor: pointer;
     background-color: #c9c9c9;

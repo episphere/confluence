@@ -17,7 +17,9 @@ export const myProjectsTemplate = async () => {
             let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             const li = document.createElement('li');
-            li.innerHTML = `<a class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow"><i title="${title}" class="${expandClass}"></i></a> ${name}`
+            li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow">
+                                <i title="${title}" class="${expandClass}"></i>
+                            </button> ${name}`
             
 
             if(type === 'folder'){
@@ -61,13 +63,13 @@ export const myProjectsTemplate = async () => {
                     const tbodyTR = document.createElement('tr');
                     tbodyTR.innerHTML = `
                             <td title=${name}>${name.length > 20 ? `${name.slice(0, 17)}...` : `${name}` }</td>
-                            <td>${fileInfo.id} <a class="copy-file-api" title="Copy file id" data-file-id="${obj.id}"><i class="far fa-copy"></i></a></td>
+                            <td>${fileInfo.id} <button class="copy-file-api" title="Copy file id" data-file-id="${obj.id}"><i class="far fa-copy"></i></button></td>
                             <td>${fileInfo.created_by.name || fileInfo.created_by.login}</td>
                             <td>${new Date(fileInfo.created_at).toLocaleString()}</td>
                             <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
                             <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
-                            <td>${fileInfo.file_version.id} <a class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></a></td>
-                            <td><a data-toggle="modal" data-target="#modalFileVersions" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</a></td>
+                            <td>${fileInfo.file_version.id} <button class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></button></td>
+                            <td><button data-toggle="modal" data-target="#modalFileVersions" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</button></td>
                         `;
                     tbody.appendChild(tbodyTR);
                 }
@@ -100,10 +102,10 @@ export const myProjectsTemplate = async () => {
                 for(let dt of versions.entries){
                     template += `
                     <tr>
-                        <td>${ID} <a class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></a></td>
+                        <td>${ID} <button class="copy-file-api" title="Copy file id" data-file-id="${ID}"><i class="far fa-copy"></i></button></td>
                         <td>${dt.modified_by.name || dt.modified_by.login}</td>
                         <td>${new Date(dt.modified_at).toLocaleString()}</td>
-                        <td>${dt.id} <a class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></a></td>
+                        <td>${dt.id} <button class="copy-file-api" title="Copy version id" data-version-id="${dt.id}"><i class="far fa-copy"></i></button></td>
                     </tr>
                     `
                 }
