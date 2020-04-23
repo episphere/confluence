@@ -31,7 +31,6 @@ export const confluence = async () => {
     const footer = document.getElementById('footer');
     footer.innerHTML = footerTemplate();
     if (localStorage.parms === undefined) {
-        const confluenceDiv = document.getElementById('confluenceDiv');
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
@@ -44,7 +43,6 @@ export const confluence = async () => {
         showAnimation();
         if (response) {
             const lclStr = JSON.parse(localStorage.parms);
-            // localStorage.parms = JSON.stringify({ ...lclStr, ...response });
             localStorage.parms = JSON.stringify(Object.assign(lclStr, response));
         }
         navBarOptions.innerHTML = template();
@@ -104,13 +102,11 @@ export const confluence = async () => {
         }
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
-                
                 <div class="nav-item  grid-elements">
                     <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
-                
                 <div class="nav-item  grid-elements">
                     <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
@@ -119,7 +115,6 @@ export const confluence = async () => {
             addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
-                
                 <div class="nav-item  grid-elements">
                     <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
@@ -127,7 +122,6 @@ export const confluence = async () => {
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
             document.getElementById('myProjectsNav').innerHTML = `
-                
                 <div class="nav-item  grid-elements">
                     <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
                 </div>
