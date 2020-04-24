@@ -17,8 +17,8 @@ export const myProjectsTemplate = async () => {
             let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             const li = document.createElement('li');
-            li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow">
-                                <i title="${title}" class="${expandClass}"></i>
+            li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-toggle="collapse" href="#toggle${data[i].id}">
+                                <i title="${title}" data-folder-name="${data[i].id}" class="${expandClass}"></i>
                             </button> ${name}`
             
 
@@ -27,7 +27,8 @@ export const myProjectsTemplate = async () => {
                 const files = response.entries;
 
                 const ulSub = document.createElement('ul');
-                ulSub.classList = ['ul-list-style content collapsible-items'];
+                ulSub.classList = ['ul-list-style collapsible-items collapse'];
+                ulSub.id = `toggle${data[i].id}`
                 
                 const liSub = document.createElement('li');
                 liSub.classList = ['my-prjects-list-item allow-overflow'];
@@ -137,20 +138,17 @@ export const expandProjects = () => {
     let collapsible = document.getElementsByClassName('collapsible');
     Array.from(collapsible).forEach(element => {
         element.addEventListener('click', () => {
-            element.classList.toggle('.active');
-            const content = element.parentNode.children[1];
-            if (content.style.maxHeight){
-                content.style.maxHeight = null;
+            if (element.getElementsByClassName('fa-folder-minus').length > 0 && element.getElementsByClassName('fa-folder-minus')[0].classList.contains('fa-folder-minus')){
                 element.getElementsByClassName('fa-folder-minus')[0].classList.add('fa-folder-plus');
                 element.getElementsByClassName('fa-folder-minus')[0].classList.remove('fa-folder-minus');
-            } else {
+            }
+            else {
                 element.getElementsByClassName('fa-folder-plus')[0].classList.add('fa-folder-minus');
                 element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
-                content.style.maxHeight = "1000px";
             }
         })
     });
     
-    let consortiaFolder = document.getElementsByClassName('consortia-folder');
-    Array.from(consortiaFolder)[0].dispatchEvent(new Event('click'));
+    let consortiaFolder = document.getElementsByClassName('collapsible');
+    consortiaFolder[0].click();
 }

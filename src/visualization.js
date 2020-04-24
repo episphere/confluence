@@ -104,7 +104,7 @@ const filterByStudy = (jsonData) => {
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
                         <li class="custom-borders">
-                            <button class="row consortium-selection consortium-selection-btn">
+                            <button class="row consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                 <div class="consortia-name">${consortium}</div>
                                 <div class="ml-auto">
                                     <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
@@ -113,7 +113,7 @@ const filterByStudy = (jsonData) => {
                                 </div>
                             </button>
                         </li>
-                        <ul class="ul-list-style content custom-padding">`;
+                        <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
@@ -197,14 +197,11 @@ const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            let content = element.parentNode.nextElementSibling;
-            if (content.style.maxHeight){
-                content.style.maxHeight = null;
+            if (element.lastElementChild.lastElementChild.classList.contains('fa-caret-up')){
                 element.lastElementChild.lastElementChild.classList.add('fa-caret-down');
                 element.lastElementChild.lastElementChild.classList.remove('fa-caret-up');
 
             } else {
-                content.style.maxHeight = "1000px";
                 element.lastElementChild.lastElementChild.classList.add('fa-caret-up');
                 element.lastElementChild.lastElementChild.classList.remove('fa-caret-down');
             }

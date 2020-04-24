@@ -516,7 +516,6 @@ label {
 
 .ul-list-style {
     list-style-type:none;
-    margin-top: 1rem;
     margin-right: 1rem;
     -webkit-transition: max-height 0.35s ease-in-out !important; 
     transition: max-height 0.35s ease-in-out !important;
@@ -819,10 +818,14 @@ label {
     padding: 0px !important;
 }
 
-.filter-studies:hover, .filter-studies:focus {
+.filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus {
     cursor: pointer;
     background-color: #c9c9c9;
     border-radius: 0.5rem !important;
+}
+
+.no-list-style {
+    list-style-type: none;
 }
 
 .filter-studies {

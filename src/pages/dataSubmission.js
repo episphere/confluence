@@ -29,8 +29,8 @@ export const template = async () => {
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
-                        <button class="${liClass}">
-                            <i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
+                        <button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
+                            <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
                         </button> ${consortiaName}
                     </li>`
     }
@@ -57,8 +57,8 @@ export const lazyload = (element) => {
         const fileEntries = allEntries.filter(obj => obj.type === 'file');
         if (entries.length > 0){
             const ul = document.createElement('ul');
-            ul.classList.add('ul-list-style');
-            ul.classList.add('content');
+            ul.classList = ['ul-list-style collapse'];
+            ul.id = `toggle${id}`
 
             for(const obj of entries){
                 const li = document.createElement('li');
@@ -66,8 +66,8 @@ export const lazyload = (element) => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<button class="${liClass}">
-                                    <i title="${title}" data-id="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
+                li.innerHTML = `<button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
+                                    <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
                                 </button> ${obj.name}`;
                 ul.appendChild(li);
             }
@@ -80,8 +80,8 @@ export const lazyload = (element) => {
         }
         else if(fileEntries.length > 0) {
             const ul = document.createElement('ul');
-            ul.classList.add('ul-list-style');
-            ul.classList.add('content');
+            ul.classList = ['ul-list-style collapse'];
+            ul.id = `toggle${id}`
 
             for(const obj of fileEntries){
                 const li = document.createElement('li');
@@ -102,16 +102,12 @@ export const lazyload = (element) => {
 export const dataSubmission = (element) => {
     element.addEventListener('click', e => {
         e.preventDefault();
-        element.classList.toggle('.active');
-        let content = element.nextElementSibling;
-        if (content.style.maxHeight){
-            content.style.maxHeight = null;
+        if (element.getElementsByClassName('fa-folder-minus').length > 0 && element.getElementsByClassName('fa-folder-minus')[0].classList.contains('fa-folder-minus')){
             element.getElementsByClassName('fa-folder-minus')[0].classList.add('fa-folder-plus');
             element.getElementsByClassName('fa-folder-minus')[0].classList.remove('fa-folder-minus');
         } else {
             element.getElementsByClassName('fa-folder-plus')[0].classList.add('fa-folder-minus');
             element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
-            content.style.maxHeight = "1000px";
             if(document.getElementsByClassName('lazy-loading-spinner').length !== 0){
                 lazyload(element);
             }
