@@ -710,6 +710,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
         showAnimation();
         removeActiveClass('nav-menu-links', 'navbar-active');
         dataGovernanceElement.classList.add('navbar-active');
+        document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
             const btnDiv = document.createElement('div');
@@ -949,8 +950,8 @@ export const addEventMyProjects = () => {
         showAnimation();
         removeActiveClass('nav-menu-links', 'navbar-active');
         myProjects.classList.add('navbar-active');
+        document.title = 'Confluence - My Projects';
         myProjectsTemplate();
-        
     });
 }
 

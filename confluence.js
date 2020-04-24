@@ -59,6 +59,7 @@ export const confluence = async () => {
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSubmissionElement.classList.add('navbar-active');
+            document.title = 'Confluence - Data Submit';
             confluenceDiv.innerHTML = await dataSubmissionTemplate();
             lazyload();
             addEventStudyRadioBtn();
@@ -71,6 +72,7 @@ export const confluence = async () => {
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
+            document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
             getFileContent();
         });
@@ -79,6 +81,7 @@ export const confluence = async () => {
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataRequestElement.classList.add('navbar-active');
+            document.title = 'Confluence - Data Request';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
@@ -87,6 +90,7 @@ export const confluence = async () => {
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             platformTutorialElement.classList.add('navbar-active');
+            document.title = 'Confluence Platform Tutorials';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
@@ -95,6 +99,7 @@ export const confluence = async () => {
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataAnalysisElement.classList.add('navbar-active');
+            document.title = 'Confluence - Data Analysis';
             confluenceDiv.innerHTML = dataAnalysisTemplate();
             hideAnimation();
         });
@@ -196,49 +201,27 @@ const manageHash = () => {
     if(hash === '#data_exploration') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
-        if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Data Explore';
-        // document.getElementById('tabHeading').innerHTML = 'Data Exploration';
-        showAnimation();
         element.click();
     }
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
-        if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Data Analysis';
-        // document.getElementById('tabHeading').innerHTML = 'Data Analysis';
-        showAnimation();
         element.click();
     }
     else if (hash === '#data_request') {
         const element = document.getElementById('dataRequest');
-        if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Data Request';
-        showAnimation();
         element.click();
     }
     else if (hash === '#tutorials') {
         const element = document.getElementById('platformTutorial');
-        if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence Platform Tutorials';
-        showAnimation();
         element.click();
     }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
-        if(element.classList.contains('navbar-active')) return;
-        // document.getElementById('tabHeading').innerHTML = 'Data Submission';
-        document.title = 'Confluence - Data Submit';
-        showAnimation();
         element.click();
     }
     else if (hash === '#data_governance') {
         const element = document.getElementById('dataGovernance');
         if (element) {
-            if(element.classList.contains('navbar-active')) return;
-            // document.getElementById('tabHeading').innerHTML = 'Data Governance';
-            document.title = 'Confluence - Data Governance';
-            showAnimation();
             element.click();
         }
         else window.location.hash = '#';
@@ -246,10 +229,6 @@ const manageHash = () => {
     else if (hash === '#my_projects') {
         const element = document.getElementById('myProjects');
         if (element) {
-            if (element.classList.contains('navbar-active')) return;
-            // document.getElementById('tabHeading').innerHTML = 'My Projects';
-            document.title = 'Confluence - My Projects';
-            showAnimation();
             element.click();
         } else window.location.hash = '#';
     } 
@@ -263,6 +242,7 @@ const manageHash = () => {
         if(element.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
+        document.title = 'Confluence Data Platform';
         confluenceDiv.innerHTML = homePage();
         addEventAboutConfluence();
         homePageVisualization();
@@ -274,6 +254,7 @@ const manageHash = () => {
         if(element.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
+        document.title = 'Confluence - About';
         confluenceDiv.innerHTML = aboutConfluence();
         addEventAboutList();
         document.getElementById('item1').click();
@@ -285,6 +266,7 @@ const manageHash = () => {
         if(element.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
+        document.title = 'Confluence - Resources';
         confluenceDiv.innerHTML = confluenceResources();
         hideAnimation();
     }
@@ -294,6 +276,7 @@ const manageHash = () => {
         if(element.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
+        document.title = 'Confluence - Contact';
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
     }
