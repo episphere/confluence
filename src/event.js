@@ -518,15 +518,15 @@ export const addEventShowAllCollaborator = () => {
             allEntries.forEach(entry => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
                 table += `<tr>
-                            <td>${name}</td>
-                            <td>${email}</td>
+                            <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
+                            <td title="${email}">${email.length > 15 ? `${email.slice(0, 15)}...` : `${email}`}</td>
                             <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
                             <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                         ` : `${role}`}</td>
                             <td>${status}</td>
                             <td>${addedBy}</td>
                             <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
-                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<a class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></a>` : ``}</td>
+                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
                         </tr>`
             });
             table += `</tbody></table>`

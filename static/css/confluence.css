@@ -812,7 +812,7 @@ label {
     padding: 0px !important;
 }
 
-.copy-file-api, .getAllFileversions {
+.copy-file-api, .getAllFileversions, .removeCollaborator {
     border: 0px;
     background-color: transparent;
     padding: 0px !important;
