@@ -30,7 +30,7 @@ export const template = async () => {
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
                         <button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
-                            <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
+                            <i title="${title}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
                         </button> ${consortiaName}
                     </li>`
     }
@@ -67,7 +67,7 @@ export const lazyload = (element) => {
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 li.innerHTML = `<button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
-                                    <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.id}" data-status="pending" class="lazy-loading-spinner"></i>
+                                    <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.name}" data-status="pending" class="lazy-loading-spinner"></i>
                                 </button> ${obj.name}`;
                 ul.appendChild(li);
             }

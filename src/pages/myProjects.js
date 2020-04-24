@@ -18,7 +18,7 @@ export const myProjectsTemplate = async () => {
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             const li = document.createElement('li');
             li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-toggle="collapse" href="#toggle${data[i].id}">
-                                <i title="${title}" data-folder-name="${data[i].id}" class="${expandClass}"></i>
+                                <i title="${title}" data-folder-name="${name}" class="${expandClass}"></i>
                             </button> ${name}`
             
 
