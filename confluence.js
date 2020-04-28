@@ -74,6 +74,16 @@ export const confluence = async () => {
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
+            document.getElementById('dataSummaryFilter').addEventListener('click', e => {
+                e.preventDefault();
+                const header = document.getElementById('confluenceModalHeader');
+                const body = document.getElementById('confluenceModalBody');
+                header.innerHTML = `<h5 class="modal-title">Studies</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>`;
+                body.innerHTML = `<span>Select Consortia or Studies to Display</span>`;
+            })
             getFileContent();
         });
         dataRequestElement.addEventListener('click', () => {

@@ -812,10 +812,14 @@ label {
     padding: 0px !important;
 }
 
-.copy-file-api, .getAllFileversions, .removeCollaborator {
+.copy-file-api, .getAllFileversions, .removeCollaborator, .info-btn {
     border: 0px;
     background-color: transparent;
     padding: 0px !important;
+}
+
+#confluenceQuestion {
+    color: #ffffff;
 }
 
 .filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus {

@@ -69,7 +69,7 @@ const chipFilter = (jsonData) => {
     
     let template = '';
     template += `<div class="row genotype-select">
-                    Genotyping chip &nbsp;<span><i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='chip' data-toggle="modal" data-target="#confluenceMainModal"></i></span>
+                    Genotyping chip &nbsp; <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='chip'></i></button>
                 </div>
                 <div class="row genotype-select">
                     <button class="filter-btn sub-div-shadow genotype-selection-btn" data-genotyped="Yes">Confluence array</button>
@@ -323,7 +323,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -350,7 +350,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -361,7 +361,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
 
     const data = [
         {
@@ -406,7 +406,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
     const data = [
         {
             x: ['Case', 'Control'],
@@ -434,7 +434,7 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
     
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
@@ -483,7 +483,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <i class="fas fa-question-circle cursor-pointer variable-definition" data-keyboard="false" data-backdrop="static" data-variable='${parameter}' data-toggle="modal" data-target="#confluenceMainModal"></i>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer variable-definition" data-variable='${parameter}'></i></button>`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){

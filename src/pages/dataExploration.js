@@ -4,7 +4,6 @@ import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
 
 export const template = () => {
-    // dataBinning();
     return `
         <div class="main-summary-row data-exploration-div">
             <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
@@ -12,7 +11,8 @@ export const template = () => {
             <div class="main-summary-row">
                 <div class="col-xl-2 margin-bottom">
                     <div class="card sub-div-shadow">
-                        <div class="card-header"><strong class="side-panel-header">Studies <i class="fas fa-question-circle cursor-pointer" title="Select Consortia or Studies to Display"></i></strong></div>
+                        <div class="card-header"><strong class="side-panel-header">Studies 
+                        <button class="info-btn" <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button></strong></div>
                         <div id="cardContent" class="card-body">
                             <div id="chipContent" class="align-left"></div>
                             <div id="studyFilter" class="align-left"></div>

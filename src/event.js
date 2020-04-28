@@ -1237,6 +1237,7 @@ export const addEventVariableDefinitions = () => {
             
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
+            
             header.innerHTML = `<h5 class="modal-title">${variableName}</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>

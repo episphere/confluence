@@ -11,7 +11,7 @@ export const template = () => {
             
             <div class="card border sub-div-shadow">
                 <div class="card-header confluence-color white-font"><strong>Confluence Data Summary</strong> 
-                    <i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion" data-toggle="modal" data-target="#confluenceMainModal"></i>
+                    <button class="info-btn" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion"></i></button>
                 </div>
                 <div id="cardContent" class="card-body">
                     <div class="row" style="margin-bottom:0.5rem;text-align:center">
