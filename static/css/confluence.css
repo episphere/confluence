@@ -720,7 +720,7 @@ label {
     cursor: pointer !important;
 }
 
-.genotype-active-btn {
+.genotype-active-btn, .gender-active-btn {
     background-color: #e7bcbc;
     border-radius: 0.5rem;
 }
@@ -732,7 +732,7 @@ label {
     border-top: 1px solid rgba(0,0,0,.3);
 }
 
-.genotype-select {
+.genotype-select, .gender-select {
     padding: 0 5px;
 }
 
@@ -822,7 +822,7 @@ label {
     color: #ffffff;
 }
 
-.filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus {
+.filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
     border-radius: 0.5rem !important;

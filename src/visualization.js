@@ -54,7 +54,6 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 export const getFileContent = async () => {
-    // const jsonData = await getFileJSON(558252350024); // Get summary level data
     const jsonData = csvJSON(await getFile(631427327364)); // Get summary level data
     
     hideAnimation();
@@ -66,25 +65,115 @@ export const getFileContent = async () => {
 };
 
 const chipFilter = (jsonData) => {
-    
-    let template = '';
-    template += `<div class="row genotype-select">
-                    Genotyping chip &nbsp; 
-                    <button class="info-btn variable-definition" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" data-variable='chip'><i class="fas fa-question-circle cursor-pointer"></i></button>
-                </div>
-                <div class="row genotype-select">
-                    <button class="filter-btn sub-div-shadow genotype-selection-btn" data-genotyped="Yes">Confluence array</button>
-                </div>
-                <div class="row genotype-select">
-                    <button class="filter-btn sub-div-shadow genotype-selection-btn" data-genotyped="No">Other arrays</button>
-                </div>
-                <div class="row genotype-select">
-                    <button class="filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn" data-genotyped="Both">All arrays</button>
-                </div>
-                <div class="custom-hr row"></div>`
-    
-    document.getElementById('chipContent').innerHTML = template;
-    addEventGenotypeBtnSelection(jsonData);
+    const div1 = document.createElement('div')
+    div1.classList = ['row genotype-select'];
+    div1.innerHTML = 'Genotyping chip &nbsp; '
+
+    const btn1 = document.createElement('button');
+    btn1.dataset.keyboard = "false";
+    btn1.dataset.backdrop = "static";
+    btn1.dataset.toggle = "modal";
+    btn1.dataset.target = "#confluenceMainModal";
+    btn1.dataset.variable = "chip";
+    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
+    btn1.classList = ['info-btn variable-definition'];
+    div1.appendChild(btn1);
+
+    const div2 = document.createElement('div')
+    div2.classList = ['row genotype-select'];
+
+    const btn2 = document.createElement('button');
+    btn2.dataset.variable = "chip";
+    btn2.dataset.value = "Confluence chip";
+    btn2.innerHTML = 'Confluence array'
+    btn2.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    div2.appendChild(btn2);
+
+    const div3 = document.createElement('div')
+    div3.classList = ['row genotype-select'];
+
+    const btn3 = document.createElement('button');
+    btn3.dataset.variable = "chip";
+    btn3.dataset.value = "Other chip";
+    btn3.innerHTML = 'Other arrays'
+    btn3.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    div3.appendChild(btn3);
+
+    const div4 = document.createElement('div')
+    div4.classList = ['row genotype-select'];
+
+    const btn4 = document.createElement('button');
+    btn4.innerHTML = 'All arrays'
+    btn4.classList = ['filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn'];
+    div4.appendChild(btn4);
+
+    const div5 = document.createElement('div');
+    div5.classList = ['custom-hr row'];
+
+    document.getElementById('chipContent').appendChild(div1);
+    document.getElementById('chipContent').appendChild(div2);
+    document.getElementById('chipContent').appendChild(div3);
+    document.getElementById('chipContent').appendChild(div4);
+    document.getElementById('chipContent').appendChild(div5);
+    addEventGenotypeBtnSelection(jsonData, btn2);
+    addEventGenotypeBtnSelection(jsonData, btn3);
+    addEventGenotypeBtnSelection(jsonData, btn4);
+}
+
+const genderFilter = (jsonData) => {
+    const div1 = document.createElement('div')
+    div1.classList = ['row gender-select'];
+    div1.innerHTML = 'Gender &nbsp;'
+
+    const btn1 = document.createElement('button');
+    btn1.dataset.keyboard = "false";
+    btn1.dataset.backdrop = "static";
+    btn1.dataset.toggle = "modal";
+    btn1.dataset.target = "#confluenceMainModal";
+    btn1.dataset.variable = "sex";
+    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
+    btn1.classList = ['info-btn variable-definition'];
+    div1.appendChild(btn1);
+
+    const div2 = document.createElement('div')
+    div2.classList = ['row gender-select'];
+
+    const btn2 = document.createElement('button');
+    btn2.dataset.variable = "sex";
+    btn2.dataset.value = "male";
+    btn2.innerHTML = 'Male'
+    btn2.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    div2.appendChild(btn2);
+
+    const div3 = document.createElement('div')
+    div3.classList = ['row gender-select'];
+
+    const btn3 = document.createElement('button');
+    btn3.dataset.variable = "sex";
+    btn3.dataset.value = "female";
+    btn3.innerHTML = 'Female'
+    btn3.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    div3.appendChild(btn3);
+
+    const div4 = document.createElement('div')
+    div4.classList = ['row gender-select'];
+
+    const btn4 = document.createElement('button');
+    btn4.innerHTML = 'All'
+    btn4.classList = ['filter-btn sub-div-shadow gender-selection-btn gender-active-btn'];
+    div4.appendChild(btn4);
+
+    const div5 = document.createElement('div');
+    div5.classList = ['custom-hr row'];
+
+    document.getElementById('genderFilter').appendChild(div1);
+    document.getElementById('genderFilter').appendChild(div2);
+    document.getElementById('genderFilter').appendChild(div3);
+    document.getElementById('genderFilter').appendChild(div4);
+    document.getElementById('genderFilter').appendChild(div5);
+    addEventGenderFilter(jsonData, btn2);
+    addEventGenderFilter(jsonData, btn3);
+    addEventGenderFilter(jsonData, btn4);
 }
 
 const aggegrateData = (jsonData) => {
@@ -138,60 +227,82 @@ const filterByStudy = (jsonData) => {
     document.getElementsByClassName('consortium-selection')[0].click();
 }
 
-const addEventGenotypeBtnSelection = (jsonData) => {
-    const elements = document.getElementsByClassName('genotype-selection-btn');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('genotype-active-btn')) return
-            removeActiveClass('genotype-selection-btn', 'genotype-active-btn');
-            element.classList.add('genotype-active-btn');
-            let array = getSelectedStudies();
-            const genotyped = element.dataset.genotyped;
-            if(array.length === 0){
-                if(genotyped === 'Yes') {
-                    const filteredData = jsonData.filter(dt => dt.chip === 'Confluence chip');
-                    updateCounts(filteredData);
-                    renderAllCharts(filteredData);
-                }
-                else if(genotyped === 'No') {
-                    const filteredData = jsonData.filter(dt => dt.chip === 'Other chip');
-                    updateCounts(filteredData)
-                    renderAllCharts(filteredData);
-                } 
-                else {
-                    updateCounts(jsonData)
-                    renderAllCharts(jsonData)
-                }
+const addEventGenderFilter = (jsonData, element) => {
+    element.addEventListener('click', () => {
+        if(element.classList.contains('gender-active-btn')) return
+        removeActiveClass('gender-selection-btn', 'gender-active-btn');
+        element.classList.add('gender-active-btn');
+        let array = getSelectedStudies();
+        let finalData = []
+
+        const selectedGenotypedElement = document.getElementsByClassName('genotype-active-btn')[0];
+        const variable1 = selectedGenotypedElement.dataset.variable;
+        const variableValue1 = selectedGenotypedElement.dataset.value;
+        
+        if(variable1) {
+            finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
+        }
+        else {
+            finalData = jsonData;
+        }
+
+        const variable = element.dataset.variable;
+        const variableValue = element.dataset.value;
+
+        if(variable) {
+            finalData = finalData.filter(dt => dt[variable] === variableValue);
+        }
+
+        updateCounts(finalData);
+        if(array.length > 0){
+            let temp_array = []
+            for(let value of array){
+                const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
+                temp_array = temp_array.concat(filteredData);
             }
-            else{
-                let finalData = [];
-                let dataUpdateCount = [];
-                if(genotyped === 'Yes'){
-                    dataUpdateCount = jsonData.filter(dt => dt.chip === 'Confluence chip');
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Confluence chip')
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
-                else if (genotyped === 'No') {
-                    dataUpdateCount = jsonData.filter(dt => dt.chip === 'Other chip');
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Other chip')
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
-                else {
-                    dataUpdateCount = jsonData;
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
-                updateCounts(dataUpdateCount);
-                renderAllCharts(finalData);
-            }
-        });
+            finalData = temp_array;
+        }
+
+        renderAllCharts(finalData);
     })
+}
+
+const addEventGenotypeBtnSelection = (jsonData, element) => {
+    element.addEventListener('click', () => {
+        if(element.classList.contains('genotype-active-btn')) return
+        removeActiveClass('genotype-selection-btn', 'genotype-active-btn');
+        element.classList.add('genotype-active-btn');
+        let array = getSelectedStudies();
+        let finalData = [];
+        const variable = element.dataset.variable;
+        const variableValue = element.dataset.value;
+
+        const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
+        const variable1 = selectedGenderElement.dataset.variable;
+        const variableValue1 = selectedGenderElement.dataset.value;
+
+        if(variable1) {
+            finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
+        }
+        else {
+            finalData = jsonData;
+        }
+        
+        if(variable) {
+            finalData = finalData.filter(dt => dt[variable] === variableValue);
+        }
+
+        updateCounts(finalData);
+        if(array.length > 0){
+            let temp_array = []
+            for(let value of array){
+                const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
+                temp_array = temp_array.concat(filteredData);
+            }
+            finalData = temp_array;
+        }
+        renderAllCharts(finalData)
+    });
 }
 
 const addEventConsortiumSelect = () => {
@@ -214,48 +325,48 @@ const addEventFilterCharts = (jsonData) => {
     const elements = document.getElementsByClassName('filter-studies');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            let array = []
-            const genotypeSelected = document.getElementsByClassName('genotype-active-btn');
-            const genotyped = genotypeSelected[0].dataset.genotyped;
-            
             if(element.classList.contains('active-filter')){
                 element.classList.remove('active-filter');
-                array = getSelectedStudies();
             }
             else{
                 element.classList.add('active-filter');
-                array = getSelectedStudies();
             }
+            const array = getSelectedStudies();
+            const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
+            const variable = genotypeSelected.dataset.variable;
+            const variableValue = genotypeSelected.dataset.value;
+
+            const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
+            const variable1 = selectedGenderElement.dataset.variable;
+            const variableValue1 = selectedGenderElement.dataset.value;
             let finalData = [];
-            if(array.length === 0){
-                if(genotyped === 'Yes') finalData = jsonData.filter(dt => dt.chip === 'Confluence chip');
-                else if(genotyped === 'No') finalData = jsonData.filter(dt => dt.chip === 'Other chip');
-                else finalData = jsonData;
+            
+            if(variable1) {
+                finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
             }
             else {
-                if(genotyped === 'Yes'){
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Confluence chip')
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
-                else if (genotyped === 'No') {
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1] && dt.chip === 'Other chip')
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
-                else {
-                    for(let value of array){
-                        const filteredData = jsonData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
-                        finalData = finalData.concat(filteredData);
-                    }
-                }
+                finalData = jsonData;
             }
-            renderAllCharts(finalData, false);
+            
+            if(variable) {
+                finalData = finalData.filter(dt => dt[variable] === variableValue);
+            }
+    
+            if(array.length > 0){
+                let temp_array = []
+                for(let value of array){
+                    const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
+                    temp_array = temp_array.concat(filteredData);
+                }
+                finalData = temp_array;
+            }
+            
+            renderAllCharts(finalData);
         });
     });
-}
+};
+
+
 
 const renderAllCharts = (finalData, showFilter) => {
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', finalData);
@@ -265,6 +376,7 @@ const renderAllCharts = (finalData, showFilter) => {
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
     renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     if(showFilter) chipFilter(finalData);
+    if(showFilter) genderFilter(finalData);
     if(showFilter) filterByStudy(finalData)
     addEventVariableDefinitions();
 }

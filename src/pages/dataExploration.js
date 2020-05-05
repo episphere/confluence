@@ -14,6 +14,7 @@ export const template = () => {
                         <div class="card-header"><strong class="side-panel-header">Studies 
                         <button class="info-btn" <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button></strong></div>
                         <div id="cardContent" class="card-body">
+                            <div id="genderFilter" class="align-left"></div>
                             <div id="chipContent" class="align-left"></div>
                             <div id="studyFilter" class="align-left"></div>
                         </div>
