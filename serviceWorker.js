@@ -8,11 +8,9 @@ const googleAnalytics = workbox.googleAnalytics;
 
 googleAnalytics.initialize();
 
-registerRoute(new RegExp('.+\\.js$'), new NetworkFirst());
-registerRoute(new RegExp('.+\\.css$'), new StaleWhileRevalidate({cacheName: 'css-cache'}));
-registerRoute(/\.(?:png|jpg|jpeg|svg|gif)$/,
+registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|html|js|css)$/,
     new CacheFirst({
-        cacheName: 'image-cache',
+        cacheName: 'confluence-cache',
         plugins: [
             new ExpirationPlugin({
                 maxEntries: 20,
@@ -33,3 +31,5 @@ registerRoute(
         ]
     })
 );
+
+workbox.precaching.precacheAndRoute([{url: 'index.html'}]);

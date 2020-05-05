@@ -16,7 +16,9 @@ import { confluenceContactPage } from './src/pages/contact.js';
 export const confluence = async () => {
     if('serviceWorker' in navigator){
         try {
-            navigator.serviceWorker.register('./serviceWorker.js');
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./serviceWorker.js');
+            });
         }
         catch (error) {
             console.log(error);
