@@ -1,49 +1,23 @@
-const cacheName = 'confluence';
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-const staticAssets = [
-  '/',
-  '/*',
-  '/index.html',
-  '/confluence.js',
-  '/static/css/confluence.css',
-  '/static/images/*',
-  '/static/js/*',
-  '/src/*'
-];
+const { registerRoute } = workbox.routing;
+const { CacheFirst, NetworkFirst, StaleWhileRevalidate } = workbox.strategies;
+const { CacheableResponse } = workbox.cacheableResponse;
+const { ExpirationPlugin } = workbox.expiration;
+const googleAnalytics = workbox.googleAnalytics;
 
-self.addEventListener('install', async function () {
-    const cache = await caches.open(cacheName);
-    cache.addAll(staticAssets);
-});
+googleAnalytics.initialize();
 
-self.addEventListener('activate', event => {
-    event.waitUntil(self.clients.claim());
-});
-  
-self.addEventListener('fetch', event => {
-    const request = event.request;
-    if(request.method === 'POST') return;
-    const url = new URL(request.url);
-    if (url.origin === location.origin) {
-        event.respondWith(cacheFirst(request));
-    } else {
-        event.respondWith(networkFirst(request));
-    }
-});
-  
-async function cacheFirst(request) {
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || fetch(request);
-}
-  
-async function networkFirst(request) {
-    const dynamicCache = await caches.open(cacheName);
-    try {
-        const networkResponse = await fetch(request);
-        dynamicCache.put(request, networkResponse.clone());
-        return networkResponse;
-    } catch (err) {
-        const cachedResponse = await dynamicCache.match(request);
-        return cachedResponse || await caches.match('./fallback.json');
-    }
-}
+registerRoute(new RegExp('.+\\.js$'), new NetworkFirst());
+registerRoute(new RegExp('.+\\.css$'), new StaleWhileRevalidate({cacheName: 'css-cache'}));
+registerRoute(/\.(?:png|jpg|jpeg|svg|gif)$/,
+    new CacheFirst({
+        cacheName: 'image-cache',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 20,
+                maxAgeSeconds: 7 * 24 * 60 * 60,
+            })
+        ]
+    })
+);
