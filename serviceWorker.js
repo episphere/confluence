@@ -24,11 +24,11 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif)$/,
 
 registerRoute(
     new RegExp('https://api.box.com/.+'),
-    new NetworkFirst({
+    new CacheFirst({
         cacheName: 'api-cache',
         plugins: [
             new CacheableResponsePlugin({
-            statuses: [0, 200],
+                statuses: [0, 200],
             })
         ]
     })
