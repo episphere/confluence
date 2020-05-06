@@ -14,19 +14,17 @@ import { confluenceResources } from './src/pages/resources.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 
 const displayNotification = () => {
-    if(Notification.permission === 'granted'){
-        navigator.serviceWorker.getRegistration()
-            .then(reg => {
-                const title = 'Hello confluence user';
-                const options = {
-                    body: 'This is notification body',
-                    icon: './static/images/icons/icon-96x96.png',
-                    vibrate: [100, 50, 100],
-                    data: { primaryKey: 1 }
-                }
-                reg.showNotification(title, options)
-            })
-    }
+    navigator.serviceWorker.getRegistration()
+        .then(reg => {
+            const title = 'Hello confluence user';
+            const options = {
+                body: 'This is notification body',
+                icon: './static/images/icons/icon-96x96.png',
+                vibrate: [100, 50, 100],
+                data: { primaryKey: 1 }
+            }
+            reg.showNotification(title, options)
+        });
 }
 
 export const confluence = async () => {
