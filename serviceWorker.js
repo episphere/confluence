@@ -22,7 +22,7 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
 
 registerRoute(
     new RegExp('https://api.box.com/.+'),
-    new CacheFirst({
+    new StaleWhileRevalidate({
         cacheName: 'api-cache',
         plugins: [
             new CacheableResponsePlugin({
