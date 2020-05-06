@@ -11,8 +11,11 @@ export const template = () => {
             <div class="main-summary-row">
                 <div class="col-xl-2 margin-bottom">
                     <div class="card sub-div-shadow">
-                        <div class="card-header"><strong class="side-panel-header">Studies 
-                        <button class="info-btn" <button class="info-btn" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button></strong></div>
+                        <div class="card-header">
+                            <strong class="side-panel-header">Studies 
+                                <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
+                            </strong>
+                        </div>
                         <div id="cardContent" class="card-body">
                             <div id="genderFilter" class="align-left"></div>
                             <div id="chipContent" class="align-left"></div>
