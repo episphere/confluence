@@ -41,9 +41,8 @@ export const confluence = async () => {
         }
     }
     Notification.requestPermission(status => {
-        displayNotification();
+        if(status === "granted") displayNotification();
     });
-    displayNotification();
 
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
