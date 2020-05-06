@@ -13,6 +13,23 @@ import { aboutConfluence } from './src/pages/about.js';
 import { confluenceResources } from './src/pages/resources.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 
+const displayNotification = () => {
+    if(Notification.permission === 'granted'){
+        console.log('show notification')
+        navigator.serviceWorker.getRegistration()
+            .then(reg => {
+                const title = 'Hello world';
+                const options = {
+                    body: 'This is notification body',
+                    icon: './static/images/icons/icon-96x96.png',
+                    vibrate: [100, 50, 100],
+                    data: { primaryKey: 1 }
+                }
+                reg.showNotification(title, options)
+            })
+    }
+}
+
 export const confluence = async () => {
     if('serviceWorker' in navigator){
         try {
@@ -24,6 +41,11 @@ export const confluence = async () => {
             console.log(error);
         }
     }
+    Notification.requestPermission(status => {
+        console.log(status)
+    })
+    displayNotification();
+
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
 
