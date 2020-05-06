@@ -38,7 +38,7 @@ export const template = () => {
             </a>
         </div>
         <div class="grid-elements">
-            <a class="nav-link nav-menu-links" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
+            <a class="nav-link nav-menu-links" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Conluence github issues">
                 <i class="fas fa-bug"></i> Report issue
             </a>
         </div>

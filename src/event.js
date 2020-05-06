@@ -1149,7 +1149,7 @@ export const addEventAboutList = () => {
                 <li>Sharing of expertise, data, and analysis code</li>
                 <li>Co-leadership in collaborative analyses and publications</li>
                 <li>Leverage infrastructure for additional initiatives</li>
-                <li>Compliance with NIH Genomic Data Sharing Policy for new genotyping <a href="https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/" target="_blank">https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/</a></li>
+                <li>Compliance with NIH Genomic Data Sharing Policy for new genotyping <a href="https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/" rel="noopener" target="_blank">https://osp.od.nih.gov/scientifc-sharing/genomic-data-sharing/</a></li>
             </ul>
         `
     });
