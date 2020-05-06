@@ -17,7 +17,7 @@ const displayNotification = () => {
     if(Notification.permission === 'granted'){
         navigator.serviceWorker.getRegistration()
             .then(reg => {
-                const title = 'Hello world';
+                const title = 'Hello confluence user';
                 const options = {
                     body: 'This is notification body',
                     icon: './static/images/icons/icon-96x96.png',
