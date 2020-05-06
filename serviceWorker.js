@@ -8,7 +8,7 @@ const googleAnalytics = workbox.googleAnalytics;
 
 googleAnalytics.initialize();
 
-registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|html|js|css)$/,
+registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|js|css)$/,
     new CacheFirst({
         cacheName: 'confluence-cache',
         plugins: [
@@ -33,3 +33,4 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([{url: 'index.html'}]);
+
