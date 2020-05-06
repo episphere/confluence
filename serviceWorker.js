@@ -7,13 +7,13 @@ const { ExpirationPlugin } = workbox.expiration;
 const googleAnalytics = workbox.googleAnalytics;
 
 googleAnalytics.initialize();
-
-registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|js|css)$/,
+registerRoute(/\.(?:js|css)$/, new NetworkFirst({cacheName: 'static-cache'}));
+registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
     new CacheFirst({
-        cacheName: 'confluence-cache',
+        cacheName: 'images-cache',
         plugins: [
             new ExpirationPlugin({
-                maxEntries: 20,
+                maxEntries: 30,
                 maxAgeSeconds: 7 * 24 * 60 * 60,
             })
         ]
@@ -26,11 +26,10 @@ registerRoute(
         cacheName: 'api-cache',
         plugins: [
             new CacheableResponsePlugin({
-                statuses: [0, 200],
+                statuses: [200],
             })
         ]
     })
 );
 
 workbox.precaching.precacheAndRoute([{url: 'index.html'}]);
-
