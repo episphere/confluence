@@ -32,4 +32,4 @@ registerRoute(
     })
 );
 
-workbox.precaching.precacheAndRoute([{url: 'index.html'}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `${new Date().getTime()}`}]);
