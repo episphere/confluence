@@ -15,7 +15,6 @@ import { confluenceContactPage } from './src/pages/contact.js';
 
 const displayNotification = () => {
     if(Notification.permission === 'granted'){
-        console.log('show notification')
         navigator.serviceWorker.getRegistration()
             .then(reg => {
                 const title = 'Hello world';
@@ -42,8 +41,8 @@ export const confluence = async () => {
         }
     }
     Notification.requestPermission(status => {
-        console.log(status)
-    })
+        displayNotification();
+    });
     displayNotification();
 
     const confluenceDiv = document.getElementById('confluenceDiv');
