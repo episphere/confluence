@@ -30,9 +30,7 @@ const displayNotification = () => {
 export const confluence = async () => {
     if('serviceWorker' in navigator){
         try {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('./serviceWorker.js');
-            });
+            navigator.serviceWorker.register('./serviceWorker.js');
         }
         catch (error) {
             console.log(error);
