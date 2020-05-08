@@ -36,9 +36,9 @@ export const confluence = async () => {
             console.log(error);
         }
     }
-    Notification.requestPermission(status => {
-        if(status === "granted") displayNotification();
-    });
+    // Notification.requestPermission(status => {
+    //     if(status === "granted") displayNotification();
+    // });
 
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
