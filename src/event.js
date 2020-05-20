@@ -732,6 +732,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const div1 = document.createElement('div');
             div1.classList = ['col-lg-6 align-left'];
             div1.innerHTML = await dataGovernanceTemplate();
+            new Modal(document.getElementById('dataSummaryFilter'));
             hideAnimation();
             divRow.appendChild(div1);
 
@@ -764,6 +765,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const div = document.createElement('div');
             div.classList = ['align-left'];
             div.innerHTML = await dataGovernanceTemplate();
+            new Modal(document.getElementById('dataSummaryFilter'));
             hideAnimation();
             confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);

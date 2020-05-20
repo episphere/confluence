@@ -1,7 +1,7 @@
 export const template = () => {
     return `
         <div class="grid-elements dropdown">
-            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button id="confluenceDropdownBtn" class="nav-link nav-menu-links dropdown-toggle dropdown-btn" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-home"></i> Confluence
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
@@ -12,7 +12,7 @@ export const template = () => {
             </div>
         </div>
         <div class="grid-elements dropdown">
-            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button id="dataDropdownBtn" class="nav-link nav-menu-links dropdown-toggle dropdown-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-database"></i> Data
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
@@ -45,7 +45,7 @@ export const template = () => {
         <div class="navbar-nav ml-auto">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="grid-elements dropdown">
-                    <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button id="userDropdownBtn" class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
                     </button>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">

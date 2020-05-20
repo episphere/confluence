@@ -64,6 +64,9 @@ export const confluence = async () => {
             localStorage.parms = JSON.stringify(Object.assign(lclStr, response));
         }
         navBarOptions.innerHTML = template();
+        new Dropdown(document.getElementById('confluenceDropdownBtn'));
+        new Dropdown(document.getElementById('dataDropdownBtn'));
+        new Dropdown(document.getElementById('userDropdownBtn'));
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
         const dataSubmissionElement = document.getElementById('dataSubmission');
@@ -92,6 +95,7 @@ export const confluence = async () => {
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
+            new Modal(document.getElementById('dataSummaryFilter'));
             document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
                 const header = document.getElementById('confluenceModalHeader');

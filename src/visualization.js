@@ -79,6 +79,7 @@ const chipFilter = (jsonData) => {
     btn1.classList = ['info-btn variable-definition'];
     btn1.setAttribute('aria-label', 'More info')
     div1.appendChild(btn1);
+    new Modal(btn1);
 
     const div2 = document.createElement('div')
     div2.classList = ['row genotype-select'];
@@ -136,6 +137,7 @@ const genderFilter = (jsonData) => {
     btn1.classList = ['info-btn variable-definition'];
     btn1.setAttribute('aria-label', 'More info')
     div1.appendChild(btn1);
+    new Modal(btn1);
 
     const div2 = document.createElement('div')
     div2.classList = ['row gender-select'];
@@ -438,7 +440,19 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -465,7 +479,18 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -476,7 +501,18 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    document.getElementById(labelID).innerHTML = `${pieLabel} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
 
     const data = [
         {
@@ -521,7 +557,18 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    document.getElementById(labelID).innerHTML = `${pieLabel} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
     const data = [
         {
             x: ['Case', 'Control'],
@@ -549,8 +596,18 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
-    
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    document.getElementById(labelID).innerHTML = `${pieLabel} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
@@ -598,7 +655,20 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+
+    const btn = document.createElement('button');
+    btn.classList = ["info-btn variable-definition"];
+    btn.dataset.variable = parameter;
+    btn.dataset.keyboard = "false";
+    btn.dataset.backdrop = "static";
+    btn.dataset.toggle = "modal";
+    btn.setAttribute("aria-label", "More info");
+    btn.dataset.target = "#confluenceMainModal";
+    btn.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>';
+    document.getElementById(labelID).innerHTML = `${pieLabel} `;
+    document.getElementById(labelID).appendChild(btn);
+    new Modal(btn);
+    
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
