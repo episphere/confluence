@@ -45,24 +45,6 @@ export const uploadInStudy = async (id) => {
     </div>`
 }
 
-
-export const createProjectModal = () => {
-    return `<div class="modal fade" id="createProjectModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content sub-div-shadow">
-                <div class="modal-header allow-overflow">
-                    <strong><i class="fas fa-project-diagram"></i> Create project</strong>
-                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body allow-overflow" id="createProjectModalBody"></div>
-            </div>
-        </div>
-    </div>`
-}
-
-
 export const fileVersionsModal = () => {
     return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">

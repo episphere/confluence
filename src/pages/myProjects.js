@@ -17,7 +17,7 @@ export const myProjectsTemplate = async () => {
             let expandClass = type === 'folder' ? 'fas fa-folder-plus' : 'fas fa-file-alt';
             let title = type === 'folder' ? 'Expand / Collapse' : '';
             const li = document.createElement('li');
-            li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-toggle="collapse" href="#toggle${data[i].id}">
+            li.innerHTML = `<button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-toggle="collapse" data-target="#toggle${data[i].id}">
                                 <i title="${title}" data-folder-name="${name}" class="${expandClass}"></i>
                             </button> ${name}`
             

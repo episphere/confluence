@@ -1,31 +1,58 @@
 import { addEventShowAllCollaborator, addEventAddNewCollaborator, addEventFileStats } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel, hideAnimation } from "../shared.js";
 
-export const template = async () => {
+export const template = async (parent) => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
-    let template = `<div class="card border sub-div-shadow"><div class="card-header"><label class="dataSummary-label">Consortium(s)</label></div>`;
-    
-    template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
+    const mainDiv = document.createElement('div');
+    mainDiv.classList = ['col-lg-6 align-left'];
+
+    const subDiv = document.createElement('div');
+    subDiv.classList = ['card border sub-div-shadow'];
+
+    const headerDiv = document.createElement('div');
+    headerDiv.classList = ['card-header'];
+    headerDiv.innerHTML = `<label class="dataSummary-label">Consortium(s)</label>`;
+    subDiv.appendChild(headerDiv);
+
+    const bodyDiv = document.createElement('div');
+    bodyDiv.classList = ['card-body data-governance'];
+
+    const ul = document.createElement('ul');
+    ul.classList = ['ul-list-style first-list-item collapsible-items'];
 
     for(let obj of array){
         const ID = obj.id;
         const consortiaName = obj.name;
         let type = obj.type;
-        let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
+        let liClass = type === 'folder' ? 'collapsible consortia-folder collapse-native' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
-        template += `<li class="collapsible-items">
-            <button class="${liClass}" data-toggle="collapse" href="#toggle${ID}">
-                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
-            </button> ${consortiaName}
-        </li>
-        `
+
+        const li = document.createElement('li');
+        li.classList = ['collapsible-items'];
+
+        const button = document.createElement('button');
+        button.classList = [`${liClass}`];
+        button.dataset.toggle = 'collapse';
+        button.dataset.target = `#toggle${ID}`;
+        button.innerHTML = `<i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>`;
+        li.appendChild(button);
+
+        const label = document.createElement('label');
+        label.innerHTML = `&nbsp; ${consortiaName}`
+        li.appendChild(label)
+        ul.appendChild(li);
     }
-    template += `</ul></div></div>`
-    return template;
+    bodyDiv.appendChild(ul);
+    subDiv.appendChild(bodyDiv);
+    mainDiv.appendChild(subDiv);
+    parent.appendChild(mainDiv);
+    hideAnimation();
+    console.log(document.querySelectorAll('.collapse-native'))
+    Array.from(document.querySelectorAll('.collapse-native')).forEach(e => new Collapse(e));
 }
 
 export const dataGovernanceProjects = async () => {
@@ -55,7 +82,7 @@ export const dataGovernanceProjects = async () => {
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 template += `
                 <li class="collapsible-items">
-                    <button class="${liClass}" data-toggle="collapse" href="#toggle${projectArray[obj].id}">
+                    <button class="${liClass}" data-toggle="collapse" data-target="#toggle${projectArray[obj].id}">
                         <i title="${title}" data-folder-name="${projectName}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                     </button> ${projectName}
                 </li>
@@ -92,6 +119,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 button.dataset.objectType = type;
                 button.innerHTML = `<i class="fas fa-share"></i>`
                 element.parentNode.parentNode.appendChild(button);
+                new Modal(button);
                 shareData(button);
             }
             else{
@@ -120,7 +148,7 @@ export const dataGovernanceLazyLoad = (element) => {
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
+                li.innerHTML = `<button class="${liClass}" data-toggle="collapse" data-target="#toggle${obj.id}">
                     <i title="${title}" data-folder-name="${obj.name}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i>
                 </button> ${obj.name}`;
 
@@ -135,6 +163,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     button.title = 'Manage collaboration';
                     button.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(button);
+                    new Modal(button);
                     shareData(button);
                 }
                 ul.appendChild(li);
@@ -170,6 +199,7 @@ export const dataGovernanceLazyLoad = (element) => {
                     button1.title = 'Manage collaboration';
                     button1.innerHTML = `<i class="fas fa-share"></i>`;
                     li.appendChild(button1);
+                    new Modal(button1);
                     shareData(button1);
 
                     const button2 = document.createElement('button');

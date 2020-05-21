@@ -198,7 +198,7 @@ const filterByStudy = (jsonData) => {
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
                         <li class="custom-borders">
-                            <button class="row consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                            <button class="row consortium-selection consortium-selection-btn" data-toggle="collapse" data-target="#toggle${consortium.replace(/ /g, '')}">
                                 <div class="consortia-name">${consortium}</div>
                                 <div class="ml-auto">
                                     <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
@@ -228,6 +228,7 @@ const filterByStudy = (jsonData) => {
     document.getElementById('studyFilter').innerHTML = template;
     addEventConsortiumSelect();
     addEventFilterCharts(jsonData);
+    Array.from(document.querySelectorAll('.row.consortium-selection.consortium-selection-btn')).forEach(element => new Collapse(element))
     document.getElementsByClassName('consortium-selection')[0].click();
 }
 

@@ -4,7 +4,6 @@ import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
-import { createProjectModal } from './components/modal.js';
 
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
@@ -715,10 +714,16 @@ export const addEventDataGovernanceNavBar = (bool) => {
         if(bool){
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
-                                    <i class="fas fa-project-diagram"></i> Create project
-                                </button>
-                                ${createProjectModal()}`;
+
+            const button = document.createElement('button');
+            button.classList = ['btn btn-light sub-div-shadow'];
+            button.id = 'createProjectBtn';
+            button.title = 'Create project';
+            button.dataset.toggle = 'modal';
+            button.dataset.target = '#createProjectModal';
+            button.innerHTML = '<i class="fas fa-project-diagram"></i> Create project';
+            btnDiv.appendChild(button);
+            new Modal(button);
 
             const divRow = document.createElement('div');
             divRow.classList = ['row'];
@@ -729,12 +734,12 @@ export const addEventDataGovernanceNavBar = (bool) => {
                 <div id="showNotification"></div>
             </div>`;
             
-            const div1 = document.createElement('div');
-            div1.classList = ['col-lg-6 align-left'];
-            div1.innerHTML = await dataGovernanceTemplate();
-            new Modal(document.getElementById('dataSummaryFilter'));
-            hideAnimation();
-            divRow.appendChild(div1);
+            dataGovernanceTemplate(divRow)
+            // const div1 = document.createElement('div');
+            // div1.classList = ['col-lg-6 align-left'];
+            // div1.innerHTML = await dataGovernanceTemplate();
+            // hideAnimation();
+            // divRow.appendChild(div1);
 
             const div2 = document.createElement('div');
             div2.classList = ['col-lg-6 align-left'];
@@ -752,21 +757,26 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
-                                    <i class="fas fa-project-diagram"></i> Create project
-                                </button>
-                                ${createProjectModal()}`;
+
+            const button = document.createElement('button');
+            button.classList = ['btn btn-light sub-div-shadow'];
+            button.id = 'createProjectBtn';
+            button.title = 'Create project';
+            button.dataset.toggle = 'modal';
+            button.dataset.target = '#createProjectModal';
+            button.innerHTML = '<i class="fas fa-project-diagram"></i> Create project';
+            btnDiv.appendChild(button);
+            new Modal(button);
             
             const notifcationDiv = document.createElement('div');
             notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
                 <div id="showNotification"></div>
             </div>`;
-            
-            const div = document.createElement('div');
-            div.classList = ['align-left'];
-            div.innerHTML = await dataGovernanceTemplate();
-            new Modal(document.getElementById('dataSummaryFilter'));
-            hideAnimation();
+            dataGovernanceTemplate(btnDiv)
+            // const div = document.createElement('div');
+            // div.classList = ['align-left'];
+            // div.innerHTML = await dataGovernanceTemplate();
+            // hideAnimation();
             confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(div);
