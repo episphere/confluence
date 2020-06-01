@@ -332,24 +332,7 @@ export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const consortia = document.getElementById('selectConsortiaUIS');
-        const consortiaId = consortia.value;
-        const consortiaText = consortia.options[consortia.selectedIndex].text;
-        const study = document.getElementById('selectStudyUIS');
-        const newStudyName = document.getElementById('newStudyName');
-        let studyId;
-        let studyName = '';
-        if(study){
-            studyId = study.value;
-            studyName = study.options[study.selectedIndex].text;
-        }
-        else if (newStudyName) {
-            const response = await createFolder(consortiaId, newStudyName.value);
-            if(response.status !== 201 ) return
-            const data = await response.json();
-            studyId = data.id;
-            studyName = newStudyName.value;
-        }
+        
 
         const file = document.getElementById('uploadDataUIS').files[0]; 
         const fileName = file.name;
@@ -358,32 +341,49 @@ export const addEventUploadStudyForm = () => {
             alert('File type not supported!');
             return;
         }
+        const consortia = document.getElementById('selectConsortiaUIS');
+        const consortiaText = consortia.options[consortia.selectedIndex].text;
+        const study = document.getElementById('selectStudyUIS');
+        const newStudyName = document.getElementById('newStudyName');
+        const studyName = newStudyName ? newStudyName.value : study.options[study.selectedIndex].text;
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
             document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...`;
-            // const dataEntries = (await getFolderItems(studyId)).entries;
-            // if(dataEntries.length === 0) {
-            //     await createFolder(studyId, 'Core Data');
-            //     await createFolder(studyId, 'Pathology Data');
-            //     await createFolder(studyId, 'Risk Factor Data');
-            //     await createFolder(studyId, 'Survival and Treatment Data');
-            // }
             
-
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
                 // TO DO: QC
-                
-                separateData(textFromFileLoaded, studyId, fileName);
+                performQAQC(textFromFileLoaded, fileName);
+                // separateData(textFromFileLoaded, fileName);
             };
-
             fileReader.readAsText(file, "UTF-8");
         }
     })
 }
 
-const separateData = async (textFromFileLoaded, studyId, fileName) => {
+const separateData = async (textFromFileLoaded, fileName) => {
+    const consortia = document.getElementById('selectConsortiaUIS');
+    const consortiaId = consortia.value;
+    const study = document.getElementById('selectStudyUIS');
+    const newStudyName = document.getElementById('newStudyName');
+    let studyId;
+    if(study){
+        studyId = study.value;
+    }
+    else if (newStudyName) {
+        const response = await createFolder(consortiaId, newStudyName.value);
+        if(response.status !== 201 ) return
+        const data = await response.json();
+        studyId = data.id;
+    }
+    const dataEntries = (await getFolderItems(studyId)).entries;
+    if(dataEntries.length === 0) {
+        await createFolder(studyId, 'Core Data');
+        await createFolder(studyId, 'Pathology Data');
+        await createFolder(studyId, 'Risk Factor Data');
+        await createFolder(studyId, 'Survival and Treatment Data');
+    }
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
@@ -395,29 +395,6 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         return obj;
     });
     
-    document.getElementById('uploadErrorReport').innerHTML = `
-        <button class="btn btn-light collapsed submission-report-btn sub-div-shadow" type="button" data-toggle="collapse" data-target="#collapseSubmissionReport" aria-expanded="false" aria-controls="collapseSubmissionReport">
-            <div class="row" style="padding: 0px 10px;">
-                <div><span class="report-label">Submission report</span></div>
-                <div class="ml-auto">
-                    <i class="fas fa-caret-down"></i>
-                </div>
-            </div>
-        </button>
-        <div id="collapseSubmissionReport" class="collapse" aria-labelledby="headingTwo">
-            <div>
-                Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
-            </div>
-            <div class="qaqc-submission-report">
-                ${runQAQC(dataForQAQC(textFromFileLoaded))}
-            </div>
-        </div>
-    `;
-    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toLocaleString()}.pdf`
-    addEventDownloadQAQCReport(fileNameQAQC);
-    addEventSubmissionReportBtn();
-    // Add continue Anyway button.
-    return;
     const masterFile = variables.masterFile;
     const core = masterFile.core.map(att => att.toLowerCase());
     const pathology = masterFile.pathology.map(att => att.toLowerCase());
@@ -479,6 +456,30 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         }
     }
     location.reload();
+}
+
+const performQAQC = (textFromFileLoaded, fileName) => {
+    document.getElementById('uploadErrorReport').innerHTML = `
+        <button class="btn btn-light collapsed submission-report-btn sub-div-shadow" type="button" data-toggle="collapse" data-target="#collapseSubmissionReport" aria-expanded="false" aria-controls="collapseSubmissionReport">
+            <div class="row" style="padding: 0px 10px;">
+                <div><span class="report-label">Submission report</span></div>
+                <div class="ml-auto">
+                    <i class="fas fa-caret-down"></i>
+                </div>
+            </div>
+        </button>
+        <div id="collapseSubmissionReport" class="collapse" aria-labelledby="headingTwo">
+            <div>
+                Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
+            </div>
+            <div class="qaqc-submission-report">
+                ${runQAQC(dataForQAQC(textFromFileLoaded))}
+            </div>
+        </div>
+    `;
+    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toLocaleString()}.pdf`
+    addEventDownloadQAQCReport(fileNameQAQC);
+    addEventSubmissionReportBtn();
 }
 
 const addEventDownloadQAQCReport = (fileName) => {
