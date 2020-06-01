@@ -361,19 +361,20 @@ export const addEventUploadStudyForm = () => {
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
             document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...`;
-            const dataEntries = (await getFolderItems(studyId)).entries;
-            if(dataEntries.length === 0) {
-                await createFolder(studyId, 'Core Data');
-                await createFolder(studyId, 'Pathology Data');
-                await createFolder(studyId, 'Risk Factor Data');
-                await createFolder(studyId, 'Survival and Treatment Data');
-            }
+            // const dataEntries = (await getFolderItems(studyId)).entries;
+            // if(dataEntries.length === 0) {
+            //     await createFolder(studyId, 'Core Data');
+            //     await createFolder(studyId, 'Pathology Data');
+            //     await createFolder(studyId, 'Risk Factor Data');
+            //     await createFolder(studyId, 'Survival and Treatment Data');
+            // }
             
 
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
                 // TO DO: QC
+                
                 separateData(textFromFileLoaded, studyId, fileName);
             };
 
@@ -394,6 +395,22 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         return obj;
     });
     
+    document.getElementById('uploadErrorReport').innerHTML = `
+        <button class="btn btn-light collapsed submission-report-btn sub-div-shadow" type="button" data-toggle="collapse" data-target="#collapseSubmissionReport" aria-expanded="false" aria-controls="collapseSubmissionReport">
+            <div class="row" style="padding: 0px 10px;">
+                <div><span class="report-label">Submission report</span></div>
+                <div class="ml-auto">
+                    <i class="fas fa-caret-down"></i>
+                </div>
+            </div>
+        </button>
+        <div id="collapseSubmissionReport" class="collapse" aria-labelledby="headingTwo">
+            ${runQAQC(dataForQAQC(textFromFileLoaded))}
+        </div>
+    `
+    addEventSubmissionReportBtn();
+    // Add continue Anyway button.
+    return;
     const masterFile = variables.masterFile;
     const core = masterFile.core.map(att => att.toLowerCase());
     const pathology = masterFile.pathology.map(att => att.toLowerCase());
@@ -455,6 +472,72 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         }
     }
     location.reload();
+}
+
+const dataForQAQC = (txt) => {
+    let data = {};
+    if(txt.slice(0,1)=='['){txt='{'+txt+'}'}
+    if(txt.slice(0,1)=='{'){
+        data = JSON.parse(txt);
+        return data
+    }else{
+        let arr =txt.split(/[\r\n]+/g).map(row=>{  // data array
+            //if(row[0]=='    '){row='undefined   '+row}
+            return row.split(/[,\t]/g) // split csv and tsv alike
+        })
+        if(arr.slice(-1).toLocaleString()==""){arr.pop()}
+        const labels = arr[0]
+        labels.forEach((label) => {
+            data[label] = []
+        })
+        arr.slice(1).forEach((row,i) => {
+            labels.forEach((label,j) => {
+                data[label][i]=row[j]
+            })
+        })
+        labels.forEach(label => {
+            data[label] = numberType(data[label])
+        })
+        return data;
+    }
+}
+
+const numberType = aa => { // try to fit numeric typing
+    let tp='number'
+    aa.forEach(a=>{
+        if(!((a==parseFloat(a))||(a=='undefined')||(a==''))){
+            tp='string'
+        }
+    })
+    if(tp=='number'){
+        aa=aa.map(a=>{
+            if(a=='undefined'||a==''){
+                a=undefined
+            }else{
+                a=parseFloat(a)
+            }
+            return a
+        })
+    }
+    return aa
+}
+
+const addEventSubmissionReportBtn = () => {
+    const elements = document.getElementsByClassName('submission-report-btn');
+    Array.from(elements).forEach(e => {
+        e.addEventListener('click', () => {
+            const reportDiv = document.getElementById('collapseSubmissionReport');
+            const icon = e.querySelectorAll('.fas')[0];
+            if(reportDiv.classList.contains('show')) {
+                icon.classList.remove('fa-caret-up');
+                icon.classList.add('fa-caret-down');
+            }
+            else{
+                icon.classList.remove('fa-caret-down');
+                icon.classList.add('fa-caret-up');
+            }
+        })
+    })
 }
 
 export const formSubmit = () => {

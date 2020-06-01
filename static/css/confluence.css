@@ -1256,3 +1256,18 @@ form {
 .my-prjects-list-item {
     margin-top: 3px;
 }
+
+.submission-report-btn {
+    width: 100%;
+    background-color: transparent !important;
+}
+
+#collapseSubmissionReport {
+    max-height: 400px;
+    overflow: auto;
+    margin-top: 0.5rem;
+}
+
+.report-label {
+    color: #f8b759;
+}
