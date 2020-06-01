@@ -405,9 +405,16 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
             </div>
         </button>
         <div id="collapseSubmissionReport" class="collapse" aria-labelledby="headingTwo">
-            ${runQAQC(dataForQAQC(textFromFileLoaded))}
+            <div>
+                Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
+            </div>
+            <div class="qaqc-submission-report">
+                ${runQAQC(dataForQAQC(textFromFileLoaded))}
+            </div>
         </div>
-    `
+    `;
+    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toLocaleString()}.pdf`
+    addEventDownloadQAQCReport(fileNameQAQC);
     addEventSubmissionReportBtn();
     // Add continue Anyway button.
     return;
@@ -472,6 +479,34 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         }
     }
     location.reload();
+}
+
+const addEventDownloadQAQCReport = (fileName) => {
+    const elements = document.getElementsByClassName('download-qaqc-report');
+    Array.from(elements).forEach(ele => {
+        ele.addEventListener('click', () => {
+            const HTML_Width = $(".qaqc-submission-report").width();
+            const HTML_Height = $(".qaqc-submission-report").height();
+            const top_left_margin = 15;
+            const PDF_Width = HTML_Width + (top_left_margin * 2);
+            const PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+            const canvas_image_width = HTML_Width;
+            const canvas_image_height = HTML_Height;
+        
+            const totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+        
+            html2canvas($(".qaqc-submission-report")[0]).then((canvas) => {
+                const imgData = canvas.toDataURL("image/jpeg", 1.0);
+                const pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+                pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+                for (let i = 1; i <= totalPDFPages; i++) { 
+                    pdf.addPage(PDF_Width, PDF_Height);
+                    pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
+                }
+                pdf.save(fileName);
+            });
+        });
+    });
 }
 
 const dataForQAQC = (txt) => {
