@@ -1267,9 +1267,10 @@ form {
 }
 
 #collapseSubmissionReport {
-    max-height: 400px;
+    max-height: 300px;
     overflow: auto;
     margin-top: 0.5rem;
+    width: inherit;
 }
 
 .report-label {

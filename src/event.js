@@ -348,21 +348,21 @@ export const addEventUploadStudyForm = () => {
         const studyName = newStudyName ? newStudyName.value : study.options[study.selectedIndex].text;
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
-            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...`;
+            document.getElementById('submitBtn').classList.add('btn-disbaled');
+            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
             
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
-                // TO DO: QC
+                
                 performQAQC(textFromFileLoaded, fileName);
-                // separateData(textFromFileLoaded, fileName);
             };
             fileReader.readAsText(file, "UTF-8");
         }
     })
 }
 
-const separateData = async (textFromFileLoaded, fileName) => {
+const separateData = async (qaqcFileName, pdf, textFromFileLoaded, fileName) => {
     const consortia = document.getElementById('selectConsortiaUIS');
     const consortiaId = consortia.value;
     const study = document.getElementById('selectStudyUIS');
@@ -378,12 +378,14 @@ const separateData = async (textFromFileLoaded, fileName) => {
         studyId = data.id;
     }
     const dataEntries = (await getFolderItems(studyId)).entries;
-    if(dataEntries.length === 0) {
-        await createFolder(studyId, 'Core Data');
-        await createFolder(studyId, 'Pathology Data');
-        await createFolder(studyId, 'Risk Factor Data');
-        await createFolder(studyId, 'Survival and Treatment Data');
-    }
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking folders...`;
+    let logFolderID = '', cDataFolderID = '', pDataFolderID = '', rfDataFolderID = '', stDataFolderID = '';
+    logFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Submission_Logs');
+    cDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Core Data');
+    pDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Pathology Data');
+    rfDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Risk Factor Data');
+    stDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Survival and Treatment Data');
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Separating data...`;
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
@@ -413,7 +415,6 @@ const separateData = async (textFromFileLoaded, fileName) => {
         let stObj = {};
 
         for(const key in data){
-
             if(core.indexOf(key.toLowerCase()) !== -1){
                 cObj[key] = data[key];
             }
@@ -436,78 +437,96 @@ const separateData = async (textFromFileLoaded, fileName) => {
         if(Object.keys(rfObj).length > 0) rfData.push(rfObj);
         if(Object.keys(stObj).length > 0) stData.push(stObj);
     });
+    // Upload Data
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
+    await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
+    await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
+    await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
+    await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
 
-    const dataFolders = (await getFolderItems(studyId)).entries;
-    for(const obj of dataFolders){
-        if(obj.name === 'Core Data'){
-            await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Pathology Data'){
-            await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Risk Factor Data'){
-            await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Survival and Treatment Data'){
-            await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, obj.id);
-        }
-    }
+    // Upload Submission logs
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
+    const blob = pdf.output('blob');
+    await uploadFile(blob, qaqcFileName, logFolderID, true)
+    
     location.reload();
 }
 
-const performQAQC = (textFromFileLoaded, fileName) => {
-    document.getElementById('uploadErrorReport').innerHTML = `
-        <button class="btn btn-light collapsed submission-report-btn sub-div-shadow" type="button" data-toggle="collapse" data-target="#collapseSubmissionReport" aria-expanded="false" aria-controls="collapseSubmissionReport">
-            <div class="row" style="padding: 0px 10px;">
-                <div><span class="report-label">Submission report</span></div>
-                <div class="ml-auto">
-                    <i class="fas fa-caret-down"></i>
-                </div>
-            </div>
-        </button>
-        <div id="collapseSubmissionReport" class="collapse" aria-labelledby="headingTwo">
-            <div>
-                Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
-            </div>
-            <div class="qaqc-submission-report">
-                ${runQAQC(dataForQAQC(textFromFileLoaded))}
-            </div>
-        </div>
-    `;
-    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toLocaleString()}.pdf`
-    addEventDownloadQAQCReport(fileNameQAQC);
-    addEventSubmissionReportBtn();
+const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
+    const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
+    let ID = '';
+    if(folderExists.length === 0) {
+        ID = (await (await createFolder(studyId, folderName)).json()).id;
+    }
+    else {
+        ID = folderExists[0].id;
+    }
+    return ID;
 }
 
-const addEventDownloadQAQCReport = (fileName) => {
+const performQAQC = async (textFromFileLoaded, fileName) => {
+    document.getElementById('uploadErrorReport').innerHTML = `
+        <div>
+            Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
+        </div>
+        <div class="qaqc-submission-report">
+            ${runQAQC(dataForQAQC(textFromFileLoaded))}
+        </div>
+    `;
+    
+    const submitBtn = document.getElementById('submitBtn');
+    
+    const newBtn = document.createElement('button');
+    newBtn.id = "continueSubmission";
+    newBtn.classList = ["btn btn-light sub-div-shadow"];
+    newBtn.title = "Continue Submission";
+    newBtn.innerHTML = 'Continue';
+    newBtn.type = "button";
+    submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+    
+    const pdf = await generatePDF();
+    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().getTime()}.pdf`
+    addEventDownloadQAQCReport(fileNameQAQC, pdf);
+    addEventContinueSubmission(fileNameQAQC, pdf, textFromFileLoaded, fileName);
+}
+
+const addEventDownloadQAQCReport = (fileName, pdf) => {
     const elements = document.getElementsByClassName('download-qaqc-report');
     Array.from(elements).forEach(ele => {
         ele.addEventListener('click', () => {
-            const HTML_Width = $(".qaqc-submission-report").width();
-            const HTML_Height = $(".qaqc-submission-report").height();
-            const top_left_margin = 15;
-            const PDF_Width = HTML_Width + (top_left_margin * 2);
-            const PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
-            const canvas_image_width = HTML_Width;
-            const canvas_image_height = HTML_Height;
-        
-            const totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
-        
-            html2canvas($(".qaqc-submission-report")[0]).then((canvas) => {
-                const imgData = canvas.toDataURL("image/jpeg", 1.0);
-                const pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
-                pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
-                for (let i = 1; i <= totalPDFPages; i++) { 
-                    pdf.addPage(PDF_Width, PDF_Height);
-                    pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
-                }
-                pdf.save(fileName);
-            });
+            pdf.save(fileName);
         });
     });
+}
+
+const addEventContinueSubmission = (qaqcFileName, pdf, textFromFileLoaded, fileName) => {
+    const element = document.getElementById('continueSubmission');
+    element.addEventListener('click', async () => {
+        element.classList.add('btn-disbaled');
+        separateData(qaqcFileName, pdf, textFromFileLoaded, fileName);
+    });
+}
+
+const generatePDF = async () => {
+    const HTML_Width = $(".qaqc-submission-report").width();
+    const HTML_Height = $(".qaqc-submission-report").height();
+    const top_left_margin = 15;
+    const PDF_Width = HTML_Width + (top_left_margin * 2);
+    const PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+    const canvas_image_width = HTML_Width;
+    const canvas_image_height = HTML_Height;
+
+    const totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+    const canvas = await html2canvas($(".qaqc-submission-report")[0])
+    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+    const pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+    pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+    for (let i = 1; i <= totalPDFPages; i++) { 
+        pdf.addPage(PDF_Width, PDF_Height);
+        pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
+    }
+    return pdf
 }
 
 const dataForQAQC = (txt) => {
@@ -556,24 +575,6 @@ const numberType = aa => { // try to fit numeric typing
         })
     }
     return aa
-}
-
-const addEventSubmissionReportBtn = () => {
-    const elements = document.getElementsByClassName('submission-report-btn');
-    Array.from(elements).forEach(e => {
-        e.addEventListener('click', () => {
-            const reportDiv = document.getElementById('collapseSubmissionReport');
-            const icon = e.querySelectorAll('.fas')[0];
-            if(reportDiv.classList.contains('show')) {
-                icon.classList.remove('fa-caret-up');
-                icon.classList.add('fa-caret-down');
-            }
-            else{
-                icon.classList.remove('fa-caret-down');
-                icon.classList.add('fa-caret-up');
-            }
-        })
-    })
 }
 
 export const formSubmit = () => {
