@@ -308,7 +308,7 @@ export const addEventConsortiaSelect = () => {
         let entries = (await getFolderItems(value)).entries;
         
         // check if study document exists
-        const documentExists = entries.filter(dt => dt.name === 'Confluence data from studies');
+        const documentExists = entries.filter(dt => dt.name.trim().toLowerCase() === 'confluence data from studies');
         if(documentExists.length === 1){
             entries = (await getFolderItems(documentExists[0].id)).entries;
         }
@@ -332,8 +332,6 @@ export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-
         const file = document.getElementById('uploadDataUIS').files[0]; 
         const fileName = file.name;
         const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
@@ -372,7 +370,10 @@ const separateData = async (qaqcFileName, pdf, textFromFileLoaded, fileName) => 
         studyId = study.value;
     }
     else if (newStudyName) {
-        const response = await createFolder(consortiaId, newStudyName.value);
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating new study...`;
+        const entries = (await getFolderItems(consortiaId)).entries;
+        const studyFolders = entries.filter(dt => dt.type === 'folder' && dt.name.trim().toLowerCase() === 'confluence data from studies');
+        const response = await createFolder(`${studyFolders.length === 0 ? consortiaId : studyFolders[0].id}`, newStudyName.value);
         if(response.status !== 201 ) return
         const data = await response.json();
         studyId = data.id;
@@ -998,7 +999,7 @@ const addEventCPCSelect = () => {
         let response = await getFolderItems(ID);
         if(response.entries.length === 0) return;
         // check if study document exists
-        const documentExists = response.entries.filter(dt => dt.name === 'Confluence data from studies');
+        const documentExists = response.entries.filter(dt => dt.name.trim().toLowerCase() === 'confluence data from studies');
         if(documentExists.length === 1){
             response = (await getFolderItems(documentExists[0].id));
         }
