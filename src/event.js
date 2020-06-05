@@ -467,10 +467,7 @@ const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
 
 const performQAQC = async (textFromFileLoaded, fileName) => {
     document.getElementById('uploadErrorReport').innerHTML = `
-        <div>
-            Download QAQC report: <button class="download-qaqc-report-btn" type="button"><i title="Download qaqc report" class="fas fa-download download-qaqc-report"></i></button>
-        </div>
-        <div class="qaqc-submission-report">
+        <div id="qaqcSubmissionReport" class="qaqc-submission-report">
             ${runQAQC(dataForQAQC(textFromFileLoaded))}
         </div>
     `;
@@ -483,20 +480,54 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     newBtn.title = "Continue Submission";
     newBtn.innerHTML = 'Continue';
     newBtn.type = "button";
+
+    const downloadAndClose = document.createElement('button');
+    downloadAndClose.classList = ['btn btn-dark sub-div-shadow'];
+    downloadAndClose.id = 'downloadQAQCReport';
+    downloadAndClose.title = 'Download Report and Close';
+    downloadAndClose.innerHTML = 'Download Report and Close';
+    newBtn.type = 'button';
+
+    const closeBtn = submitBtn.parentNode.querySelectorAll('[data-dismiss="modal"]')[0];
+    closeBtn.parentNode.replaceChild(downloadAndClose, closeBtn)
     submitBtn.parentNode.replaceChild(newBtn, submitBtn);
     
     const pdf = await generatePDF();
-    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().getTime()}.pdf`
+    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toISOString()}.html`
     addEventDownloadQAQCReport(fileNameQAQC, pdf);
     addEventContinueSubmission(fileNameQAQC, pdf, textFromFileLoaded, fileName);
 }
 
-const addEventDownloadQAQCReport = (fileName, pdf) => {
-    const elements = document.getElementsByClassName('download-qaqc-report');
-    Array.from(elements).forEach(ele => {
-        ele.addEventListener('click', () => {
-            pdf.save(fileName);
-        });
+const addEventDownloadQAQCReport = (fileName) => {
+    const element = document.getElementById('downloadQAQCReport');
+    element.addEventListener('click', () => {
+        const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
+        const link = document.createElement('a');
+        const mimeType = 'text/html';
+
+        link.setAttribute('download', fileName);
+        link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(elHtml));
+        link.click();
+
+        const closeBtn = document.createElement('button');
+        closeBtn.classList = ['btn btn-dark sub-div-shadow'];
+        closeBtn.title = 'Close';
+        closeBtn.innerHTML = 'Close';
+        closeBtn.type = 'button';
+        closeBtn.dataset.dismiss = 'modal';
+
+        element.parentNode.replaceChild(closeBtn, element);
+
+        const continueBtn = document.getElementById('continueSubmission');
+        const submitBtn = document.createElement('button');
+        submitBtn.classList = ['btn btn-light sub-div-shadow'];
+        submitBtn.id = 'submitBtn';
+        submitBtn.title = 'Submit';
+        submitBtn.innerHTML = 'Submit';
+        submitBtn.type = 'Submit';
+
+        continueBtn.parentNode.replaceChild(submitBtn, continueBtn);
+        document.getElementById('uploadInStudy').querySelectorAll('.close.modal-close-btn')[0].click();
     });
 }
 

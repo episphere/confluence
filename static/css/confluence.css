@@ -1280,3 +1280,7 @@ form {
 .fa-confluence {
     cursor: pointer;
 }
+
+#uploadErrorReport {
+    max-height: 300px;
+}
