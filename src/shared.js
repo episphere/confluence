@@ -350,12 +350,12 @@ export const uploadFileBox = async (folderId, fileName, file) => {
     }
 };
 
-export const uploadFile = async (data, fileName, folderId, pdf) => {
+export const uploadFile = async (data, fileName, folderId, html) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
         const form = new FormData();
         let blobData = '';
-        if(pdf) blobData = new Blob([data], { type: 'application/pdf'});
+        if(html) blobData = new Blob([data], { type: 'text/html'});
         else blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
         form.append('file', blobData);
         form.append('attributes', `{"name": "${fileName}", "parent": {"id": "${folderId}"}}`);

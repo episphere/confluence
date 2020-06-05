@@ -360,7 +360,7 @@ export const addEventUploadStudyForm = () => {
     })
 }
 
-const separateData = async (qaqcFileName, pdf, textFromFileLoaded, fileName) => {
+const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     const consortia = document.getElementById('selectConsortiaUIS');
     const consortiaId = consortia.value;
     const study = document.getElementById('selectStudyUIS');
@@ -440,15 +440,44 @@ const separateData = async (qaqcFileName, pdf, textFromFileLoaded, fileName) => 
     });
     // Upload Data
     document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
-    await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
-    await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
-    await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
-    await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
+    const showNotification = document.getElementById('showNotification');
+    const response1 = await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
+    if(response1.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        replaceBtns();
+        return;
+    }
+    const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
+    if(response2.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        replaceBtns();
+        return;
+    }
+    const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
+    if(response3.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        replaceBtns();
+        return;
+    }
+    const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
+    if(response4.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        replaceBtns();
+        return;
+    }
 
     // Upload Submission logs
     document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
-    const blob = pdf.output('blob');
-    await uploadFile(blob, qaqcFileName, logFolderID, true)
+    const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
+    await uploadFile(elHtml, qaqcFileName, logFolderID, true)
     
     location.reload();
 }
@@ -492,10 +521,9 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     closeBtn.parentNode.replaceChild(downloadAndClose, closeBtn)
     submitBtn.parentNode.replaceChild(newBtn, submitBtn);
     
-    const pdf = await generatePDF();
     const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toISOString()}.html`
-    addEventDownloadQAQCReport(fileNameQAQC, pdf);
-    addEventContinueSubmission(fileNameQAQC, pdf, textFromFileLoaded, fileName);
+    addEventDownloadQAQCReport(fileNameQAQC);
+    addEventContinueSubmission(fileNameQAQC, textFromFileLoaded, fileName);
 }
 
 const addEventDownloadQAQCReport = (fileName) => {
@@ -509,56 +537,39 @@ const addEventDownloadQAQCReport = (fileName) => {
         link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(elHtml));
         link.click();
 
-        const closeBtn = document.createElement('button');
-        closeBtn.classList = ['btn btn-dark sub-div-shadow'];
-        closeBtn.title = 'Close';
-        closeBtn.innerHTML = 'Close';
-        closeBtn.type = 'button';
-        closeBtn.dataset.dismiss = 'modal';
-
-        element.parentNode.replaceChild(closeBtn, element);
-
-        const continueBtn = document.getElementById('continueSubmission');
-        const submitBtn = document.createElement('button');
-        submitBtn.classList = ['btn btn-light sub-div-shadow'];
-        submitBtn.id = 'submitBtn';
-        submitBtn.title = 'Submit';
-        submitBtn.innerHTML = 'Submit';
-        submitBtn.type = 'Submit';
-
-        continueBtn.parentNode.replaceChild(submitBtn, continueBtn);
+        replaceBtns();
         document.getElementById('uploadInStudy').querySelectorAll('.close.modal-close-btn')[0].click();
     });
 }
 
-const addEventContinueSubmission = (qaqcFileName, pdf, textFromFileLoaded, fileName) => {
+const replaceBtns = () => {
+    const element = document.getElementById('downloadQAQCReport');
+    const closeBtn = document.createElement('button');
+    closeBtn.classList = ['btn btn-dark sub-div-shadow'];
+    closeBtn.title = 'Close';
+    closeBtn.innerHTML = 'Close';
+    closeBtn.type = 'button';
+    closeBtn.dataset.dismiss = 'modal';
+
+    element.parentNode.replaceChild(closeBtn, element);
+
+    const continueBtn = document.getElementById('continueSubmission');
+    const submitBtn = document.createElement('button');
+    submitBtn.classList = ['btn btn-light sub-div-shadow'];
+    submitBtn.id = 'submitBtn';
+    submitBtn.title = 'Submit';
+    submitBtn.innerHTML = 'Submit';
+    submitBtn.type = 'Submit';
+
+    continueBtn.parentNode.replaceChild(submitBtn, continueBtn);
+}
+
+const addEventContinueSubmission = (qaqcFileName, textFromFileLoaded, fileName) => {
     const element = document.getElementById('continueSubmission');
     element.addEventListener('click', async () => {
         element.classList.add('btn-disbaled');
-        separateData(qaqcFileName, pdf, textFromFileLoaded, fileName);
+        separateData(qaqcFileName, textFromFileLoaded, fileName);
     });
-}
-
-const generatePDF = async () => {
-    const HTML_Width = $(".qaqc-submission-report").width();
-    const HTML_Height = $(".qaqc-submission-report").height();
-    const top_left_margin = 15;
-    const PDF_Width = HTML_Width + (top_left_margin * 2);
-    const PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
-    const canvas_image_width = HTML_Width;
-    const canvas_image_height = HTML_Height;
-
-    const totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
-
-    const canvas = await html2canvas($(".qaqc-submission-report")[0])
-    const imgData = canvas.toDataURL("image/jpeg", 1.0);
-    const pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
-    pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
-    for (let i = 1; i <= totalPDFPages; i++) { 
-        pdf.addPage(PDF_Width, PDF_Height);
-        pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
-    }
-    return pdf
 }
 
 const dataForQAQC = (txt) => {
