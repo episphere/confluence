@@ -446,6 +446,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         top = top+2;
         let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
         showNotification.innerHTML = template;
+        addEventHideNotification();
         replaceBtns();
         return;
     }
@@ -454,6 +455,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         top = top+2;
         let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
         showNotification.innerHTML = template;
+        addEventHideNotification();
         replaceBtns();
         return;
     }
@@ -462,6 +464,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         top = top+2;
         let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
         showNotification.innerHTML = template;
+        addEventHideNotification();
         replaceBtns();
         return;
     }
@@ -470,6 +473,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         top = top+2;
         let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
         showNotification.innerHTML = template;
+        addEventHideNotification();
         replaceBtns();
         return;
     }
@@ -886,11 +890,6 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const divRow = document.createElement('div');
             divRow.classList = ['row'];
             divRow.id = 'dataGovernanceMain'
-    
-            const notifcationDiv = document.createElement('div');
-            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
-                <div id="showNotification"></div>
-            </div>`;
             
             const div1 = document.createElement('div');
             div1.classList = ['col-lg-6 align-left'];
@@ -904,7 +903,6 @@ export const addEventDataGovernanceNavBar = (bool) => {
             divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
-            confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(divRow);
             dataGovernanceProjects();
@@ -919,16 +917,10 @@ export const addEventDataGovernanceNavBar = (bool) => {
                                 </button>
                                 ${createProjectModal()}`;
             
-            const notifcationDiv = document.createElement('div');
-            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
-                <div id="showNotification"></div>
-            </div>`;
-            
             const div = document.createElement('div');
             div.classList = ['align-left'];
             div.innerHTML = await dataGovernanceTemplate();
             hideAnimation();
-            confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(div);
             dataGovernanceLazyLoad();
