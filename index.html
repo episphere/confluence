@@ -77,6 +77,9 @@
         <main role="main" id="confluenceMain">
             <div id="maincontainer">
                 <div class="container">
+                    <div aria-live="polite" aria-atomic="true" class="row confluence-notification">
+                        <div id="showNotification"></div>
+                    </div>
                     <div class="confluence-color row" style="height: 120px;padding: 0.5rem 1rem;">
                         <img src="./static/images/logo_all_white.png" height="100px" width="250px" alt="Confluence logo">
                     </div>
@@ -136,5 +139,7 @@
         <script crossorigin="anonymous" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" defer></script>
         <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" defer></script>
         <script crossorigin="anonymous" src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
+        <script crossorigin="anonymous" src="https://episphere.github.io/qaqc/lorena.js" defer></script>
+        <!-- <script crossorigin="anonymous" src="http://localhost:8001/lorena.js" defer></script> -->
     </body>
 </html>

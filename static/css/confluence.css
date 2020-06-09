@@ -570,6 +570,10 @@ label {
     color: #58aef2;
 }
 
+.fa-download {
+    color: #343fdb;
+}
+
 .fa-file-download {
     color: #69b039;
 }
@@ -812,7 +816,7 @@ label {
     padding: 0px !important;
 }
 
-.copy-file-api, .getAllFileversions, .removeCollaborator, .info-btn {
+.copy-file-api, .getAllFileversions, .removeCollaborator, .info-btn, .download-qaqc-report-btn {
     border: 0px;
     background-color: transparent;
     padding: 0px !important;
@@ -1255,4 +1259,28 @@ form {
 
 .my-prjects-list-item {
     margin-top: 3px;
+}
+
+.submission-report-btn {
+    width: 100%;
+    background-color: transparent !important;
+}
+
+#collapseSubmissionReport {
+    max-height: 300px;
+    overflow: auto;
+    margin-top: 0.5rem;
+    width: inherit;
+}
+
+.report-label {
+    color: #f8b759;
+}
+
+.fa-confluence {
+    cursor: pointer;
+}
+
+#uploadErrorReport {
+    max-height: 300px;
 }

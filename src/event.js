@@ -308,7 +308,7 @@ export const addEventConsortiaSelect = () => {
         let entries = (await getFolderItems(value)).entries;
         
         // check if study document exists
-        const documentExists = entries.filter(dt => dt.name === 'Confluence data from studies');
+        const documentExists = entries.filter(dt => dt.name.trim().toLowerCase() === 'confluence data from studies');
         if(documentExists.length === 1){
             entries = (await getFolderItems(documentExists[0].id)).entries;
         }
@@ -332,25 +332,6 @@ export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const consortia = document.getElementById('selectConsortiaUIS');
-        const consortiaId = consortia.value;
-        const consortiaText = consortia.options[consortia.selectedIndex].text;
-        const study = document.getElementById('selectStudyUIS');
-        const newStudyName = document.getElementById('newStudyName');
-        let studyId;
-        let studyName = '';
-        if(study){
-            studyId = study.value;
-            studyName = study.options[study.selectedIndex].text;
-        }
-        else if (newStudyName) {
-            const response = await createFolder(consortiaId, newStudyName.value);
-            if(response.status !== 201 ) return
-            const data = await response.json();
-            studyId = data.id;
-            studyName = newStudyName.value;
-        }
-
         const file = document.getElementById('uploadDataUIS').files[0]; 
         const fileName = file.name;
         const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
@@ -358,31 +339,54 @@ export const addEventUploadStudyForm = () => {
             alert('File type not supported!');
             return;
         }
+        const consortia = document.getElementById('selectConsortiaUIS');
+        const consortiaText = consortia.options[consortia.selectedIndex].text;
+        const study = document.getElementById('selectStudyUIS');
+        const newStudyName = document.getElementById('newStudyName');
+        const studyName = newStudyName ? newStudyName.value : study.options[study.selectedIndex].text;
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
-            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...`;
-            const dataEntries = (await getFolderItems(studyId)).entries;
-            if(dataEntries.length === 0) {
-                await createFolder(studyId, 'Core Data');
-                await createFolder(studyId, 'Pathology Data');
-                await createFolder(studyId, 'Risk Factor Data');
-                await createFolder(studyId, 'Survival and Treatment Data');
-            }
+            document.getElementById('submitBtn').classList.add('btn-disbaled');
+            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
             
-
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
-                // TO DO: QC
-                separateData(textFromFileLoaded, studyId, fileName);
+                
+                performQAQC(textFromFileLoaded, fileName);
             };
-
             fileReader.readAsText(file, "UTF-8");
         }
     })
 }
 
-const separateData = async (textFromFileLoaded, studyId, fileName) => {
+const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
+    const consortia = document.getElementById('selectConsortiaUIS');
+    const consortiaId = consortia.value;
+    const study = document.getElementById('selectStudyUIS');
+    const newStudyName = document.getElementById('newStudyName');
+    let studyId;
+    if(study){
+        studyId = study.value;
+    }
+    else if (newStudyName) {
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating new study...`;
+        const entries = (await getFolderItems(consortiaId)).entries;
+        const studyFolders = entries.filter(dt => dt.type === 'folder' && dt.name.trim().toLowerCase() === 'confluence data from studies');
+        const response = await createFolder(`${studyFolders.length === 0 ? consortiaId : studyFolders[0].id}`, newStudyName.value);
+        if(response.status !== 201 ) return
+        const data = await response.json();
+        studyId = data.id;
+    }
+    const dataEntries = (await getFolderItems(studyId)).entries;
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking folders...`;
+    let logFolderID = '', cDataFolderID = '', pDataFolderID = '', rfDataFolderID = '', stDataFolderID = '';
+    logFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Submission_Logs');
+    cDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Core Data');
+    pDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Pathology Data');
+    rfDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Risk Factor Data');
+    stDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Survival and Treatment Data');
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Separating data...`;
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
@@ -412,7 +416,6 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         let stObj = {};
 
         for(const key in data){
-
             if(core.indexOf(key.toLowerCase()) !== -1){
                 cObj[key] = data[key];
             }
@@ -435,26 +438,190 @@ const separateData = async (textFromFileLoaded, studyId, fileName) => {
         if(Object.keys(rfObj).length > 0) rfData.push(rfObj);
         if(Object.keys(stObj).length > 0) stData.push(stObj);
     });
-
-    const dataFolders = (await getFolderItems(studyId)).entries;
-    for(const obj of dataFolders){
-        if(obj.name === 'Core Data'){
-            await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Pathology Data'){
-            await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Risk Factor Data'){
-            await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, obj.id);
-        }
-
-        if(obj.name === 'Survival and Treatment Data'){
-            await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, obj.id);
-        }
+    // Upload Data
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
+    const showNotification = document.getElementById('showNotification');
+    const response1 = await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
+    if(response1.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        addEventHideNotification();
+        replaceBtns();
+        return;
     }
+    const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
+    if(response2.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        addEventHideNotification();
+        replaceBtns();
+        return;
+    }
+    const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
+    if(response3.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        addEventHideNotification();
+        replaceBtns();
+        return;
+    }
+    const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
+    if(response4.status === 409) {
+        top = top+2;
+        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
+        showNotification.innerHTML = template;
+        addEventHideNotification();
+        replaceBtns();
+        return;
+    }
+
+    // Upload Submission logs
+    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
+    const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
+    await uploadFile(elHtml, qaqcFileName, logFolderID, true)
+    
     location.reload();
+}
+
+const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
+    const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
+    let ID = '';
+    if(folderExists.length === 0) {
+        ID = (await (await createFolder(studyId, folderName)).json()).id;
+    }
+    else {
+        ID = folderExists[0].id;
+    }
+    return ID;
+}
+
+const performQAQC = async (textFromFileLoaded, fileName) => {
+    document.getElementById('uploadErrorReport').innerHTML = `
+        <div id="qaqcSubmissionReport" class="qaqc-submission-report">
+            ${runQAQC(dataForQAQC(textFromFileLoaded))}
+        </div>
+    `;
+    
+    const submitBtn = document.getElementById('submitBtn');
+    
+    const newBtn = document.createElement('button');
+    newBtn.id = "continueSubmission";
+    newBtn.classList = ["btn btn-light sub-div-shadow"];
+    newBtn.title = "Continue Submission";
+    newBtn.innerHTML = 'Continue';
+    newBtn.type = "button";
+
+    const downloadAndClose = document.createElement('button');
+    downloadAndClose.classList = ['btn btn-dark sub-div-shadow'];
+    downloadAndClose.id = 'downloadQAQCReport';
+    downloadAndClose.title = 'Download Report and Close';
+    downloadAndClose.innerHTML = 'Download Report and Close';
+    newBtn.type = 'button';
+
+    const closeBtn = submitBtn.parentNode.querySelectorAll('[data-dismiss="modal"]')[0];
+    closeBtn.parentNode.replaceChild(downloadAndClose, closeBtn)
+    submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+    
+    const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toISOString()}.html`
+    addEventDownloadQAQCReport(fileNameQAQC);
+    addEventContinueSubmission(fileNameQAQC, textFromFileLoaded, fileName);
+}
+
+const addEventDownloadQAQCReport = (fileName) => {
+    const element = document.getElementById('downloadQAQCReport');
+    element.addEventListener('click', () => {
+        const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
+        const link = document.createElement('a');
+        const mimeType = 'text/html';
+
+        link.setAttribute('download', fileName);
+        link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(elHtml));
+        link.click();
+
+        replaceBtns();
+        document.getElementById('uploadInStudy').querySelectorAll('.close.modal-close-btn')[0].click();
+    });
+}
+
+const replaceBtns = () => {
+    const element = document.getElementById('downloadQAQCReport');
+    const closeBtn = document.createElement('button');
+    closeBtn.classList = ['btn btn-dark sub-div-shadow'];
+    closeBtn.title = 'Close';
+    closeBtn.innerHTML = 'Close';
+    closeBtn.type = 'button';
+    closeBtn.dataset.dismiss = 'modal';
+
+    element.parentNode.replaceChild(closeBtn, element);
+
+    const continueBtn = document.getElementById('continueSubmission');
+    const submitBtn = document.createElement('button');
+    submitBtn.classList = ['btn btn-light sub-div-shadow'];
+    submitBtn.id = 'submitBtn';
+    submitBtn.title = 'Submit';
+    submitBtn.innerHTML = 'Submit';
+    submitBtn.type = 'Submit';
+
+    continueBtn.parentNode.replaceChild(submitBtn, continueBtn);
+}
+
+const addEventContinueSubmission = (qaqcFileName, textFromFileLoaded, fileName) => {
+    const element = document.getElementById('continueSubmission');
+    element.addEventListener('click', async () => {
+        element.classList.add('btn-disbaled');
+        separateData(qaqcFileName, textFromFileLoaded, fileName);
+    });
+}
+
+const dataForQAQC = (txt) => {
+    let data = {};
+    if(txt.slice(0,1)=='['){txt='{'+txt+'}'}
+    if(txt.slice(0,1)=='{'){
+        data = JSON.parse(txt);
+        return data
+    }else{
+        let arr =txt.split(/[\r\n]+/g).map(row=>{  // data array
+            //if(row[0]=='    '){row='undefined   '+row}
+            return row.split(/[,\t]/g) // split csv and tsv alike
+        })
+        if(arr.slice(-1).toLocaleString()==""){arr.pop()}
+        const labels = arr[0]
+        labels.forEach((label) => {
+            data[label] = []
+        })
+        arr.slice(1).forEach((row,i) => {
+            labels.forEach((label,j) => {
+                data[label][i]=row[j]
+            })
+        })
+        labels.forEach(label => {
+            data[label] = numberType(data[label])
+        })
+        return data;
+    }
+}
+
+const numberType = aa => { // try to fit numeric typing
+    let tp='number'
+    aa.forEach(a=>{
+        if(!((a==parseFloat(a))||(a=='undefined')||(a==''))){
+            tp='string'
+        }
+    })
+    if(tp=='number'){
+        aa=aa.map(a=>{
+            if(a=='undefined'||a==''){
+                a=undefined
+            }else{
+                a=parseFloat(a)
+            }
+            return a
+        })
+    }
+    return aa
 }
 
 export const formSubmit = () => {
@@ -723,11 +890,6 @@ export const addEventDataGovernanceNavBar = (bool) => {
             const divRow = document.createElement('div');
             divRow.classList = ['row'];
             divRow.id = 'dataGovernanceMain'
-    
-            const notifcationDiv = document.createElement('div');
-            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
-                <div id="showNotification"></div>
-            </div>`;
             
             const div1 = document.createElement('div');
             div1.classList = ['col-lg-6 align-left'];
@@ -741,7 +903,6 @@ export const addEventDataGovernanceNavBar = (bool) => {
             divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
-            confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(divRow);
             dataGovernanceProjects();
@@ -756,16 +917,10 @@ export const addEventDataGovernanceNavBar = (bool) => {
                                 </button>
                                 ${createProjectModal()}`;
             
-            const notifcationDiv = document.createElement('div');
-            notifcationDiv.innerHTML = `<div aria-live="polite" aria-atomic="true" class="row confluence-notification">
-                <div id="showNotification"></div>
-            </div>`;
-            
             const div = document.createElement('div');
             div.classList = ['align-left'];
             div.innerHTML = await dataGovernanceTemplate();
             hideAnimation();
-            confluenceDiv.appendChild(notifcationDiv);
             confluenceDiv.appendChild(btnDiv);
             confluenceDiv.appendChild(div);
             dataGovernanceLazyLoad();
@@ -878,7 +1033,7 @@ const addEventCPCSelect = () => {
         let response = await getFolderItems(ID);
         if(response.entries.length === 0) return;
         // check if study document exists
-        const documentExists = response.entries.filter(dt => dt.name === 'Confluence data from studies');
+        const documentExists = response.entries.filter(dt => dt.name.trim().toLowerCase() === 'confluence data from studies');
         if(documentExists.length === 1){
             response = (await getFolderItems(documentExists[0].id));
         }
