@@ -1,109 +1,227 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
+import { variables } from '../variables.js';
 
 export const template = () => {
     return `
         <div class="main-summary-row data-exploration-div">
-            <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
+            <div class="main-summary-row statistics-row">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#data_exploration/missing"><strong>Missingness statistics</strong></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-summary-row" id="dataSummaryStatistics"></div>
+    `;
+}
 
-            <div class="main-summary-row">
-                <div class="col-xl-2 margin-bottom">
+export const dataSummaryStatisticsTemplate = () => `
+    <div class="col-xl-2 margin-bottom">
+        <div class="card sub-div-shadow">
+            <div class="card-header">
+                <strong class="side-panel-header">Studies 
+                    <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
+                </strong>
+            </div>
+            <div id="cardContent" class="card-body">
+                <div id="genderFilter" class="align-left"></div>
+                <div id="chipContent" class="align-left"></div>
+                <div id="studyFilter" class="align-left"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-10">
+        <div class="main-summary-row">
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv7">
                     <div class="card sub-div-shadow">
                         <div class="card-header">
-                            <strong class="side-panel-header">Studies 
-                                <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
-                            </strong>
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                         </div>
-                        <div id="cardContent" class="card-body">
-                            <div id="genderFilter" class="align-left"></div>
-                            <div id="chipContent" class="align-left"></div>
-                            <div id="studyFilter" class="align-left"></div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-10">
-                    <div class="main-summary-row">
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv7">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv2">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                         </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv2">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv5">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
                         </div>
                     </div>
-                    <div class="main-summary-row">
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv3">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv5">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
                         </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv6">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv4">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    `;  
+        <div class="main-summary-row">
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv3">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv6">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv4">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`
+
+export const dataSummaryMissingTemplate = async () => {
+    const response = await getFile('653087731560');
+    const data = csv2Json(response);
+    let template = ''
+    let acceptedVariables = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available'];
+    acceptedVariables = acceptedVariables.sort();
+    if(data.length > 0){
+        template += '<table class="table table-hover table-borderless"><thead>';
+        const headerCount = computeHeader(data, acceptedVariables);
+        template += `<tr><th></th>`
+        for(let variable in headerCount) {
+            template += `<th>${headerCount[variable]}</th>`
+        }
+        template += `<th></th></tr><tr><td></td>`;
+        for(let variable in headerCount) {
+            template += `<th>${variable.replace('_Data available', '')}</th>`
+        }
+        template += '<th></th></tr></thead><tbody>';
+        
+        let degree1 = {};
+        
+        template += `<tr><td>No set</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>${computeSet0(data, acceptedVariables)}</td></tr>`;
+        // const result = computeDegree1(data, acceptedVariables);
+        const result = computeSets(data, acceptedVariables);
+        let variableDisplayed = {};
+        for(let key in result) {
+            const allVariables = key.split('@#$');
+            const firstVar = key.split('@#$')[0];
+            template += '<tr>';
+            if(variableDisplayed[firstVar] === undefined) {
+                template += `<td>${firstVar.replace('_Data available', '')}</td>`;
+                variableDisplayed[firstVar] = '';
+            }else {
+                template += '<td></td>'
+            }
+            acceptedVariables.forEach((variable, index) => {
+                if(variable === firstVar) {
+                    template += '<td>&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) !== -1){
+                    template += '<td>&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) === -1){
+                    template += '<td>&#9898</td>'
+                }
+                if(index === acceptedVariables.length - 1) {
+                    template += `<td>${result[key]}</td>`
+                }
+            });
+            template += '</tr>';
+        }
+        
+        template += '<tbody></table>';
+    }
+    hideAnimation();
+    document.getElementById('dataSummaryStatistics').innerHTML = template;
+}
+
+const computeSets = (data, acceptedVariables) => {
+    let obj = {};
+    const allCombinations = getCombinations(acceptedVariables);
+    allCombinations.forEach(combination => {
+        const setLength = setLengths(data, combination.split('@#$'));
+        if(setLength > 0) {
+            obj[combination] = setLength;
+        }
+    });
+    return obj;
+}
+
+const setLengths = (data, arr) => {
+    arr.forEach(variable => {
+        if(variable) {
+            data = data.filter(dt => dt[variable] === '1');
+        }
+    });
+    return data.length
+}
+
+const getCombinations = (chars) => {
+    const result = [];
+    const f = (prefix, chars) => {
+        for (var i = 0; i < chars.length; i++) {
+            const str = `${prefix}${prefix ? '@#$': ''}${chars[i]}`;
+            result.push(str);
+            f(str, chars.slice(i + 1));
+        }
+    }
+    f('', chars);
+    return result;
+}
+
+const computeHeader = (data, acceptedVariables) => {
+    let obj = {};
+    acceptedVariables.forEach(variable => {
+        obj[variable] = data.filter(dt => dt[variable] === '1').length;
+    });
+    return obj;
+}
+
+const computeSet0 = (data, acceptedVariables) => {
+    acceptedVariables.forEach(variable => {
+        data = data.filter(dt => dt[variable] === '0');
+    });
+    return data.length
 }
 
 const dataBinning = async () => {

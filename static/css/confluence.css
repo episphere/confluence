@@ -1294,3 +1294,7 @@ form {
 #uploadErrorReport {
     max-height: 300px;
 }
+
+.statistics-row {
+    margin-bottom: 1rem;
+}
