@@ -146,7 +146,6 @@ const addEventMissingnessVariableChange = (data, headers) => {
         });
         showAnimation();
         midset(data, selectedVariables, headers);
-        hideAnimation();
     });
 }
 
@@ -157,7 +156,7 @@ const renderFilter = (data, acceptedVariables, headers) => {
                     <label for="dataMissingnessVariables">Multiple select variable</label>
                     <select multiple class="form-control" id="dataMissingnessVariables">`
     headers.forEach(variable => {
-        template += `<option ${acceptedVariables.indexOf(variable) !== -1 ? 'selected': ''} value="${variable}">${variable}</option>`
+        template += `<option ${acceptedVariables.indexOf(variable) !== -1 ? 'selected': ''} value="${variable}">${variable.replace('_Data available', '')}</option>`
     });
     template += '</select></div></div>'
     document.getElementById('missingnessFilter').innerHTML = template;
