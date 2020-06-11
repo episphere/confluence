@@ -165,10 +165,11 @@ const renderFilter = (data, acceptedVariables, headers) => {
 
 const midset = (data, acceptedVariables) => {
     let template = '';
-    
+    let plotData = '';
     if(data.length > 0){
         template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead>';
         const headerCount = computeHeader(data, acceptedVariables);
+        const result = computeSets(data, acceptedVariables);
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
             template += `<th class="missing-column">${headerCount[variable]}</th>`
@@ -177,14 +178,16 @@ const midset = (data, acceptedVariables) => {
         for(let variable in headerCount) {
             template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th class="missing-column"></th></tr></thead><tbody><tr><td class="missing-column">No set</td>';
-        
+        template += '<th></th></tr></thead><tbody><tr><td class="missing-column">No set</td>';
+        const set0 =computeSet0(data, acceptedVariables);
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
-            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${computeSet0(data, acceptedVariables)}</td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 1}"></td>`;
         });
         template += '</tr>';
-        const result = computeSets(data, acceptedVariables);
+        plotData = Object.values(result);
+        plotData.unshift(set0);
+
         let variableDisplayed = {};
         for(let key in result) {
             const allVariables = key.split('@#$');
@@ -217,6 +220,46 @@ const midset = (data, acceptedVariables) => {
     }
     hideAnimation();
     document.getElementById('missingnessTable').innerHTML = template;
+    renderMidsetPlot(plotData.reverse(), 'midsetChart');
+}
+
+const renderMidsetPlot = (x, id) => {
+    const data = [{
+        type: 'bar',
+        x: x,
+        hoverinfo: 'x',
+        orientation: 'h',
+        marker: {
+            color: '#ef71a8'
+        }
+    }];
+
+    const layout = {
+        yaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+        }
+    }
+
+    const options = {
+        responsive: true, 
+        displayModeBar: false
+    }
+    Plotly.newPlot(id, data, layout, options);
 }
 
 const computeSets = (data, acceptedVariables) => {

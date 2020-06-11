@@ -1300,9 +1300,14 @@ form {
 }
 
 .missing-column {
-    padding: 2px !important;
+    padding: 2px 2px 2px 2px !important;
 }
 
 .missingness-table {
     font-size: 0.8rem;
+}
+
+#midsetChart {
+    min-width: 100%;
+    padding: 0px !important;
 }
