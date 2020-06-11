@@ -1298,3 +1298,11 @@ form {
 .statistics-row {
     margin-bottom: 1rem;
 }
+
+.missing-column {
+    padding: 2px !important;
+}
+
+.missingness-table {
+    font-size: 0.8rem;
+}

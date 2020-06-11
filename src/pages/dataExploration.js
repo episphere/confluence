@@ -124,21 +124,21 @@ export const dataSummaryMissingTemplate = async () => {
     let acceptedVariables = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available'];
     acceptedVariables = acceptedVariables.sort();
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless"><thead>';
+        template += '<table class="table table-hover table-borderless missingness-table"><thead>';
         const headerCount = computeHeader(data, acceptedVariables);
-        template += `<tr><th></th>`
+        template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
-            template += `<th>${headerCount[variable]}</th>`
+            template += `<th class="missing-column">${headerCount[variable]}</th>`
         }
-        template += `<th></th></tr><tr><td></td>`;
+        template += `<th class="missing-column"></th></tr><tr><td class="missing-column"></td>`;
         for(let variable in headerCount) {
-            template += `<th>${variable.replace('_Data available', '')}</th>`
+            template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th></th></tr></thead><tbody>';
+        template += '<th class="missing-column"></th></tr></thead><tbody>';
         
         let degree1 = {};
         
-        template += `<tr><td>No set</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>&#9898</td><td>${computeSet0(data, acceptedVariables)}</td></tr>`;
+        template += `<tr><td class="missing-column">No set</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">${computeSet0(data, acceptedVariables)}</td></tr>`;
         // const result = computeDegree1(data, acceptedVariables);
         const result = computeSets(data, acceptedVariables);
         let variableDisplayed = {};
@@ -147,23 +147,23 @@ export const dataSummaryMissingTemplate = async () => {
             const firstVar = key.split('@#$')[0];
             template += '<tr>';
             if(variableDisplayed[firstVar] === undefined) {
-                template += `<td>${firstVar.replace('_Data available', '')}</td>`;
+                template += `<td class="missing-column">${firstVar.replace('_Data available', '')}</td>`;
                 variableDisplayed[firstVar] = '';
             }else {
-                template += '<td></td>'
+                template += '<td class="missing-column"></td>'
             }
             acceptedVariables.forEach((variable, index) => {
                 if(variable === firstVar) {
-                    template += '<td>&#9899</td>'
+                    template += '<td class="missing-column">&#9899</td>'
                 }
                 else if(variable !== firstVar && allVariables.indexOf(variable) !== -1){
-                    template += '<td>&#9899</td>'
+                    template += '<td class="missing-column">&#9899</td>'
                 }
                 else if(variable !== firstVar && allVariables.indexOf(variable) === -1){
-                    template += '<td>&#9898</td>'
+                    template += '<td class="missing-column">&#9898</td>'
                 }
                 if(index === acceptedVariables.length - 1) {
-                    template += `<td>${result[key]}</td>`
+                    template += `<td class="missing-column">${result[key]}</td>`
                 }
             });
             template += '</tr>';
