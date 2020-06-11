@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
@@ -119,12 +119,56 @@ export const dataSummaryStatisticsTemplate = () => `
 
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile('653087731560');
-    const data = csv2Json(response);
-    let template = ''
-    let acceptedVariables = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available'];
-    acceptedVariables = acceptedVariables.sort();
+    const {data, headers} = csv2Json(response);
+    
+    const div1 = document.createElement('div');
+    div1.classList = ['main-summary-row'];
+    div1.id = 'missingnessFilter';
+
+    const div2 = document.createElement('div');
+    div2.classList = ['main-summary-row'];
+    div2.id = 'missingnessTable';
+
+    document.getElementById('dataSummaryStatistics').appendChild(div1);
+    document.getElementById('dataSummaryStatistics').appendChild(div2);
+
+    const initialSelection = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available']
+    renderFilter(data, initialSelection.sort(), headers.sort());
+    midset(data, initialSelection.sort());
+}
+
+const addEventMissingnessVariableChange = (data, headers) => {
+    const select = document.getElementById('dataMissingnessVariables');
+    select.addEventListener('change', () => {
+        const selectedVariables = [];
+        Array.from(select.options).forEach(option => {
+            if(option.selected) selectedVariables.push(option.value)
+        });
+        showAnimation();
+        midset(data, selectedVariables, headers);
+        hideAnimation();
+    });
+}
+
+const renderFilter = (data, acceptedVariables, headers) => {
+    let template = '';
+    template += '<div class="main-summary-row">'
+    template += `<div class="form-group">
+                    <label for="dataMissingnessVariables">Multiple select variable</label>
+                    <select multiple class="form-control" id="dataMissingnessVariables">`
+    headers.forEach(variable => {
+        template += `<option ${acceptedVariables.indexOf(variable) !== -1 ? 'selected': ''} value="${variable}">${variable}</option>`
+    });
+    template += '</select></div></div>'
+    document.getElementById('missingnessFilter').innerHTML = template;
+    addEventMissingnessVariableChange(data, headers);
+}
+
+const midset = (data, acceptedVariables) => {
+    let template = '';
+    
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless missingness-table"><thead>';
+        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead>';
         const headerCount = computeHeader(data, acceptedVariables);
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
@@ -134,12 +178,13 @@ export const dataSummaryMissingTemplate = async () => {
         for(let variable in headerCount) {
             template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th class="missing-column"></th></tr></thead><tbody>';
+        template += '<th class="missing-column"></th></tr></thead><tbody><tr><td class="missing-column">No set</td>';
         
-        let degree1 = {};
-        
-        template += `<tr><td class="missing-column">No set</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">&#9898</td><td class="missing-column">${computeSet0(data, acceptedVariables)}</td></tr>`;
-        // const result = computeDegree1(data, acceptedVariables);
+        acceptedVariables.forEach((variable, index) => {
+            template += `<td class="missing-column">&#9898</td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${computeSet0(data, acceptedVariables)}</td>`;
+        });
+        template += '</tr>';
         const result = computeSets(data, acceptedVariables);
         let variableDisplayed = {};
         for(let key in result) {
@@ -172,7 +217,7 @@ export const dataSummaryMissingTemplate = async () => {
         template += '<tbody></table>';
     }
     hideAnimation();
-    document.getElementById('dataSummaryStatistics').innerHTML = template;
+    document.getElementById('missingnessTable').innerHTML = template;
 }
 
 const computeSets = (data, acceptedVariables) => {

@@ -942,5 +942,5 @@ export const csv2Json = (csv) => {
         }
         if(Object.keys(obj).length > 0) result.push(obj);
     }
-    return result;
+    return {data:result, headers};
 }
