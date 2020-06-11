@@ -1305,9 +1305,9 @@ form {
 
 .missingness-table {
     font-size: 0.8rem;
+    overflow: auto !important;
 }
 
 #midsetChart {
-    min-width: 100%;
     padding: 0px !important;
 }
