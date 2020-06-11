@@ -235,6 +235,9 @@ const renderMidsetPlot = (x, id) => {
     }];
 
     const layout = {
+        xaxis: {
+            fixedrange: true
+        },
         yaxis: {
             autorange: true,
             showgrid: false,
@@ -242,7 +245,8 @@ const renderMidsetPlot = (x, id) => {
             showline: false,
             autotick: true,
             ticks: '',
-            showticklabels: false
+            showticklabels: false,
+            fixedrange: true
         },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
