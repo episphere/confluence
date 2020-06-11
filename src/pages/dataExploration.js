@@ -236,6 +236,7 @@ const renderMidsetPlot = (x, id) => {
 
     const layout = {
         xaxis: {
+            showgrid: false,
             fixedrange: true
         },
         yaxis: {
