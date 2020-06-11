@@ -179,7 +179,8 @@ const midset = (data, acceptedVariables) => {
             template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
         }
         template += '<th></th></tr></thead><tbody><tr><td class="missing-column">No set</td>';
-        const set0 =computeSet0(data, acceptedVariables);
+        // const set0 = computeSet0(data, acceptedVariables);
+        const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
             if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 1}"></td>`;
