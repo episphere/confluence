@@ -86,7 +86,6 @@ export const confluence = async () => {
             hideAnimation();
         });
         dataSummaryElement.addEventListener('click', () => {
-            if (dataSummaryElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
@@ -179,7 +178,6 @@ const manageRouter = async () => {
     if(localStorage.parms !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
-    
     if(hash === '#home'){
         const element = document.getElementById('homePage');
         if(!element) return;
