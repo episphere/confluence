@@ -829,7 +829,7 @@ label {
 .filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover,.genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
-    border-radius: 0.5rem !important;
+    border-radius: 0.25rem !important;
 }
 
 .no-list-style {
@@ -838,12 +838,12 @@ label {
 
 .filter-studies {
     margin: 1px 0px;
-    border-radius: 0.5rem !important;
+    border-radius: 0.25rem !important;
 }
 
 .filter-midset-variable {
     margin: 1px 0px !important;
-    border-radius: 0.5rem !important;
+    border-radius: 0.25rem !important;
 }
 
 .filter-list-item {
@@ -857,8 +857,7 @@ label {
 }
 
 .active-filter {
-    background-color: #e7bcbc;
-    border-radius: 0.5rem;
+    background-color: #e7bcbc !important;
 }
 
 .custom-borders {
