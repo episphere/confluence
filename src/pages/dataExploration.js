@@ -26,7 +26,7 @@ export const dataSummaryStatisticsTemplate = () => `
     <div class="col-xl-2 margin-bottom">
         <div class="card sub-div-shadow">
             <div class="card-header">
-                <strong class="side-panel-header">Studies 
+                <strong class="side-panel-header">Filter 
                     <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
                 </strong>
             </div>
@@ -122,11 +122,11 @@ export const dataSummaryMissingTemplate = async () => {
     const {data, headers} = csv2Json(response);
     
     const div1 = document.createElement('div');
-    div1.classList = ['main-summary-row'];
+    div1.classList = ['col-lg-2'];
     div1.id = 'missingnessFilter';
 
     const div2 = document.createElement('div');
-    div2.classList = ['main-summary-row'];
+    div2.classList = ['col-lg-10'];
     div2.id = 'missingnessTable';
 
     document.getElementById('dataSummaryStatistics').appendChild(div1);
@@ -137,30 +137,50 @@ export const dataSummaryMissingTemplate = async () => {
     midset(data, initialSelection.sort());
 }
 
-const addEventMissingnessVariableChange = (data, headers) => {
-    const select = document.getElementById('dataMissingnessVariables');
-    select.addEventListener('change', () => {
-        const selectedVariables = [];
-        Array.from(select.options).forEach(option => {
-            if(option.selected) selectedVariables.push(option.value)
-        });
-        showAnimation();
-        midset(data, selectedVariables, headers);
-    });
-}
-
 const renderFilter = (data, acceptedVariables, headers) => {
     let template = '';
-    template += '<div class="main-summary-row">'
-    template += `<div class="form-group">
-                    <label for="dataMissingnessVariables">Multiple select variable</label>
-                    <select multiple class="form-control" id="dataMissingnessVariables">`
-    headers.forEach(variable => {
-        template += `<option ${acceptedVariables.indexOf(variable) !== -1 ? 'selected': ''} value="${variable}">${variable.replace('_Data available', '')}</option>`
-    });
-    template += '</select></div></div>'
+    template += `
+    <div class="card sub-div-shadow">
+        <div class="card-header">
+            <strong class="side-panel-header">Filter</strong>
+        </div>
+        <div class="card-body">
+            <div id="midsetVariables" class="align-left"></div>
+        </div>
+    </div>
+    `
     document.getElementById('missingnessFilter').innerHTML = template;
-    addEventMissingnessVariableChange(data, headers);
+    renderMidsetVariables(data, acceptedVariables, headers);
+}
+
+const renderMidsetVariables = (data, acceptedVariables, headers) => {
+    let template = '';
+    template += `<ul class="remove-padding-left">`;
+    headers.forEach(variable => {
+        template += `<li class="filter-list-item">
+                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" data-variable="${variable}">
+                            <div class="variable-name">${variable.replace('_Data available', '')}</div>
+                        </button>
+                    </li>`;
+    });
+    template += `</ul>`;
+    document.getElementById('midsetVariables').innerHTML = template;
+    addEventFilterMidset(data, headers);
+}
+
+const addEventFilterMidset = (data, headers) => {
+    const elements = document.getElementsByClassName('filter-midset-variable');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
+            else element.classList.add('active-filter');
+            const selections = [];
+            const cardBody = document.getElementById('midsetVariables');
+            const variables = cardBody.querySelectorAll('.active-filter');
+            Array.from(variables).forEach(el => selections.push(el.dataset.variable));
+            midset(data, selections, headers);
+        });
+    });
 }
 
 const midset = (data, acceptedVariables) => {
@@ -320,7 +340,9 @@ const renderMidsetPlot = (x, id) => {
 
     const options = {
         responsive: true, 
-        displayModeBar: false
+        displayModeBar: false,
+        useResizeHandler: true,
+        style: {width: "100%", height: "100%"}
     }
     Plotly.newPlot(id, data, layout, options);
 }

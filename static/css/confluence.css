@@ -826,7 +826,7 @@ label {
     color: #ffffff;
 }
 
-.filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
+.filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover,.genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
     border-radius: 0.5rem !important;
@@ -841,11 +841,16 @@ label {
     border-radius: 0.5rem !important;
 }
 
+.filter-midset-variable {
+    margin: 1px 0px !important;
+    border-radius: 0.5rem !important;
+}
+
 .filter-list-item {
     padding: 0px 5px !important;
 }
 
-.filter-studies-btn {
+.filter-studies-btn, .filter-midset-variable-btn {
     border: 0px;
     width: 100% !important;
     background-color: #ffffff;
@@ -884,7 +889,7 @@ label {
     font-weight: bold;
 }
 
-.consortia-name, .study-name {
+.consortia-name, .study-name, .variable-name {
     margin: 0.125rem 0;
 }
 
