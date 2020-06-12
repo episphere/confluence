@@ -1323,3 +1323,7 @@ form {
     height: 120px;
     padding: 0px 0px 0px 25px !important;
 }
+
+.set-label {
+    font-weight: bold;
+}

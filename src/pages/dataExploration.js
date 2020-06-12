@@ -182,7 +182,7 @@ const midset = (data, acceptedVariables) => {
         for(let variable in headerCount) {
             template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th></th></tr></thead><tbody><tr><td class="missing-column">No set</td>';
+        template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">No set</td>';
         // const set0 = computeSet0(data, acceptedVariables);
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
@@ -199,7 +199,7 @@ const midset = (data, acceptedVariables) => {
             const firstVar = key.split('@#$')[0];
             template += '<tr>';
             if(variableDisplayed[firstVar] === undefined) {
-                template += `<td class="missing-column">${firstVar.replace('_Data available', '')}</td>`;
+                template += `<td class="missing-column set-label">${firstVar.replace('_Data available', '')}</td>`;
                 variableDisplayed[firstVar] = '';
             }else {
                 template += '<td class="missing-column"></td>'
