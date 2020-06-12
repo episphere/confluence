@@ -140,7 +140,7 @@ export const dataSummaryMissingTemplate = async () => {
 const renderFilter = (data, acceptedVariables, headers) => {
     let template = '';
     template += `
-    <div class="card sub-div-shadow">
+    <div class="card sub-div-shadow" id="midsetFilterCard">
         <div class="card-header">
             <strong class="side-panel-header">Filter</strong>
         </div>

@@ -1332,3 +1332,8 @@ form {
 .set-label {
     font-weight: bold;
 }
+
+#midsetFilterCard {
+    max-height: 600px;
+    overflow: auto;
+}
