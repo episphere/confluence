@@ -346,16 +346,16 @@ const setLengths = (data, arr) => {
     return data.length
 }
 
-const getCombinations = (chars) => {
+const getCombinations = (array) => {
     const result = [];
-    const f = (prefix, chars) => {
-        for (var i = 0; i < chars.length; i++) {
-            const str = `${prefix}${prefix ? '@#$': ''}${chars[i]}`;
+    const sets = (prefix, array) => {
+        for (var i = 0; i < array.length; i++) {
+            const str = `${prefix}${prefix ? '@#$': ''}${array[i]}`;
             result.push(str);
-            f(str, chars.slice(i + 1));
+            sets(str, array.slice(i + 1));
         }
     }
-    f('', chars);
+    sets('', array);
     return result;
 }
 
