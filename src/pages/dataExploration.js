@@ -196,11 +196,11 @@ const midset = (data, acceptedVariables) => {
         
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
-            template += `<th class="missing-column">${headerCount[variable]}</th>`
+            template += `<th class="missing-column cell-equal-width">${headerCount[variable]}</th>`
         }
         template += `<th class="missing-column"></th></tr><tr><td class="missing-column"></td>`;
         for(let variable in headerCount) {
-            template += `<th class="missing-column">${variable.replace('_Data available', '')}</th>`
+            template += `<th class="missing-column cell-equal-width">${variable.replace('_Data available', '')}</th>`
         }
         template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">No set</td>';
         // const set0 = computeSet0(data, acceptedVariables);
