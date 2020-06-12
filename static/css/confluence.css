@@ -1331,6 +1331,7 @@ form {
 
 .set-label {
     font-weight: bold;
+    text-align: left;
 }
 
 #midsetFilterCard {
