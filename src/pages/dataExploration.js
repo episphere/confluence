@@ -188,7 +188,7 @@ const midset = (data, acceptedVariables) => {
     let plotData = '';
     let headerData = '';
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
+        template += '<table class="table table-hover table-borderless missingness-table table-striped sub-div-shadow"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
         headerData = headerCount;
         const result = computeSets(data, acceptedVariables);

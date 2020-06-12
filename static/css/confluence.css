@@ -1311,13 +1311,15 @@ form {
 .missingness-table {
     font-size: 0.8rem;
     overflow: auto !important;
-    margin-top: 1rem;
+    background-color: #ffffff;
+    border-radius: 0.25rem;
 }
 
 #midsetChart {
     padding: 0px !important;
     height: 100%;
     width: 100%;
+    background-color: #ffffff;
 }
 
 #midsetHeader {
@@ -1334,6 +1336,7 @@ form {
 .set-label {
     font-weight: bold;
     text-align: left;
+    padding-left: 10px !important;
 }
 
 #midsetFilterCard {
