@@ -166,10 +166,14 @@ const renderFilter = (data, acceptedVariables, headers) => {
 const midset = (data, acceptedVariables) => {
     let template = '';
     let plotData = '';
+    let headerData = '';
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead>';
+        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
+        headerData = headerCount;
         const result = computeSets(data, acceptedVariables);
+        template += `<tr class="midset-header"><th class="missing-column"></th><th class='bar-chart-cell' colspan="${Object.keys(headerCount).length}"><div id="midsetHeader"></div></th><th class="missing-column"></th></tr>`
+        
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
             template += `<th class="missing-column">${headerCount[variable]}</th>`
@@ -222,6 +226,58 @@ const midset = (data, acceptedVariables) => {
     hideAnimation();
     document.getElementById('missingnessTable').innerHTML = template;
     renderMidsetPlot(plotData.reverse(), 'midsetChart');
+    renderMidsetHeader(acceptedVariables, Object.values(headerData), 'midsetHeader');
+}
+
+const renderMidsetHeader = (x, y, id) => {
+    x = x.map(dt => dt.replace('_Data available', ''))
+    const data = [{
+        type: 'bar',
+        x,
+        y,
+        marker: {
+            color: '#7F7F7F'
+        }
+    }];
+
+    const layout = {
+        xaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+            fixedrange: true
+        },
+        yaxis: {
+            autorange: true,
+            showgrid: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+            fixedrange: true
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+        }
+    }
+
+    const options = {
+        responsive: true, 
+        displayModeBar: false,
+        useResizeHandler: true,
+        style: {width: "100%", height: "100%"}
+    }
+    Plotly.newPlot(id, data, layout, options);
 }
 
 const renderMidsetPlot = (x, id) => {
@@ -238,6 +294,7 @@ const renderMidsetPlot = (x, id) => {
     const layout = {
         xaxis: {
             showgrid: false,
+            zeroline: false,
             fixedrange: true
         },
         yaxis: {

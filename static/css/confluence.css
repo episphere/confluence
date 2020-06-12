@@ -1306,9 +1306,21 @@ form {
 .missingness-table {
     font-size: 0.8rem;
     overflow: auto !important;
+    margin-top: 1rem;
 }
 
 #midsetChart {
     padding: 0px !important;
     background-color: #ffffff;
+}
+
+#midsetHeader {
+    margin-bottom: 0.25rem;
+    height: 100%;
+    width: 100%;
+}
+
+.bar-chart-cell {
+    height: 120px;
+    padding: 0px 0px 0px 25px !important;
 }
