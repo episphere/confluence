@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -440,42 +440,27 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     });
     // Upload Data
     document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
-    const showNotification = document.getElementById('showNotification');
     const response1 = await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
+    
     if(response1.status === 409) {
-        top = top+2;
-        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
-        showNotification.innerHTML = template;
-        addEventHideNotification();
-        replaceBtns();
-        return;
+        const conflictFileId = response1.json.context_info.conflicts.id;
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        await uploadFileVersion(coreData, conflictFileId);
     }
     const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
     if(response2.status === 409) {
-        top = top+2;
-        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
-        showNotification.innerHTML = template;
-        addEventHideNotification();
-        replaceBtns();
-        return;
+        const conflictFileId = response2.json.context_info.conflicts.id;
+        await uploadFileVersion(coreData, conflictFileId);
     }
     const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
     if(response3.status === 409) {
-        top = top+2;
-        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
-        showNotification.innerHTML = template;
-        addEventHideNotification();
-        replaceBtns();
-        return;
+        const conflictFileId = response3.json.context_info.conflicts.id;
+        await uploadFileVersion(coreData, conflictFileId);
     }
     const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
     if(response4.status === 409) {
-        top = top+2;
-        let template = notificationTemplate(top, `<span class="errorMsg">Submission conflict</span>`, `File with same name already exists!`);
-        showNotification.innerHTML = template;
-        addEventHideNotification();
-        replaceBtns();
-        return;
+        const conflictFileId = response4.json.context_info.conflicts.id;
+        await uploadFileVersion(coreData, conflictFileId);
     }
 
     // Upload Submission logs

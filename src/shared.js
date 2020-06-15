@@ -369,7 +369,43 @@ export const uploadFile = async (data, fileName, folderId, html) => {
             contentType: false
         });
         if(response.status === 401){
-            if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
+            if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId, html);
+        }
+        else if(response.status === 201){
+            return response.json();
+        }
+        else if(response.status === 409) {
+            return {status: response.status, json: await response.json()}
+        }
+        else{
+            return {status: response.status, statusText: response.statusText};
+        };
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId, html);
+    }
+}
+
+export const uploadFileVersion = async (data, fileId, html) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const form = new FormData();
+        let blobData = '';
+        if(html) blobData = new Blob([data], { type: 'text/html'});
+        else blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
+        
+        form.append('file', blobData);
+    
+        let response = await fetch(`https://upload.box.com/api/2.0/files/${fileId}/content`, {
+            method: "POST",
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: form,
+            contentType: false
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await uploadFileVersion(data, fileName, folderId, html);
         }
         else if(response.status === 201){
             return response.json();
@@ -379,7 +415,7 @@ export const uploadFile = async (data, fileName, folderId, html) => {
         };
     }
     catch(err) {
-        if((await refreshToken()) === true) return await uploadFile(data, fileName, folderId);
+        if((await refreshToken()) === true) return await uploadFileVersion(data, fileName, folderId, html);
     }
 }
 
