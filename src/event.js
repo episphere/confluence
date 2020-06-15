@@ -450,17 +450,20 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
     if(response2.status === 409) {
         const conflictFileId = response2.json.context_info.conflicts.id;
-        await uploadFileVersion(coreData, conflictFileId);
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        await uploadFileVersion(pathologyData, conflictFileId);
     }
     const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
     if(response3.status === 409) {
         const conflictFileId = response3.json.context_info.conflicts.id;
-        await uploadFileVersion(coreData, conflictFileId);
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        await uploadFileVersion(rfData, conflictFileId);
     }
     const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
     if(response4.status === 409) {
         const conflictFileId = response4.json.context_info.conflicts.id;
-        await uploadFileVersion(coreData, conflictFileId);
+        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        await uploadFileVersion(stData, conflictFileId);
     }
 
     // Upload Submission logs
