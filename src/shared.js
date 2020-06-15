@@ -405,7 +405,7 @@ export const uploadFileVersion = async (data, fileId, html) => {
             contentType: false
         });
         if(response.status === 401){
-            if((await refreshToken()) === true) return await uploadFileVersion(data, fileName, folderId, html);
+            if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, html);
         }
         else if(response.status === 201){
             return response.json();
@@ -415,7 +415,7 @@ export const uploadFileVersion = async (data, fileId, html) => {
         };
     }
     catch(err) {
-        if((await refreshToken()) === true) return await uploadFileVersion(data, fileName, folderId, html);
+        if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, html);
     }
 }
 
