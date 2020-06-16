@@ -826,10 +826,10 @@ label {
     color: #ffffff;
 }
 
-.filter-studies:hover, .filter-studies:focus, .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
+.filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover,.genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
-    border-radius: 0.5rem !important;
+    border-radius: 0.25rem !important;
 }
 
 .no-list-style {
@@ -838,22 +838,26 @@ label {
 
 .filter-studies {
     margin: 1px 0px;
-    border-radius: 0.5rem !important;
+    border-radius: 0.25rem !important;
+}
+
+.filter-midset-variable {
+    margin: 1px 0px !important;
+    border-radius: 0.25rem !important;
 }
 
 .filter-list-item {
     padding: 0px 5px !important;
 }
 
-.filter-studies-btn {
+.filter-studies-btn, .filter-midset-variable-btn {
     border: 0px;
     width: 100% !important;
     background-color: #ffffff;
 }
 
 .active-filter {
-    background-color: #e7bcbc;
-    border-radius: 0.5rem;
+    background-color: #e7bcbc !important;
 }
 
 .custom-borders {
@@ -884,7 +888,7 @@ label {
     font-weight: bold;
 }
 
-.consortia-name, .study-name {
+.consortia-name, .study-name, .variable-name {
     margin: 0.125rem 0;
 }
 
@@ -1293,4 +1297,52 @@ form {
 
 #uploadErrorReport {
     max-height: 300px;
+}
+
+.statistics-row {
+    margin-bottom: 1rem;
+}
+
+.missing-column {
+    padding: 2px 2px 2px 2px !important;
+}
+
+.missingness-table {
+    font-size: 0.8rem;
+    overflow: auto !important;
+    background-color: #ffffff;
+    border-radius: 0.25rem;
+}
+
+#midsetChart {
+    padding: 0px !important;
+    height: 100%;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+#midsetHeader {
+    margin-bottom: 0.25rem;
+    height: 100%;
+    width: 100%;
+}
+
+.bar-chart-cell {
+    height: 120px;
+    padding: 0px !important;
+}
+
+.set-label {
+    font-weight: bold;
+    text-align: left;
+    padding-left: 10px !important;
+}
+
+#midsetFilterCard {
+    max-height: 600px;
+    overflow: auto;
+}
+
+.cell-equal-width {
+    min-width: 100px;
 }

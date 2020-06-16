@@ -1,109 +1,399 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
+import { variables } from '../variables.js';
 
 export const template = () => {
     return `
         <div class="main-summary-row data-exploration-div">
-            <div class="row chart-interaction-msg" id="chartInteractionMsg"></div>
+            <div class="main-summary-row statistics-row">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#data_exploration/missing"><strong>Missingness statistics</strong></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-summary-row" id="dataSummaryStatistics"></div>
+    `;
+}
 
-            <div class="main-summary-row">
-                <div class="col-xl-2 margin-bottom">
+export const dataSummaryStatisticsTemplate = () => `
+    <div class="col-xl-2 margin-bottom">
+        <div class="card sub-div-shadow">
+            <div class="card-header">
+                <strong class="side-panel-header">Filter 
+                    <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
+                </strong>
+            </div>
+            <div id="cardContent" class="card-body">
+                <div id="genderFilter" class="align-left"></div>
+                <div id="chipContent" class="align-left"></div>
+                <div id="studyFilter" class="align-left"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-10">
+        <div class="main-summary-row">
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv7">
                     <div class="card sub-div-shadow">
                         <div class="card-header">
-                            <strong class="side-panel-header">Studies 
-                                <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
-                            </strong>
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
                         </div>
-                        <div id="cardContent" class="card-body">
-                            <div id="genderFilter" class="align-left"></div>
-                            <div id="chipContent" class="align-left"></div>
-                            <div id="studyFilter" class="align-left"></div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-10">
-                    <div class="main-summary-row">
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv7">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv2">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
                         </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv2">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv5">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
                         </div>
                     </div>
-                    <div class="main-summary-row">
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv3">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv5">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
                         </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv6">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="data-exploration-charts col-xl-4">
-                            <div id="chartDiv4">
-                                <div class="card sub-div-shadow">
-                                    <div class="card-header">
-                                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
-                                    </div>
-                                    <div class="card-body viz-card-body">
-                                        <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    `;  
+        <div class="main-summary-row">
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv3">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv6">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-exploration-charts col-xl-4">
+                <div id="chartDiv4">
+                    <div class="card sub-div-shadow">
+                        <div class="card-header">
+                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
+                        </div>
+                        <div class="card-body viz-card-body">
+                            <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`
+
+export const dataSummaryMissingTemplate = async () => {
+    const response = await getFile('653087731560');
+    const {data, headers} = csv2Json(response);
+    
+    const div1 = document.createElement('div');
+    div1.classList = ['col-lg-2'];
+    div1.id = 'missingnessFilter';
+
+    const div2 = document.createElement('div');
+    div2.classList = ['col-lg-10'];
+    div2.id = 'missingnessTable';
+
+    document.getElementById('dataSummaryStatistics').appendChild(div1);
+    document.getElementById('dataSummaryStatistics').appendChild(div2);
+
+    const initialSelection = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available']
+    renderFilter(data, initialSelection.sort(), headers.sort());
+    midset(data, initialSelection.sort());
+}
+
+const renderFilter = (data, acceptedVariables, headers) => {
+    let template = '';
+    template += `
+    <div class="card sub-div-shadow" id="midsetFilterCard">
+        <div class="card-header">
+            <strong class="side-panel-header">Filter</strong>
+        </div>
+        <div class="card-body">
+            <div id="midsetVariables" class="align-left"></div>
+        </div>
+    </div>
+    `
+    document.getElementById('missingnessFilter').innerHTML = template;
+    renderMidsetVariables(data, acceptedVariables, headers);
+}
+
+const renderMidsetVariables = (data, acceptedVariables, headers) => {
+    let template = '';
+    template += `<ul class="remove-padding-left">`;
+    headers.forEach(variable => {
+        template += `<li class="filter-list-item">
+                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" data-variable="${variable}">
+                            <div class="variable-name">${variable.replace('_Data available', '')}</div>
+                        </button>
+                    </li>`;
+    });
+    template += `</ul>`;
+    document.getElementById('midsetVariables').innerHTML = template;
+    addEventFilterMidset(data, headers);
+}
+
+const addEventFilterMidset = (data, headers) => {
+    const elements = document.getElementsByClassName('filter-midset-variable');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
+            else element.classList.add('active-filter');
+            const selections = [];
+            const cardBody = document.getElementById('midsetVariables');
+            const variables = cardBody.querySelectorAll('.active-filter');
+            Array.from(variables).forEach(el => selections.push(el.dataset.variable));
+            midset(data, selections, headers);
+        });
+    });
+}
+
+const midset = (data, acceptedVariables) => {
+    let template = '';
+    let plotData = '';
+    let headerData = '';
+    if(data.length > 0){
+        template += '<table class="table table-hover table-borderless missingness-table table-striped sub-div-shadow"><thead class="midset-table-header">';
+        const headerCount = computeHeader(data, acceptedVariables);
+        headerData = headerCount;
+        const result = computeSets(data, acceptedVariables);
+        template += `<tr class="midset-header"><th class="missing-column"></th><th class='bar-chart-cell' colspan="${Object.keys(headerCount).length}"><div id="midsetHeader"></div></th><th class="missing-column"></th></tr>`
+        
+        template += `<tr><th class="missing-column"></th>`
+        for(let variable in headerCount) {
+            template += `<th class="missing-column cell-equal-width">${headerCount[variable]}</th>`
+        }
+        template += `<th class="missing-column"></th></tr><tr><td class="missing-column"></td>`;
+        for(let variable in headerCount) {
+            template += `<th class="missing-column cell-equal-width">${variable.replace('_Data available', '')}</th>`
+        }
+        template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">No set</td>';
+        // const set0 = computeSet0(data, acceptedVariables);
+        const set0 = data.length;
+        acceptedVariables.forEach((variable, index) => {
+            template += `<td class="missing-column">&#9898</td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 1}"></td>`;
+        });
+        template += '</tr>';
+        plotData = Object.values(result);
+        plotData.unshift(set0);
+
+        let variableDisplayed = {};
+        for(let key in result) {
+            const allVariables = key.split('@#$');
+            const firstVar = key.split('@#$')[0];
+            template += '<tr>';
+            if(variableDisplayed[firstVar] === undefined) {
+                template += `<td class="missing-column set-label">${firstVar.replace('_Data available', '')}</td>`;
+                variableDisplayed[firstVar] = '';
+            }else {
+                template += '<td class="missing-column"></td>'
+            }
+            acceptedVariables.forEach((variable, index) => {
+                if(variable === firstVar) {
+                    template += '<td class="missing-column">&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) !== -1){
+                    template += '<td class="missing-column">&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) === -1){
+                    template += '<td class="missing-column">&#9898</td>'
+                }
+                if(index === acceptedVariables.length - 1) {
+                    template += `<td class="missing-column">${result[key]}</td>`
+                }
+            });
+            template += '</tr>';
+        }
+        
+        template += '<tbody></table>';
+    }
+    hideAnimation();
+    document.getElementById('missingnessTable').innerHTML = template;
+    renderMidsetPlot(plotData.reverse(), 'midsetChart');
+    renderMidsetHeader(acceptedVariables, Object.values(headerData), 'midsetHeader');
+}
+
+const renderMidsetHeader = (x, y, id) => {
+    x = x.map(dt => dt.replace('_Data available', ''))
+    const data = [{
+        type: 'bar',
+        x,
+        y,
+        marker: {
+            color: '#7F7F7F'
+        }
+    }];
+
+    const layout = {
+        xaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+            fixedrange: true
+        },
+        yaxis: {
+            autorange: true,
+            showgrid: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+            fixedrange: true
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+        }
+    }
+
+    const options = {
+        responsive: true, 
+        displayModeBar: false,
+        useResizeHandler: true,
+        style: {width: "100%", height: "100%"}
+    }
+    Plotly.newPlot(id, data, layout, options);
+}
+
+const renderMidsetPlot = (x, id) => {
+    const data = [{
+        type: 'bar',
+        x: x,
+        hoverinfo: 'x',
+        orientation: 'h',
+        marker: {
+            color: '#ef71a8'
+        }
+    }];
+
+    const layout = {
+        xaxis: {
+            showgrid: false,
+            zeroline: false,
+            fixedrange: true
+        },
+        yaxis: {
+            autorange: true,
+            showgrid: false,
+            zeroline: false,
+            showline: false,
+            autotick: true,
+            ticks: '',
+            showticklabels: false,
+            fixedrange: true
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+        }
+    }
+
+    const options = {
+        responsive: true, 
+        displayModeBar: false,
+        useResizeHandler: true,
+        style: {width: "100%", height: "100%"}
+    }
+    Plotly.newPlot(id, data, layout, options);
+}
+
+const computeSets = (data, acceptedVariables) => {
+    let obj = {};
+    const allCombinations = getCombinations(acceptedVariables);
+    allCombinations.forEach(combination => {
+        const setLength = setLengths(data, combination.split('@#$'));
+        if(setLength > 0) {
+            obj[combination] = setLength;
+        }
+    });
+    return obj;
+}
+
+const setLengths = (data, arr) => {
+    arr.forEach(variable => {
+        if(variable) {
+            data = data.filter(dt => dt[variable] === '1');
+        }
+    });
+    return data.length
+}
+
+const getCombinations = (array) => {
+    const result = [];
+    const sets = (prefix, array) => {
+        for (var i = 0; i < array.length; i++) {
+            const str = `${prefix}${prefix ? '@#$': ''}${array[i]}`;
+            result.push(str);
+            sets(str, array.slice(i + 1));
+        }
+    }
+    sets('', array);
+    return result;
+}
+
+const computeHeader = (data, acceptedVariables) => {
+    let obj = {};
+    acceptedVariables.forEach(variable => {
+        obj[variable] = data.filter(dt => dt[variable] === '1').length;
+    });
+    return obj;
+}
+
+const computeSet0 = (data, acceptedVariables) => {
+    acceptedVariables.forEach(variable => {
+        data = data.filter(dt => dt[variable] === '0');
+    });
+    return data.length
 }
 
 const dataBinning = async () => {

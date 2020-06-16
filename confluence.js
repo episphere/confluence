@@ -1,7 +1,7 @@
 import { template } from './src/components/navBarMenuItems.js';
 import { template as homePage, homePageVisualization, addEventAboutConfluence } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
-import { template as dataSummary } from './src/pages/dataExploration.js';
+import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
@@ -86,12 +86,12 @@ export const confluence = async () => {
             hideAnimation();
         });
         dataSummaryElement.addEventListener('click', () => {
-            if (dataSummaryElement.classList.contains('navbar-active')) return;
             showAnimation();
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
+            document.getElementById('dataSummaryStatistics').innerHTML = dataSummaryStatisticsTemplate();
             document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
                 const header = document.getElementById('confluenceModalHeader');
@@ -178,7 +178,6 @@ const manageRouter = async () => {
     if(localStorage.parms !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
-    
     if(hash === '#home'){
         const element = document.getElementById('homePage');
         if(!element) return;
@@ -226,10 +225,22 @@ const manageHash = () => {
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
-    if(hash === '#data_exploration') {
+    if(hash === '#data_exploration/summary') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
         element.click();
+    }
+    else if(hash === '#data_exploration/missing') {
+        const confluenceDiv = document.getElementById('confluenceDiv');
+        const dataSummaryElement = document.getElementById('dataSummary');
+        showAnimation();
+        removeActiveClass('nav-menu-links', 'navbar-active');
+        dataSummaryElement.classList.add('navbar-active');
+        document.title = 'Confluence - Data Explore';
+        confluenceDiv.innerHTML = dataSummary();
+        removeActiveClass('nav-link', 'active');
+        document.querySelectorAll('[href="#data_exploration/missing"]')[0].classList.add('active');
+        dataSummaryMissingTemplate();
     }
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
@@ -308,7 +319,7 @@ const manageHash = () => {
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
     }
-    else window.location.hash = '#data_exploration';
+    else window.location.hash = '#data_exploration/summary';
 };
 
 window.onload = async () => {

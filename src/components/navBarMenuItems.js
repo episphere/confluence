@@ -16,7 +16,7 @@ export const template = () => {
                 <i class="fas fa-database"></i> Data
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_exploration" title="Data Exploration" id="dataSummary">
+                <a class="dropdown-item nav-link nav-menu-links" href="#data_exploration/summary" title="Data Exploration" id="dataSummary">
                     <i class="fas fa-chart-bar"></i> Explore
                 </a>
                 <a class="dropdown-item nav-link nav-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 

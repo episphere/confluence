@@ -183,7 +183,7 @@ export const storeAccessToken = async () => {
         });
         if(response.status && response.status === 200) {
             localStorage.parms = JSON.stringify(await response.json());
-            window.history.replaceState({},'', './#data_exploration');
+            window.history.replaceState({},'', './#data_exploration/summary');
             confluence();
             document.getElementById('loginBoxAppDev').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;
@@ -961,4 +961,22 @@ export const csvJSON = (csv) => {
         obj.total = parseInt(obj['20-29']) + parseInt(obj['30-39'])+ parseInt(obj['40-49']) + parseInt(obj['50-59']) + parseInt(obj['60-69']) + parseInt(obj['70-79']) + parseInt(obj['80-89']) + parseInt(obj['90-99']);
     }
     return result;
+}
+
+export const csv2Json = (csv) => {
+    const lines = csv.split("\n");
+    const result = [];
+    const headers = lines[0].split("\r")[0].split(",");
+    for(let i=1; i < lines.length; i++){
+        const obj = {};
+        const currentline = lines[i].split(",");
+        for(let j = 0; j<headers.length; j++){
+            if(currentline[j]){
+                let value = headers[j];
+                obj[value] = currentline[j];
+            }
+        }
+        if(Object.keys(obj).length > 0) result.push(obj);
+    }
+    return {data:result, headers};
 }
