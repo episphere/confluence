@@ -178,9 +178,9 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                         </button>
                     </li>`;
     });
-    template += `</ul>`;
+    template += `</ul><div class="custom-hr row"></div>`;
 
-    template += '</br><div class="row study-select">Study</div>'
+    template += '<div class="row study-select">Study</div>'
     template += `<ul class="remove-padding-left" id="studiesList">`;
     studies.forEach(study => {
         template += `<li class="filter-list-item">
