@@ -173,7 +173,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     status.push('All');
     status.forEach(variable => {
         template += `<li class="filter-list-item">
-                        <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
+                        <button class="${variable === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
                             <div class="variable-name">${variable.replace(new RegExp('status_', 'i'), '')}</div>
                         </button>
                     </li>`;
