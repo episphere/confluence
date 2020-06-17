@@ -1353,4 +1353,5 @@ form {
     color: #3e4086;
     font-weight: bold;
     margin-top: 2px !important;
+    cursor: default !important;
 }
