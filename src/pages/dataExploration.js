@@ -154,7 +154,7 @@ const renderFilter = (data, acceptedVariables, headers, status, studies) => {
     <div class="card sub-div-shadow midset-Card">
         <div class="card-header" style="white-space: nowrap;">
             <strong class="side-panel-header">Variable Selection</strong>
-            <div class="filter-btn custom-margin study-total sub-div-shadow" id="selectedVariablesCount"></div>
+            <div class="filter-btn custom-margin variable-selection-total sub-div-shadow" id="selectedVariablesCount"></div>
         </div>
         <div class="card-body">
             <div id="midsetVariables" class="align-left"></div>

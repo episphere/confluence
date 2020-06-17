@@ -1347,3 +1347,10 @@ form {
 .cell-equal-width {
     min-width: 100px;
 }
+
+.variable-selection-total {
+    background-color: #ffffff;
+    color: #3e4086;
+    font-weight: bold;
+    margin-top: 2px !important;
+}
