@@ -532,7 +532,7 @@ label {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
 }
 
 .my-projects-div {
@@ -540,7 +540,7 @@ label {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
 }
 
 .btn-copy {
@@ -715,7 +715,7 @@ label {
     -ms-user-select: none;
     user-select: none;
     border: 0.5px solid black;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     color: #000000;
     font-size: 0.75rem;
@@ -726,7 +726,6 @@ label {
 
 .genotype-active-btn, .gender-active-btn {
     background-color: #e7bcbc;
-    border-radius: 0.5rem;
 }
 
 .custom-hr {
@@ -905,19 +904,19 @@ label {
 .consortium-selection:hover, .consortium-selection:focus {
     cursor: pointer;
     background-color: #c9c9c9;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
 }
 
 .consortium-selection-btn {
     border: 0px;
     width: 100% !important;
     margin: 0.5px 0px !important;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     background-color: #ffffff;
 }
 
 .card {
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     margin-bottom: 30px;
 }
 
@@ -1182,7 +1181,7 @@ form {
     background-color: #fff;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
 }
 
 .lazy-loading-spinner {
