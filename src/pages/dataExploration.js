@@ -152,8 +152,9 @@ const renderFilter = (data, acceptedVariables, headers, status, studies) => {
         </div>
     </div>
     <div class="card sub-div-shadow midset-Card">
-        <div class="card-header">
+        <div class="card-header" style="white-space: nowrap;">
             <strong class="side-panel-header">Variable Selection</strong>
+            <div class="filter-btn custom-margin study-total sub-div-shadow" id="selectedVariablesCount"></div>
         </div>
         <div class="card-body">
             <div id="midsetVariables" class="align-left"></div>
@@ -295,6 +296,13 @@ const midset = (data, acceptedVariables) => {
     let template = '';
     let plotData = '';
     let headerData = '';
+    document.getElementById('selectedVariablesCount').innerHTML = acceptedVariables.length;
+    if(acceptedVariables.length === 0){
+        template += 'No variable selected.';
+        hideAnimation();
+        document.getElementById('missingnessTable').innerHTML = template;
+        return;
+    }
     if(data.length > 0){
         template += '<table class="table table-hover table-borderless missingness-table table-striped sub-div-shadow"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
