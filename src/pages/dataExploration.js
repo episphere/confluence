@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
@@ -120,6 +120,9 @@ export const dataSummaryStatisticsTemplate = () => `
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile('653087731560');
     const {data, headers} = csv2Json(response);
+    const variables = headers.filter(dt => /status_/i.test(dt) === false && /study_/i.test(dt) === false);
+    const status = headers.filter(dt => /status_/i.test(dt) === true);
+    const studies = headers.filter(dt => /study_/i.test(dt) === true);
     
     const div1 = document.createElement('div');
     div1.classList = ['col-lg-2'];
@@ -133,16 +136,24 @@ export const dataSummaryMissingTemplate = async () => {
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
     const initialSelection = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available']
-    renderFilter(data, initialSelection.sort(), headers.sort());
+    renderFilter(data, initialSelection.sort(), variables.sort(), status.sort(), studies.sort());
     midset(data, initialSelection.sort());
 }
 
-const renderFilter = (data, acceptedVariables, headers) => {
+const renderFilter = (data, acceptedVariables, headers, status, studies) => {
     let template = '';
     template += `
-    <div class="card sub-div-shadow" id="midsetFilterCard">
+    <div class="card sub-div-shadow midset-Card">
         <div class="card-header">
             <strong class="side-panel-header">Filter</strong>
+        </div>
+        <div class="card-body">
+            <div id="midsetFilterData" class="align-left"></div>
+        </div>
+    </div>
+    <div class="card sub-div-shadow midset-Card">
+        <div class="card-header">
+            <strong class="side-panel-header">Variable Selection</strong>
         </div>
         <div class="card-body">
             <div id="midsetVariables" class="align-left"></div>
@@ -151,6 +162,93 @@ const renderFilter = (data, acceptedVariables, headers) => {
     `
     document.getElementById('missingnessFilter').innerHTML = template;
     renderMidsetVariables(data, acceptedVariables, headers);
+    renderMidsetFilterData(data, acceptedVariables, headers, status, studies);
+}
+
+const renderMidsetFilterData = (data, acceptedVariables, headers, status, studies) => {
+    let template = '';
+    template += '<div class="row status-select">Status</div>'
+    template += `<ul class="remove-padding-left" id="statusList">`;
+    status.push('All');
+    status.forEach(variable => {
+        template += `<li class="filter-list-item">
+                        <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
+                            <div class="variable-name">${variable.replace(new RegExp('status_', 'i'), '')}</div>
+                        </button>
+                    </li>`;
+    });
+    template += `</ul>`;
+
+    template += '</br><div class="row study-select">Study</div>'
+    template += `<ul class="remove-padding-left" id="studiesList">`;
+    studies.forEach(study => {
+        template += `<li class="filter-list-item">
+                        <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
+                            <div class="variable-name">${study.replace(new RegExp('study_', 'i'), '')}</div>
+                        </button>
+                    </li>`;
+    });
+    template += `</ul>`;
+    document.getElementById('midsetFilterData').innerHTML = template;
+    addEventFilterDataStatus(data, acceptedVariables, headers);
+}
+
+const addEventFilterDataStatus = (data) => {
+    const elements = document.getElementsByClassName('filter-midset-data-status');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('active-filter')) return;
+            removeActiveClass('filter-midset-data-status', 'active-filter')
+            element.classList.add('active-filter');
+            
+            const [statusSelection] = getSelectedVariables('statusList');
+            const studySelection = getSelectedVariables('studiesList');
+            
+            let newData = [];
+            studySelection.forEach(variable => {
+                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
+            });
+            if(newData.length === 0) newData = data;
+            if(statusSelection === 'All') {
+                newData = newData;
+            }
+            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
+
+            midset(newData, getSelectedVariables('midsetVariables'));
+        })
+    });
+
+    const elements2 =  document.getElementsByClassName('filter-midset-data-study');
+    Array.from(elements2).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
+            else element.classList.add('active-filter');
+            
+            
+            const [statusSelection] = getSelectedVariables('statusList');
+            const studySelection = getSelectedVariables('studiesList');
+            
+            let newData = [];
+            studySelection.forEach(variable => {
+                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
+            });
+            if(newData.length === 0) newData = data;
+            if(statusSelection === 'All') {
+                newData = newData;
+            }
+            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
+            
+            midset(newData, getSelectedVariables('midsetVariables'));
+        })
+    });
+};
+
+const getSelectedVariables = (parentId) => {
+    const selections = [];
+    const cardBody = document.getElementById(parentId);
+    const variables = cardBody.querySelectorAll('.active-filter');
+    Array.from(variables).forEach(el => selections.push(el.dataset.variable));
+    return selections;
 }
 
 const renderMidsetVariables = (data, acceptedVariables, headers) => {
@@ -174,11 +272,21 @@ const addEventFilterMidset = (data, headers) => {
         element.addEventListener('click', () => {
             if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
             else element.classList.add('active-filter');
-            const selections = [];
-            const cardBody = document.getElementById('midsetVariables');
-            const variables = cardBody.querySelectorAll('.active-filter');
-            Array.from(variables).forEach(el => selections.push(el.dataset.variable));
-            midset(data, selections, headers);
+
+            const [statusSelection] = getSelectedVariables('statusList');
+            const studySelection = getSelectedVariables('studiesList');
+            
+            let newData = [];
+            studySelection.forEach(variable => {
+                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
+            });
+            if(newData.length === 0) newData = data;
+            if(statusSelection === 'All') {
+                newData = newData;
+            }
+            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
+            if(newData.length === 0) newData = data;
+            midset(newData, getSelectedVariables('midsetVariables'), headers);
         });
     });
 }
@@ -203,14 +311,21 @@ const midset = (data, acceptedVariables) => {
             template += `<th class="missing-column cell-equal-width">${variable.replace('_Data available', '')}</th>`
         }
         template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">No set</td>';
-        // const set0 = computeSet0(data, acceptedVariables);
+        
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
-            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 1}"></td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>`;
+        });
+        template += '</tr><tr><td class="missing-column set-label">All set</td>';
+        const set1 = setLengths(data, acceptedVariables);
+        acceptedVariables.forEach((variable, index) => {
+            template += `<td class="missing-column">&#9899</td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set1}</td>`;
         });
         template += '</tr>';
         plotData = Object.values(result);
+        plotData.unshift(set1);
         plotData.unshift(set0);
 
         let variableDisplayed = {};
@@ -333,8 +448,7 @@ const renderMidsetPlot = (x, id) => {
             l: 0,
             r: 0,
             b: 0,
-            t: 0,
-            pad: 0
+            t: 0
         }
     }
 

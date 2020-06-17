@@ -231,7 +231,7 @@ body {
 }
 
 .card {
-    margin: 0px !important;
+    margin: 0rem 0rem 1rem 0rem !important;
 }
 
 #confluenceInfo {
@@ -736,7 +736,7 @@ label {
     border-top: 1px solid rgba(0,0,0,.3);
 }
 
-.genotype-select, .gender-select {
+.genotype-select, .gender-select, .status-select, .study-select  {
     padding: 0 5px;
 }
 
@@ -826,7 +826,8 @@ label {
     color: #ffffff;
 }
 
-.filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover,.genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
+.filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover, 
+.filter-midset-data-status:focus, .filter-midset-data-status:hover, .filter-midset-data-study:focus, .filter-midset-data-study:hover, .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
     border-radius: 0.25rem !important;
@@ -841,7 +842,7 @@ label {
     border-radius: 0.25rem !important;
 }
 
-.filter-midset-variable {
+.filter-midset-variable, .filter-midset-data-status {
     margin: 1px 0px !important;
     border-radius: 0.25rem !important;
 }
@@ -1338,8 +1339,8 @@ form {
     padding-left: 10px !important;
 }
 
-#midsetFilterCard {
-    max-height: 600px;
+.midset-Card {
+    max-height: 400px;
     overflow: auto;
 }
 
