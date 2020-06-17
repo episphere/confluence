@@ -201,20 +201,7 @@ const addEventFilterDataStatus = (data) => {
             if(element.classList.contains('active-filter')) return;
             removeActiveClass('filter-midset-data-status', 'active-filter')
             element.classList.add('active-filter');
-            
-            const [statusSelection] = getSelectedVariables('statusList');
-            const studySelection = getSelectedVariables('studiesList');
-            
-            let newData = [];
-            studySelection.forEach(variable => {
-                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
-            });
-            if(newData.length === 0) newData = data;
-            if(statusSelection === 'All') {
-                newData = newData;
-            }
-            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
-
+            const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'));
         })
     });
@@ -224,21 +211,7 @@ const addEventFilterDataStatus = (data) => {
         element.addEventListener('click', () => {
             if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
             else element.classList.add('active-filter');
-            
-            
-            const [statusSelection] = getSelectedVariables('statusList');
-            const studySelection = getSelectedVariables('studiesList');
-            
-            let newData = [];
-            studySelection.forEach(variable => {
-                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
-            });
-            if(newData.length === 0) newData = data;
-            if(statusSelection === 'All') {
-                newData = newData;
-            }
-            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
-            
+            const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'));
         })
     });
@@ -273,20 +246,7 @@ const addEventFilterMidset = (data, headers) => {
         element.addEventListener('click', () => {
             if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
             else element.classList.add('active-filter');
-
-            const [statusSelection] = getSelectedVariables('statusList');
-            const studySelection = getSelectedVariables('studiesList');
-            
-            let newData = [];
-            studySelection.forEach(variable => {
-                newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
-            });
-            if(newData.length === 0) newData = data;
-            if(statusSelection === 'All') {
-                newData = newData;
-            }
-            else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
-            if(newData.length === 0) newData = data;
+            const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'), headers);
         });
     });
@@ -370,6 +330,23 @@ const midset = (data, acceptedVariables) => {
     document.getElementById('missingnessTable').innerHTML = template;
     renderMidsetPlot(plotData.reverse(), 'midsetChart');
     renderMidsetHeader(acceptedVariables, Object.values(headerData), 'midsetHeader');
+}
+
+const computeNewData = (data) => {
+    const [statusSelection] = getSelectedVariables('statusList');
+    const studySelection = getSelectedVariables('studiesList');
+    
+    let newData = [];
+    studySelection.forEach(variable => {
+        newData = [...new Set([...newData , ...data.filter(dt => dt[variable] === '1')])]
+    });
+    if(newData.length === 0) newData = data;
+    if(statusSelection === 'All') {
+        newData = newData;
+    }
+    else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
+    if(newData.length === 0) newData = data;
+    return newData;
 }
 
 const renderMidsetHeader = (x, y, id) => {
