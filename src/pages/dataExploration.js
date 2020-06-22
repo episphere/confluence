@@ -13,7 +13,7 @@ export const template = () => {
                         <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#data_exploration/missing"><strong>Missingness statistics</strong></a>
+                        <a class="nav-link" href="#data_exploration/subset"><strong>Subset statistics</strong></a>
                     </li>
                 </ul>
             </div>
@@ -135,7 +135,7 @@ export const dataSummaryMissingTemplate = async () => {
     document.getElementById('dataSummaryStatistics').appendChild(div1);
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
-    const initialSelection = ['ER_statusIndex_Data available', 'ageInt_Data available', 'ethnicityClass_Data available', 'famHist_Data available', 'contrType_Data available']
+    const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     renderFilter(data, initialSelection.sort(), variables.sort(), status.sort(), studies.sort());
     midset(data, initialSelection.sort());
 }
@@ -278,14 +278,14 @@ const midset = (data, acceptedVariables) => {
         for(let variable in headerCount) {
             template += `<th class="missing-column cell-equal-width">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">No set</td>';
+        template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">All Subjects</td>';
         
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
             if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>`;
         });
-        template += '</tr><tr><td class="missing-column set-label">All set</td>';
+        template += '</tr><tr><td class="missing-column set-label">Complete set</td>';
         const set1 = setLengths(data, acceptedVariables);
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9899</td>`;
@@ -296,6 +296,7 @@ const midset = (data, acceptedVariables) => {
         acceptedVariables.forEach((v,i) => {
             if(i===0) ignore += v;
             else ignore += `@#$${v}`;
+            delete result[v];
         });
         delete result[ignore];
         plotData = Object.values(result);

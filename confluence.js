@@ -230,7 +230,7 @@ const manageHash = () => {
         if(!element) return;
         element.click();
     }
-    else if(hash === '#data_exploration/missing') {
+    else if(hash === '#data_exploration/subset') {
         const confluenceDiv = document.getElementById('confluenceDiv');
         const dataSummaryElement = document.getElementById('dataSummary');
         showAnimation();
@@ -239,7 +239,7 @@ const manageHash = () => {
         document.title = 'Confluence - Data Explore';
         confluenceDiv.innerHTML = dataSummary();
         removeActiveClass('nav-link', 'active');
-        document.querySelectorAll('[href="#data_exploration/missing"]')[0].classList.add('active');
+        document.querySelectorAll('[href="#data_exploration/subset"]')[0].classList.add('active');
         dataSummaryMissingTemplate();
     }
     else if (hash === '#data_analysis') {
