@@ -254,7 +254,7 @@ const addEventFilterMidset = (data, headers) => {
 
 const midset = (data, acceptedVariables) => {
     let template = '';
-    let plotData = '';
+    let plotData = [];
     let headerData = '';
     document.getElementById('selectedVariablesCount').innerHTML = acceptedVariables.length;
     if(acceptedVariables.length === 0){
@@ -292,6 +292,12 @@ const midset = (data, acceptedVariables) => {
             if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set1}</td>`;
         });
         template += '</tr>';
+        let ignore = '';
+        acceptedVariables.forEach((v,i) => {
+            if(i===0) ignore += v;
+            else ignore += `@#$${v}`;
+        });
+        delete result[ignore];
         plotData = Object.values(result);
         plotData.unshift(set1);
         plotData.unshift(set0);
