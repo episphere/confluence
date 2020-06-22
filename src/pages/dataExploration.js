@@ -2,7 +2,6 @@ import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, con
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
-import { variables } from '../variables.js';
 
 export const template = () => {
     return `
@@ -321,30 +320,28 @@ const midset = (data, acceptedVariables) => {
         for(let key in result) {
             const allVariables = key.split('@#$');
             const firstVar = key.split('@#$')[0];
-            if(allVariables.length !== acceptedVariables.length) {
-                template += '<tr>';
-                if(variableDisplayed[firstVar] === undefined) {
-                    template += `<td class="missing-column set-label">${firstVar.replace('_Data available', '')}</td>`;
-                    variableDisplayed[firstVar] = '';
-                }else {
-                    template += '<td class="missing-column"></td>'
-                }
-                acceptedVariables.forEach((variable, index) => {
-                    if(variable === firstVar) {
-                        template += '<td class="missing-column">&#9899</td>'
-                    }
-                    else if(variable !== firstVar && allVariables.indexOf(variable) !== -1){
-                        template += '<td class="missing-column">&#9899</td>'
-                    }
-                    else if(variable !== firstVar && allVariables.indexOf(variable) === -1){
-                        template += '<td class="missing-column">&#9898</td>'
-                    }
-                    if(index === acceptedVariables.length - 1) {
-                        template += `<td class="missing-column">${result[key]}</td>`
-                    }
-                });
-                template += '</tr>';
+            template += '<tr>';
+            if(variableDisplayed[firstVar] === undefined) {
+                template += `<td class="missing-column set-label">${firstVar.replace('_Data available', '')}</td>`;
+                variableDisplayed[firstVar] = '';
+            }else {
+                template += '<td class="missing-column"></td>'
             }
+            acceptedVariables.forEach((variable, index) => {
+                if(variable === firstVar) {
+                    template += '<td class="missing-column">&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) !== -1){
+                    template += '<td class="missing-column">&#9899</td>'
+                }
+                else if(variable !== firstVar && allVariables.indexOf(variable) === -1){
+                    template += '<td class="missing-column">&#9898</td>'
+                }
+                if(index === acceptedVariables.length - 1) {
+                    template += `<td class="missing-column">${result[key]}</td>`
+                }
+            });
+            template += '</tr>';
         }
         
         template += '<tbody></table>';
