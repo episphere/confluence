@@ -1377,7 +1377,27 @@ export const addEventVariableDefinitions = () => {
                 variableName = 'Genotyping chip'; 
                 definition = "Filter data according to subjects genotyped by the confluence chips or other genotyping chips";
             }
-            
+            if(variable === 'subsetStatistics') {
+                variableName = 'Subset statistics'; 
+                definition = "This plot shows the number of subjects with data available on variables selected on the bottom left panel. You can filter the numbers shown by case-control status and study by selecting filters on the top left panel.";
+            }
+            if(variable === 'allSubjects') {
+                variableName = 'All Subjects'; 
+                definition = "All subjects in the set with data on any of the selected variables.";
+            }
+            if(variable === 'completeSet') {
+                variableName = 'Complete set'; 
+                definition = "Number of subjects with data on all selected variables.";
+            }
+            if(variable === 'midsetTopBars') {
+                variableName = 'Top bars'; 
+                definition = "Number of subjects with data on each of the selected variable (irrespective of the others).";
+            }
+            if(variable === 'midsetSideBars') {
+                variableName = 'Side bars'; 
+                definition = "Number of subjects with data on a combination 2 or more selected variables.";
+            }
+
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
             

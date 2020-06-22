@@ -1,7 +1,7 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType } from '../event.js';
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
 import { variables } from '../variables.js';
 
 export const template = () => {
@@ -13,7 +13,9 @@ export const template = () => {
                         <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#data_exploration/subset"><strong>Subset statistics</strong></a>
+                        <a class="nav-link" href="#data_exploration/subset">
+                            <strong>Subset statistics</strong>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -268,7 +270,7 @@ const midset = (data, acceptedVariables) => {
         const headerCount = computeHeader(data, acceptedVariables);
         headerData = headerCount;
         const result = computeSets(data, acceptedVariables);
-        template += `<tr class="midset-header"><th class="missing-column"></th><th class='bar-chart-cell' colspan="${Object.keys(headerCount).length}"><div id="midsetHeader"></div></th><th class="missing-column"></th></tr>`
+        template += `<tr class="midset-header"><th class="missing-column"><button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='midsetTopBars'><i class="fas fa-question-circle cursor-pointer"></i></button></th><th class='bar-chart-cell' colspan="${Object.keys(headerCount).length}"><div id="midsetHeader"></div></th><th class="missing-column"></th></tr>`
         
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
@@ -278,14 +280,26 @@ const midset = (data, acceptedVariables) => {
         for(let variable in headerCount) {
             template += `<th class="missing-column cell-equal-width">${variable.replace('_Data available', '')}</th>`
         }
-        template += '<th></th></tr></thead><tbody><tr><td class="missing-column set-label">All Subjects</td>';
+        template += `<th class="missing-column"></th>
+                    <th class="missing-column"><button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='midsetSideBars'><i class="fas fa-question-circle cursor-pointer"></i></button></th>
+                    </tr></thead><tbody>
+                    <tr>
+                        <td class="missing-column set-label">
+                            All subjects 
+                            <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='allSubjects'><i class="fas fa-question-circle cursor-pointer"></i></button>
+                        </td>`;
         
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
             if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>`;
         });
-        template += '</tr><tr><td class="missing-column set-label">Complete set</td>';
+        template += `</tr>
+                    <tr>
+                        <td class="missing-column set-label">
+                            Complete set 
+                            <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='completeSet'><i class="fas fa-question-circle cursor-pointer"></i></button>
+                        </td>`;
         const set1 = setLengths(data, acceptedVariables);
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9899</td>`;
@@ -337,6 +351,7 @@ const midset = (data, acceptedVariables) => {
     }
     hideAnimation();
     document.getElementById('missingnessTable').innerHTML = template;
+    addEventVariableDefinitions();
     renderMidsetPlot(plotData.reverse(), 'midsetChart');
     renderMidsetHeader(acceptedVariables, Object.values(headerData), 'midsetHeader');
 }
