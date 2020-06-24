@@ -137,8 +137,15 @@ export const dataSummaryMissingTemplate = async () => {
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
     const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
-    renderFilter(data, initialSelection.sort(), variables.sort(), status.sort(), studies.sort());
-    midset(data, initialSelection.sort());
+    renderFilter(data, sortArray(initialSelection), sortArray(variables), sortArray(status), sortArray(studies));
+    midset(data, sortArray(initialSelection));
+}
+
+const sortArray = (array) => {
+    array.sort(function (a, b) {
+        return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
+    return array
 }
 
 const renderFilter = (data, acceptedVariables, headers, status, studies) => {
