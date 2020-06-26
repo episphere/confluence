@@ -964,6 +964,8 @@ label {
 .dropdown-btn {
     background-color: #574F4F !important;
     border: 0px;
+    width: 100%;
+    text-align: left;
 }
 
 .nav-menu-links:focus {
