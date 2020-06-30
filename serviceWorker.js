@@ -8,7 +8,7 @@ const googleAnalytics = workbox.googleAnalytics;
 
 googleAnalytics.initialize();
 registerRoute(/\.(?:js|css)$/, new NetworkFirst({cacheName: 'static-cache'}));
-registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico)$/,
+registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|webp)$/,
     new CacheFirst({
         cacheName: 'images-cache',
         plugins: [
@@ -32,4 +32,4 @@ registerRoute(
     })
 );
 
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: `${new Date().getTime()}`}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: '7'}]);

@@ -32,14 +32,14 @@ export const template = () => {
             </div>
         </div>
         <div class="col-lg-5" id="confluenceInfo">
-            <img usemap="#consortiamap" id="consortiaCircle" src="./static/images/home_page_circle.png" alt="List of consortiums displayed in circle format" height="95%" width="95%">
+            <img usemap="#consortiamap" id="consortiaCircle" src="./static/images/home_page_circle.webp" alt="List of consortiums displayed in circle format" height="95%" width="95%">
             <map name="consortiamap">
-                <area shape="circle" data-image="consortia_1.png" data-consortia-name="BCAC" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
-                <area shape="circle" data-image="consortia_2.png" data-consortia-name="NCI-DCEG" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
-                <area shape="circle" data-image="consortia_3.png" data-consortia-name="AABCGS" class="consortia-circle" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
-                <area shape="circle" data-image="consortia_4.png" data-consortia-name="LAGENO-BC" class="consortia-circle" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
-                <area shape="circle" data-image="consortia_5.png" data-consortia-name="CIMBA" class="consortia-circle" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
-                <area shape="circle" data-image="consortia_6.png" data-consortia-name="MALE-BC" class="consortia-circle" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
+                <area shape="circle" data-image="consortia_1.webp" data-consortia-name="BCAC" class="consortia-circle" coords="275,45,40" alt="BCAC" title="Breast Cancer Association Consortium" id="map1">
+                <area shape="circle" data-image="consortia_2.webp" data-consortia-name="NCI-DCEG" class="consortia-circle" coords="385,110,40" alt="NCI-DCEG" title="NCI-DCEG" id="map2">
+                <area shape="circle" data-image="consortia_3.webp" data-consortia-name="AABCGS" class="consortia-circle" coords="385,240,40" alt="AABCGS" title="African Ancestry Breast Cancer Genetic Study" id="map3">
+                <area shape="circle" data-image="consortia_4.webp" data-consortia-name="LAGENO-BC" class="consortia-circle" coords="275,305,40" alt="LAGENO-BC" title="Latin America Genomics Breast Cancer Consortium" id="map4">
+                <area shape="circle" data-image="consortia_5.webp" data-consortia-name="CIMBA" class="consortia-circle" coords="162,240,40" alt="CIMBA" title="Consortium of Investigators of Modifers of BRCA1/2" id="map5">
+                <area shape="circle" data-image="consortia_6.webp" data-consortia-name="MALE-BC" class="consortia-circle" coords="162,110,40" alt="MALE-BC" title="Male Breast Cancer GWAS Consortium" id="map6">
             </map>
         </div>
     </div>
@@ -172,7 +172,7 @@ export const homePageVisualization = async () => {
             document.getElementById('publicControlCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b) : 0}</h2>`;
         });
         element.addEventListener('mouseout', () => {
-            mainImage.src = `./static/images/home_page_circle.png`;
+            mainImage.src = `./static/images/home_page_circle.webp`;
             document.getElementById('displayConsortiaName').innerHTML = '</br>';
             document.getElementById('publicConsortiaCount').innerHTML = `<h2>${Object.keys(data).length}</h2>`;
             document.getElementById('publicStudiesCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h2>`;
