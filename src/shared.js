@@ -964,9 +964,9 @@ export const csvJSON = (csv) => {
 }
 
 export const csv2Json = (csv) => {
-    const lines = csv.split(/[\r\n]+/g);
+    const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
     const result = [];
-    const headers = lines[0].split(/[,\t]/g);
+    const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
     for(let i=1; i < lines.length; i++){
         const obj = {};
         const currentline = lines[i].split(/[,\t]/g);
