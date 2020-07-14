@@ -65,6 +65,7 @@ export const getFileContent = async () => {
 };
 
 const chipFilter = (jsonData) => {
+    document.getElementById('chipContent').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row genotype-select'];
     div1.innerHTML = 'Genotyping chip &nbsp; '
@@ -122,6 +123,7 @@ const chipFilter = (jsonData) => {
 }
 
 const genderFilter = (jsonData) => {
+    document.getElementById('genderFilter').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
     div1.innerHTML = 'Gender &nbsp;'
