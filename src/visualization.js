@@ -57,7 +57,7 @@ export const getFileContent = async () => {
     const jsonData = csvJSON(await getFile(631427327364)); // Get summary level data
     
     hideAnimation();
-    if(!jsonData) {
+    if(jsonData.length === 0) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }

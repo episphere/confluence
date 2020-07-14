@@ -935,12 +935,12 @@ export const inactivityTime = () => {
 };
 
 export const csvJSON = (csv) => {
-    const lines = csv.split("\n");
+    const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
     const result = [];
-    const headers = lines[0].split(",");
+    const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
     for(let i=1; i < lines.length; i++){
         const obj = {};
-        const currentline = lines[i].split(",");
+        const currentline = lines[i].split(/[,\t]/g);
         for(let j = 0; j<headers.length; j++){
             let value = headers[j];
             if(value === 'age20.29') value = '20-29';
