@@ -54,7 +54,7 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 export const getFileContent = async () => {
-    const jsonData = csvJSON(await getFile(691120773924)); // Get summary level data
+    const jsonData = csvJSON(await getFile(691143057533)); // Get summary level data
     
     hideAnimation();
     if(jsonData.length === 0) {
