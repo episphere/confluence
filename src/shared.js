@@ -980,3 +980,16 @@ export const csv2Json = (csv) => {
     }
     return {data:result, headers};
 }
+
+export const jsonToTSVTxt = (json) => {
+    const fields = Object.keys(json[0])
+    const replacer = (key, value) => { return value === null ? '' : value } 
+    let tsv = json.map((row) => {
+    return fields.map((fieldName) => {
+        return JSON.stringify(row[fieldName], replacer)
+    }).join('\t')
+    })
+    tsv.unshift(fields.join('\t')) // add header column
+    tsv = tsv.join('\r\n');
+    return tsv;
+}
