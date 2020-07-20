@@ -160,7 +160,7 @@ const renderFilter = (data, acceptedVariables, headers, status, studies) => {
         </div>
     </div>
     <div class="card sub-div-shadow midset-Card">
-        <div class="card-header" style="white-space: nowrap;">
+        <div class="card-header variable-selection-header" style="white-space: nowrap;">
             <strong class="side-panel-header">Variable Selection</strong>
             <div class="filter-btn custom-margin variable-selection-total sub-div-shadow" id="selectedVariablesCount"></div>
         </div>
@@ -238,8 +238,8 @@ const renderMidsetVariables = (data, acceptedVariables, headers) => {
     template += `<ul class="remove-padding-left">`;
     headers.forEach(variable => {
         template += `<li class="filter-list-item">
-                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" data-variable="${variable}">
-                            <div class="variable-name">${variable.replace('_Data available', '')}</div>
+                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" title="${variable.replace('_Data available', '')}" data-variable="${variable}">
+                            <div class="variable-name">${variable.replace('_Data available', '').length > 20 ? `${variable.replace('_Data available', '').slice(0,20)}...`: `${variable.replace('_Data available', '')}`}</div>
                         </button>
                     </li>`;
     });

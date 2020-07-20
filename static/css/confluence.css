@@ -1356,3 +1356,8 @@ form {
     margin-top: 2px !important;
     cursor: default !important;
 }
+
+.variable-selection-header {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
