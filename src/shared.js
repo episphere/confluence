@@ -958,7 +958,7 @@ export const csvJSON = (csv) => {
         }
     }
     for(let obj of result){
-        obj.total = parseInt(obj['20-29']) + parseInt(obj['30-39'])+ parseInt(obj['40-49']) + parseInt(obj['50-59']) + parseInt(obj['60-69']) + parseInt(obj['70-79']) + parseInt(obj['80-89']) + parseInt(obj['90-99']);
+        obj.total = parseInt(obj['statusTotal']);
     }
     return result;
 }

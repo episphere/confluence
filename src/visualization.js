@@ -182,13 +182,13 @@ const genderFilter = (jsonData) => {
 
 const aggegrateData = (jsonData) => {
     let obj = {};
-    for(let value of jsonData){
+    jsonData.forEach(value => {
         if(obj[value.consortium] === undefined) obj[value.consortium] = {};
         if(obj[value.consortium]){
-            obj[value.consortium]['consortiumTotal'] = jsonData.filter(dt => {if(dt.consortium === value.consortium) return dt}).map(dt => dt.total).reduce((a,b) => a+b)
-            if(obj[value.consortium][value.study] === undefined) obj[value.consortium][value.study] = { total : jsonData.filter(dt => {if(dt.study === value.study) return dt}).map(dt => dt.total).reduce((a,b) => a+b)};
+            obj[value.consortium]['consortiumTotal'] = jsonData.filter(dt => dt.consortium === value.consortium).map(dt => dt.total).reduce((a,b) => a+b)
+            if(obj[value.consortium][value.study] === undefined) obj[value.consortium][value.study] = { total : jsonData.filter(dt => dt.study === value.study).map(dt => dt.total).reduce((a,b) => a+b)};
         }
-    }
+    });
     return obj;
 }
 
@@ -222,7 +222,7 @@ const filterByStudy = (jsonData) => {
                                 </button>
                             </li>`;
             }
-        }   
+        }
         template += `</ul></ul>`;
     }
     document.getElementById('studyFilter').innerHTML = template;
@@ -381,7 +381,7 @@ const renderAllCharts = (finalData, showFilter) => {
     renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
     if(showFilter) chipFilter(finalData);
     if(showFilter) genderFilter(finalData);
-    if(showFilter) filterByStudy(finalData)
+    if(showFilter) filterByStudy(finalData);
     addEventVariableDefinitions();
 }
 
