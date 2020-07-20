@@ -1,14 +1,14 @@
 {
     "NCI-DCEG": {
-        "cases": 5488,
+        "cases": 6524,
         "controls": 7623,
         "studies": 4,
         "name": "NCI-DCEG"
     },
-    "LAGENO-BC": {
-        "cases": 3907,
-        "controls": 5701,
-        "studies": 4,
-        "name": "LAGENO-BC"
+    "BCAC": {
+        "cases": 138558,
+        "controls": 120435,
+        "studies": 68,
+        "name": "BCAC"
     }
 }
