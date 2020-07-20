@@ -429,7 +429,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
                     jsonData.map(dt => parseInt(dt['90-99'])).reduce((a,b) => a+b)
             ],
             marker:{
-                color: ['#BF1B61', '#BF1B61','#BF1B61', '#BF1B61','#BF1B61', '#BF1B61','#BF1B61', '#BF1B61']
+                color: ['#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61']
             },
           type: 'bar'
         }
