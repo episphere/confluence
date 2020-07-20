@@ -943,6 +943,7 @@ export const csvJSON = (csv) => {
         const currentline = lines[i].split(/[,\t]/g);
         for(let j = 0; j<headers.length; j++){
             let value = headers[j];
+            if(value === 'age10.19') value = '10-19';
             if(value === 'age20.29') value = '20-29';
             if(value === 'age30.39') value = '30-39';
             if(value === 'age40.49') value = '40-49';

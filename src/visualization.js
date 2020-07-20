@@ -417,8 +417,9 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
-            x: ['20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
-            y: [jsonData.map(dt => parseInt(dt['20-29'])).reduce((a,b) => a+b),
+            x: ['10-19','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
+            y: [jsonData.map(dt => parseInt(dt['10-19'])).reduce((a,b) => a+b),
+                    jsonData.map(dt => parseInt(dt['20-29'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['30-39'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['40-49'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['50-59'])).reduce((a,b) => a+b),
