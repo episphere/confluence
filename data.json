@@ -6,8 +6,8 @@
         "name": "NCI-DCEG"
     },
     "BCAC": {
-        "cases": 138558,
-        "controls": 120435,
+        "cases": 149838,
+        "controls": 123079,
         "studies": 68,
         "name": "BCAC"
     }
