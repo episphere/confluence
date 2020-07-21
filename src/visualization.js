@@ -197,15 +197,17 @@ const filterByStudy = (jsonData) => {
     let template = '';
     for(let consortium in obj){
         template += `<ul class="remove-padding-left">
-                        <li class="custom-borders">
-                            <button class="row consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                <div class="consortia-name">${consortium}</div>
-                                <div class="ml-auto">
-                                    <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
-                                        ${obj[consortium].consortiumTotal}
-                                    </div> <i class="fas fa-caret-down"></i>
-                                </div>
-                            </button>
+                        <li class="custom-borders filter-list-item">
+                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
+                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                            <div class="ml-auto">
+                                <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
+                                    ${obj[consortium].consortiumTotal}
+                                </div> 
+                                <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                                    <i class="fas fa-caret-down"></i>
+                                </button>
+                            </div>
                         </li>
                         <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
@@ -228,6 +230,7 @@ const filterByStudy = (jsonData) => {
     document.getElementById('studyFilter').innerHTML = template;
     addEventConsortiumSelect();
     addEventFilterCharts(jsonData);
+    addEventSelectEntireConsortia(jsonData);
     document.getElementsByClassName('consortium-selection')[0].click();
 }
 
@@ -236,37 +239,25 @@ const addEventGenderFilter = (jsonData, element) => {
         if(element.classList.contains('gender-active-btn')) return
         removeActiveClass('gender-selection-btn', 'gender-active-btn');
         element.classList.add('gender-active-btn');
-        let array = getSelectedStudies();
-        let finalData = []
+        const array = getSelectedStudies();
+        const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
+        const variable = genotypeSelected.dataset.variable;
+        const variableValue = genotypeSelected.dataset.value;
 
-        const selectedGenotypedElement = document.getElementsByClassName('genotype-active-btn')[0];
-        const variable1 = selectedGenotypedElement.dataset.variable;
-        const variableValue1 = selectedGenotypedElement.dataset.value;
-        
+        const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
+        const variable1 = selectedGenderElement.dataset.variable;
+        const variableValue1 = selectedGenderElement.dataset.value;
+        let finalData = jsonData;
         if(variable1) {
-            finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
+            finalData = finalData.filter(dt => dt[variable1] === variableValue1);
         }
-        else {
-            finalData = jsonData;
-        }
-
-        const variable = element.dataset.variable;
-        const variableValue = element.dataset.value;
-
         if(variable) {
             finalData = finalData.filter(dt => dt[variable] === variableValue);
         }
-
         updateCounts(finalData);
         if(array.length > 0){
-            let temp_array = []
-            for(let value of array){
-                const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
-                temp_array = temp_array.concat(filteredData);
-            }
-            finalData = temp_array;
+            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
         }
-
         renderAllCharts(finalData);
     })
 }
@@ -276,36 +267,26 @@ const addEventGenotypeBtnSelection = (jsonData, element) => {
         if(element.classList.contains('genotype-active-btn')) return
         removeActiveClass('genotype-selection-btn', 'genotype-active-btn');
         element.classList.add('genotype-active-btn');
-        let array = getSelectedStudies();
-        let finalData = [];
-        const variable = element.dataset.variable;
-        const variableValue = element.dataset.value;
+        const array = getSelectedStudies();
+        const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
+        const variable = genotypeSelected.dataset.variable;
+        const variableValue = genotypeSelected.dataset.value;
 
         const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
         const variable1 = selectedGenderElement.dataset.variable;
         const variableValue1 = selectedGenderElement.dataset.value;
-
+        let finalData = jsonData;
         if(variable1) {
-            finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
+            finalData = finalData.filter(dt => dt[variable1] === variableValue1);
         }
-        else {
-            finalData = jsonData;
-        }
-        
         if(variable) {
             finalData = finalData.filter(dt => dt[variable] === variableValue);
         }
-
         updateCounts(finalData);
         if(array.length > 0){
-            let temp_array = []
-            for(let value of array){
-                const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
-                temp_array = temp_array.concat(filteredData);
-            }
-            finalData = temp_array;
+            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
         }
-        renderAllCharts(finalData)
+        renderAllCharts(finalData);
     });
 }
 
@@ -313,14 +294,52 @@ const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            if (element.lastElementChild.lastElementChild.classList.contains('fa-caret-up')){
-                element.lastElementChild.lastElementChild.classList.add('fa-caret-down');
-                element.lastElementChild.lastElementChild.classList.remove('fa-caret-up');
+            if (element.lastElementChild.classList.contains('fa-caret-up')){
+                element.lastElementChild.classList.add('fa-caret-down');
+                element.lastElementChild.classList.remove('fa-caret-up');
 
             } else {
-                element.lastElementChild.lastElementChild.classList.add('fa-caret-up');
-                element.lastElementChild.lastElementChild.classList.remove('fa-caret-down');
+                element.lastElementChild.classList.add('fa-caret-up');
+                element.lastElementChild.classList.remove('fa-caret-down');
             }
+        });
+    });
+}
+
+const addEventSelectEntireConsortia = (jsonData) => {
+    const elements = document.getElementsByClassName('select-consortium');
+    Array.from(elements).forEach(el => {
+        el.addEventListener('click', () => {
+            if(el.checked){
+                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-studies')).forEach(btns => btns.classList.add('active-filter'));
+            }
+            else {
+                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-studies')).forEach(btns => btns.classList.remove('active-filter'));
+            }
+            let selectedConsortia = [];
+            Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
+                if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
+            });
+            
+            const array = getSelectedStudies();
+            const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
+            const variable = genotypeSelected.dataset.variable;
+            const variableValue = genotypeSelected.dataset.value;
+
+            const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
+            const variable1 = selectedGenderElement.dataset.variable;
+            const variableValue1 = selectedGenderElement.dataset.value;
+            let finalData = jsonData;
+            if(variable1) {
+                finalData = finalData.filter(dt => dt[variable1] === variableValue1);
+            }
+            if(variable) {
+                finalData = finalData.filter(dt => dt[variable] === variableValue);
+            }
+            if(array.length > 0){
+                finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
+            }
+            renderAllCharts(finalData);
         });
     });
 }
@@ -331,10 +350,18 @@ const addEventFilterCharts = (jsonData) => {
         element.addEventListener('click', () => {
             if(element.classList.contains('active-filter')){
                 element.classList.remove('active-filter');
+                document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = false;
             }
             else{
                 element.classList.add('active-filter');
             }
+            let allStudiesSelected = true;
+            const constortiaStudyElements = element.parentNode.parentNode.querySelectorAll('.filter-studies');
+            Array.from(constortiaStudyElements).forEach(el => {
+                if(!allStudiesSelected) return;
+                if(el.classList.contains('active-filter') === false) allStudiesSelected = false;
+            });
+            if(allStudiesSelected) document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = true;
             const array = getSelectedStudies();
             const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
             const variable = genotypeSelected.dataset.variable;
@@ -343,28 +370,16 @@ const addEventFilterCharts = (jsonData) => {
             const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
             const variable1 = selectedGenderElement.dataset.variable;
             const variableValue1 = selectedGenderElement.dataset.value;
-            let finalData = [];
-            
+            let finalData = jsonData;
             if(variable1) {
-                finalData = jsonData.filter(dt => dt[variable1] === variableValue1);
+                finalData = finalData.filter(dt => dt[variable1] === variableValue1);
             }
-            else {
-                finalData = jsonData;
-            }
-            
             if(variable) {
                 finalData = finalData.filter(dt => dt[variable] === variableValue);
             }
-    
             if(array.length > 0){
-                let temp_array = []
-                for(let value of array){
-                    const filteredData = finalData.filter(dt => dt.consortium === value.split('@#$')[0] && dt.study === value.split('@#$')[1])
-                    temp_array = temp_array.concat(filteredData);
-                }
-                finalData = temp_array;
+                finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1)
             }
-            
             renderAllCharts(finalData);
         });
     });
