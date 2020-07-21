@@ -201,7 +201,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     });
     template += `</ul>`;
 
-    template += '<div class="custom-hr row"></div><div class="row study-select">Ancestory</div>'
+    template += '<div class="custom-hr row"></div><div class="row study-select">Ancestry</div>'
     template += `<ul class="remove-padding-left" id="ancestoryList">`;
     ancestory.push('All');
     ancestory.forEach(anc => {
