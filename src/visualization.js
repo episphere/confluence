@@ -1,4 +1,4 @@
-import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass } from './shared.js';
+import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas } from './shared.js';
 import { variables } from './variables.js';
 import { addEventVariableDefinitions } from './event.js';
 
@@ -202,7 +202,7 @@ const filterByStudy = (jsonData) => {
                             <label for="label${consortium}" class="consortia-name">${consortium}</label>
                             <div class="ml-auto">
                                 <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
-                                    ${obj[consortium].consortiumTotal}
+                                    ${numberWithCommas(obj[consortium].consortiumTotal)}
                                 </div> 
                                 <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                     <i class="fas fa-caret-down"></i>
@@ -218,7 +218,7 @@ const filterByStudy = (jsonData) => {
                                     <div class="study-name">${study}</div>
                                     <div class="ml-auto">
                                         <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
-                                            ${total}
+                                            ${numberWithCommas(total)}
                                         </div>
                                     </div>
                                 </button>
@@ -451,7 +451,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -477,7 +477,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -552,7 +552,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -634,7 +634,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     ];
     const layout = {
         xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, fixedrange: true},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };

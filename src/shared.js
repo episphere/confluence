@@ -994,3 +994,7 @@ export const jsonToTSVTxt = (json) => {
     tsv = tsv.join('\r\n');
     return tsv;
 }
+
+export const numberWithCommas = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
