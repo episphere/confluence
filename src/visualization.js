@@ -236,7 +236,6 @@ const filterByStudy = (jsonData) => {
     addEventConsortiumSelect();
     addEventFilterCharts(jsonData);
     addEventSelectEntireConsortia(jsonData);
-    document.getElementsByClassName('consortium-selection')[0].click();
 }
 
 const addEventGenderFilter = (jsonData, element) => {
