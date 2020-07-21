@@ -185,7 +185,8 @@ const aggegrateData = (jsonData) => {
     jsonData.forEach(value => {
         if(obj[value.consortium] === undefined) obj[value.consortium] = {};
         if(obj[value.consortium]){
-            obj[value.consortium]['consortiumTotal'] = jsonData.filter(dt => dt.consortium === value.consortium).map(dt => dt.total).reduce((a,b) => a+b)
+            if(obj[value.consortium]['consortiumTotal'] === undefined) obj[value.consortium]['consortiumTotal'] = 0;
+            obj[value.consortium]['consortiumTotal'] += value.total;
             if(obj[value.consortium][value.study] === undefined) obj[value.consortium][value.study] = { total : jsonData.filter(dt => dt.study === value.study).map(dt => dt.total).reduce((a,b) => a+b)};
         }
     });
