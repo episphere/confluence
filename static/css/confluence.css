@@ -721,7 +721,6 @@ label {
     font-size: 0.75rem;
     background-color: #ffffff;
     margin: 0.25rem 0;
-    cursor: pointer !important;
 }
 
 .genotype-active-btn, .gender-active-btn {
@@ -826,7 +825,8 @@ label {
 }
 
 .filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover, 
-.filter-midset-data-status:focus, .filter-midset-data-status:hover, .filter-midset-data-study:focus, .filter-midset-data-study:hover, .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
+.filter-midset-data-status:focus, .filter-midset-data-status:hover, .filter-midset-data-study:focus, .filter-midset-data-study:hover, .filter-midset-data-ancestory:focus, .filter-midset-data-ancestory:hover,
+.genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
     border-radius: 0.25rem !important;
@@ -880,6 +880,7 @@ label {
     background-color: #ffffff;
     color: #3e4086;
     font-weight: bold;
+    cursor: pointer !important;
 }
 
 .consortia-total {
@@ -909,10 +910,10 @@ label {
 
 .consortium-selection-btn {
     border: 0px;
-    width: 100% !important;
     margin: 0.5px 0px !important;
     border-radius: 0.25rem;
     background-color: #ffffff;
+    text-align: end;
 }
 
 .card {
@@ -1360,4 +1361,29 @@ form {
 .variable-selection-header {
     padding-left: 5px !important;
     padding-right: 5px !important;
+}
+
+.filter-list-item {
+    display: flex;
+}
+
+.select-consortium {
+    margin-top: 5px;
+    margin-right: 2px;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }
