@@ -397,7 +397,7 @@ const renderAllCharts = (finalData, showFilter) => {
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    renderConsortiumPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'selectedRange7', 'chartDiv7');
+    renderStudyDesignPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) chipFilter(finalData);
     if(showFilter) genderFilter(finalData);
     if(showFilter) filterByStudy(finalData);
@@ -510,7 +510,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
             type: 'pie',
             textinfo: 'label+percent',
             hoverinfo: 'label+value+percent',
-            textposition: 'inside',
+            textposition: 'outside',
             automargin: true,
             showlegend: false,
             marker:{
@@ -563,7 +563,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+const renderStudyDesignPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -586,10 +586,11 @@ const renderConsortiumPieChart = (jsonData, parameter, id, labelID, rangeLabelID
             type: 'pie',
             hole: .4,
             textinfo: 'label+value',
-            textposition: 'inside',
+            textposition: 'outside',
             text: {
                 font: '10px'
             },
+            rotation: 90,
             showlegend: false,
             automargin: true,
             marker:{
