@@ -397,7 +397,7 @@ const renderAllCharts = (finalData, showFilter) => {
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
-    renderStudyDesignPieChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
+    renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) chipFilter(finalData);
     if(showFilter) genderFilter(finalData);
     if(showFilter) filterByStudy(finalData);
@@ -563,7 +563,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const renderStudyDesignPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
+const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -581,24 +581,17 @@ const renderStudyDesignPieChart = (jsonData, parameter, id, labelID, chartDiv) =
     
     const data = [
         {
-            labels: allLabels,
-            values: valueCount,
-            type: 'pie',
-            hole: .4,
-            textinfo: 'label+value',
-            textposition: 'outside',
-            text: {
-                font: '10px'
-            },
-            rotation: 90,
-            showlegend: false,
-            automargin: true,
+            x: allLabels,
+            y: valueCount,
+            type: 'bar',
             marker:{
-                colors: ['#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61']
+                color: ['#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61']
             },
         }
     ];
     const layout = {
+        xaxis: {fixedrange: true, automargin: true},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
