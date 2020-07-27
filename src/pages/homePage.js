@@ -1,3 +1,5 @@
+import { numberWithCommas } from "./../shared.js";
+
 export const template = () => {
     return `
     <div class="main-summary-row home-page-stats sub-div-shadow">
@@ -167,23 +169,23 @@ export const homePageVisualization = async () => {
             mainImage.src = `./static/images/${imageName}`;
             document.getElementById('displayConsortiaName').innerHTML = `<strong>${element.title}</strong>`;
             document.getElementById('publicConsortiaCount').innerHTML = `<h2>1</h2>`;
-            document.getElementById('publicStudiesCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.studies).reduce((a,b) => a+b) : 0}</h2>`;
-            document.getElementById('publicCaseCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.cases).reduce((a,b) => a+b) : 0}</h2>`;
-            document.getElementById('publicControlCount').innerHTML = `<h2>${data[consortiaName] ? Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b) : 0}</h2>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h2>${data[consortiaName] ? numberWithCommas(Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.studies).reduce((a,b) => a+b)) : 0}</h2>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h2>${data[consortiaName] ? numberWithCommas(Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.cases).reduce((a,b) => a+b)) : 0}</h2>`;
+            document.getElementById('publicControlCount').innerHTML = `<h2>${data[consortiaName] ? numberWithCommas(Object.values(data).filter(dt => dt.name === consortiaName).map(dt => dt.controls).reduce((a,b) => a+b)) : 0}</h2>`;
         });
         element.addEventListener('mouseout', () => {
             mainImage.src = `./static/images/home_page_circle.webp`;
             document.getElementById('displayConsortiaName').innerHTML = '</br>';
-            document.getElementById('publicConsortiaCount').innerHTML = `<h2>${Object.keys(data).length}</h2>`;
-            document.getElementById('publicStudiesCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h2>`;
-            document.getElementById('publicCaseCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h2>`;
-            document.getElementById('publicControlCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h2>`;
+            document.getElementById('publicConsortiaCount').innerHTML = `<h2>${numberWithCommas(Object.keys(data).length)}</h2>`;
+            document.getElementById('publicStudiesCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b))}</h2>`;
+            document.getElementById('publicCaseCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b))}</h2>`;
+            document.getElementById('publicControlCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b))}</h2>`;
         })
     });
-    document.getElementById('publicConsortiaCount').innerHTML = `<h2>${Object.keys(data).length}</h2>`;
-    document.getElementById('publicStudiesCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b)}</h2>`;
-    document.getElementById('publicCaseCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b)}</h2>`;
-    document.getElementById('publicControlCount').innerHTML = `<h2>${Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b)}</h2>`;
+    document.getElementById('publicConsortiaCount').innerHTML = `<h2>${numberWithCommas(Object.keys(data).length)}</h2>`;
+    document.getElementById('publicStudiesCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b))}</h2>`;
+    document.getElementById('publicCaseCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b))}</h2>`;
+    document.getElementById('publicControlCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b))}</h2>`;
 
     //     const ageData = data.age;        
     //     var trace = {
