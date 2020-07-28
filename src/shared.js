@@ -943,15 +943,15 @@ export const csvJSON = (csv) => {
         const currentline = lines[i].split(/[,\t]/g);
         for(let j = 0; j<headers.length; j++){
             let value = headers[j];
-            if(value === 'age10.19') value = '10-19';
-            if(value === 'age20.29') value = '20-29';
-            if(value === 'age30.39') value = '30-39';
-            if(value === 'age40.49') value = '40-49';
-            if(value === 'age50.59') value = '50-59';
-            if(value === 'age60.69') value = '60-69';
-            if(value === 'age70.79') value = '70-79';
-            if(value === 'age80.89') value = '80-89';
-            if(value === 'age90.99') value = '90-99';
+            if(value === 'age10:19') value = '10-19';
+            if(value === 'age20:29') value = '20-29';
+            if(value === 'age30:39') value = '30-39';
+            if(value === 'age40:49') value = '40-49';
+            if(value === 'age50:59') value = '50-59';
+            if(value === 'age60:69') value = '60-69';
+            if(value === 'age70:79') value = '70-79';
+            if(value === 'age80:89') value = '80-89';
+            if(value === 'age90:99') value = '90-99';
             obj[value] = currentline[j];
         }
         if(obj.study !== undefined) {

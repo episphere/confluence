@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
@@ -124,7 +124,13 @@ export const dataSummaryMissingTemplate = async () => {
     const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
     
-    const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i)
+    // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);
+    const studies = {};
+    data.forEach(dt => {
+        if(studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
+        if(studies[dt['Consortia']][dt['study']] === undefined) studies[dt['Consortia']][dt['study']] = {};
+    });
+    console.log(studies)
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     
     const div1 = document.createElement('div');
@@ -200,17 +206,42 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                     </li>`;
     });
     template += `</ul>`;
-    template += '<div class="custom-hr row"></div><div class="row study-select">Study</div>'
-    template += `<ul class="remove-padding-left" id="studiesList">`;
+
+    template += '<div class="custom-hr row"></div>'
     
-    studies.forEach(study => {
-        template += `<li class="filter-list-item">
-                        <button class="${study === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
-                            <div class="variable-name">${study}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
+    template += '<div id="studiesList">'
+    for(let consortium in studies){
+        template += `<ul class="remove-padding-left">
+                        <li class="custom-borders filter-list-item">
+                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
+                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                            <div class="ml-auto">
+                                
+                                <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                                    <i class="fas fa-caret-down"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
+        for(let study in studies[consortium]){
+            template += `<li class="filter-list-item">
+                            <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
+                                <div class="variable-name">${study}</div>
+                            </button>
+                        </li>`;
+        }
+        template += `</ul></ul></div>`;
+    }
+    // template += `<ul class="remove-padding-left" id="studiesList">`;
+    
+    // studies.forEach(study => {
+    //     template += `<li class="filter-list-item">
+    //                     <button class="${study === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
+    //                         <div class="variable-name">${study}</div>
+    //                     </button>
+    //                 </li>`;
+    // });
+    // template += `</ul>`;
 
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventFilterDataStatus(data, acceptedVariables, headers);
@@ -248,11 +279,25 @@ const addEventFilterDataStatus = (data) => {
             midset(newData, getSelectedVariables('midsetVariables'));
         })
     });
+
+    const elements4 = document.getElementsByClassName('select-consortium');
+    Array.from(elements4).forEach(el => {
+        el.addEventListener('click', () => {
+            if(el.checked){
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.add('active-filter'));
+            }
+            else {
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.remove('active-filter'));
+            }
+            const newData = computeNewData(data);
+            midset(newData, getSelectedVariables('midsetVariables'));
+        })
+    })
 };
 
 const getSelectedVariables = (parentId) => {
     const selections = [];
-    const cardBody = document.getElementById(parentId);
+    let cardBody = document.getElementById(parentId);
     const variables = cardBody.querySelectorAll('.active-filter');
     Array.from(variables).forEach(el => selections.push(el.dataset.variable));
     return selections;
@@ -305,7 +350,7 @@ const midset = (data, acceptedVariables) => {
         
         template += `<tr><th class="missing-column"></th>`
         for(let variable in headerCount) {
-            template += `<th class="missing-column cell-equal-width">${headerCount[variable]}</th>`
+            template += `<th class="missing-column cell-equal-width">${numberWithCommas(headerCount[variable])}</th>`
         }
         template += `<th class="missing-column"></th></tr><tr><td class="missing-column"></td>`;
         for(let variable in headerCount) {
@@ -323,7 +368,7 @@ const midset = (data, acceptedVariables) => {
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9898</td>`;
-            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set0}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${numberWithCommas(set0)}</td><td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>`;
         });
         template += `</tr>
                     <tr>
@@ -334,7 +379,7 @@ const midset = (data, acceptedVariables) => {
         const set1 = setLengths(data, acceptedVariables);
         acceptedVariables.forEach((variable, index) => {
             template += `<td class="missing-column">&#9899</td>`;
-            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${set1}</td>`;
+            if(index === acceptedVariables.length - 1) template += `<td class="missing-column">${numberWithCommas(set1)}</td>`;
         });
         template += '</tr>';
         let ignore = '';
@@ -370,7 +415,7 @@ const midset = (data, acceptedVariables) => {
                     template += '<td class="missing-column">&#9898</td>'
                 }
                 if(index === acceptedVariables.length - 1) {
-                    template += `<td class="missing-column">${result[key]}</td>`
+                    template += `<td class="missing-column">${numberWithCommas(result[key])}</td>`
                 }
             });
             template += '</tr>';
@@ -434,9 +479,8 @@ const renderMidsetHeader = (x, y, id) => {
             showgrid: false,
             showline: false,
             autotick: true,
-            ticks: '',
-            showticklabels: false,
-            fixedrange: true
+            fixedrange: true,
+            tickformat:',d'
         },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
@@ -473,7 +517,8 @@ const renderMidsetPlot = (x, id) => {
         xaxis: {
             showgrid: false,
             zeroline: false,
-            fixedrange: true
+            fixedrange: true,
+            tickformat:',d'
         },
         yaxis: {
             autorange: true,
