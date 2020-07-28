@@ -121,9 +121,10 @@ export const dataSummaryStatisticsTemplate = () => `
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile('653087731560');
     const {data, headers} = csv2Json(response);
-    const variables = headers.filter(dt => /status_/i.test(dt) === false && /study_/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false);
+    const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
-    const studies = headers.filter(dt => /study_/i.test(dt) === true);
+    
+    const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i)
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     
     const div1 = document.createElement('div');
@@ -187,20 +188,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                         </button>
                     </li>`;
     });
-    template += `</ul><div class="custom-hr row"></div>`;
-
-    template += '<div class="row study-select">Study</div>'
-    template += `<ul class="remove-padding-left" id="studiesList">`;
-    studies.push('All');
-    studies.forEach(study => {
-        template += `<li class="filter-list-item">
-                        <button class="${study === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
-                            <div class="variable-name">${study.replace(new RegExp('study_', 'i'), '')}</div>
-                        </button>
-                    </li>`;
-    });
     template += `</ul>`;
-
     template += '<div class="custom-hr row"></div><div class="row study-select">Ancestry</div>'
     template += `<ul class="remove-padding-left" id="ancestoryList">`;
     ancestory.push('All');
@@ -212,6 +200,18 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                     </li>`;
     });
     template += `</ul>`;
+    template += '<div class="custom-hr row"></div><div class="row study-select">Study</div>'
+    template += `<ul class="remove-padding-left" id="studiesList">`;
+    
+    studies.forEach(study => {
+        template += `<li class="filter-list-item">
+                        <button class="${study === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
+                            <div class="variable-name">${study}</div>
+                        </button>
+                    </li>`;
+    });
+    template += `</ul>`;
+
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventFilterDataStatus(data, acceptedVariables, headers);
 }
@@ -231,9 +231,8 @@ const addEventFilterDataStatus = (data) => {
     const elements2 = document.getElementsByClassName('filter-midset-data-study');
     Array.from(elements2).forEach(element => {
         element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) return
-            removeActiveClass('filter-midset-data-study', 'active-filter')
-            element.classList.add('active-filter');
+            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
+            else element.classList.add('active-filter');
             const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'));
         })
@@ -388,14 +387,11 @@ const midset = (data, acceptedVariables) => {
 
 const computeNewData = (data) => {
     const [statusSelection] = getSelectedVariables('statusList');
-    const [studySelection] = getSelectedVariables('studiesList');
+    const studySelection = getSelectedVariables('studiesList');
     const [ancestorySelection] = getSelectedVariables('ancestoryList');
     let newData = data;
 
-    if(studySelection === 'All') {
-        newData = newData;
-    }
-    else if(studySelection) newData = newData.filter(dt => dt[studySelection] === '1');
+    if(studySelection.length > 0) newData = newData.filter(dt => studySelection.indexOf(dt['study']) !== -1);
     if(newData.length === 0) newData = data;
 
     if(ancestorySelection === 'All') {
