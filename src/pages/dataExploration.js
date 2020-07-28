@@ -378,6 +378,7 @@ const midset = (data, acceptedVariables) => {
         
         template += '<tbody></table>';
     }
+    else template += 'Data not available.'
     hideAnimation();
     document.getElementById('missingnessTable').innerHTML = template;
     addEventVariableDefinitions();
@@ -392,19 +393,17 @@ const computeNewData = (data) => {
     let newData = data;
 
     if(studySelection.length > 0) newData = newData.filter(dt => studySelection.indexOf(dt['study']) !== -1);
-    if(newData.length === 0) newData = data;
-
+    
     if(ancestorySelection === 'All') {
         newData = newData;
     }
     else if(ancestorySelection) newData = newData.filter(dt => dt[ancestorySelection] === '1');
-    if(newData.length === 0) newData = data;
-
+    
     if(statusSelection === 'All') {
         newData = newData;
     }
     else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
-    if(newData.length === 0) newData = data;
+    
     return newData;
 }
 
