@@ -500,17 +500,26 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
         pieLabel = parameter;
     }
     document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
-
+    const values = [jsonData.map(dt => parseInt(dt['ER_statusIndex_pos'])).reduce((a,b) => a+b),
+        jsonData.map(dt => parseInt(dt['ER_statusIndex_neg'])).reduce((a,b) => a+b),
+        jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b)
+    ];
+    const labels = ['Positive', 'Negative', 'Don\'t know'];
+    const d3 = Plotly.d3
+    const format = d3.format(',3f')
+    const total = values.reduce((a, b) => a + b)
+    const text = values.map((v, i) => `
+            ${labels[i]}<br>
+            ${format(v)}<br>
+            ${v / total * 100}%
+        `)
     const data = [
         {
-            labels: ['Positive', 'Negative', 'Don\'t know'],
-            values: [jsonData.map(dt => parseInt(dt['ER_statusIndex_pos'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['ER_statusIndex_neg'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b)
-                ],
+            labels,
+            values,
             type: 'pie',
             textinfo: 'label+percent',
-            hoverinfo: 'label+value+percent',
+            hoverinfo: text,
             textposition: 'outside',
             automargin: true,
             showlegend: false,
