@@ -20,12 +20,12 @@ export const template = () => {
                         <div class="col" id="displayConsortiaName"></br></div>
                     </div>
                     <div class="row" style="margin-bottom:1rem">
-                        <div class="col">Consortia</br><span id="publicConsortiaCount">0</span></div>
-                        <div class="col">Studies</br><span id="publicStudiesCount">0</span></div>
+                        <div class="col">Consortia</br><span id="publicConsortiaCount"><h2>0</h2></span></div>
+                        <div class="col">Studies</br><span id="publicStudiesCount"><h2>0</h2></span></div>
                     </div>
                     <div class="row">
-                        <div class="col">Cases</br><span id="publicCaseCount">0</span></div>
-                        <div class="col">Controls</br><span id="publicControlCount">0</span></div>
+                        <div class="col">Cases</br><span id="publicCaseCount"><h2>0</h2></span></div>
+                        <div class="col">Controls</br><span id="publicControlCount"><h2>0</h2></span></div>
                     </div>
                 </div>
             </div>
