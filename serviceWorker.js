@@ -32,4 +32,16 @@ registerRoute(
     })
 );
 
+registerRoute(
+    new RegExp('https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/.+'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-cache',
+        plugins: [
+            new CacheableResponsePlugin({
+                statuses: [200],
+            })
+        ]
+    })
+);
+
 workbox.precaching.precacheAndRoute([{url: 'index.html', revision: '8'}]);

@@ -6,7 +6,7 @@ import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
-import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList } from './src/event.js';
+import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 import { aboutConfluence } from './src/pages/about.js';
@@ -91,6 +91,7 @@ export const confluence = async () => {
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
+            addEventUpdateSummaryStatsData();
             document.getElementById('dataSummaryStatistics').innerHTML = dataSummaryStatisticsTemplate();
             document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
@@ -238,6 +239,7 @@ const manageHash = () => {
         dataSummaryElement.classList.add('navbar-active');
         document.title = 'Confluence - Data Explore';
         confluenceDiv.innerHTML = dataSummary();
+        addEventUpdateSummaryStatsData();
         removeActiveClass('nav-link', 'active');
         document.querySelectorAll('[href="#data_exploration/subset"]')[0].classList.add('active');
         dataSummaryMissingTemplate();

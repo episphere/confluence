@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -445,25 +445,25 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     if(response1.status === 409) {
         const conflictFileId = response1.json.context_info.conflicts.id;
         document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
-        await uploadFileVersion(coreData, conflictFileId);
+        await uploadFileVersion(coreData, conflictFileId, 'application/json');
     }
     const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
     if(response2.status === 409) {
         const conflictFileId = response2.json.context_info.conflicts.id;
         document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
-        await uploadFileVersion(pathologyData, conflictFileId);
+        await uploadFileVersion(pathologyData, conflictFileId, 'application/json');
     }
     const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
     if(response3.status === 409) {
         const conflictFileId = response3.json.context_info.conflicts.id;
         document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
-        await uploadFileVersion(rfData, conflictFileId);
+        await uploadFileVersion(rfData, conflictFileId, 'application/json');
     }
     const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
     if(response4.status === 409) {
         const conflictFileId = response4.json.context_info.conflicts.id;
         document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
-        await uploadFileVersion(stData, conflictFileId);
+        await uploadFileVersion(stData, conflictFileId, 'application/json');
     }
 
     // Upload Submission logs
@@ -1408,4 +1408,93 @@ export const addEventVariableDefinitions = () => {
             body.innerHTML = `<span>${definition}</span>`;
         });
     });
+}
+
+export const addEventUpdateSummaryStatsData = () => {
+    const btn = document.getElementById('updateSummaryStatsData');
+    if(!btn) return;
+    btn.addEventListener('click', async () => {
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Update summary stats data</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+
+        const response = await getFolderItems(106289683820);
+        const summaryFolder = response.entries.filter(dt => dt.type === 'folder');
+        let template = '<form id="updateSummaryStatsForm">';
+        template += `Select summary data folder(s)`
+        template += `<ul>`;
+        
+        summaryFolder.forEach(folder => {
+            template += `<li class="filter-list-item">
+                            <button type="button" class="filter-btn sub-div-shadow collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
+                                <div class="variable-name">${folder.name}</div>
+                            </button>
+                        </li>`;
+        });
+        template += `</ul>`;
+        template += '<div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update data</button></div>'
+        template += '</form>';
+        body.innerHTML = template;
+        addEventSummaryFolderSelection();
+        addEventUpdateSummaryStatsForm();
+    });
+}
+
+const addEventSummaryFolderSelection = () => {
+    const elements = document.getElementsByClassName('update-summary-stats-btn');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
+            else element.classList.add('active-filter');
+        })
+    })
+}
+
+const addEventUpdateSummaryStatsForm = () => {
+    const form = document.getElementById('updateSummaryStatsForm');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        form.querySelectorAll('[type="submit"]')[0].classList.add('disabled');
+        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Updating...';
+        const selectedBtn = form.querySelectorAll('.active-filter');
+        const folderIds = Array.from(selectedBtn).map(btn => parseInt(btn.dataset.folderId));
+        if(folderIds.length === 0) return;
+        let masterArray = [];
+        let publicDataObj = {};
+        for(let id of folderIds){
+            const response = await getFolderItems(id);
+            const file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics/i.test(dt.name) === true);
+            form.querySelectorAll('[type="submit"]')[0].innerHTML = `Processing ${file[0].name}...`;
+            const csv = await getFile(file[0].id);
+            const jsonArray = csv2Json(csv).data;
+            const uniqueStudies = [];
+            jsonArray.forEach(obj => {
+                const consortium = obj.consortium === 'NCI' ? 'NCI-DCEG' : obj.consortium;
+                if(publicDataObj[consortium] === undefined) {
+                    publicDataObj[consortium] = {};
+                    publicDataObj[consortium].name = consortium;
+                    publicDataObj[consortium].studies = 0;
+                    publicDataObj[consortium].cases = 0;
+                    publicDataObj[consortium].controls = 0;
+                }
+                if(uniqueStudies.indexOf(obj.study) === -1) {
+                    uniqueStudies.push(obj.study);
+                    publicDataObj[consortium].studies += 1;
+                }
+                if(obj.status === 'case') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
+                if(obj.status === 'control') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
+            })
+            masterArray = masterArray.concat(jsonArray);
+        }
+        const masterCSV = json2csv(masterArray);
+        await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
+        await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
+        form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
+        removeActiveClass('update-summary-stats-btn', 'active-filter');
+    })
 }

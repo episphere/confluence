@@ -94,11 +94,11 @@ body {
 }
 
 .data-exploration-charts {
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .data-exploration-div {
-    margin-top: 30px;
+    margin-top: 1rem;
 }
 
 .collapse {
@@ -825,7 +825,8 @@ label {
 }
 
 .filter-studies:hover, .filter-studies:focus, .filter-midset-variable:focus, .filter-midset-variable:hover, 
-.filter-midset-data-status:focus, .filter-midset-data-status:hover, .filter-midset-data-study:focus, .filter-midset-data-study:hover, .filter-midset-data-ancestory:focus, .filter-midset-data-ancestory:hover,
+.filter-midset-data-status:focus, .filter-midset-data-status:hover, .filter-midset-data-study:focus, .filter-midset-data-study:hover, 
+.filter-midset-data-ancestory:focus, .filter-midset-data-ancestory:hover, .update-summary-stats-btn:focus, .update-summary-stats-btn:hover,
 .genotype-selection-btn:hover, .genotype-selection-btn:focus, .gender-selection-btn:hover, .gender-selection-btn:focus  {
     cursor: pointer;
     background-color: #c9c9c9;
@@ -1304,6 +1305,7 @@ form {
 
 .statistics-row {
     margin-bottom: 1rem;
+    margin-top: 0.5rem;
 }
 
 .missing-column {
@@ -1315,6 +1317,7 @@ form {
     overflow: auto !important;
     background-color: #ffffff;
     border-radius: 0.25rem;
+    padding-left: 15px;
 }
 
 #midsetChart {
@@ -1386,4 +1389,12 @@ form {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555; 
+}
+
+#dataLastModified {
+    padding-left: 30px;
+    font-style: italic;
+    color: #7e7e7e;
+    font-size: 12px;
+    margin-bottom: 15px;
 }

@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
@@ -6,6 +6,9 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 export const template = () => {
     return `
         <div class="main-summary-row data-exploration-div">
+            ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1? `
+                <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update summary stats data</button></div>
+            `:``}
             <div class="main-summary-row statistics-row">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
@@ -20,11 +23,14 @@ export const template = () => {
             </div>
         </div>
         <div class="main-summary-row" id="dataSummaryStatistics"></div>
+        <div class="main-summary-row">
+            <div class="offset-lg-2" id="dataLastModified"></div>
+        </div>
     `;
 }
 
 export const dataSummaryStatisticsTemplate = () => `
-    <div class="col-xl-2 margin-bottom">
+    <div class="col-xl-2">
         <div class="card sub-div-shadow">
             <div class="card-header">
                 <strong class="side-panel-header">Filter 
@@ -119,7 +125,9 @@ export const dataSummaryStatisticsTemplate = () => `
 `
 
 export const dataSummaryMissingTemplate = async () => {
-    const response = await getFile('653087731560');
+    const response = await getFile(missingnessStatsFileId);
+    const lastModified = (await getFileInfo(missingnessStatsFileId)).modified_at;
+    document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     const {data, headers} = csv2Json(response);
     const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
@@ -130,7 +138,6 @@ export const dataSummaryMissingTemplate = async () => {
         if(studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
         if(studies[dt['Consortia']][dt['study']] === undefined) studies[dt['Consortia']][dt['study']] = {};
     });
-    console.log(studies)
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     
     const div1 = document.createElement('div');

@@ -1,4 +1,4 @@
-import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas } from './shared.js';
+import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo } from './shared.js';
 import { variables } from './variables.js';
 import { addEventVariableDefinitions } from './event.js';
 
@@ -54,8 +54,9 @@ export const getData = (studyEntries, studyIds, values) => {
 }
 
 export const getFileContent = async () => {
-    const jsonData = csvJSON(await getFile(691143057533)); // Get summary level data
-    
+    const jsonData = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
+    const lastModified = (await getFileInfo(summaryStatsFileId)).modified_at;
+    document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     hideAnimation();
     if(jsonData.length === 0) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`

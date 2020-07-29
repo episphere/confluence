@@ -1,4 +1,4 @@
-import { numberWithCommas } from "./../shared.js";
+import { numberWithCommas, getPublicFile, publicDataFileId } from "./../shared.js";
 
 export const template = () => {
     return `
@@ -20,12 +20,12 @@ export const template = () => {
                         <div class="col" id="displayConsortiaName"></br></div>
                     </div>
                     <div class="row" style="margin-bottom:1rem">
-                        <div class="col">Consortia</br><span id="publicConsortiaCount"></span></div>
-                        <div class="col">Studies</br><span id="publicStudiesCount"></span></div>
+                        <div class="col">Consortia</br><span id="publicConsortiaCount">0</span></div>
+                        <div class="col">Studies</br><span id="publicStudiesCount">0</span></div>
                     </div>
                     <div class="row">
-                        <div class="col">Cases</br><span id="publicCaseCount"></span></div>
-                        <div class="col">Controls</br><span id="publicControlCount"></span></div>
+                        <div class="col">Cases</br><span id="publicCaseCount">0</span></div>
+                        <div class="col">Controls</br><span id="publicControlCount">0</span></div>
                     </div>
                 </div>
             </div>
@@ -156,10 +156,9 @@ export const homePageVisualization = async () => {
     //         .style("fill", "url(#grump_avatar" + i + ")");
     // });
 
-    
-
-    const response = await fetch('./data.json');
-    const data = await response.json();
+    // const response = await fetch('./data.json');
+    const response = await getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId);
+    const data = response.data;
     const elements = document.getElementsByClassName('consortia-circle');
     const mainImage = document.getElementById('consortiaCircle');
     Array.from(elements).forEach(element => {

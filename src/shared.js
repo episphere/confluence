@@ -53,6 +53,19 @@ export const getFolderInfo = async (id) => {
     }
 }
 
+export const getPublicFile = async (sharedName, id) => {
+    let r = await fetch(`https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/confluencePublicData?fileId=${id}&sharedName=${sharedName}`,{
+        method:'GET'
+    });
+    if(r.status === 200) {
+        return r.json();
+    }
+    else{
+        hideAnimation();
+        console.error(r);
+    }
+};
+
 export const getFile = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
@@ -386,13 +399,13 @@ export const uploadFile = async (data, fileName, folderId, html) => {
     }
 }
 
-export const uploadFileVersion = async (data, fileId, html) => {
+export const uploadFileVersion = async (data, fileId, type) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
         const form = new FormData();
         let blobData = '';
-        if(html) blobData = new Blob([data], { type: 'text/html'});
-        else blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
+        if(type === 'text/html' || type === 'text/csv') blobData = new Blob([data], { type: type});
+        else blobData = new Blob([JSON.stringify(data)], { type: type});
         
         form.append('file', blobData);
     
@@ -405,7 +418,7 @@ export const uploadFileVersion = async (data, fileId, html) => {
             contentType: false
         });
         if(response.status === 401){
-            if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, html);
+            if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, type);
         }
         else if(response.status === 201){
             return response.json();
@@ -415,7 +428,7 @@ export const uploadFileVersion = async (data, fileId, html) => {
         };
     }
     catch(err) {
-        if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, html);
+        if((await refreshToken()) === true) return await uploadFileVersion(data, fileId, 'text/html');
     }
 }
 
@@ -943,15 +956,15 @@ export const csvJSON = (csv) => {
         const currentline = lines[i].split(/[,\t]/g);
         for(let j = 0; j<headers.length; j++){
             let value = headers[j];
-            if(value === 'age10:19') value = '10-19';
-            if(value === 'age20:29') value = '20-29';
-            if(value === 'age30:39') value = '30-39';
-            if(value === 'age40:49') value = '40-49';
-            if(value === 'age50:59') value = '50-59';
-            if(value === 'age60:69') value = '60-69';
-            if(value === 'age70:79') value = '70-79';
-            if(value === 'age80:89') value = '80-89';
-            if(value === 'age90:99') value = '90-99';
+            if(value === 'age10.19') value = '10-19';
+            if(value === 'age20.29') value = '20-29';
+            if(value === 'age30.39') value = '30-39';
+            if(value === 'age40.49') value = '40-49';
+            if(value === 'age50.59') value = '50-59';
+            if(value === 'age60.69') value = '60-69';
+            if(value === 'age70.79') value = '70-79';
+            if(value === 'age80.89') value = '80-89';
+            if(value === 'age90.99') value = '90-99';
             obj[value] = currentline[j];
         }
         if(obj.study !== undefined) {
@@ -995,6 +1008,27 @@ export const jsonToTSVTxt = (json) => {
     return tsv;
 }
 
+export const json2csv = (json) => {
+    const fields = Object.keys(json[0])
+    const replacer = (key, value) => { return value === null ? '' : value } 
+    let csv = json.map((row) => {
+        return fields.map((fieldName) => {
+            return JSON.stringify(row[fieldName], replacer)
+        }).join(',')
+    })
+    csv.unshift(fields.join(',')) // add header column
+    csv = csv.join('\r\n');
+    return csv;
+}
+
 export const numberWithCommas = (x) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export const emailsAllowedToUpdateData = ['patelbhp@nih.gov']
+
+export const publicDataFileId = 697309514903;
+
+export const summaryStatsFileId = 691143057533;
+
+export const missingnessStatsFileId = 653087731560;
