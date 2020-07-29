@@ -1317,7 +1317,7 @@ form {
     overflow: auto !important;
     background-color: #ffffff;
     border-radius: 0.25rem;
-    padding-left: 15px;
+    margin-left: 15px;
 }
 
 #midsetChart {
