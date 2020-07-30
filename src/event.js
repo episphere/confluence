@@ -854,7 +854,7 @@ const addEventHideNotification = () => {
             btn.parentNode.parentNode.parentNode.removeChild(btn.parentNode.parentNode);
             if(top >= 2) top = top-2;
         });
-        setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 5000);
+        setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 8000);
     });
 }
 
