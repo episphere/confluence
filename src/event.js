@@ -1495,8 +1495,6 @@ const addEventUpdateSummaryStatsForm = () => {
         await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
         form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
         await getFile(summaryStatsFileId);
-        window.reload();
-        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
-        removeActiveClass('update-summary-stats-btn', 'active-filter');
+        location.reload();
     })
 }
