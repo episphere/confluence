@@ -1494,9 +1494,9 @@ const addEventUpdateSummaryStatsForm = () => {
         await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
         await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
         form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
-        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
-        removeActiveClass('update-summary-stats-btn', 'active-filter');
         await getFile(summaryStatsFileId);
         window.reload();
+        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
+        removeActiveClass('update-summary-stats-btn', 'active-filter');
     })
 }
