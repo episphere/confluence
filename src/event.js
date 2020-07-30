@@ -1495,6 +1495,7 @@ const addEventUpdateSummaryStatsForm = () => {
         await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
         form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
         await getFile(summaryStatsFileId);
+        await getFileInfo(summaryStatsFileId);
         form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
         removeActiveClass('update-summary-stats-btn', 'active-filter');
         let template = notificationTemplate(top, `<span class="successMsg">Summary statistics updated</span>`, `Summary statistics successfully updated, please reload to see updated data.`);
