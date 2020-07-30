@@ -1496,5 +1496,7 @@ const addEventUpdateSummaryStatsForm = () => {
         form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
         form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
         removeActiveClass('update-summary-stats-btn', 'active-filter');
+        await getFile(summaryStatsFileId);
+        window.reload();
     })
 }
