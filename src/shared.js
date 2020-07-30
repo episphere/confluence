@@ -1025,7 +1025,7 @@ export const numberWithCommas = (x) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-export const emailsAllowedToUpdateData = ['patelbhp@nih.gov']
+export const emailsAllowedToUpdateData = ['patelbhp@nih.gov', 'ahearntu@nih.gov']
 
 export const publicDataFileId = 697309514903;
 
