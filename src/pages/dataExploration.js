@@ -6,7 +6,7 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 export const template = () => {
     return `
         <div class="main-summary-row data-exploration-div">
-            ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1? `
+            ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
                 <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update summary stats data</button></div>
             `:``}
             <div class="main-summary-row statistics-row">
@@ -232,23 +232,13 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                         <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in studies[consortium]){
             template += `<li class="filter-list-item">
-                            <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
+                            <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
                                 <div class="variable-name">${study}</div>
                             </button>
                         </li>`;
         }
         template += `</ul></ul></div>`;
     }
-    // template += `<ul class="remove-padding-left" id="studiesList">`;
-    
-    // studies.forEach(study => {
-    //     template += `<li class="filter-list-item">
-    //                     <button class="${study === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-variable="${study}">
-    //                         <div class="variable-name">${study}</div>
-    //                     </button>
-    //                 </li>`;
-    // });
-    // template += `</ul>`;
 
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventFilterDataStatus(data, acceptedVariables, headers);
@@ -271,8 +261,17 @@ const addEventFilterDataStatus = (data) => {
         element.addEventListener('click', () => {
             if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
             else element.classList.add('active-filter');
+            document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = false;
             const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'));
+            let allStudiesSelected = true;
+            const constortiaStudyElements = element.parentNode.parentNode.querySelectorAll('.filter-midset-data-study');
+            Array.from(constortiaStudyElements).forEach(el => {
+                if(!allStudiesSelected) return;
+                if(el.classList.contains('active-filter') === false) allStudiesSelected = false;
+            });
+            if(allStudiesSelected) document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = true;
+            
         })
     });
 
