@@ -1467,7 +1467,7 @@ const addEventUpdateSummaryStatsForm = () => {
         let publicDataObj = {};
         for(let id of folderIds){
             const response = await getFolderItems(id);
-            const file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics/i.test(dt.name) === true);
+            const file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics.csv/i.test(dt.name) === true);
             form.querySelectorAll('[type="submit"]')[0].innerHTML = `Processing ${file[0].name}...`;
             const csv = await getFile(file[0].id);
             const jsonArray = csv2Json(csv).data;
