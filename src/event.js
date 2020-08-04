@@ -499,7 +499,7 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     newBtn.id = "continueSubmission";
     newBtn.classList = ["btn btn-light sub-div-shadow"];
     newBtn.title = "Continue Submission";
-    newBtn.innerHTML = 'Continue';
+    newBtn.innerHTML = 'Submit';
     newBtn.type = "button";
 
     const downloadAndClose = document.createElement('button');
@@ -550,7 +550,7 @@ const replaceBtns = () => {
     submitBtn.classList = ['btn btn-light sub-div-shadow'];
     submitBtn.id = 'submitBtn';
     submitBtn.title = 'Submit';
-    submitBtn.innerHTML = 'Submit';
+    submitBtn.innerHTML = 'run QAQC';
     submitBtn.type = 'Submit';
 
     continueBtn.parentNode.replaceChild(submitBtn, continueBtn);

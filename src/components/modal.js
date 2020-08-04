@@ -37,7 +37,7 @@ export const uploadInStudy = async (id) => {
                         <div id="uploadErrorReport"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" title="Submit" class="btn btn-light sub-div-shadow" id="submitBtn">Submit</button>
+                        <button type="submit" title="Submit" class="btn btn-light sub-div-shadow" id="submitBtn">run QAQC</button>
                         <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
                     </div>
                 </form>
