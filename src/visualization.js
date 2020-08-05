@@ -595,7 +595,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
             y: valueCount,
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2','#BF1B61']
+                color: getColors(allLabels.length)
             },
         }
     ];
@@ -647,4 +647,13 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
+}
+
+const getColors = (n) => {
+    let colors = [];
+    for(let i=0; i<n ; i++) {
+        if(Math.abs(i % 2) == 1) colors.push('#f7b6d2');
+        else colors.push('#BF1B61')
+    }
+    return colors;
 }
