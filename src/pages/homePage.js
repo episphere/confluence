@@ -27,6 +27,7 @@ export const template = () => {
                         <div class="col">Cases</br><span id="publicCaseCount"><h2>0</h2></span></div>
                         <div class="col">Controls</br><span id="publicControlCount"><h2>0</h2></span></div>
                     </div>
+                    <div class="row modified-at" id="publicDataModifiedAt"></div>
                 </div>
             </div>
             <div class="align-left info-confluence-bottom">
@@ -159,6 +160,10 @@ export const homePageVisualization = async () => {
     // const response = await fetch('./data.json');
     const response = await getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId);
     const data = response.data;
+    const dataModifiedAt = data.dataModifiedAt;
+    document.getElementById('publicDataModifiedAt').innerHTML = `Data last modified at - ${new Date(dataModifiedAt).toLocaleString()}`;
+    delete data.dataModifiedAt;
+    
     const elements = document.getElementsByClassName('consortia-circle');
     const mainImage = document.getElementById('consortiaCircle');
     Array.from(elements).forEach(element => {
@@ -185,59 +190,4 @@ export const homePageVisualization = async () => {
     document.getElementById('publicStudiesCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b))}</h2>`;
     document.getElementById('publicCaseCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b))}</h2>`;
     document.getElementById('publicControlCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b))}</h2>`;
-
-    //     const ageData = data.age;        
-    //     var trace = {
-    //         type: "bar",
-    //         x:Object.keys(ageData),
-    //         y:Object.keys(ageData).map(keys => ageData[keys]),
-    //         marker: {
-    //             color: '#c0236a'
-    //         }
-    //     }
-    //     if(trace.x.length>1){
-    //         if(trace.x.slice(-1)[0]=="undefined" || trace.x.slice(-1)[0]==""){
-    //             trace.x.pop();
-    //             trace.y.pop();
-    //         }
-    //     }
-    //     var layout = {
-    //         xaxis: {title:`Age`, font: {size: 16}, fixedrange: true},
-    //         yaxis: {title:`Count`, font: {size: 16}, fixedrange: true},
-    //         paper_bgcolor: 'rgba(0,0,0,0)',
-    //         plot_bgcolor: 'rgba(0,0,0,0)',
-    //         hovermode: false,
-    //         title: {
-    //             text: "Age Distribution Chart",
-    //             font: {
-    //                 size: 18
-    //             }
-    //         }
-    //     };
-    //     Plotly.newPlot('barChart', [trace], layout, {responsive: true, displayModeBar: false});
-
-    //     const ethnicity = data.ethnicity;
-
-    //     var pieData = [{
-    //         values: Object.keys(ethnicity).map(key => ethnicity[key]),
-    //         labels: Object.keys(ethnicity),
-    //         type: 'pie',
-    //         hole: .5,
-    //         textinfo: "none"
-    //     }];
-
-    //     var pieLayout = {
-    //         xaxis: {title:`Age`, font: {size: 16}},
-    //         yaxis: {title:`Count`, font: {size: 16}},
-    //         paper_bgcolor: 'rgba(0,0,0,0)',
-    //         plot_bgcolor: 'rgba(0,0,0,0)',
-    //         title: {
-    //             text: "Ethnicity Chart",
-    //             font: {
-    //                 size: 18
-    //             }
-    //         }
-    //     };
-        
-    //     Plotly.newPlot('pieChart', pieData, pieLayout, {responsive: true, displayModeBar: false});
 }

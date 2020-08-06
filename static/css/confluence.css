@@ -1398,3 +1398,11 @@ form {
     font-size: 12px;
     margin-bottom: 15px;
 }
+
+.modified-at {
+    margin: 0px !important;
+    font-style: italic;
+    color: #7e7e7e;
+    font-size: 12px;
+    margin-bottom: 15px;
+}

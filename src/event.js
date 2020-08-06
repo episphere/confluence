@@ -1490,6 +1490,7 @@ const addEventUpdateSummaryStatsForm = () => {
             })
             masterArray = masterArray.concat(jsonArray);
         }
+        publicDataObj['dataModifiedAt'] = new Date().toISOString();
         const masterCSV = json2csv(masterArray);
         await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
         await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
