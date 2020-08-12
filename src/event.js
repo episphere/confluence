@@ -1422,27 +1422,47 @@ export const addEventUpdateSummaryStatsData = () => {
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
 
-        const response = await getFolderItems(106289683820);
-        const summaryFolder = response.entries.filter(dt => dt.type === 'folder');
         let template = '<form id="updateSummaryStatsForm">';
         template += `<label>Select data type</label></br> <div style="padding-left:40px"><input type="radio" required value="summary" name="summarydataType"> Summary data</div><div style="padding-left:40px"><input value="missingness" required type="radio" name="summarydataType"> Missingness data</div>`
-        template += `</br>Select data folder(s)`
-        template += `<ul>`;
+        template += '</br><div id="summaryDataFolderList"></div>'
         
-        summaryFolder.forEach(folder => {
-            template += `<li class="filter-list-item">
-                            <button type="button" class="filter-btn sub-div-shadow collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
-                                <div class="variable-name">${folder.name}</div>
-                            </button>
-                        </li>`;
-        });
-        template += `</ul>`;
         template += '<div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update data</button></div>'
         template += '</form>';
         body.innerHTML = template;
-        addEventSummaryFolderSelection();
+        addEventDataTypeRadio();
         addEventUpdateSummaryStatsForm();
     });
+}
+
+const addEventDataTypeRadio = () => {
+    const radios = document.getElementsByName('summarydataType');
+    Array.from(radios).forEach(radio => {
+        radio.addEventListener('click', async () => {
+            const dataType = Array.from(document.getElementsByName('summarydataType')).filter(ele => ele.checked === true)[0].value;
+            let template = '';
+            const response = await getFolderItems(106289683820);
+            let summaryFolder = [];
+            if(dataType === 'summary') {
+                summaryFolder = response.entries.filter(dt => dt.type === 'folder' && /_summary_statistics/i.test(dt.name) === true);
+            }
+            else {
+                summaryFolder = response.entries.filter(dt => dt.type === 'folder' && /_missingness_statistics/i.test(dt.name) === true);
+            }
+            template += `Select data folder(s)`
+            template += `<ul>`;
+            summaryFolder.forEach(folder => {
+                template += `<li class="filter-list-item">
+                <button type="button" class="filter-btn sub-div-shadow collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
+                <div class="variable-name">${folder.name}</div>
+                </button>
+                </li>`;
+            });
+            template += `</ul>`;
+
+            document.getElementById('summaryDataFolderList').innerHTML = template;
+            addEventSummaryFolderSelection();
+        })
+    })
 }
 
 const addEventSummaryFolderSelection = () => {
