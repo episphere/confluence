@@ -233,8 +233,7 @@ export const refreshToken = async () => {
         body: `grant_type=refresh_token&refresh_token=${parms.refresh_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
     });
     if(response.status === 200){
-        const newToken = await response.json()
-        // const newParms = { ...parms, ...newToken };
+        const newToken = await response.json();
         const newParms = Object.assign(parms, newToken);
         localStorage.parms = JSON.stringify(newParms);
         return true;

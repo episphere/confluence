@@ -7,7 +7,7 @@ export const template = () => {
     return `
         <div class="main-summary-row data-exploration-div">
             ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
-                <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update summary stats data</button></div>
+                <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
             `:``}
             <div class="main-summary-row statistics-row">
                 <ul class="nav nav-tabs">
@@ -129,7 +129,7 @@ export const dataSummaryMissingTemplate = async () => {
     const lastModified = (await getFileInfo(missingnessStatsFileId)).modified_at;
     document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     const {data, headers} = csv2Json(response);
-    const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false);
+    const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false  && /bcac_id/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
     
     // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);

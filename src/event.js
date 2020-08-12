@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -1417,7 +1417,7 @@ export const addEventUpdateSummaryStatsData = () => {
         const header = document.getElementById('confluenceModalHeader');
         const body = document.getElementById('confluenceModalBody');
         
-        header.innerHTML = `<h5 class="modal-title">Update summary stats data</h5>
+        header.innerHTML = `<h5 class="modal-title">Update data</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>`;
@@ -1425,7 +1425,8 @@ export const addEventUpdateSummaryStatsData = () => {
         const response = await getFolderItems(106289683820);
         const summaryFolder = response.entries.filter(dt => dt.type === 'folder');
         let template = '<form id="updateSummaryStatsForm">';
-        template += `Select summary data folder(s)`
+        template += `<label>Select data type</label></br> <div style="padding-left:40px"><input type="radio" required value="summary" name="summarydataType"> Summary data</div><div style="padding-left:40px"><input value="missingness" required type="radio" name="summarydataType"> Missingness data</div>`
+        template += `</br>Select data folder(s)`
         template += `<ul>`;
         
         summaryFolder.forEach(folder => {
@@ -1458,6 +1459,7 @@ const addEventUpdateSummaryStatsForm = () => {
     const form = document.getElementById('updateSummaryStatsForm');
     form.addEventListener('submit', async e => {
         e.preventDefault();
+        const dataType = Array.from(document.getElementsByName('summarydataType')).filter(ele => ele.checked === true)[0].value;
         form.querySelectorAll('[type="submit"]')[0].classList.add('disabled');
         form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Updating...';
         const selectedBtn = form.querySelectorAll('.active-filter');
@@ -1467,39 +1469,52 @@ const addEventUpdateSummaryStatsForm = () => {
         let publicDataObj = {};
         for(let id of folderIds){
             const response = await getFolderItems(id);
-            const file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics.csv/i.test(dt.name) === true);
+            let file = [];
+            if(dataType === 'summary') file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics.csv/i.test(dt.name) === true);
+            else file = response.entries.filter(dt => dt.type === 'file' && /_missingness_statistics.csv/i.test(dt.name) === true);
+            if(file.length === 0) return;
             form.querySelectorAll('[type="submit"]')[0].innerHTML = `Processing ${file[0].name}...`;
             const csv = await getFile(file[0].id);
             const jsonArray = csv2Json(csv).data;
-            const uniqueStudies = [];
-            jsonArray.forEach(obj => {
-                const consortium = obj.consortium === 'NCI' ? 'NCI-DCEG' : obj.consortium;
-                if(publicDataObj[consortium] === undefined) {
-                    publicDataObj[consortium] = {};
-                    publicDataObj[consortium].name = consortium;
-                    publicDataObj[consortium].studies = 0;
-                    publicDataObj[consortium].cases = 0;
-                    publicDataObj[consortium].controls = 0;
-                }
-                if(uniqueStudies.indexOf(obj.study) === -1) {
-                    uniqueStudies.push(obj.study);
-                    publicDataObj[consortium].studies += 1;
-                }
-                if(obj.status === 'case') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
-                if(obj.status === 'control') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
-            })
+            if(dataType === 'summary') {
+                const uniqueStudies = [];
+                jsonArray.forEach(obj => {
+                    const consortium = obj.consortium === 'NCI' ? 'NCI-DCEG' : obj.consortium;
+                    if(publicDataObj[consortium] === undefined) {
+                        publicDataObj[consortium] = {};
+                        publicDataObj[consortium].name = consortium;
+                        publicDataObj[consortium].studies = 0;
+                        publicDataObj[consortium].cases = 0;
+                        publicDataObj[consortium].controls = 0;
+                    }
+                    if(uniqueStudies.indexOf(obj.study) === -1) {
+                        uniqueStudies.push(obj.study);
+                        publicDataObj[consortium].studies += 1;
+                    }
+                    if(obj.status === 'case') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
+                    if(obj.status === 'control') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
+                })
+            }
             masterArray = masterArray.concat(jsonArray);
         }
-        publicDataObj['dataModifiedAt'] = new Date().toISOString();
         const masterCSV = json2csv(masterArray);
-        await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
-        await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
-        form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
-        await getFile(summaryStatsFileId);
-        await getFileInfo(summaryStatsFileId);
+        if(dataType === 'summary') {
+            publicDataObj['dataModifiedAt'] = new Date().toISOString();
+            await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
+            await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
+            form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+            await getFile(summaryStatsFileId);
+            await getFileInfo(summaryStatsFileId);
+        }
+        else {
+            await uploadFileVersion(masterCSV, missingnessStatsFileId, 'text/csv');
+            form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+            await getFile(missingnessStatsFileId);
+            await getFileInfo(missingnessStatsFileId);
+        }
         form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
         removeActiveClass('update-summary-stats-btn', 'active-filter');
-        let template = notificationTemplate(top, `<span class="successMsg">Summary statistics updated</span>`, `Summary statistics successfully updated, please reload to see updated data.`);
+        let template = notificationTemplate(top, `<span class="successMsg">Data updated</span>`, `Data successfully updated, please reload to see updated data.`);
         document.getElementById('showNotification').innerHTML = template;
         addEventHideNotification();
     })
