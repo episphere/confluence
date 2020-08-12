@@ -240,8 +240,9 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                             </button>
                         </li>`;
         }
-        template += `</ul></ul></div>`;
+        template += `</ul></ul>`;
     }
+    template += `</div>`
 
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventFilterDataStatus(data, acceptedVariables, headers);
