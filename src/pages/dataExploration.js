@@ -293,10 +293,10 @@ const addEventFilterDataStatus = (data) => {
     Array.from(elements4).forEach(el => {
         el.addEventListener('click', () => {
             if(el.checked){
-                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.add('active-filter'));
+                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.add('active-filter'));
             }
             else {
-                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.remove('active-filter'));
+                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.remove('active-filter'));
             }
             const newData = computeNewData(data);
             midset(newData, getSelectedVariables('midsetVariables'));
