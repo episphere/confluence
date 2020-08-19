@@ -573,7 +573,7 @@ const dataForQAQC = (txt) => {
     }else{
         let arr =txt.split(/[\r\n]+/g).map(row=>{  // data array
             //if(row[0]=='    '){row='undefined   '+row}
-            return row.split(/[,\t]/g) // split csv and tsv alike
+            return row.replace(/"/g, '').split(/[,\t]/g) // split csv and tsv alike
         })
         if(arr.slice(-1).toLocaleString()==""){arr.pop()}
         const labels = arr[0]
