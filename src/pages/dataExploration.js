@@ -135,8 +135,8 @@ export const dataSummaryMissingTemplate = async () => {
     // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);
     const studies = {};
     data.forEach(dt => {
-        if(studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
-        if(studies[dt['Consortia']][dt['study']] === undefined) studies[dt['Consortia']][dt['study']] = {};
+        if(dt['study'] && studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
+        if(dt['study'] && studies[dt['Consortia']][dt['study']] === undefined) studies[dt['Consortia']][dt['study']] = {};
     });
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     

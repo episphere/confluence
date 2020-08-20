@@ -1022,6 +1022,7 @@ export const jsonToTSVTxt = (json) => {
 
 export const json2csv = (json) => {
     const fields = Object.keys(json[0])
+    if(!fields.includes('study')) fields.push('study');
     const replacer = (key, value) => { return value === null ? '' : value } 
     let csv = json.map((row) => {
         return fields.map((fieldName) => {
