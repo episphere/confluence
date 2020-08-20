@@ -1,11 +1,11 @@
-import { getFolderItems, filterConsortiums, checkMyPermissionLevel, getCollaboration } from "../shared.js"
+import { getFolderItems, filterConsortiums, getCollaboration, checkDataSubmissionPermissionLevel } from "../shared.js"
 
 export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content sub-div-shadow">
                 <div class="modal-header allow-overflow">
-                <h5 class="modal-title">Upload in existing study</h5>
+                <h5 class="modal-title">Upload data</h5>
                     <button type="button" title="Close" class="close modal-close-btn" title="Close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -84,7 +84,7 @@ const createConsortiaOptions = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
     for(let consortia of array){
-        const bool = checkMyPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), JSON.parse(localStorage.parms).login);
+        const bool = checkDataSubmissionPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), JSON.parse(localStorage.parms).login);
         if(bool === true) template += `<option value="${consortia.id}">${consortia.name}</option>`
     }
     return template;
