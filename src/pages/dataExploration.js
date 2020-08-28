@@ -135,7 +135,7 @@ export const dataSummaryMissingTemplate = async () => {
     // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);
     const studies = {};
     data.forEach(dt => {
-        if(dt['study'] && studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
+        if(studies[dt['Consortia']] === undefined) studies[dt['Consortia']] = {};
         if(dt['study'] && studies[dt['Consortia']][dt['study']] === undefined) studies[dt['Consortia']][dt['study']] = {};
     });
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
@@ -222,25 +222,28 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     template += '<div id="studiesList">'
     for(let consortium in studies){
         template += `<ul class="remove-padding-left">
-                        <li class="custom-borders filter-list-item">
+                        <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
                             <label for="label${consortium}" class="consortia-name">${consortium}</label>
                             <div class="ml-auto">
-                                
-                                <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                                <button ${Object.keys(studies[consortium]).length !== 0 ? ``:`disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                     <i class="fas fa-caret-down"></i>
                                 </button>
                             </div>
-                        </li>
-                        <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
-        for(let study in studies[consortium]){
-            template += `<li class="filter-list-item">
-                            <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
-                                <div class="variable-name">${study}</div>
-                            </button>
-                        </li>`;
+                        </li>`
+        if(Object.keys(studies[consortium]).length !== 0) {
+            template += `<ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
+
+            for(let study in studies[consortium]){
+                template += `<li class="filter-list-item">
+                                <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
+                                    <div class="variable-name">${study}</div>
+                                </button>
+                            </li>`;
+            }
+            template += `</ul>`;
         }
-        template += `</ul></ul>`;
+        template += `</ul>`;
     }
     template += `</div>`
 
@@ -445,9 +448,10 @@ const computeNewData = (data) => {
     const [statusSelection] = getSelectedVariables('statusList');
     const studySelection = getSelectedVariables('studiesList');
     const [ancestorySelection] = getSelectedVariables('ancestoryList');
+    const consortiaSelection = Array.from(document.getElementById('studiesList').querySelectorAll('[type="checkbox"]')).filter(element => element.checked === true).map(element => element.dataset.consortia);
     let newData = data;
 
-    if(studySelection.length > 0) newData = newData.filter(dt => studySelection.indexOf(dt['study']) !== -1);
+    if(studySelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studySelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
     
     if(ancestorySelection === 'All') {
         newData = newData;
@@ -458,7 +462,6 @@ const computeNewData = (data) => {
         newData = newData;
     }
     else if(statusSelection) newData = newData.filter(dt => dt[statusSelection] === '1');
-    
     return newData;
 }
 

@@ -750,7 +750,7 @@ export const sessionExpired = () => {
 }
 
 export const showAnimation = () => {
-    document.getElementById('loadingAnimation').style.display = '';
+    document.getElementById('loadingAnimation').style.display = 'block';
 }
 
 export const hideAnimation = () => {
