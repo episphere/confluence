@@ -471,7 +471,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
             x: ['Yes', 'No', 'Don\'t know'],
             y: [jsonData.map(dt => parseInt(dt['famHist_yes'])).reduce((a,b) => a+b),
                     jsonData.map(dt => parseInt(dt['famHist_no'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['famHist_DK\r'])).reduce((a,b) => a+b)
+                    jsonData.map(dt => parseInt(dt['famHist_DK'])).reduce((a,b) => a+b)
                     
             ],
             marker:{
