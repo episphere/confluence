@@ -1045,3 +1045,7 @@ export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 691143057533;
 
 export const missingnessStatsFileId = 653087731560;
+
+export const mapReduce = (data, variable) => {
+    return data.map(dt => parseInt(dt[variable])).reduce((a,b) => a+b);
+}

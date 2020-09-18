@@ -1,4 +1,4 @@
-import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo } from './shared.js';
+import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
 import { addEventVariableDefinitions } from './event.js';
 
@@ -438,16 +438,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
     const data = [
         {
             x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
-            y: [jsonData.map(dt => parseInt(dt['10-19'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['20-29'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['30-39'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['40-49'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['50-59'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['60-69'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['70-79'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['80-89'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['90-99'])).reduce((a,b) => a+b)
-            ],
+            y: [ mapReduce(jsonData, '10-19'), mapReduce(jsonData, '20-29'), mapReduce(jsonData, '30-39'), mapReduce(jsonData, '40-49'), mapReduce(jsonData, '50-59'), mapReduce(jsonData, '60-69'), mapReduce(jsonData, '70-79'), mapReduce(jsonData, '80-89'), mapReduce(jsonData, '90-99') ],
             marker:{
                 color: ['#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61']
             },
@@ -469,11 +460,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     const data = [
         {
             x: ['Yes', 'No', 'Don\'t know'],
-            y: [jsonData.map(dt => parseInt(dt['famHist_yes'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['famHist_no'])).reduce((a,b) => a+b),
-                    jsonData.map(dt => parseInt(dt['famHist_DK'])).reduce((a,b) => a+b)
-                    
-            ],
+            y: [ mapReduce(jsonData, 'famHist_yes'), mapReduce(jsonData, 'famHist_no'), mapReduce(jsonData, 'famHist_DK') ],
             marker:{
                 color: ['#BF1B61', '#f7b6d2', '#7F7F7F']
             },
@@ -500,10 +487,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
         pieLabel = parameter;
     }
     document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
-    const values = [jsonData.map(dt => parseInt(dt['ER_statusIndex_pos'])).reduce((a,b) => a+b),
-        jsonData.map(dt => parseInt(dt['ER_statusIndex_neg'])).reduce((a,b) => a+b),
-        jsonData.map(dt => parseInt(dt['ER_statusIndex_DK'])).reduce((a,b) => a+b)
-    ];
+    const values = [ mapReduce(jsonData, 'ER_statusIndex_pos'), mapReduce(jsonData, 'ER_statusIndex_neg'), mapReduce(jsonData, 'ER_statusIndex_DK') ];
     const labels = ['Positive', 'Negative', 'Don\'t know'];
     const d3 = Plotly.d3
     const format = d3.format(',3f')
