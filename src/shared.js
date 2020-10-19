@@ -881,7 +881,7 @@ export const getValidConsortium = async () => {
 }
 
 export const filterConsortiums = (array) => {
-    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC' || obj.name === 'Confluence_LAGENO'));
+    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC' || obj.name === 'Confluence_LAGENO' || obj.name === 'Confluence_OCPL'));
 }
 
 export const filterStudies = (array) => {
