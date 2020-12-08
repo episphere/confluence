@@ -1020,8 +1020,7 @@ export const jsonToTSVTxt = (json) => {
     return tsv;
 }
 
-export const json2csv = (json) => {
-    const fields = Object.keys(json[0])
+export const json2csv = (json, fields) => {
     if(!fields.includes('study')) fields.push('study');
     const replacer = (key, value) => { return value === null ? '' : value } 
     let csv = json.map((row) => {

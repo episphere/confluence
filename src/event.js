@@ -1487,6 +1487,7 @@ const addEventUpdateSummaryStatsForm = () => {
         if(folderIds.length === 0) return;
         let masterArray = [];
         let publicDataObj = {};
+        let allHeaders = [];
         for(let id of folderIds){
             const response = await getFolderItems(id);
             let file = [];
@@ -1495,7 +1496,9 @@ const addEventUpdateSummaryStatsForm = () => {
             if(file.length === 0) return;
             form.querySelectorAll('[type="submit"]')[0].innerHTML = `Processing ${file[0].name}...`;
             const csv = await getFile(file[0].id);
-            const jsonArray = csv2Json(csv).data;
+            const responseData = csv2Json(csv);
+            const jsonArray = responseData.data;
+            allHeaders = allHeaders.concat(responseData.headers)
             if(dataType === 'summary') {
                 const uniqueStudies = [];
                 jsonArray.forEach(obj => {
@@ -1517,7 +1520,8 @@ const addEventUpdateSummaryStatsForm = () => {
             }
             masterArray = masterArray.concat(jsonArray);
         }
-        const masterCSV = json2csv(masterArray);
+        const finalHeaders = allHeaders.filter((item, pos) => allHeaders.indexOf(item) === pos);
+        const masterCSV = json2csv(masterArray, finalHeaders);
         if(dataType === 'summary') {
             publicDataObj['dataModifiedAt'] = new Date().toISOString();
             await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
