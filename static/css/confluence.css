@@ -116,7 +116,7 @@ body {
 .container {
     min-height: inherit;
     height: 100%;
-    max-width: 100% !important;
+    max-width: 85% !important;
     margin: 0 auto;
     padding: 0;
 }
