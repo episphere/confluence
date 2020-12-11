@@ -118,7 +118,7 @@ body {
     height: 100%;
     max-width: 85% !important;
     margin: 0 auto;
-    padding: 0;
+    padding: 0px !important;
 }
 
 #pieChartLabel {
