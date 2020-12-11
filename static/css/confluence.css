@@ -1010,14 +1010,11 @@ span.icon {
     font-size: 0.9em;
     bottom: 0;
     width: 100%;
+    background-color: #333B4D;
 }
 
 .footer-content {
     text-align: center;
-    border-top: 0.5px solid rgba(0, 0, 0, 0.3);
-    width: 100%;
-    background-color: #fff;
-    margin: 0px !important;
 }
 
 .footer-col {
@@ -1028,6 +1025,38 @@ span.icon {
 .footer-row {
     padding: 8px 8px 10px 8px;
     margin: 0px !important;
+}
+
+.division-of-cancer-e {
+    color: #FFFFFF;
+    font-family: Montserrat;
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+.at-the-national-canc {
+    color: #FFFFFF;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.footer-heading {
+    color: #ffffff;
+    font-family: "Helvetica Neue";
+    font-size: 19.2px;
+    margin-top: 1rem;
+}
+
+.footer-body {
+    color: #ffffff;
+    font-family: "Helvetica Neue";
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+.zero-padding {
+    padding: 0px !important;
 }
 
 .dc-select-menu {
@@ -1052,18 +1081,18 @@ span.icon {
 }
 
 .footer-links {
-    color: #4d4d4d;
-    text-decoration: underline;
+    color: #ffffff !important;
+    text-decoration: none !important;
 }
 
 .footer-links:hover {
     text-decoration: none;
-    color: #4d4d4d;
+    color: #ffffff;
 }
 
 .footer-tagline {
-    color: black;
-    font-size: 1.1rem
+    color: #ffffff;
+    font-size: 1.1rem;
 }
 
 .grid
