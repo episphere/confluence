@@ -940,19 +940,15 @@ label {
     box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 6px 0px;
 }
 
-.nav-menu-links:hover, .dropdown-menu-links {
+.nav-menu-links:hover, .nav-menu-links:focus {
     cursor: pointer;
     background-color: #ffffff !important;
     color: #A41652 !important;
+    border: 0px;
 }
 
 .navbar-active {
     border-bottom: 5px solid #A41652 !important;
-    background-color: #ffffff !important;
-    color: #A41652 !important;
-}
-
-.nav-menu-links:focus, .dropdown-menu-links {
     background-color: #ffffff !important;
     color: #A41652 !important;
 }
@@ -987,6 +983,41 @@ label {
     color: #A41652 !important;
     padding: 0.5rem 1rem !important;
     font-weight: bold !important;
+}
+
+.banner-overlay-line {
+    box-sizing: border-box;
+    height: 1px;
+    border: 3px solid #ffffff;
+    margin: 12px 85px;
+}
+
+.banner-overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.confluence-banner {
+    position: relative;
+    text-align: center;
+    display: block;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.banner-overlay-h1 {
+    font-size:2.5vw;
+    color: #ffffff;
+    font-weight: bold;
+    font-family: "Helvetica Neue";
+}
+
+.banner-overlay-h3 {
+    font-size:1.5vw;
+    color: #ffffff;
+    font-family: "Helvetica Neue";
 }
 
 .grid-elements:hover {
