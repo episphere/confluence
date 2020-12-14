@@ -948,12 +948,13 @@ label {
 
 .navbar-active {
     border-bottom: 5px solid #A41652 !important;
+    background-color: #ffffff !important;
+    color: #A41652 !important;
 }
 
 .nav-menu-links:focus, .dropdown-menu-links {
     background-color: #ffffff !important;
     color: #A41652 !important;
-    border: 0px !important;
 }
 
 .dropdown-btn {
@@ -976,7 +977,7 @@ label {
 
 .nav-menu-links {
     text-decoration: none !important;
-    color:#ffffff !important;
+    color: #ffffff;
     padding: 0.5rem 1rem !important;
     font-weight: bold !important;
 }
