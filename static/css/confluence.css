@@ -94,9 +94,8 @@ body {
     height: inherit;
 }
 
-#maincontainer {
-    background-color: #f5f5f5;
-    min-height: calc(100vh - 256px);
+#confluenceDiv {
+    min-height: calc(100vh - 720px);
 }
 
 .h4-heading {

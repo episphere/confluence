@@ -37,28 +37,28 @@ export const template = () => {
         </div>
         <div id="governanceNav"></div>
         <div class="grid-elements">
-            <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial"><i class="fas fa-file-video">
+            <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
                 </i> Tutorials
             </a>
         </div>
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
-                <i class="fas fa-bug"></i> Report issue
+                Report issue
             </a>
         </div>
         <div class="navbar-nav ml-auto">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="grid-elements dropdown">
                     <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
+                        ${JSON.parse(localStorage.parms).name}
                     </button>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#logout" id="logOutBtn">Log Out</a>
                     </div>
                 </div>
             ` : `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" title="Log Out" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    <a class="nav-link nav-menu-links" title="Log Out" href="#logout" id="logOutBtn">Log Out</a>
                 </div>
             `}
             

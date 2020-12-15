@@ -189,6 +189,7 @@ const manageRouter = async () => {
         // confluenceDiv.innerHTML = homePage();
         // addEventAboutConfluence();
         // homePageVisualization();
+        hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
@@ -287,7 +288,7 @@ const manageHash = () => {
         // confluenceDiv.innerHTML = homePage();
         // addEventAboutConfluence();
         // homePageVisualization();
-        // hideAnimation();
+        hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
