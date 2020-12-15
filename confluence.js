@@ -146,7 +146,7 @@ export const confluence = async () => {
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
@@ -159,7 +159,7 @@ export const confluence = async () => {
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);

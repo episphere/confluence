@@ -750,11 +750,11 @@ export const sessionExpired = () => {
 }
 
 export const showAnimation = () => {
-    document.getElementById('loadingAnimation').style.display = 'block';
+    if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'block';
 }
 
 export const hideAnimation = () => {
-    document.getElementById('loadingAnimation').style.display = 'none';
+    if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'none';
 }
 
 export const showError = (errorMessage) => {
