@@ -6,12 +6,12 @@ export const template = async () => {
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) {
         hideAnimation();
-        return 'No folder found for Data Submission';
+        return '<div class="container">No folder found for Data Submission</div>';
     };
     
     let template = '';
     
-    template += `<div class="row create-study">
+    template += `<div class="container"><div class="row create-study">
                 <div class="upload-in-study">
                     <button data-toggle="modal" title="Upload data" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow">
                         <i class="fas fa-upload"></i> Upload data
@@ -35,7 +35,7 @@ export const template = async () => {
                     </li>`
     }
 
-    template += '</ul></div>';
+    template += '</ul></div></div>';
     return template;
 };
 
