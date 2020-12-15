@@ -186,9 +186,9 @@ const manageRouter = async () => {
         document.title = 'Confluence Data Platform';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
-        confluenceDiv.innerHTML = homePage();
-        addEventAboutConfluence();
-        homePageVisualization();
+        // confluenceDiv.innerHTML = homePage();
+        // addEventAboutConfluence();
+        // homePageVisualization();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
@@ -284,10 +284,10 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         document.title = 'Confluence Data Platform';
-        confluenceDiv.innerHTML = homePage();
-        addEventAboutConfluence();
-        homePageVisualization();
-        hideAnimation();
+        // confluenceDiv.innerHTML = homePage();
+        // addEventAboutConfluence();
+        // homePageVisualization();
+        // hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
@@ -326,7 +326,7 @@ const manageHash = () => {
 
 window.onload = async () => {
     const confluenceDiv = document.getElementById('confluenceDiv');
-    confluenceDiv.innerHTML = '';
+    // confluenceDiv.innerHTML = '';
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         await checkAccessTokenValidity();
         inactivityTime();

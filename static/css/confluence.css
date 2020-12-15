@@ -233,7 +233,7 @@ body {
 }
 
 .white-font {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 .cursor-pointer {
@@ -1018,6 +1018,42 @@ label {
     font-size:1.5vw;
     color: #ffffff;
     font-family: "Helvetica Neue";
+}
+
+.rounded-circle {
+    border-radius: 50%!important;
+}
+
+.icon-padding {
+    padding: 10px;
+}
+
+.primary-bg {
+    background-color: #A41652 !important;
+}
+
+.font-white {
+    color: #ffffff;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.confluence-cards {
+    align-items: center;
+    border: 1px solid rgb(218, 219, 230) !important;
+    border-radius: 1rem !important;
+    margin: 0px 15px 48px 15px !important;
+}
+
+.stretched-link:hover {
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .grid-elements:hover {
