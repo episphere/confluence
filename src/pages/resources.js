@@ -1,6 +1,6 @@
 export const confluenceResources = () => {
     return `
-        <div class="container">
+        <div class="container body-min-height">
             <div class="main-summary-row confluence-resources sub-div-shadow">
                 <div class="col">
                     <span class="confluence-pink">Links:</span></br>

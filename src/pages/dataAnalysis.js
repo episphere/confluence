@@ -1,6 +1,6 @@
 export const dataAnalysisTemplate = () => {
     return `
-        <div class="container">
+        <div class="container body-min-height">
             <div class="data-submission sub-div-shadow">
                 <div class="row data-analysis">
                     <div class="col-lg-6 allow-overflow">

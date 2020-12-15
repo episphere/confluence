@@ -94,10 +94,6 @@ body {
     height: inherit;
 }
 
-#confluenceDiv {
-    min-height: calc(100vh - 720px);
-}
-
 .h4-heading {
     color: #000000;
     font-weight: bold;
@@ -112,9 +108,11 @@ body {
     overflow: auto;
 }
 
+.body-min-height {
+    min-height: calc(100vh - 220px) !important;
+}
+
 .container {
-    min-height: inherit;
-    height: 100%;
     max-width: 85% !important;
     margin: 0 auto;
     padding: 0px !important;

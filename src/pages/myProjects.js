@@ -6,7 +6,7 @@ export const myProjectsTemplate = async () => {
     const response = await getFolderItems(0);
     const data = filterProjects(response.entries);
     if(data.length <= 0) confluenceDiv.innerHTML = `No projects found!`;
-    confluenceDiv.innerHTML = `<div class="container"><div class="my-projects-div sub-div-shadow" id="myProjectsList">${fileVersionsModal()}</div></div>`
+    confluenceDiv.innerHTML = `<div class="container body-min-height"><div class="my-projects-div sub-div-shadow" id="myProjectsList">${fileVersionsModal()}</div></div>`
     const ul =  document.createElement('ul');
     ul.classList = ['ul-list-style first-list-item'];
     for(let i = 0 ; i < data.length; i++) {

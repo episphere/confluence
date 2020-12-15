@@ -5,7 +5,7 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 
 export const template = () => {
     return `
-        <div class="container">
+        <div class="container body-min-height">
             <div class="main-summary-row data-exploration-div">
                 ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
                     <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>

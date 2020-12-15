@@ -44,4 +44,4 @@ registerRoute(
     })
 );
 
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: '11'}]);
+workbox.precaching.precacheAndRoute([{url: 'index.html', revision: '12'}]);

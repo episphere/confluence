@@ -1,6 +1,6 @@
 export const aboutConfluence = () => {
     return `
-        <div class="container">
+        <div class="container body-min-height">
             <div class="main-summary-row home-page-stats sub-div-shadow">
                 <div class="col-lg-6" id="aboutContent"></div>
                 <div class="col-lg-6">
