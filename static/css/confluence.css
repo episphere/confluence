@@ -7,11 +7,6 @@ a {
     text-decoration: none;
 }
 
-p,li,div {
-    color: #000;
-    font-family:sans-serif;
-}
-
 .fa-copy, .getAllFileversions, .fa-folder-minus {
     color: #0085c8 !important;
     cursor: pointer !important;
@@ -1026,6 +1021,10 @@ label {
 
 .primary-bg {
     background-color: #A41652 !important;
+}
+
+.secondary-bg {
+    background-color: #F7F5F4 !important;
 }
 
 .font-white {

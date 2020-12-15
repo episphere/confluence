@@ -111,132 +111,133 @@
     <main role="main" id="confluenceMain">
         <div class="main-summary-row" id="loadingAnimation" role="status" style="display: none;"></div>
         <div id="confluenceDiv">
-            <div class="confluence-banner">
-                <img src="./static/images/hero-banner.jpg" height="100%" width="100%" alt="Confluence logo">
-                <div class="banner-overlay-text row justify-content-center text-center">
-                    <div class="col-md-12">
-                        <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
-                        <div class="banner-overlay-line"></div>
-                        <h3 class="banner-overlay-h3" style="font-size:2vw;">Uncovering breast cancer genetic susceptibility</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container body-min-height align-middle text-center" style="margin-top: 70px;">
-                <div class="card-deck">
-                    <div class="col-lg card confluence-cards">
-                        <a class="stretched-link" href="#/">
-                            <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
-                                <i class="fas fa-download fa-2x icon-padding font-white"></i>
-                            </div>
-                        </a>
-                        <div class="card-body">
-                            <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
-                                <h2 style="font-size: 1.75rem;"><b>Learn about Confluence</b></h2>
-                            </div>
-                            <p class="text-secondary card-text">
-                                <small>Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.</small>
-                            </p>
-                        </div>
-
-                        <div class="bg-white border-top-0 card-footer" style="width: 100%;">
-                            <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
-                                <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Learn about Confluence</a>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="col-lg card confluence-cards">
-                        <a class="stretched-link" href="#/">
-                            <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
-                                <i class="fas fa-chart-bar fa-2x icon-padding font-white"></i>
-                            </div>
-                        </a>
-                        <div class="card-body">
-                            <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
-                                <h2 style="font-size: 1.75rem;"><b>Join a Participating Consortia</b></h2>
-                            </div>
-                            <p class="text-secondary card-text">
-                                <small>You can participate in Confluence by joining a breast cancer consortia.</small>
-                            </p>
-                        </div>
-
-                        <div class="bg-white border-top-0 card-footer" style="width: 100%;">
-                            <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
-                                <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Join a Consortia</a>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="col-lg card confluence-cards">
-                        <a class="stretched-link" href="#/">
-                            <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
-                                <i class="fas fa-handshake fa-2x icon-padding font-white"></i>
-                            </div>
-                        </a>
-                        <div class="card-body">
-                            <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
-                                <h2 style="font-size: 1.75rem;"><b>Request Data Access</b></h2>
-                            </div>
-                            <p class="text-secondary card-text">
-                                <small>The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.</small>
-                            </p>
-                        </div>
-
-                        <div class="bg-white border-top-0 card-footer" style="width: 100%;">
-                            <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
-                                <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Request Data Access</a>
-                            </button>
-                        </div>
-                    </div>
-                    
-                </div>
-                <div aria-live="polite" aria-atomic="true" class="row confluence-notification">
-                    <div id="showNotification"></div>
-                </div>
-
-                <div class="modal fade" id="confluenceMainModal" data-keyboard="false" data-backdrop="static"
-                    tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content sub-div-shadow">
-                            <div class="modal-header" id="confluenceModalHeader"></div>
-                            <div class="modal-body" id="confluenceModalBody"></div>
+            <div class="secondary-bg">
+                <div class="confluence-banner">
+                    <img src="./static/images/hero-banner.jpg" height="100%" width="100%" alt="Confluence logo">
+                    <div class="banner-overlay-text row justify-content-center text-center">
+                        <div class="col-md-12">
+                            <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
+                            <div class="banner-overlay-line"></div>
+                            <h3 class="banner-overlay-h3" style="font-size:2vw;">Uncovering breast cancer genetic susceptibility</h3>
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1"
-                    role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content sub-div-shadow">
-                            <div class="modal-header allow-overflow">
-                                <div id="folderToShare"></div>
-                                <ul class="nav nav-tabs">
-                                    <li>
-                                        <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
-                                    </li>
-
-                                    <li>
-                                        <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
-                                    </li>
-                                </ul>
-                                <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                <div class="container body-min-height align-middle text-center" style="margin-top: 70px;">
+                    <div class="card-deck">
+                        <div class="col-lg card confluence-cards">
+                            <a class="stretched-link" href="#/">
+                                <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
+                                    <i class="fas fa-download fa-2x icon-padding font-white"></i>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
+                                    <h2 style="font-size: 1.75rem;"><b>Learn about Confluence</b></h2>
+                                </div>
+                                <p class="text-secondary card-text">
+                                    <small>Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.</small>
+                                </p>
+                            </div>
+    
+                            <div class="bg-white border-top-0 card-footer" style="width: 100%;">
+                                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
+                                    <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Learn about Confluence</a>
                                 </button>
                             </div>
-
-                            <div id="collaboratorModalBody"></div>
+                        </div>
+    
+                        <div class="col-lg card confluence-cards">
+                            <a class="stretched-link" href="#/">
+                                <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
+                                    <i class="fas fa-chart-bar fa-2x icon-padding font-white"></i>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
+                                    <h2 style="font-size: 1.75rem;"><b>Join a Participating Consortia</b></h2>
+                                </div>
+                                <p class="text-secondary card-text">
+                                    <small>You can participate in Confluence by joining a breast cancer consortia.</small>
+                                </p>
+                            </div>
+    
+                            <div class="bg-white border-top-0 card-footer" style="width: 100%;">
+                                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
+                                    <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Join a Consortia</a>
+                                </button>
+                            </div>
+                        </div>
+    
+                        <div class="col-lg card confluence-cards">
+                            <a class="stretched-link" href="#/">
+                                <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
+                                    <i class="fas fa-handshake fa-2x icon-padding font-white"></i>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                <div class="card-title h5" style="color: rgb(84, 88, 113); word-spacing: 100vw;">
+                                    <h2 style="font-size: 1.75rem;"><b>Request Data Access</b></h2>
+                                </div>
+                                <p class="text-secondary card-text">
+                                    <small>The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.</small>
+                                </p>
+                            </div>
+    
+                            <div class="bg-white border-top-0 card-footer" style="width: 100%;">
+                                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
+                                    <a class="stretched-link font-white" href="#/" style="text-decoration: none;">Request Data Access</a>
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div aria-live="polite" aria-atomic="true" class="row confluence-notification">
+                        <div id="showNotification"></div>
+                    </div>
+    
+                    <div class="modal fade" id="confluenceMainModal" data-keyboard="false" data-backdrop="static"
+                        tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header" id="confluenceModalHeader"></div>
+                                <div class="modal-body" id="confluenceModalBody"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static"
-                    tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content sub-div-shadow">
-                            <div class="modal-header allow-overflow" id="modalFileStatsHeader"></div>
-                            <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
-                            <div class="modal-footer">
-                                <button type="button" title="Close" class="btn btn-dark sub-div-shadow"
-                                    data-dismiss="modal">Close</button>
+                    <div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1"
+                        role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header allow-overflow">
+                                    <div id="folderToShare"></div>
+                                    <ul class="nav nav-tabs">
+                                        <li>
+                                            <button title="Add collaborator(s)" class="nav-link sub-div-shadow" id="addNewCollaborators">Add collaborator(s)</button>
+                                        </li>
+    
+                                        <li>
+                                            <button title="All collaborator(s)" class="nav-link sub-div-shadow" id="listCollaborators">All collaborator(s)</button>
+                                        </li>
+                                    </ul>
+                                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+    
+                                <div id="collaboratorModalBody"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static"
+                        tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content sub-div-shadow">
+                                <div class="modal-header allow-overflow" id="modalFileStatsHeader"></div>
+                                <div class="modal-body allow-overflow" id="modalFileStatsBody"></div>
+                                <div class="modal-footer">
+                                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow"
+                                        data-dismiss="modal">Close</button>
+                                </div>
                             </div>
                         </div>
                     </div>
