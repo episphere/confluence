@@ -26,7 +26,7 @@ export const template = () => {
 }
 
 const dataVisulizationCards = (obj) => `
-        <div class="data-exploration-charts col-xl-4">
+        <div class="col-xl-4 padding-right-zero">
             <div id="${obj.divId}">
                 <div class="card">
                     <div class="card-header">
@@ -56,7 +56,7 @@ export const dataSummaryStatisticsTemplate = () => {
             </div>
         </div>
     </div>
-    <div class="col-xl-10">
+    <div class="col-xl-10 padding-right-zero">
         <div class="main-summary-row">`
         template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
         template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})

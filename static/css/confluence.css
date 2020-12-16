@@ -73,10 +73,6 @@ body {
     font-weight: bold;
 }
 
-.data-exploration-charts {
-    margin-bottom: 15px;
-}
-
 #updateSummaryStatsData {
     margin: 1rem 0 !important;
 }
@@ -191,6 +187,10 @@ body {
 .confluence-pink {
     color: #A41652;
     font-weight: bold;
+}
+
+.padding-right-zero {
+    padding-right: 0px !important;
 }
 
 .list-group-item-active {
