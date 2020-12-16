@@ -13,7 +13,7 @@ export const template = async () => {
     
     template += `<div class="container body-min-height"><div class="row create-study">
                 <div class="upload-in-study">
-                    <button data-toggle="modal" title="Upload data" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow">
+                    <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow">
                         <i class="fas fa-upload"></i> Upload data
                     </button>
                 </div>

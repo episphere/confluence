@@ -1083,6 +1083,10 @@ label {
     text-decoration: none;
 }
 
+#createProjectBtn, #uploadDataBtn {
+    margin-top: 1rem;
+}
+
 .grid-elements:hover {
     text-decoration: none;
     color:#fff;

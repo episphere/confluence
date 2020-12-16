@@ -868,6 +868,8 @@ export const addEventDataGovernanceNavBar = (bool) => {
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
+            const containerDiv = document.createElement('div');
+            containerDiv.classList = ['container'];
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
             btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
@@ -891,8 +893,9 @@ export const addEventDataGovernanceNavBar = (bool) => {
             divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
-            confluenceDiv.appendChild(btnDiv);
-            confluenceDiv.appendChild(divRow);
+            containerDiv.appendChild(btnDiv)
+            containerDiv.appendChild(divRow)
+            confluenceDiv.appendChild(containerDiv);
             dataGovernanceProjects();
         }
         else{
