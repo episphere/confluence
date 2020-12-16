@@ -932,6 +932,7 @@ label {
     background-color: #ffffff !important;
     color: #A41652 !important;
     border: 0px;
+    border-bottom: 5px solid #ffffff !important;
 }
 
 .navbar-active {
@@ -997,13 +998,13 @@ label {
     font-size:2.5vw;
     color: #ffffff;
     font-weight: bold;
-    font-family: helvetica;
+    font-family: 'Helvetica Neue', sans-serif;
 }
 
 .banner-overlay-h3 {
     font-size:1.5vw;
     color: #ffffff;
-    font-family: helvetica;
+    font-family: 'Helvetica Neue', sans-serif;
 }
 
 .rounded-circle {
@@ -1032,10 +1033,17 @@ label {
 }
 
 .font-family-helvetica {
-    font-family: 'Helvetica Neue' !important;
+    font-family: 'Helvetica Neue', sans-serif !important;
+}
+
+.inverse-triangle {
+    height: 50px; 
+    clip-path: polygon(50% 100%, 0px 0px, 100% 0px);
 }
 
 .our-goals {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
     color: #333B4D !important;
 }
 
@@ -1066,7 +1074,7 @@ label {
 .confluence-cards {
     align-items: center;
     border: 1px solid rgb(218, 219, 230) !important;
-    border-radius: 1rem !important;
+    border-radius: 0.5rem !important;
     margin: 0px 15px 48px 15px !important;
 }
 
@@ -1103,7 +1111,7 @@ span.icon {
 
 .footer-content {
     text-align: center;
-    font-family: Montserrat;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .footer-col {
@@ -1118,28 +1126,28 @@ span.icon {
 
 .division-of-cancer-e {
     color: #FFFFFF;
-    font-family: Montserrat;
+    font-family: 'Montserrat', sans-serif;
     font-size: 25px;
     font-weight: bold;
   }
 
 .at-the-national-canc {
     color: #FFFFFF;
-    font-family: Montserrat;
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     font-weight: bold;
 }
 
 .footer-heading {
     color: #ffffff;
-    font-family: helvetica;
+    font-family: 'Helvetica Neue', sans-serif;
     font-size: 19.2px;
     margin-top: 1rem;
 }
 
 .footer-body {
     color: #ffffff;
-    font-family: helvetica;
+    font-family: 'Helvetica Neue', sans-serif;
     font-size: 16px;
     font-weight: bold;
   }

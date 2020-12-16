@@ -796,7 +796,7 @@ export const addEventAddNewCollaborator = () => {
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="btn btn-light sub-div-shadow" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
+                            <button class="btn btn-light sub-div-shadow" type="button" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
                         </div>
                     </div>
                 </div>
@@ -811,7 +811,7 @@ export const addEventAddNewCollaborator = () => {
         addMoreEmail.addEventListener('click', () => {
             const counter = parseInt(addMoreEmail.dataset.counter)+1;
             addMoreEmail.dataset.counter = counter;
-            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            document.getElementById('collaboratorEmails').insertAdjacentHTML("beforeend", addFields(counter));
             if(counter === 5) addMoreEmail.disabled = true;
         });
 
@@ -944,7 +944,7 @@ const addEventCreateProjectBtn = () => {
             </div>
                 
             <div class="row">
-                <div class="col"><button title="Add more collaborators" class="btn btn-light sub-div-shadow" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                <div class="col"><button title="Add more collaborators" type="button" class="btn btn-light sub-div-shadow" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
             </div>
             </br>
         </div>
@@ -957,7 +957,7 @@ const addEventCreateProjectBtn = () => {
         addMoreEmail.addEventListener('click', () => {
             const counter = parseInt(addMoreEmail.dataset.counter)+1;
             addMoreEmail.dataset.counter = counter;
-            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            document.getElementById('collaboratorEmails').insertAdjacentHTML("beforeend", addFields(counter));
             if(counter === 5) addMoreEmail.disabled = true;
         });
         addEventCPCSelect();
