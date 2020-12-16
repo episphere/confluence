@@ -949,7 +949,7 @@ label {
 
 .dropdown-menu {
     border: 0px !important;
-    box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 5px 0px;
+    box-shadow: -3px 0px 13px -7px #000000, 3px 0px 13px -7px #000000, 0px 13px 13px -13px rgba(0,0,0,0.3);
 }
 
 .navbar-dropdown {
