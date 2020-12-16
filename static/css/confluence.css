@@ -33,7 +33,7 @@ a {
 }
 
 body {
-    font-family: helvetica !important;
+    font-family: 'Helvetica Neue' !important;
 }
 
 #page {
@@ -1031,11 +1031,21 @@ label {
     padding: 2rem 0 !important;
 }
 
+.font-family-helvetica {
+    font-family: 'Helvetica Neue' !important;
+}
+
+.our-goals {
+    color: #333B4D !important;
+}
+
 .font-size-28 {
     font-size: 28px !important;
 }
 
-
+.font-size-18 {
+    font-size: 18px !important;
+}
 
 .font-size-14 {
     font-size: 14px !important;
@@ -1046,7 +1056,7 @@ label {
 }
 
 .font-weight-bold {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .align-center {

@@ -3,7 +3,6 @@ import { template as homePage, homePageVisualization, addEventAboutConfluence } 
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList, addEventUpdateSummaryStatsData } from './src/event.js';
@@ -46,8 +45,6 @@ export const confluence = async () => {
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
 
-    const footer = document.getElementById('footer');
-    footer.innerHTML = footerTemplate();
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
