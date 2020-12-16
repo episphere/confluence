@@ -11,6 +11,7 @@ import { getFileContent } from './src/visualization.js';
 import { aboutConfluence } from './src/pages/about.js';
 import { confluenceResources } from './src/pages/resources.js';
 import { confluenceContactPage } from './src/pages/contact.js';
+import { footerTemplate } from './src/components/footer.js';
 
 const displayNotification = () => {
     navigator.serviceWorker.getRegistration()
@@ -173,6 +174,7 @@ export const confluence = async () => {
 };
 
 const manageRouter = async () => {
+    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
@@ -222,6 +224,7 @@ const manageRouter = async () => {
 }
 
 const manageHash = () => {
+    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();

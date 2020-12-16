@@ -1,4 +1,3 @@
-import { footerTemplate } from "../components/footer.js";
 import { numberWithCommas, getPublicFile, publicDataFileId } from "./../shared.js";
 
 export const template = () => {
@@ -243,7 +242,6 @@ export const infoDeck = () => {
         </div>
     `
     document.getElementById('confluenceDiv').innerHTML = template;
-    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
 }
 
 export const infoDeckAfterLoggedIn = () => {
@@ -297,7 +295,6 @@ export const infoDeckAfterLoggedIn = () => {
         </div>
     `
     document.getElementById('confluenceDiv').innerHTML = template;
-    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
 }
 
 const cardContents = (obj) => {
