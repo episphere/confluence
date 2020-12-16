@@ -225,6 +225,7 @@ const manageHash = () => {
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
+    debugger
     if(hash === '#data_exploration/summary') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
