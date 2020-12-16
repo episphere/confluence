@@ -69,18 +69,18 @@ const chipFilter = (jsonData) => {
     document.getElementById('chipContent').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row genotype-select'];
-    div1.innerHTML = 'Genotyping chip &nbsp; '
+    div1.innerHTML = 'Genotyping chip'
 
-    const btn1 = document.createElement('button');
-    btn1.dataset.keyboard = "false";
-    btn1.dataset.backdrop = "static";
-    btn1.dataset.toggle = "modal";
-    btn1.dataset.target = "#confluenceMainModal";
-    btn1.dataset.variable = "chip";
-    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
-    btn1.classList = ['info-btn variable-definition'];
-    btn1.setAttribute('aria-label', 'More info')
-    div1.appendChild(btn1);
+    // const btn1 = document.createElement('button');
+    // btn1.dataset.keyboard = "false";
+    // btn1.dataset.backdrop = "static";
+    // btn1.dataset.toggle = "modal";
+    // btn1.dataset.target = "#confluenceMainModal";
+    // btn1.dataset.variable = "chip";
+    // btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
+    // btn1.classList = ['info-btn variable-definition'];
+    // btn1.setAttribute('aria-label', 'More info')
+    // div1.appendChild(btn1);
 
     const div2 = document.createElement('div')
     div2.classList = ['row genotype-select'];
@@ -127,18 +127,18 @@ const genderFilter = (jsonData) => {
     document.getElementById('genderFilter').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
-    div1.innerHTML = 'Gender &nbsp;'
+    div1.innerHTML = 'Gender'
 
-    const btn1 = document.createElement('button');
-    btn1.dataset.keyboard = "false";
-    btn1.dataset.backdrop = "static";
-    btn1.dataset.toggle = "modal";
-    btn1.dataset.target = "#confluenceMainModal";
-    btn1.dataset.variable = "sex";
-    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
-    btn1.classList = ['info-btn variable-definition'];
-    btn1.setAttribute('aria-label', 'More info')
-    div1.appendChild(btn1);
+    // const btn1 = document.createElement('button');
+    // btn1.dataset.keyboard = "false";
+    // btn1.dataset.backdrop = "static";
+    // btn1.dataset.toggle = "modal";
+    // btn1.dataset.target = "#confluenceMainModal";
+    // btn1.dataset.variable = "sex";
+    // btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
+    // btn1.classList = ['info-btn variable-definition'];
+    // btn1.setAttribute('aria-label', 'More info')
+    // div1.appendChild(btn1);
 
     const div2 = document.createElement('div')
     div2.classList = ['row gender-select'];
