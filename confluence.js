@@ -89,7 +89,7 @@ export const confluence = async () => {
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary();
             addEventUpdateSummaryStatsData();
-            document.getElementById('dataSummaryStatistics').innerHTML = dataSummaryStatisticsTemplate();
+            dataSummaryStatisticsTemplate();
             document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
                 const header = document.getElementById('confluenceModalHeader');

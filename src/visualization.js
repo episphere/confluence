@@ -452,7 +452,8 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -475,7 +476,8 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -486,7 +488,8 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const values = [ mapReduce(jsonData, 'ER_statusIndex_pos'), mapReduce(jsonData, 'ER_statusIndex_neg'), mapReduce(jsonData, 'ER_statusIndex_DK') ];
     const labels = ['Positive', 'Negative', 'Don\'t know'];
     const d3 = Plotly.d3
@@ -537,7 +540,8 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const data = [
         {
             x: ['Case', 'Control'],
@@ -565,7 +569,8 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
@@ -608,7 +613,8 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){

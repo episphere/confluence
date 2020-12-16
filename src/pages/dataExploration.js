@@ -31,7 +31,24 @@ export const template = () => {
     `;
 }
 
-export const dataSummaryStatisticsTemplate = () => `
+const dataVisulizationCards = (obj) => `
+        <div class="data-exploration-charts col-xl-4">
+            <div id="${obj.divId}">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="${obj.cardHeaderId}"></label></span>
+                    </div>
+                    <div class="card-body viz-card-body">
+                        <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+export const dataSummaryStatisticsTemplate = () => {
+    let template = '';
+    template = `
     <div class="col-xl-2">
         <div class="card sub-div-shadow">
             <div class="card-header">
@@ -47,84 +64,21 @@ export const dataSummaryStatisticsTemplate = () => `
         </div>
     </div>
     <div class="col-xl-10">
-        <div class="main-summary-row">
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv7">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv2">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv5">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="main-summary-row">
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv3">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv6">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv4">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-`
+        <div class="main-summary-row">`
+        template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
+        template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
+        template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
+        template += `</div><div class="main-summary-row">`
+
+        template += dataVisulizationCards({divId: 'chartDiv3', cardHeaderId: 'dataSummaryVizLabel3', cardBodyId: 'dataSummaryVizChart3'})
+        template += dataVisulizationCards({divId: 'chartDiv6', cardHeaderId: 'dataSummaryVizLabel6', cardBodyId: 'dataSummaryVizChart6'})
+        template += dataVisulizationCards({divId: 'chartDiv4', cardHeaderId: 'dataSummaryVizLabel4', cardBodyId: 'dataSummaryVizChart4'})
+        
+        template += `</div></div>
+    `;
+    document.getElementById('dataSummaryStatistics').innerHTML = template
+}
+
 
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile(missingnessStatsFileId);
