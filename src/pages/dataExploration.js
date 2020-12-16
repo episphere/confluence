@@ -5,27 +5,29 @@ import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataTy
 
 export const template = () => {
     return `
-        <div class="container body-min-height">
-            <div class="main-summary-row data-exploration-div">
-                ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
-                    <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
-                `:``}
-                <div class="main-summary-row statistics-row">
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#data_exploration/subset">
-                                <strong>Subset statistics</strong>
-                            </a>
-                        </li>
-                    </ul>
+        <div class="data-exploration-bg">
+            <div class="container body-min-height">
+                <div class="main-summary-row data-exploration-div">
+                    ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
+                        <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
+                    `:``}
+                    <div class="main-summary-row statistics-row">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#data_exploration/subset">
+                                    <strong>Subset statistics</strong>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <div class="main-summary-row" id="dataSummaryStatistics"></div>
-            <div class="main-summary-row">
-                <div class="offset-lg-2" id="dataLastModified"></div>
+                <div class="main-summary-row" id="dataSummaryStatistics"></div>
+                <div class="main-summary-row">
+                    <div class="offset-lg-2" id="dataLastModified"></div>
+                </div>
             </div>
         </div>
     `;
@@ -96,11 +98,11 @@ export const dataSummaryMissingTemplate = async () => {
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     
     const div1 = document.createElement('div');
-    div1.classList = ['col-lg-2'];
+    div1.classList = ['col-xl-2 filter-column'];
     div1.id = 'missingnessFilter';
 
     const div2 = document.createElement('div');
-    div2.classList = ['col-lg-10'];
+    div2.classList = ['col-xl-10'];
     div2.id = 'missingnessTable';
 
     document.getElementById('dataSummaryStatistics').appendChild(div1);
@@ -121,7 +123,7 @@ const sortArray = (array) => {
 const renderFilter = (data, acceptedVariables, headers, status, studies, ancestory) => {
     let template = '';
     template += `
-    <div class="card sub-div-shadow midset-Card">
+    <div class="card midset-Card">
         <div class="card-header align-left card-filter-header">
             <strong class="side-panel-header">Filter</strong>
         </div>
@@ -129,10 +131,10 @@ const renderFilter = (data, acceptedVariables, headers, status, studies, ancesto
             <div id="midsetFilterData" class="align-left"></div>
         </div>
     </div>
-    <div class="card sub-div-shadow midset-Card">
+    <div class="card midset-Card">
         <div class="card-header variable-selection-header" style="white-space: nowrap;">
             <strong class="side-panel-header">Variable Selection</strong>
-            <div class="filter-btn custom-margin variable-selection-total sub-div-shadow" id="selectedVariablesCount"></div>
+            <div class="filter-btn custom-margin variable-selection-total" id="selectedVariablesCount"></div>
         </div>
         <div class="card-body">
             <div id="midsetVariables" class="align-left"></div>
@@ -310,7 +312,7 @@ const midset = (data, acceptedVariables) => {
         return;
     }
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless missingness-table table-striped sub-div-shadow"><thead class="midset-table-header">';
+        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
         headerData = headerCount;
         const result = computeSets(data, acceptedVariables);
