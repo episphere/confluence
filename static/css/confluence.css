@@ -64,7 +64,8 @@ body {
 }
 
 .active {
-    background-color: #aaaaaa;
+    /* background-color: #aaaaaa; */
+    border-bottom: 2px solid #A41652;
 }
 
 .active-tab {
@@ -76,8 +77,8 @@ body {
     margin-bottom: 15px;
 }
 
-.data-exploration-div {
-    padding-top: 1rem;
+#updateSummaryStatsData {
+    margin: 1rem 0 !important;
 }
 
 .collapse {
@@ -188,7 +189,7 @@ body {
 }
 
 .confluence-pink {
-    color: #C22169;
+    color: #A41652;
     font-weight: bold;
 }
 
@@ -221,6 +222,10 @@ body {
 
 .white-font {
     color: #ffffff !important;
+}
+
+.black-font {
+    color: #000000 !important;
 }
 
 .cursor-pointer {
@@ -784,7 +789,7 @@ label {
     padding: 0px !important;
 }
 
-.copy-file-api, .getAllFileversions, .removeCollaborator, .info-btn, .download-qaqc-report-btn {
+.copy-file-api, .getAllFileversions, .removeCollaborator, .info-btn, .download-qaqc-report-btn, .sub-menu-btn {
     border: 0px;
     background-color: transparent;
     padding: 0px !important;
@@ -1012,6 +1017,10 @@ label {
 
 .icon-padding {
     padding: 10px;
+}
+
+.white-bg {
+    background-color: #ffffff !important;
 }
 
 .primary-bg {
