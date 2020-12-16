@@ -191,3 +191,44 @@ export const homePageVisualization = async () => {
     document.getElementById('publicCaseCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b))}</h2>`;
     document.getElementById('publicControlCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b))}</h2>`;
 }
+
+export const infoDeck = () => {
+    let template = '';
+    template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#home', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
+    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#home', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortia.'})
+    template += cardContents({header: 'Request Data Access', button: 'Request Data Access', href: '#home', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
+    document.getElementById('infoDeck').innerHTML = template;
+}
+
+export const infoDeckAfterLoggedIn = () => {
+    let template = '';
+    template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#home', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br>You can always view, modify or download any data you submit.'})
+    template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#home', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br>Does not require DACC review.'})
+    template += cardContents({header: 'Submit a Proposal', button: 'Submit a Proposal', href: '#home', icon: 'fa-file-upload', explanation: 'Submit a proposal to access data for analyses. </br>Proposals will be reviewed by DACCs from all relevant consortia.'})
+    template += cardContents({header: 'My Projects', button: 'My Projects', href: '#home', icon: 'fa-database', explanation: 'Analyze data for projects approved by all relevant DACCs. </br>Requires data agreements.'})
+    document.getElementById('infoDeck').innerHTML = template;
+}
+
+const cardContents = (obj) => {
+    return `
+        <div class="col-lg card confluence-cards">
+            <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
+                <i class="fas ${obj.icon} fa-2x icon-padding font-white"></i>
+            </div>
+            <div class="card-body">
+                <div class="card-title" style="color: #333B4D">
+                    <div class="font-size-28"><b>${obj.header}</b></div>
+                </div>
+                <p class="text-secondary card-text font-size-14">
+                    ${obj.explanation}
+                </p>
+            </div>
+
+            <div class="bg-white border-top-0 card-footer" style="width: 100%;">
+                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
+                    <a class="stretched-link font-white" href="${obj.href}" style="text-decoration: none;">${obj.button}</a>
+                </button>
+            </div>
+        </div>
+        `;
+}

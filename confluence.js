@@ -1,5 +1,5 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization, addEventAboutConfluence } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization, addEventAboutConfluence, infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
@@ -183,6 +183,7 @@ const manageRouter = async () => {
         document.title = 'Confluence Data Platform';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
+        infoDeck();
         // confluenceDiv.innerHTML = homePage();
         // addEventAboutConfluence();
         // homePageVisualization();
@@ -282,6 +283,7 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         document.title = 'Confluence Data Platform';
+        infoDeckAfterLoggedIn();
         // confluenceDiv.innerHTML = homePage();
         // addEventAboutConfluence();
         // homePageVisualization();
