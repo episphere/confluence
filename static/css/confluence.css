@@ -1091,6 +1091,14 @@ label {
     background-color: #ffffff !important;
 }
 
+.card-filter-header {
+    padding-left: 10px !important;
+}
+
+.filter-column {
+    padding: 0px !important;
+}
+
 .grid-elements:hover {
     text-decoration: none;
     color:#fff;

@@ -48,13 +48,12 @@ const dataVisulizationCards = (obj) => `
 
 export const dataSummaryStatisticsTemplate = () => {
     let template = '';
+    // <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
     template = `
-    <div class="col-xl-2">
-        <div class="card sub-div-shadow">
-            <div class="card-header">
-                <strong class="side-panel-header">Filter 
-                    <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
-                </strong>
+    <div class="col-xl-2 filter-column">
+        <div class="card">
+            <div class="card-header align-left card-filter-header">
+                <strong class="side-panel-header">Filter</strong>
             </div>
             <div id="cardContent" class="card-body">
                 <div id="genderFilter" class="align-left"></div>
@@ -123,7 +122,7 @@ const renderFilter = (data, acceptedVariables, headers, status, studies, ancesto
     let template = '';
     template += `
     <div class="card sub-div-shadow midset-Card">
-        <div class="card-header">
+        <div class="card-header align-left card-filter-header">
             <strong class="side-panel-header">Filter</strong>
         </div>
         <div class="card-body">
