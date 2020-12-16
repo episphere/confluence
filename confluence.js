@@ -147,9 +147,9 @@ export const confluence = async () => {
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
-                </div>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+                    My Projects
+                </a>
             `;
             addEventDataGovernanceNavBar(true);
             addEventMyProjects();
@@ -162,9 +162,9 @@ export const confluence = async () => {
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
-                </div>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+                    My Projects
+                </a>
             `;
             addEventMyProjects();
         }
