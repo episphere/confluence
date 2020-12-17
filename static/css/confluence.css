@@ -84,6 +84,14 @@ body {
     margin: 0 0 1rem 0 !important;
 }
 
+#missingnessTable {
+    margin-left: 1rem;
+}
+
+.left-10 {
+    left: 10px;
+}
+
 #filterBarToggle {
     background: transparent;
     border: 0px;
@@ -1517,7 +1525,7 @@ form {
     overflow: auto !important;
     background-color: #ffffff;
     border-radius: 0.25rem;
-    margin-left: 15px;
+    padding-left: 15px;
 }
 
 #midsetChart {

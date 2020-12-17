@@ -1,7 +1,7 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle } from '../event.js';
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
 export const template = (pageHeader) => {
     return `
@@ -103,14 +103,20 @@ export const dataSummaryMissingTemplate = async () => {
 
     const div2 = document.createElement('div');
     div2.classList = ['col-xl-10'];
-    div2.id = 'missingnessTable';
+    div2.innerHTML = '<button id="filterBarToggle" class="left-10"><i class="fas fa-caret-left"></i></button>';
 
+    const row = document.createElement('div');
+    row.classList = ['main-summary-row'];
+    row.id = 'missingnessTable'
+
+    div2.appendChild(row);
     document.getElementById('dataSummaryStatistics').appendChild(div1);
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
     const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     renderFilter(data, initialSelection, variables, status, studies, ancestory);
     midset(data, initialSelection);
+    addEventMissingnessFilterBarToggle()
 }
 
 const sortArray = (array) => {

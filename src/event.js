@@ -1585,3 +1585,30 @@ export const addEventFilterBarToggle = () => {
         }
     })
 }
+
+export const addEventMissingnessFilterBarToggle = () => {
+    const button = document.getElementById('filterBarToggle');
+    button.addEventListener('click', () => {
+        const child = Array.from(button.childNodes)[0];
+        if(child.classList.contains('fa-caret-left')) {
+            child.classList.remove('fa-caret-left');
+            child.classList.add('fa-caret-right');
+            document.getElementById('missingnessFilter').classList = ['d-none'];
+            document.getElementById('missingnessTable').parentNode.classList = ['col-xl-12 padding-right-zero padding-left-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
+            document.getElementById('dataLastModified').classList.remove('offset-xl-2');
+            document.getElementById('dataLastModified').classList.remove('padding-left-30');
+        }
+        else {
+            child.classList.remove('fa-caret-right');
+            child.classList.add('fa-caret-left');
+            document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
+            document.getElementById('missingnessTable').parentNode.classList = ['col-xl-10 padding-right-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
+            document.getElementById('dataLastModified').classList.add('offset-xl-2');
+            document.getElementById('dataLastModified').classList.add('padding-left-30');
+        }
+    })
+}
