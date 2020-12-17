@@ -1,7 +1,7 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle } from '../event.js';
 
 export const template = (pageHeader) => {
     return `
@@ -12,7 +12,7 @@ export const template = (pageHeader) => {
                     <button class="sub-menu-btn"><a class="nav-link black-font" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
                 </div>
                 <div class="main-summary-row">
-                    <div class="offset-xl-2 col-xl-10 align-left" style="padding-left: 30px;">
+                    <div class="offset-xl-2 col-xl-10 align-left padding-left-30">
                         <h1 class="page-header">${pageHeader}</h1>
                     </div>
                 </div>
@@ -22,7 +22,7 @@ export const template = (pageHeader) => {
                 `:``}
                 <div class="main-summary-row" id="dataSummaryStatistics"></div>
                 <div class="main-summary-row">
-                    <div class="offset-lg-2" id="dataLastModified"></div>
+                    <div class="offset-xl-2" id="dataLastModified"></div>
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@ export const dataSummaryStatisticsTemplate = () => {
     let template = '';
     // <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
     template = `
-    <div class="col-xl-2 filter-column">
+    <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
         <div class="card">
             <div class="card-header align-left card-filter-header">
                 <strong class="side-panel-header">Filter</strong>
@@ -60,8 +60,9 @@ export const dataSummaryStatisticsTemplate = () => {
             </div>
         </div>
     </div>
-    <div class="col-xl-10 padding-right-zero">
-        <div class="main-summary-row">`
+    <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
+        <div class="main-summary-row">
+        <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>`
         template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
         template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
         template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
@@ -73,7 +74,8 @@ export const dataSummaryStatisticsTemplate = () => {
         
         template += `</div></div>
     `;
-    document.getElementById('dataSummaryStatistics').innerHTML = template
+    document.getElementById('dataSummaryStatistics').innerHTML = template;
+    addEventFilterBarToggle();
 }
 
 

@@ -81,7 +81,20 @@ body {
 }
 
 #updateSummaryStatsData {
-    margin: 1rem 0 !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+#filterBarToggle {
+    background: transparent;
+    border: 0px;
+    padding: 0px;
+    height: fit-content;
+    position: absolute;
+    z-index: 9;
+}
+
+#filterBarToggle:hover {
+    cursor: pointer !important;
 }
 
 .collapse {
@@ -201,6 +214,14 @@ body {
 
 .padding-right-zero {
     padding-right: 0px !important;
+}
+
+.padding-left-zero {
+    padding-left: 0px !important;
+}
+
+.padding-left-30 {
+    padding-left: 30px !important;
 }
 
 .list-group-item-active {
@@ -362,7 +383,8 @@ label {
 .align-left {
     text-align: left;
     list-style-type: none;
-    padding: 0px !important;
+    padding: 0px;
+/*     padding: 0px !important; */
 }
 
 .create-project-btn {
