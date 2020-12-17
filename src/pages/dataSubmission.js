@@ -6,22 +6,41 @@ export const template = async () => {
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) {
         hideAnimation();
-        return '<div class="container body-min-height">No folder found for Data Submission</div>';
+        return `<div class="general-bg padding-bottom-1rem">
+                    <div class="container body-min-height">
+                        <div class="main-summary-row">
+                            <div class="align-left">
+                                <h1 class="page-header">Data Submission</h1>
+                            </div>
+                        </div>
+                        <div class="data-submission div-border" style="padding-left: 1rem;">
+                            No folder found for Data Submission
+                        </div>
+                    </div>
+                </div>`;
     };
     
     let template = '';
     
-    template += `<div class="container body-min-height"><div class="row create-study">
-                <div class="upload-in-study">
-                    <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light">
-                        <i class="fas fa-upload"></i> Upload data
-                    </button>
+    template += `
+        <div class="general-bg padding-bottom-1rem">
+            <div class="container body-min-height">
+                <div class="main-summary-row">
+                    <div class="align-left">
+                        <h1 class="page-header">Data Submission</h1>
+                    </div>
                 </div>
-            </div>`;
+                <div class="row create-study">
+                    <div class="upload-in-study">
+                        <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light">
+                            <i class="fas fa-upload"></i> Upload data
+                        </button>
+                    </div>
+                </div>`;
 
     template += await uploadInStudy('uploadInStudy');
     
-    template += '<div class="data-submission"><ul class="ul-list-style first-list-item collapsible-items">';
+    template += '<div class="data-submission div-border white-bg"><ul class="ul-list-style first-list-item collapsible-items">';
 
     for(let obj of array){
         const consortiaName = obj.name;
@@ -35,7 +54,7 @@ export const template = async () => {
                     </li>`
     }
 
-    template += '</ul></div></div>';
+    template += '</ul></div></div></div>';
     return template;
 };
 

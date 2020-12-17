@@ -868,8 +868,18 @@ export const addEventDataGovernanceNavBar = (bool) => {
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
+            const generalDiv = document.createElement('div');
+            generalDiv.classList = ['general-bg padding-bottom-1rem']
             const containerDiv = document.createElement('div');
+
             containerDiv.classList = ['container'];
+
+            const headerDiv = document.createElement('div');
+            headerDiv.classList = ['main-summary-row'];
+            headerDiv.innerHTML = `<div class="align-left">
+                                        <h1 class="page-header">Data Governance</h1>
+                                    </div>`
+
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
             btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
@@ -878,7 +888,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
                                 ${createProjectModal()}`;
 
             const divRow = document.createElement('div');
-            divRow.classList = ['row'];
+            divRow.classList = ['main-summary-row white-bg div-border'];
             divRow.id = 'dataGovernanceMain'
             
             const div1 = document.createElement('div');
@@ -893,9 +903,11 @@ export const addEventDataGovernanceNavBar = (bool) => {
             divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
+            containerDiv.appendChild(headerDiv)
             containerDiv.appendChild(btnDiv)
             containerDiv.appendChild(divRow)
-            confluenceDiv.appendChild(containerDiv);
+            generalDiv.appendChild(containerDiv)
+            confluenceDiv.appendChild(generalDiv);
             dataGovernanceProjects();
         }
         else{

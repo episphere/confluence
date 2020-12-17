@@ -362,7 +362,7 @@ label {
 .align-left {
     text-align: left;
     list-style-type: none;
-    padding: 0;
+    padding: 0px !important;
 }
 
 .create-project-btn {
@@ -1097,10 +1097,6 @@ label {
 .stretched-link:hover {
     color: #ffffff;
     text-decoration: none;
-}
-
-#createProjectBtn, #uploadDataBtn {
-    margin-top: 1rem;
 }
 
 .card-header {
