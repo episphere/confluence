@@ -22,7 +22,9 @@ export const template = (pageHeader) => {
                 `:``}
                 <div class="main-summary-row" id="dataSummaryStatistics"></div>
                 <div class="main-summary-row">
-                    <div class="offset-xl-2" id="dataLastModified"></div>
+                    <div class="col">
+                        <div class="offset-xl-2 padding-left-30 align-left" id="dataLastModified"></div>
+                    </div>
                 </div>
             </div>
         </div>

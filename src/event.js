@@ -1570,6 +1570,8 @@ export const addEventFilterBarToggle = () => {
             document.getElementById('summaryStatsCharts').classList = ['col-xl-12 padding-right-zero padding-left-zero'];
             document.querySelector('[class="page-header"]').parentNode.classList.remove('offset-xl-2');
             document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
+            document.getElementById('dataLastModified').classList.remove('offset-xl-2')
+            document.getElementById('dataLastModified').classList.remove('padding-left-30')
         }
         else {
             child.classList.remove('fa-caret-right');
@@ -1578,6 +1580,8 @@ export const addEventFilterBarToggle = () => {
             document.getElementById('summaryStatsCharts').classList = ['col-xl-10 padding-right-zero'];
             document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
             document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
+            document.getElementById('dataLastModified').classList.add('offset-xl-2')
+            document.getElementById('dataLastModified').classList.add('padding-left-30')
         }
     })
 }
