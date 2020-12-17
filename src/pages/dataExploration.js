@@ -149,7 +149,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     status.push('All');
     status.forEach(variable => {
         template += `<li class="filter-list-item">
-                        <button class="${variable === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
+                        <button class="${variable === 'All' ? 'active-filter ': ''}filter-btn collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
                             <div class="variable-name">${variable.replace(new RegExp('status_', 'i'), '')}</div>
                         </button>
                     </li>`;
@@ -163,7 +163,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     ancestory.push('All');
     ancestory.forEach(anc => {
         template += `<li class="filter-list-item">
-                        <button class="${anc === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-ancestory filter-midset-data-btn" data-variable="${anc}">
+                        <button class="${anc === 'All' ? 'active-filter ': ''}filter-btn collapsible-items filter-midset-data-ancestory filter-midset-data-btn" data-variable="${anc}">
                             <div class="variable-name">${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</div>
                         </button>
                     </li>`;
@@ -189,7 +189,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
 
             for(let study in studies[consortium]){
                 template += `<li class="filter-list-item">
-                                <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
+                                <button class="filter-btn collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
                                     <div class="variable-name">${study}</div>
                                 </button>
                             </li>`;

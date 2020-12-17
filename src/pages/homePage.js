@@ -2,7 +2,7 @@ import { numberWithCommas, getPublicFile, publicDataFileId } from "./../shared.j
 
 export const template = () => {
     return `
-    <div class="main-summary-row home-page-stats sub-div-shadow">
+    <div class="main-summary-row home-page-stats">
         <div class="col-lg-7">
             <div class="align-left info-confluence">
                 <span style="color:#74103A;font-weight:bold">
@@ -11,7 +11,7 @@ export const template = () => {
                  and men of multiple ancestries, by integrating existing and new genome-wide genetic data.
             </div>
             
-            <div class="card border sub-div-shadow">
+            <div class="card border">
                 <div class="card-header confluence-color white-font"><strong>Confluence Data Summary</strong> 
                     <button class="info-btn" data-toggle="modal" data-target="#confluenceMainModal"  aria-label="More info"><i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion"></i></button>
                 </div>
@@ -312,7 +312,7 @@ const cardContents = (obj) => {
                 </p>
             </div>
 
-            <div class="bg-white border-top-0 card-footer" style="width: 100%;">
+            <div class="white-bg border-top-0 card-footer" style="width: 100%;">
                 <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
                     <a class="stretched-link font-white" href="${obj.href}" style="text-decoration: none;">${obj.button}</a>
                 </button>

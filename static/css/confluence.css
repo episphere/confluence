@@ -132,6 +132,10 @@ body {
     border: 1px solid #DDDDDD;
 }
 
+.div-border {
+    border: 1px solid #DDDDDD !important;
+}
+
 .confluence-color {
     background-color: #74103A !important;
 }
@@ -524,8 +528,6 @@ label {
 
 .my-projects-div {
     text-align: left;
-    background-color: #fff;
-    margin-bottom: 1rem;
     padding: 0.5rem 0;
     border-radius: 0.25rem;
 }
@@ -1114,6 +1116,10 @@ label {
 
 .padding-bottom-1rem {
     padding-bottom: 1rem !important;
+}
+
+.padding-top-1rem {
+    padding-top: 1rem !important;
 }
 
 .card-filter-header {

@@ -6,7 +6,15 @@ export const myProjectsTemplate = async () => {
     const response = await getFolderItems(0);
     const data = filterProjects(response.entries);
     if(data.length <= 0) confluenceDiv.innerHTML = `No projects found!`;
-    confluenceDiv.innerHTML = `<div class="container body-min-height"><div class="my-projects-div sub-div-shadow" id="myProjectsList">${fileVersionsModal()}</div></div>`
+    confluenceDiv.innerHTML = `<div class="general-bg padding-bottom-1rem">
+        <div class="container body-min-height">
+            <div class="main-summary-row">
+                <div class="align-left">
+                    <h1 class="page-header">My Projects</h1>
+                </div>
+            </div>
+            <div class="my-projects-div white-bg div-border" id="myProjectsList">${fileVersionsModal()}</div>
+        </div></div>`
     const ul =  document.createElement('ul');
     ul.classList = ['ul-list-style first-list-item'];
     for(let i = 0 ; i < data.length; i++) {
@@ -34,7 +42,7 @@ export const myProjectsTemplate = async () => {
                 liSub.classList = ['my-prjects-list-item allow-overflow'];
 
                 const table = document.createElement('table');
-                table.classList = ['table table-borderless table-striped my-projects-table sub-div-shadow'];
+                table.classList = ['table table-borderless table-striped my-projects-table'];
 
                 const thead = document.createElement('thead');
 
@@ -111,7 +119,7 @@ export const myProjectsTemplate = async () => {
                     `
                 }
                 document.getElementById('modalFVBody').innerHTML = `
-                <table class="table table-borderless table-striped sub-div-shadow">
+                <table class="table table-borderless table-striped">
                     <thead>
                         <tr class="table-no-wrap">
                             <th>File id</th>

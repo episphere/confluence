@@ -13,7 +13,7 @@ export const template = async () => {
     
     template += `<div class="container body-min-height"><div class="row create-study">
                 <div class="upload-in-study">
-                    <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light sub-div-shadow">
+                    <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light">
                         <i class="fas fa-upload"></i> Upload data
                     </button>
                 </div>
@@ -21,7 +21,7 @@ export const template = async () => {
 
     template += await uploadInStudy('uploadInStudy');
     
-    template += '<div class="data-submission sub-div-shadow"><ul class="ul-list-style first-list-item collapsible-items">';
+    template += '<div class="data-submission"><ul class="ul-list-style first-list-item collapsible-items">';
 
     for(let obj of array){
         const consortiaName = obj.name;

@@ -89,7 +89,7 @@ const chipFilter = (jsonData) => {
     btn2.dataset.variable = "chip";
     btn2.dataset.value = "Confluence chip";
     btn2.innerHTML = 'Confluence array'
-    btn2.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    btn2.classList = ['filter-btn genotype-selection-btn'];
     div2.appendChild(btn2);
 
     const div3 = document.createElement('div')
@@ -99,7 +99,7 @@ const chipFilter = (jsonData) => {
     btn3.dataset.variable = "chip";
     btn3.dataset.value = "Other chip";
     btn3.innerHTML = 'Other arrays'
-    btn3.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    btn3.classList = ['filter-btn genotype-selection-btn'];
     div3.appendChild(btn3);
 
     const div4 = document.createElement('div')
@@ -107,7 +107,7 @@ const chipFilter = (jsonData) => {
 
     const btn4 = document.createElement('button');
     btn4.innerHTML = 'All arrays'
-    btn4.classList = ['filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn'];
+    btn4.classList = ['filter-btn genotype-selection-btn genotype-active-btn'];
     div4.appendChild(btn4);
 
     const div5 = document.createElement('div');
@@ -147,7 +147,7 @@ const genderFilter = (jsonData) => {
     btn2.dataset.variable = "sex";
     btn2.dataset.value = "male";
     btn2.innerHTML = 'Male'
-    btn2.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    btn2.classList = ['filter-btn gender-selection-btn'];
     div2.appendChild(btn2);
 
     const div3 = document.createElement('div')
@@ -157,7 +157,7 @@ const genderFilter = (jsonData) => {
     btn3.dataset.variable = "sex";
     btn3.dataset.value = "female";
     btn3.innerHTML = 'Female'
-    btn3.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    btn3.classList = ['filter-btn gender-selection-btn'];
     div3.appendChild(btn3);
 
     const div4 = document.createElement('div')
@@ -165,7 +165,7 @@ const genderFilter = (jsonData) => {
 
     const btn4 = document.createElement('button');
     btn4.innerHTML = 'All'
-    btn4.classList = ['filter-btn sub-div-shadow gender-selection-btn gender-active-btn'];
+    btn4.classList = ['filter-btn gender-selection-btn gender-active-btn'];
     div4.appendChild(btn4);
 
     const div5 = document.createElement('div');
@@ -207,7 +207,7 @@ const filterByStudy = (jsonData) => {
                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
                             <label for="label${consortium}" class="consortia-name">${consortium}</label>
                             <div class="ml-auto">
-                                <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
+                                <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
                                     ${numberWithCommas(obj[consortium].consortiumTotal)}
                                 </div> 
                                 <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
@@ -223,7 +223,7 @@ const filterByStudy = (jsonData) => {
                                 <button class="row collapsible-items filter-studies filter-studies-btn" data-consortium=${consortium} data-study=${study}>
                                     <div class="study-name">${study}</div>
                                     <div class="ml-auto">
-                                        <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
+                                        <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
                                             ${numberWithCommas(total)}
                                         </div>
                                     </div>

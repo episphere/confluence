@@ -497,13 +497,13 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     
     const newBtn = document.createElement('button');
     newBtn.id = "continueSubmission";
-    newBtn.classList = ["btn btn-light sub-div-shadow"];
+    newBtn.classList = ["btn btn-light"];
     newBtn.title = "Continue Submission";
     newBtn.innerHTML = 'Submit';
     newBtn.type = "button";
 
     const downloadAndClose = document.createElement('button');
-    downloadAndClose.classList = ['btn btn-dark sub-div-shadow'];
+    downloadAndClose.classList = ['btn btn-dark'];
     downloadAndClose.id = 'downloadQAQCReport';
     downloadAndClose.title = 'Download Report and Close';
     downloadAndClose.innerHTML = 'Download Report and Close';
@@ -537,7 +537,7 @@ const addEventDownloadQAQCReport = (fileName) => {
 const replaceBtns = () => {
     const element = document.getElementById('downloadQAQCReport');
     const closeBtn = document.createElement('button');
-    closeBtn.classList = ['btn btn-dark sub-div-shadow'];
+    closeBtn.classList = ['btn btn-dark'];
     closeBtn.title = 'Close';
     closeBtn.innerHTML = 'Close';
     closeBtn.type = 'button';
@@ -547,7 +547,7 @@ const replaceBtns = () => {
 
     const continueBtn = document.getElementById('continueSubmission');
     const submitBtn = document.createElement('button');
-    submitBtn.classList = ['btn btn-light sub-div-shadow'];
+    submitBtn.classList = ['btn btn-light'];
     submitBtn.id = 'submitBtn';
     submitBtn.title = 'Submit';
     submitBtn.innerHTML = 'run QAQC';
@@ -656,7 +656,7 @@ export const addEventShowAllCollaborator = () => {
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
             table += `<strong>${name}</strong><br><br>
-                <table class="table table-borderless table-striped collaborator-table sub-div-shadow">
+                <table class="table table-borderless table-striped collaborator-table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -692,7 +692,7 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body allow-overflow">${table}</div>
             <div class="modal-footer">
-                <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+                <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
         `;
         addEventRemoveCollaborator();
@@ -796,13 +796,13 @@ export const addEventAddNewCollaborator = () => {
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="btn btn-light sub-div-shadow" type="button" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
+                            <button class="btn btn-light" type="button" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
-                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+                    <button type="submit" title="Submit" class="btn btn-light">Submit</button>
+                    <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
                 </div>
             </form>
         `;
@@ -872,7 +872,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             containerDiv.classList = ['container'];
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -903,7 +903,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -947,13 +947,13 @@ const addEventCreateProjectBtn = () => {
             </div>
                 
             <div class="row">
-                <div class="col"><button title="Add more collaborators" type="button" class="btn btn-light sub-div-shadow" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                <div class="col"><button title="Add more collaborators" type="button" class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
             </div>
             </br>
         </div>
         <div class="modal-footer">
-            <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
-            <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+            <button type="submit" title="Submit" class="btn btn-light">Submit</button>
+            <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
         </form>
         `
         const addMoreEmail = document.getElementById('addMoreEmail');
@@ -1455,7 +1455,7 @@ const addEventDataTypeRadio = () => {
             template += `<ul>`;
             summaryFolder.forEach(folder => {
                 template += `<li class="filter-list-item">
-                <button type="button" class="filter-btn sub-div-shadow collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
+                <button type="button" class="filter-btn collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
                 <div class="variable-name">${folder.name}</div>
                 </button>
                 </li>`;

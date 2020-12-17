@@ -1,7 +1,7 @@
 export const confluenceContactPage = () => {
     return `
         <div class="container body-min-height">
-            <div class="main-summary-row confluence-resources sub-div-shadow">
+            <div class="main-summary-row confluence-resources">
                 <div class="col">
                     <span class="confluence-pink">Contacts:</span></br>
                     </br>
