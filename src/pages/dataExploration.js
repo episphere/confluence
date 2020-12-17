@@ -3,19 +3,23 @@ import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
 
-export const template = () => {
+export const template = (pageHeader) => {
     return `
-        <div class="data-exploration-bg">
+        <div class="general-bg">
             <div class="container body-min-height">
-                <div class="main-summary-row">
-                    <div class="main-summary-row white-bg">
-                        <button class="sub-menu-btn"><a class="nav-link active black-font" href="#data_exploration/summary"><strong>Summary statistics</strong></a></button>
-                        <button class="sub-menu-btn"><a class="nav-link black-font" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
-                    </div>
-                    ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
-                        <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
-                    `:``}
+                <div class="main-summary-row white-bg">
+                    <button class="sub-menu-btn"><a class="nav-link active black-font" href="#data_exploration/summary"><strong>Summary statistics</strong></a></button>
+                    <button class="sub-menu-btn"><a class="nav-link black-font" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
                 </div>
+                <div class="main-summary-row">
+                    <div class="offset-xl-2 col-xl-10 align-left" style="padding-left: 30px;">
+                        <h1 class="page-header">${pageHeader}</h1>
+                    </div>
+                </div>
+                
+                ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
+                    <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
+                `:``}
                 <div class="main-summary-row" id="dataSummaryStatistics"></div>
                 <div class="main-summary-row">
                     <div class="offset-lg-2" id="dataLastModified"></div>

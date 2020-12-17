@@ -88,7 +88,7 @@ export const confluence = async () => {
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
-            confluenceDiv.innerHTML = dataSummary();
+            confluenceDiv.innerHTML = dataSummary('Summary Statistics');
             addEventUpdateSummaryStatsData();
             dataSummaryStatisticsTemplate();
             if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
@@ -240,7 +240,7 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         dataSummaryElement.classList.add('navbar-active');
         document.title = 'Confluence - Data Explore';
-        confluenceDiv.innerHTML = dataSummary();
+        confluenceDiv.innerHTML = dataSummary('Subset Statistics');
         addEventUpdateSummaryStatsData();
         removeActiveClass('nav-link', 'active');
         document.querySelectorAll('[href="#data_exploration/subset"]')[0].classList.add('active');

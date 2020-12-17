@@ -73,6 +73,13 @@ body {
     font-weight: bold;
 }
 
+.page-header {
+    width: 100% !important;
+    font-size: 22px;
+    margin: 1rem 0px;
+    font-weight: bold;
+}
+
 #updateSummaryStatsData {
     margin: 1rem 0 !important;
 }
@@ -121,9 +128,8 @@ body {
 
 .home-page-stats {
     background-color: #fff;
-    padding-bottom: 0.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border: 1px solid #DDDDDD;
 }
 
 .confluence-color {
@@ -1102,8 +1108,12 @@ label {
     padding-bottom: 0px !important;
 }
 
-.data-exploration-bg {
+.general-bg {
     background-color: #F0F0F7 !important;
+}
+
+.padding-bottom-1rem {
+    padding-bottom: 1rem !important;
 }
 
 .card-filter-header {
