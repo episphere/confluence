@@ -1590,7 +1590,7 @@ export const addEventFilterBarToggle = () => {
 export const addEventMissingnessFilterBarToggle = () => {
     const button = document.getElementById('filterBarToggle');
     button.addEventListener('click', () => {
-        const child = Array.from(button.childNodes)[0];
+        const child = button.querySelector('.fas');
         if(child.classList.contains('fa-caret-left')) {
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
