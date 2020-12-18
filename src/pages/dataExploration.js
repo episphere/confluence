@@ -139,7 +139,7 @@ const renderFilter = (data, acceptedVariables, headers, status, studies, ancesto
             <strong class="side-panel-header">Filter</strong>
         </div>
         <div class="card-body" id="cardContent">
-            <div id="midsetFilterData" class="align-left"></div>
+            <div id="midsetFilterData" class="row gender-select align-left"></div>
         </div>
     </div>
     `
@@ -189,7 +189,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                 </li>
         `;
         if(Object.keys(studies[consortium]).length !== 0) {
-            innerTemplate += `<ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
+            innerTemplate += `<ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
 
             for(let study in studies[consortium]){
                 innerTemplate += `

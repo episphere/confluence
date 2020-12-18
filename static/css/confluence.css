@@ -1125,6 +1125,10 @@ label {
     font-size: 15px !important;
 }
 
+.max-height-study-list {
+    max-height: 250px !important;
+}
+
 .font-white {
     color: #ffffff;
 }

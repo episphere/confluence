@@ -93,7 +93,7 @@ const allFilters = (jsonData) => {
     for(let consortium in obj){
         let innerTemplate = `
                     <ul class="remove-padding-left font-size-15" id="studyConsortiaList">
-                        <li class="custom-borders filter-list-item" style="padding-bottom: 0.125rem !important;padding-top: 0.125rem !important;">
+                        <li class="custom-borders filter-list-item">
                             <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                 <i class="fas fa-caret-down"></i>
                             </button>
@@ -105,7 +105,7 @@ const allFilters = (jsonData) => {
                                 </div>
                             </div>
                         </li>
-                        <ul class="collapse no-list-style custom-padding allow-overflow" style="max-height: 250px;" id="toggle${consortium.replace(/ /g, '')}">`;
+                        <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
