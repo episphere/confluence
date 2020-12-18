@@ -56,15 +56,20 @@ export const dataSummaryStatisticsTemplate = () => {
                 <strong class="side-panel-header">Filter</strong>
             </div>
             <div id="cardContent" class="card-body">
-                <div id="genderFilter" class="align-left"></div>
-                <div id="chipContent" class="align-left"></div>
-                <div id="studyFilter" class="align-left"></div>
+                <div id="allFilters" class="align-left"></div>
             </div>
         </div>
     </div>
     <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
+        <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>
+        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+            <div class="col white-bg div-border align-left" style="padding: 0.5rem;" id="listFilters">
+                <span class="font-weight-bold font-size-17">Gender:</span> All<span class="vertical-line"></span>
+                <span class="font-weight-bold font-size-17">Genotyping chip:</span> All Arrays
+            </div>
+        </div>
         <div class="main-summary-row">
-        <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>`
+        `
         template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
         template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
         template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})

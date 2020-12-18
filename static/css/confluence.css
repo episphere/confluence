@@ -99,6 +99,8 @@ body {
     height: fit-content;
     position: absolute;
     z-index: 9;
+    left: 10px;
+    margin-right: 4px;
 }
 
 #filterBarToggle:hover {
@@ -384,15 +386,11 @@ label {
     stroke-width: 2 !important;
 }
 
-#parameterList {
-    /* border-top: 1px solid rgba(0,0,0,.125); */
-}
-
 .align-left {
     text-align: left;
     list-style-type: none;
     padding: 0px;
-/*     padding: 0px !important; */
+    /*     padding: 0px !important; */
 }
 
 .create-project-btn {
@@ -727,7 +725,7 @@ label {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    border: 0.5px solid black;
+    /* border: 0.5px solid black; */
     border-radius: 0.25rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     color: #000000;
@@ -818,7 +816,8 @@ label {
     padding-left: 0px !important;
     margin-bottom: 0px !important;
     list-style-type: none;
-    margin: 0px -18px;
+    margin-right: -30px;
+    margin-left: -4px;
 }
 
 .consortia-folder, .share-folder, .file-access-stats {
@@ -861,7 +860,7 @@ label {
 }
 
 .filter-list-item {
-    padding: 0px 5px !important;
+    padding: 0px 3px !important;
 }
 
 .filter-studies-btn, .filter-midset-variable-btn {
@@ -887,18 +886,16 @@ label {
 }
 
 .custom-margin {
-    padding: 0px 3px;
+    margin: 0px 8px 0 0;
 }
 
 .study-total {
-    background-color: #ffffff;
-    color: #3e4086;
     font-weight: bold;
     cursor: pointer !important;
 }
 
 .consortia-total {
-    color: #74103A !important;
+    /* color: #74103A !important; */
     background-color: #ffffff;
     font-weight: bold;
 }
@@ -908,18 +905,17 @@ label {
 }
 
 .custom-padding {
-    padding-left: 1rem;;
+    padding-left: 0.75rem;
 }
 
 .consortium-selection {
     list-style-type: none;
     padding: 0px 5px;
+    margin-left: -5px !important;
 }
 
 .consortium-selection:hover, .consortium-selection:focus {
     cursor: pointer;
-    background-color: #c9c9c9;
-    border-radius: 0.25rem;
 }
 
 .consortium-selection-btn {
@@ -1093,8 +1089,17 @@ label {
     color: #333B4D !important;
 }
 
+.vertical-line {
+    border-right: 2px solid #000000;
+    margin: 0 1rem;
+}
+
 .font-size-28 {
     font-size: 28px !important;
+}
+
+.font-size-17 {
+    font-size: 17px !important;
 }
 
 .font-size-18 {
@@ -1578,9 +1583,13 @@ form {
     display: flex;
 }
 
-.select-consortium {
+.select-consortium, .select-study {
     margin-top: 5px;
     margin-right: 2px;
+}
+
+.select-study {
+    margin-left: 1.25rem;
 }
 
 ::-webkit-scrollbar {

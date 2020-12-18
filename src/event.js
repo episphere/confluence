@@ -5,6 +5,7 @@ import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
 import { createProjectModal } from './components/modal.js';
+import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
@@ -1610,5 +1611,44 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.getElementById('dataLastModified').classList.add('offset-xl-2');
             document.getElementById('dataLastModified').classList.add('padding-left-30');
         }
+    })
+}
+
+export const addEventSummaryStatsFilterForm = (jsonData) => {
+    const form = document.getElementById('summaryStatsFilterForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const gender = document.getElementById('genderSelection').value;
+        const chip = document.getElementById('genotypingChipSelection').value;
+        
+        const elements = document.getElementsByClassName('select-consortium');
+        Array.from(elements).forEach(el => {
+            el.addEventListener('click', () => {
+                if(el.checked){
+                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+                }
+                else {
+                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
+                }
+            })
+        })
+        let selectedConsortia = [];
+        Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
+            if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
+        });
+        console.log(selectedConsortia)
+        const array = getSelectedStudies();
+        let finalData = jsonData;
+        if(gender !== 'all') {
+            finalData = finalData.filter(dt => dt['sex'] === gender);
+        }
+        if(chip !== 'all') {
+            finalData = finalData.filter(dt => dt['chip'] === chip);
+        }
+        updateCounts(finalData);
+        if(array.length > 0){
+            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
+        }
+        renderAllCharts(finalData);
     })
 }
