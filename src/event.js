@@ -1652,9 +1652,9 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         }
         const selectedStudies = array.map(s => s.split('@#$')[1]);
         document.getElementById('listFilters').innerHTML = `
-        <span class="font-weight-bold font-size-17">Gender: </span>${genderFilter}<span class="vertical-line"></span>
-        <span class="font-weight-bold font-size-17">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
-        <span class="vertical-line"></span><span class="font-weight-bold font-size-17">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
+        <span class="font-weight-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+        <span class="font-weight-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-weight-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} others</span>`:``}
         `:``}`
         renderAllCharts(finalData);
     })

@@ -93,7 +93,7 @@ export const dataSummaryMissingTemplate = async () => {
     const {data, headers} = csv2Json(response);
     const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false  && /bcac_id/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
-    
+    const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);
     const studies = {};
     data.forEach(dt => {
@@ -108,7 +108,20 @@ export const dataSummaryMissingTemplate = async () => {
 
     const div2 = document.createElement('div');
     div2.classList = ['col-xl-10'];
-    div2.innerHTML = '<button id="filterBarToggle" class="left-10"><i class="fas fa-caret-left"></i></button>';
+    div2.innerHTML = `
+        <button id="filterBarToggle" class="left-10">
+            <i class="fas fa-caret-left"></i>
+        </button>
+        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+            <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
+                <span class="font-weight-bold">Status:</span> All<span class="vertical-line"></span>
+                <span class="font-weight-bold">Ancestry:</span> All
+                ${initialSelection.length > 0 ? `
+                    <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} others</span>`:``}
+                `:``}
+            </div>
+        </div>
+        `;
 
     const row = document.createElement('div');
     row.classList = ['main-summary-row div-border'];
@@ -118,7 +131,6 @@ export const dataSummaryMissingTemplate = async () => {
     document.getElementById('dataSummaryStatistics').appendChild(div1);
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
-    const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     renderFilter(data, initialSelection, variables, status, studies, ancestory);
     midset(data, initialSelection);
     addEventMissingnessFilterBarToggle()
@@ -158,7 +170,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
             <div class="form-group" id="statusList">
                 <label class="filter-label font-size-13" for="statusSelection">Status</label>
                 <select class="form-control font-size-15" id="statusSelection">
-                    <option selected value='all'>All</option>
+                    <option selected value='All'>All</option>
                     <option value='status_case'>case</option>
                     <option value='status_control'>control</option>
                 </select>
@@ -223,7 +235,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     `
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventConsortiumSelect();
-    addEventMidsetFilterForm(data, acceptedVariables, headers);
+    addEventMidsetFilterForm(data);
 }
 
 const addEventMidsetFilterForm = (data) => {
@@ -239,14 +251,23 @@ const addEventMidsetFilterForm = (data) => {
         let newData = data;
         if(studiesSelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studiesSelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
         
-        if(status !== 'all') {
+        if(status !== 'All') {
             newData = newData.filter(dt => dt[status] === '1');
         }
         
         if(ancestry !== 'All') {
             newData = newData.filter(dt => dt[ancestry] === '1');
         }
-
+        document.getElementById('listFilters').innerHTML = `
+        <span class="font-weight-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
+        <span class="font-weight-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
+        ${studiesSelection.length > 0 ? `
+            <span class="vertical-line"></span><span class="font-weight-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} others</span>`:``}
+        `:``}
+        ${selectedVariables.length > 0 ? `
+            <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} others</span>`:``}
+        `:``}
+        `
         midset(newData, selectedVariables);
     });
 };
