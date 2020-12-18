@@ -7,7 +7,7 @@ export const template = async () => {
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
-    let template = `<div class="card border sub-div-shadow"><div class="card-header"><label class="dataSummary-label">Consortium(s)</label></div>`;
+    let template = `<div class="card" style="border: 0px;"><div class="card-header"><label class="dataSummary-label">Consortium(s)</label></div>`;
     
     template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
 
@@ -43,7 +43,7 @@ export const dataGovernanceProjects = async () => {
     if(checker === true) {
         for(let obj = 0; obj < projectArray.length; obj++){
             const bool = checkMyPermissionLevel(await getCollaboration(projectArray[obj].id, `${projectArray[obj].type}s`), JSON.parse(localStorage.parms).login);
-            if(obj === 0) template += `<div class="card border sub-div-shadow"><div class="card-header">
+            if(obj === 0) template += `<div class="card" style="border: 0px;"><div class="card-header">
                                             <label class="dataSummary-label">Project(s)</label>
                                         </div> 
                                         <div class="card-body data-governance">

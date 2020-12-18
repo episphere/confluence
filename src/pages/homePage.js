@@ -2,7 +2,7 @@ import { numberWithCommas, getPublicFile, publicDataFileId } from "./../shared.j
 
 export const template = () => {
     return `
-    <div class="main-summary-row home-page-stats sub-div-shadow">
+    <div class="main-summary-row home-page-stats">
         <div class="col-lg-7">
             <div class="align-left info-confluence">
                 <span style="color:#74103A;font-weight:bold">
@@ -11,7 +11,7 @@ export const template = () => {
                  and men of multiple ancestries, by integrating existing and new genome-wide genetic data.
             </div>
             
-            <div class="card border sub-div-shadow">
+            <div class="card border">
                 <div class="card-header confluence-color white-font"><strong>Confluence Data Summary</strong> 
                     <button class="info-btn" data-toggle="modal" data-target="#confluenceMainModal"  aria-label="More info"><i class="fas fa-question-circle cursor-pointer" id="confluenceQuestion"></i></button>
                 </div>
@@ -190,4 +190,133 @@ export const homePageVisualization = async () => {
     document.getElementById('publicStudiesCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.studies).reduce((a,b) => a+b))}</h2>`;
     document.getElementById('publicCaseCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.cases).reduce((a,b) => a+b))}</h2>`;
     document.getElementById('publicControlCount').innerHTML = `<h2>${numberWithCommas(Object.values(data).map(dt => dt.controls).reduce((a,b) => a+b))}</h2>`;
+}
+
+export const infoDeck = () => {
+    let template = '';
+    template += `
+        <div class="secondary-bg">
+            <div class="confluence-banner">
+                <img src="./static/images/hero-banner.jpg" height="100%" width="100%" alt="Confluence logo">
+                <div class="banner-overlay-text row justify-content-center text-center">
+                    <div class="col-md-12">
+                        <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
+                        <div class="banner-overlay-line"></div>
+                        <h3 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="container align-middle text-center" style="margin-top: 70px;">
+                <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
+                    template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#home', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
+                    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#home', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortia.'})
+                    template += cardContents({header: 'Request Data Access', button: 'Request Data Access', href: '#home', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
+                template += `</div>
+            </div>
+        </div>
+        <div class="secondary-bg inverse-triangle"></div>
+        <div class="container align-center">
+            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals">OUR GOALS</div>
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
+                <div class="col-lg-3"></div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-auto font-size-18 align-left">
+                    <ul>
+                        <li>Discover variants for breast cancer risk overall and by subtype</li>
+                        <li>Develop multi-ancestry polygenic risk scores for personalized risk assessment</li>
+                        <li>Discover variants for breast cancer survival, pharmacogenomics, and second cancers</li>
+                    </ul>
+                </div>
+                <div class="col-lg-2"></div>
+            </div>
+        </div>
+        <div class="ternary-bg">
+            <div class="container align-left confluence-info font-family-helvetica">
+                <div>Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the Division of Cancer Epidemiology and Genetics (DCEG) of NCI.</div>
+            </div>
+        </div>
+    `
+    document.getElementById('confluenceDiv').innerHTML = template;
+}
+
+export const infoDeckAfterLoggedIn = () => {
+    let template = '';
+    template += `
+        <div class="secondary-bg">
+            <div class="confluence-banner">
+                <img src="./static/images/hero-banner.jpg" height="100%" width="100%" alt="Confluence logo">
+                <div class="banner-overlay-text row justify-content-center text-center">
+                    <div class="col-md-12">
+                        <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
+                        <div class="banner-overlay-line"></div>
+                        <h3 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="container align-middle text-center" style="margin-top: 70px;">
+                <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
+                template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#data_submission', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br></br>You can always view, modify or download any data you submit.'})
+                template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
+                template += cardContents({header: 'Submit a Proposal', button: 'Submit a Proposal', href: '#home', icon: 'fa-file-upload', explanation: 'Submit a proposal to access data for analyses. </br></br>Proposals will be reviewed by DACCs from all relevant consortia.'})
+                template += cardContents({header: 'My Projects', button: 'My Projects', href: '#my_projects', icon: 'fa-database', explanation: 'Analyze data for projects approved by all relevant DACCs. </br></br>Requires data agreements.'})
+                template += `</div>
+            </div>
+        </div>
+        <div class="secondary-bg inverse-triangle"></div>
+        <div class="container align-center">
+            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals">OUR GOALS</div>
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
+                <div class="col-lg-3"></div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-auto font-size-18 align-left">
+                    <ul>
+                        <li>Discover variants for breast cancer risk overall and by subtype</li>
+                        <li>Develop multi-ancestry polygenic risk scores for personalized risk assessment</li>
+                        <li>Discover variants for breast cancer survival, pharmacogenomics, and second cancers</li>
+                    </ul>
+                </div>
+                <div class="col-lg-2"></div>
+            </div>
+        </div>
+        <div class="ternary-bg">
+            <div class="container align-left confluence-info font-family-helvetica">
+                <div>Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the Division of Cancer Epidemiology and Genetics (DCEG) of NCI.</div>
+            </div>
+        </div>
+    `
+    document.getElementById('confluenceDiv').innerHTML = template;
+}
+
+const cardContents = (obj) => {
+    return `
+        <div class="col-lg card confluence-cards">
+            <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
+                <i class="fas ${obj.icon} fa-2x icon-padding font-white"></i>
+            </div>
+            <div class="card-body">
+                <div class="card-title" style="color: #333B4D">
+                    <div class="font-size-28"><b>${obj.header}</b></div>
+                </div>
+                <p class="text-secondary card-text font-size-14">
+                    ${obj.explanation}
+                </p>
+            </div>
+
+            <div class="white-bg border-top-0 card-footer" style="width: 100%;">
+                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
+                    <a class="stretched-link font-white" href="${obj.href}" style="text-decoration: none;">${obj.button}</a>
+                </button>
+            </div>
+        </div>
+        `;
 }

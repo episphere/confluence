@@ -1,128 +1,90 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
-import { txt2dt } from '../visualization.js';
-import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions } from '../event.js';
+import { txt2dt, addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
+import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
-export const template = () => {
+export const template = (pageHeader) => {
     return `
-        <div class="main-summary-row data-exploration-div">
-            ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
-                <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
-            `:``}
-            <div class="main-summary-row statistics-row">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#data_exploration/summary"><strong>Summary statistics</strong></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#data_exploration/subset">
-                            <strong>Subset statistics</strong>
-                        </a>
-                    </li>
-                </ul>
+        <div class="general-bg">
+            <div class="container body-min-height">
+                <div class="main-summary-row white-bg">
+                    <button class="sub-menu-btn"><a class="nav-link active black-font" href="#data_exploration/summary"><strong>Summary statistics</strong></a></button>
+                    <button class="sub-menu-btn"><a class="nav-link black-font" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
+                </div>
+                <div class="main-summary-row">
+                    <div class="offset-xl-2 col-xl-10 align-left padding-left-30">
+                        <h1 class="page-header">${pageHeader}</h1>
+                    </div>
+                </div>
+                
+                ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
+                    <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
+                `:``}
+                <div class="main-summary-row" id="dataSummaryStatistics"></div>
+                <div class="main-summary-row">
+                    <div class="col">
+                        <div class="offset-xl-2 padding-left-30 align-left" id="dataLastModified"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="main-summary-row" id="dataSummaryStatistics"></div>
-        <div class="main-summary-row">
-            <div class="offset-lg-2" id="dataLastModified"></div>
         </div>
     `;
 }
 
-export const dataSummaryStatisticsTemplate = () => `
-    <div class="col-xl-2">
-        <div class="card sub-div-shadow">
-            <div class="card-header">
-                <strong class="side-panel-header">Filter 
-                    <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
-                </strong>
+const dataVisulizationCards = (obj) => `
+        <div class="col-xl-4 padding-right-zero">
+            <div id="${obj.divId}">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="${obj.cardHeaderId}"></label></span>
+                    </div>
+                    <div class="card-body viz-card-body">
+                        <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+export const dataSummaryStatisticsTemplate = () => {
+    let template = '';
+    // <button class="info-btn" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" id="dataSummaryFilter"><i class="fas fa-question-circle cursor-pointer"></i></button>
+    template = `
+    <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
+        <div class="card">
+            <div class="card-header align-left card-filter-header">
+                <strong class="side-panel-header font-size-17">Filter</strong>
             </div>
             <div id="cardContent" class="card-body">
-                <div id="genderFilter" class="align-left"></div>
-                <div id="chipContent" class="align-left"></div>
-                <div id="studyFilter" class="align-left"></div>
+                <div id="allFilters" class="align-left"></div>
             </div>
         </div>
     </div>
-    <div class="col-xl-10">
-        <div class="main-summary-row">
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv7">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel7"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart7"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv2">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel2"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv5">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel5"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart5"></div>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
+        <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>
+        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+            <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
+                <span class="font-weight-bold">Gender:</span> All<span class="vertical-line"></span>
+                <span class="font-weight-bold">Genotyping chip:</span> All Arrays
             </div>
         </div>
         <div class="main-summary-row">
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv3">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel3"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv6">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel6"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart6"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="data-exploration-charts col-xl-4">
-                <div id="chartDiv4">
-                    <div class="card sub-div-shadow">
-                        <div class="card-header">
-                            <span class="data-summary-label-wrap"><label class="dataSummary-label" id="dataSummaryVizLabel4"></label></span>
-                        </div>
-                        <div class="card-body viz-card-body">
-                            <div class="dataSummary-chart" id="dataSummaryVizChart4"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-`
+        `
+        template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
+        template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
+        template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
+        template += `</div><div class="main-summary-row">`
+
+        template += dataVisulizationCards({divId: 'chartDiv3', cardHeaderId: 'dataSummaryVizLabel3', cardBodyId: 'dataSummaryVizChart3'})
+        template += dataVisulizationCards({divId: 'chartDiv6', cardHeaderId: 'dataSummaryVizLabel6', cardBodyId: 'dataSummaryVizChart6'})
+        template += dataVisulizationCards({divId: 'chartDiv4', cardHeaderId: 'dataSummaryVizLabel4', cardBodyId: 'dataSummaryVizChart4'})
+        
+        template += `</div></div>
+    `;
+    document.getElementById('dataSummaryStatistics').innerHTML = template;
+    addEventFilterBarToggle();
+}
+
 
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile(missingnessStatsFileId);
@@ -131,7 +93,7 @@ export const dataSummaryMissingTemplate = async () => {
     const {data, headers} = csv2Json(response);
     const variables = headers.filter(dt => /status_/i.test(dt) === false && /study/i.test(dt) === false && /consortia/i.test(dt) === false && /ethnicityClass_/i.test(dt) === false  && /bcac_id/i.test(dt) === false);
     const status = headers.filter(dt => /status_/i.test(dt) === true);
-    
+    const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     // const studies = data.map(dt => dt['study']).filter((item, i, ar) => ar.indexOf(item) === i);
     const studies = {};
     data.forEach(dt => {
@@ -141,19 +103,37 @@ export const dataSummaryMissingTemplate = async () => {
     const ancestory = headers.filter(dt => /ethnicityClass_/i.test(dt) === true);
     
     const div1 = document.createElement('div');
-    div1.classList = ['col-lg-2'];
+    div1.classList = ['col-xl-2 filter-column'];
     div1.id = 'missingnessFilter';
 
     const div2 = document.createElement('div');
-    div2.classList = ['col-lg-10'];
-    div2.id = 'missingnessTable';
+    div2.classList = ['col-xl-10'];
+    div2.innerHTML = `
+        <button id="filterBarToggle" class="left-10">
+            <i class="fas fa-caret-left"></i>
+        </button>
+        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+            <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
+                <span class="font-weight-bold">Status:</span> All<span class="vertical-line"></span>
+                <span class="font-weight-bold">Ancestry:</span> All
+                ${initialSelection.length > 0 ? `
+                    <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} others</span>`:``}
+                `:``}
+            </div>
+        </div>
+        `;
 
+    const row = document.createElement('div');
+    row.classList = ['main-summary-row div-border'];
+    row.id = 'missingnessTable'
+
+    div2.appendChild(row);
     document.getElementById('dataSummaryStatistics').appendChild(div1);
     document.getElementById('dataSummaryStatistics').appendChild(div2);
 
-    const initialSelection = variables.length > 5 ? variables.slice(0, 5) : variables;
     renderFilter(data, initialSelection, variables, status, studies, ancestory);
     midset(data, initialSelection);
+    addEventMissingnessFilterBarToggle()
 }
 
 const sortArray = (array) => {
@@ -166,188 +146,145 @@ const sortArray = (array) => {
 const renderFilter = (data, acceptedVariables, headers, status, studies, ancestory) => {
     let template = '';
     template += `
-    <div class="card sub-div-shadow midset-Card">
-        <div class="card-header">
+    <div class="card midset-card">
+        <div class="card-header align-left card-filter-header">
             <strong class="side-panel-header">Filter</strong>
         </div>
-        <div class="card-body">
-            <div id="midsetFilterData" class="align-left"></div>
-        </div>
-    </div>
-    <div class="card sub-div-shadow midset-Card">
-        <div class="card-header variable-selection-header" style="white-space: nowrap;">
-            <strong class="side-panel-header">Variable Selection</strong>
-            <div class="filter-btn custom-margin variable-selection-total sub-div-shadow" id="selectedVariablesCount"></div>
-        </div>
-        <div class="card-body">
-            <div id="midsetVariables" class="align-left"></div>
+        <div class="card-body" id="cardContent">
+            <div id="midsetFilterData" class="row gender-select align-left"></div>
         </div>
     </div>
     `
     document.getElementById('missingnessFilter').innerHTML = template;
-    renderMidsetVariables(data, acceptedVariables, headers);
     renderMidsetFilterData(data, acceptedVariables, headers, status, studies, ancestory);
 }
 
 const renderMidsetFilterData = (data, acceptedVariables, headers, status, studies, ancestory) => {
     let template = '';
-    template += '<div class="row status-select">Status</div>'
-    template += `<ul class="remove-padding-left" id="statusList">`;
-    status.push('All');
-    status.forEach(variable => {
-        template += `<li class="filter-list-item">
-                        <button class="${variable === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
-                            <div class="variable-name">${variable.replace(new RegExp('status_', 'i'), '')}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-    template += '<div class="custom-hr row"></div><div class="row study-select">Ancestry</div>'
-    template += `<ul class="remove-padding-left" id="ancestoryList">`;
     ancestory.splice(ancestory.indexOf('ethnicityClass_Other'), 1);
     ancestory.sort();
     ancestory.push('ethnicityClass_Other');
     ancestory.push('All');
+    template += `
+        <form id="midsetFilterForm" method="POST">
+            <div class="form-group" id="statusList">
+                <label class="filter-label font-size-13" for="statusSelection">Status</label>
+                <select class="form-control font-size-15" id="statusSelection">
+                    <option selected value='All'>All</option>
+                    <option value='status_case'>case</option>
+                    <option value='status_control'>control</option>
+                </select>
+            </div>
+            <div class="form-group" id="ancestryList">
+                <label class="filter-label font-size-13" for="ancestrySelection">Ancestry</label>
+                <select class="form-control font-size-15" id="ancestrySelection">`
     ancestory.forEach(anc => {
-        template += `<li class="filter-list-item">
-                        <button class="${anc === 'All' ? 'active-filter ': ''}filter-btn sub-div-shadow collapsible-items filter-midset-data-ancestory filter-midset-data-btn" data-variable="${anc}">
-                            <div class="variable-name">${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-
-    template += '<div class="custom-hr row"></div>'
-    
-    template += '<div id="studiesList">'
+        template += `<option value="${anc}" ${anc === 'All' ? 'selected':''}>${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</option>`
+    }) 
+                
+    template += `</select>
+            </div>
+            <div class="form-group">
+                <label class="filter-label font-size-13" for="studiesList">Studies</label>
+                <div id="studiesList" class="font-size-15">`
     for(let consortium in studies){
-        template += `<ul class="remove-padding-left">
-                        <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
-                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
-                            <div class="ml-auto">
-                                <button ${Object.keys(studies[consortium]).length !== 0 ? ``:`disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                    <i class="fas fa-caret-down"></i>
-                                </button>
-                            </div>
-                        </li>`
+        let innerTemplate = `
+            <ul class="remove-padding-left">
+                <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
+                    <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
+                    <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                    <div class="ml-auto">
+                        <button type="button" ${Object.keys(studies[consortium]).length !== 0 ? ``:`disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+                    </div>
+                </li>
+        `;
         if(Object.keys(studies[consortium]).length !== 0) {
-            template += `<ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
+            innerTemplate += `<ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
 
             for(let study in studies[consortium]){
-                template += `<li class="filter-list-item">
-                                <button class="filter-btn sub-div-shadow collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
-                                    <div class="variable-name">${study}</div>
-                                </button>
-                            </li>`;
+                innerTemplate += `
+                    <li class="filter-list-item">
+                        <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
+                        <label for="label${study}" class="study-name" title="${study}">${study.length > 10 ? `${study.substr(0,10)}...`:study}</label>
+                    </li>`;
             }
-            template += `</ul>`;
+            innerTemplate += `</ul>`;
         }
-        template += `</ul>`;
+        innerTemplate += '</ul>'
+        template += innerTemplate
     }
-    template += `</div>`
-
+    template +=`
+                </div>
+            </div>
+            <div class="form-group" id="midsetVariables">
+                <label class="filter-label font-size-13" for="variableSelectionList">Variable Selection</label>
+                <ul class="remove-padding-left font-size-15" id="variableSelectionList">
+            `
+    headers.forEach(variable => {
+        template += `<li class="filter-list-item">
+                        <input type="checkbox" ${acceptedVariables.indexOf(variable) !== -1 ? 'checked': ''} data-variable="${variable}" id="label${variable}" class="select-variable"/>
+                        <label for="label${variable}" class="variable-name" title="${variable}">${variable.replace('_Data available', '').length > 20 ? `${variable.replace('_Data available', '').slice(0,20)}...`: `${variable.replace('_Data available', '')}`}</label>
+                    </li>`;
+    });
+    template += `</ul></div></br>
+            <button type="submit" class="btn btn-light">Submit</button>
+            <button type="reset" class="btn btn-light">Reset</button>
+        </form>
+    `
     document.getElementById('midsetFilterData').innerHTML = template;
-    addEventFilterDataStatus(data, acceptedVariables, headers);
+    addEventConsortiumSelect();
+    addEventMidsetFilterForm(data);
 }
 
-const addEventFilterDataStatus = (data) => {
-    const elements = document.getElementsByClassName('filter-midset-data-status');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) return;
-            removeActiveClass('filter-midset-data-status', 'active-filter')
-            element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
-    });
+const addEventMidsetFilterForm = (data) => {
+    const form = document.getElementById('midsetFilterForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const status = document.getElementById('statusSelection').value;
+        const ancestry = document.getElementById('ancestrySelection').value;
+        const selectedVariables = getSelectedVariables('midsetVariables');
+        const studiesSelection = getSelectedStudies().map(dt => dt.split('@#$')[1]);
+        const consortiaSelection = Array.from(document.querySelectorAll(`input:checked.select-consortium`)).map(dt => dt.dataset.consortia);
 
-    const elements2 = document.getElementsByClassName('filter-midset-data-study');
-    Array.from(elements2).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
-            else element.classList.add('active-filter');
-            document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = false;
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-            let allStudiesSelected = true;
-            const constortiaStudyElements = element.parentNode.parentNode.querySelectorAll('.filter-midset-data-study');
-            Array.from(constortiaStudyElements).forEach(el => {
-                if(!allStudiesSelected) return;
-                if(el.classList.contains('active-filter') === false) allStudiesSelected = false;
-            });
-            if(allStudiesSelected) document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = true;
-            
-        })
+        let newData = data;
+        if(studiesSelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studiesSelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
+        
+        if(status !== 'All') {
+            newData = newData.filter(dt => dt[status] === '1');
+        }
+        
+        if(ancestry !== 'All') {
+            newData = newData.filter(dt => dt[ancestry] === '1');
+        }
+        document.getElementById('listFilters').innerHTML = `
+        <span class="font-weight-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
+        <span class="font-weight-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
+        ${studiesSelection.length > 0 ? `
+            <span class="vertical-line"></span><span class="font-weight-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} others</span>`:``}
+        `:``}
+        ${selectedVariables.length > 0 ? `
+            <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} others</span>`:``}
+        `:``}
+        `
+        midset(newData, selectedVariables);
     });
-
-    const elements3 = document.getElementsByClassName('filter-midset-data-ancestory');
-    Array.from(elements3).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) return;
-            removeActiveClass('filter-midset-data-ancestory', 'active-filter')
-            element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
-    });
-
-    const elements4 = document.getElementsByClassName('select-consortium');
-    Array.from(elements4).forEach(el => {
-        el.addEventListener('click', () => {
-            if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.add('active-filter'));
-            }
-            else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.remove('active-filter'));
-            }
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
-    })
 };
 
 const getSelectedVariables = (parentId) => {
     const selections = [];
     let cardBody = document.getElementById(parentId);
-    const variables = cardBody.querySelectorAll('.active-filter');
+    const variables = cardBody.querySelectorAll('input:checked');
     Array.from(variables).forEach(el => selections.push(el.dataset.variable));
     return selections;
-}
-
-const renderMidsetVariables = (data, acceptedVariables, headers) => {
-    let template = '';
-    template += `<ul class="remove-padding-left">`;
-    headers.forEach(variable => {
-        template += `<li class="filter-list-item">
-                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" title="${variable.replace('_Data available', '')}" data-variable="${variable}">
-                            <div class="variable-name">${variable.replace('_Data available', '').length > 20 ? `${variable.replace('_Data available', '').slice(0,20)}...`: `${variable.replace('_Data available', '')}`}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-    document.getElementById('midsetVariables').innerHTML = template;
-    addEventFilterMidset(data, headers);
-}
-
-const addEventFilterMidset = (data, headers) => {
-    const elements = document.getElementsByClassName('filter-midset-variable');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
-            else element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'), headers);
-        });
-    });
 }
 
 const midset = (data, acceptedVariables) => {
     let template = '';
     let plotData = [];
     let headerData = '';
-    document.getElementById('selectedVariablesCount').innerHTML = acceptedVariables.length;
+
     if(acceptedVariables.length === 0){
         template += 'No variable selected.';
         hideAnimation();
@@ -355,7 +292,7 @@ const midset = (data, acceptedVariables) => {
         return;
     }
     if(data.length > 0){
-        template += '<table class="table table-hover table-borderless missingness-table table-striped sub-div-shadow"><thead class="midset-table-header">';
+        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
         headerData = headerCount;
         const result = computeSets(data, acceptedVariables);

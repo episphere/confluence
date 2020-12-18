@@ -5,6 +5,7 @@ import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
 import { createProjectModal } from './components/modal.js';
+import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 
 let top = 0;
 export const addEventStudiesCheckBox = (dataObject, folderId) => {
@@ -497,13 +498,13 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     
     const newBtn = document.createElement('button');
     newBtn.id = "continueSubmission";
-    newBtn.classList = ["btn btn-light sub-div-shadow"];
+    newBtn.classList = ["btn btn-light"];
     newBtn.title = "Continue Submission";
     newBtn.innerHTML = 'Submit';
     newBtn.type = "button";
 
     const downloadAndClose = document.createElement('button');
-    downloadAndClose.classList = ['btn btn-dark sub-div-shadow'];
+    downloadAndClose.classList = ['btn btn-dark'];
     downloadAndClose.id = 'downloadQAQCReport';
     downloadAndClose.title = 'Download Report and Close';
     downloadAndClose.innerHTML = 'Download Report and Close';
@@ -537,7 +538,7 @@ const addEventDownloadQAQCReport = (fileName) => {
 const replaceBtns = () => {
     const element = document.getElementById('downloadQAQCReport');
     const closeBtn = document.createElement('button');
-    closeBtn.classList = ['btn btn-dark sub-div-shadow'];
+    closeBtn.classList = ['btn btn-dark'];
     closeBtn.title = 'Close';
     closeBtn.innerHTML = 'Close';
     closeBtn.type = 'button';
@@ -547,7 +548,7 @@ const replaceBtns = () => {
 
     const continueBtn = document.getElementById('continueSubmission');
     const submitBtn = document.createElement('button');
-    submitBtn.classList = ['btn btn-light sub-div-shadow'];
+    submitBtn.classList = ['btn btn-light'];
     submitBtn.id = 'submitBtn';
     submitBtn.title = 'Submit';
     submitBtn.innerHTML = 'run QAQC';
@@ -656,7 +657,7 @@ export const addEventShowAllCollaborator = () => {
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
             table += `<strong>${name}</strong><br><br>
-                <table class="table table-borderless table-striped collaborator-table sub-div-shadow">
+                <table class="table table-borderless table-striped collaborator-table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -692,7 +693,7 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body allow-overflow">${table}</div>
             <div class="modal-footer">
-                <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+                <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
         `;
         addEventRemoveCollaborator();
@@ -796,13 +797,13 @@ export const addEventAddNewCollaborator = () => {
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="btn btn-light sub-div-shadow" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
+                            <button class="btn btn-light" type="button" title="Add more collaborators" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
-                    <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+                    <button type="submit" title="Submit" class="btn btn-light">Submit</button>
+                    <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
                 </div>
             </form>
         `;
@@ -811,7 +812,7 @@ export const addEventAddNewCollaborator = () => {
         addMoreEmail.addEventListener('click', () => {
             const counter = parseInt(addMoreEmail.dataset.counter)+1;
             addMoreEmail.dataset.counter = counter;
-            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            document.getElementById('collaboratorEmails').insertAdjacentHTML("beforeend", addFields(counter));
             if(counter === 5) addMoreEmail.disabled = true;
         });
 
@@ -868,15 +869,27 @@ export const addEventDataGovernanceNavBar = (bool) => {
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
+            const generalDiv = document.createElement('div');
+            generalDiv.classList = ['general-bg padding-bottom-1rem']
+            const containerDiv = document.createElement('div');
+
+            containerDiv.classList = ['container'];
+
+            const headerDiv = document.createElement('div');
+            headerDiv.classList = ['main-summary-row'];
+            headerDiv.innerHTML = `<div class="align-left">
+                                        <h1 class="page-header">Data Governance</h1>
+                                    </div>`
+
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
 
             const divRow = document.createElement('div');
-            divRow.classList = ['row'];
+            divRow.classList = ['main-summary-row white-bg div-border'];
             divRow.id = 'dataGovernanceMain'
             
             const div1 = document.createElement('div');
@@ -891,8 +904,11 @@ export const addEventDataGovernanceNavBar = (bool) => {
             divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
-            confluenceDiv.appendChild(btnDiv);
-            confluenceDiv.appendChild(divRow);
+            containerDiv.appendChild(headerDiv)
+            containerDiv.appendChild(btnDiv)
+            containerDiv.appendChild(divRow)
+            generalDiv.appendChild(containerDiv)
+            confluenceDiv.appendChild(generalDiv);
             dataGovernanceProjects();
         }
         else{
@@ -900,7 +916,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const btnDiv = document.createElement('div');
             btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light sub-div-shadow">
+            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
                                     <i class="fas fa-project-diagram"></i> Create project
                                 </button>
                                 ${createProjectModal()}`;
@@ -944,20 +960,20 @@ const addEventCreateProjectBtn = () => {
             </div>
                 
             <div class="row">
-                <div class="col"><button title="Add more collaborators" class="btn btn-light sub-div-shadow" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
+                <div class="col"><button title="Add more collaborators" type="button" class="btn btn-light" id="addMoreEmail" data-counter=1><i class="fas fa-plus"></i> Add</button></div>
             </div>
             </br>
         </div>
         <div class="modal-footer">
-            <button type="submit" title="Submit" class="btn btn-light sub-div-shadow">Submit</button>
-            <button type="button" title="Close" class="btn btn-dark sub-div-shadow" data-dismiss="modal">Close</button>
+            <button type="submit" title="Submit" class="btn btn-light">Submit</button>
+            <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
         </form>
         `
         const addMoreEmail = document.getElementById('addMoreEmail');
         addMoreEmail.addEventListener('click', () => {
             const counter = parseInt(addMoreEmail.dataset.counter)+1;
             addMoreEmail.dataset.counter = counter;
-            document.getElementById('collaboratorEmails').innerHTML += addFields(counter);
+            document.getElementById('collaboratorEmails').insertAdjacentHTML("beforeend", addFields(counter));
             if(counter === 5) addMoreEmail.disabled = true;
         });
         addEventCPCSelect();
@@ -1452,7 +1468,7 @@ const addEventDataTypeRadio = () => {
             template += `<ul>`;
             summaryFolder.forEach(folder => {
                 template += `<li class="filter-list-item">
-                <button type="button" class="filter-btn sub-div-shadow collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
+                <button type="button" class="filter-btn collapsible-items update-summary-stats-btn filter-midset-data-btn" data-folder-id="${folder.id}">
                 <div class="variable-name">${folder.name}</div>
                 </button>
                 </li>`;
@@ -1541,5 +1557,105 @@ const addEventUpdateSummaryStatsForm = () => {
         let template = notificationTemplate(top, `<span class="successMsg">Data updated</span>`, `Data successfully updated, please reload to see updated data.`);
         document.getElementById('showNotification').innerHTML = template;
         addEventHideNotification();
+    })
+}
+
+export const addEventFilterBarToggle = () => {
+    const button = document.getElementById('filterBarToggle');
+    button.addEventListener('click', () => {
+        const child = Array.from(button.childNodes)[0];
+        if(child.classList.contains('fa-caret-left')) {
+            child.classList.remove('fa-caret-left');
+            child.classList.add('fa-caret-right');
+            document.getElementById('summaryFilterSiderBar').classList = ['d-none'];
+            document.getElementById('summaryStatsCharts').classList = ['col-xl-12 padding-right-zero padding-left-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
+            document.getElementById('dataLastModified').classList.remove('offset-xl-2')
+            document.getElementById('dataLastModified').classList.remove('padding-left-30')
+        }
+        else {
+            child.classList.remove('fa-caret-right');
+            child.classList.add('fa-caret-left');
+            document.getElementById('summaryFilterSiderBar').classList = ['col-xl-2 filter-column'];
+            document.getElementById('summaryStatsCharts').classList = ['col-xl-10 padding-right-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
+            document.getElementById('dataLastModified').classList.add('offset-xl-2')
+            document.getElementById('dataLastModified').classList.add('padding-left-30')
+        }
+    })
+}
+
+export const addEventMissingnessFilterBarToggle = () => {
+    const button = document.getElementById('filterBarToggle');
+    button.addEventListener('click', () => {
+        const child = Array.from(button.childNodes)[0];
+        if(child.classList.contains('fa-caret-left')) {
+            child.classList.remove('fa-caret-left');
+            child.classList.add('fa-caret-right');
+            document.getElementById('missingnessFilter').classList = ['d-none'];
+            document.getElementById('missingnessTable').parentNode.classList = ['col-xl-12 padding-right-zero padding-left-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
+            document.getElementById('dataLastModified').classList.remove('offset-xl-2');
+            document.getElementById('dataLastModified').classList.remove('padding-left-30');
+        }
+        else {
+            child.classList.remove('fa-caret-right');
+            child.classList.add('fa-caret-left');
+            document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
+            document.getElementById('missingnessTable').parentNode.classList = ['col-xl-10 padding-right-zero'];
+            document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
+            document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
+            document.getElementById('dataLastModified').classList.add('offset-xl-2');
+            document.getElementById('dataLastModified').classList.add('padding-left-30');
+        }
+    })
+}
+
+export const addEventSummaryStatsFilterForm = (jsonData) => {
+    const form = document.getElementById('summaryStatsFilterForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const gender = document.getElementById('genderSelection').value;
+        const chip = document.getElementById('genotypingChipSelection').value;
+        const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
+        const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
+        
+        const elements = document.getElementsByClassName('select-consortium');
+        Array.from(elements).forEach(el => {
+            el.addEventListener('click', () => {
+                if(el.checked){
+                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+                }
+                else {
+                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
+                }
+            })
+        })
+        let selectedConsortia = [];
+        Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
+            if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
+        });
+        const array = getSelectedStudies();
+        let finalData = jsonData;
+        if(gender !== 'all') {
+            finalData = finalData.filter(dt => dt['sex'] === gender);
+        }
+        if(chip !== 'all') {
+            finalData = finalData.filter(dt => dt['chip'] === chip);
+        }
+        updateCounts(finalData);
+        if(array.length > 0){
+            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
+        }
+        const selectedStudies = array.map(s => s.split('@#$')[1]);
+        document.getElementById('listFilters').innerHTML = `
+        <span class="font-weight-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+        <span class="font-weight-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-weight-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} others</span>`:``}
+        `:``}`
+        renderAllCharts(finalData);
     })
 }

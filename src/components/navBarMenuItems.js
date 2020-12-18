@@ -1,60 +1,64 @@
 export const template = () => {
     return `
+        <div class="grid-elements">
+            <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
+                Home
+            </a>
+        </div>
         <div class="grid-elements dropdown">
-            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-home"></i> Confluence
+            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                About Confluence
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links" href="#home" id="homePage"> Home</a>
-                <a class="dropdown-item nav-link nav-menu-links" href="#about" id="aboutConfluence"> About</a>
-                <a class="dropdown-item nav-link nav-menu-links" href="#resources" id="resourcesConfluence"> Resources</a>
-                <a class="dropdown-item nav-link nav-menu-links" href="#contact" id="contactConfluence"> Contact</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about" id="aboutConfluence">Learn about Confluence</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#resources" id="resourcesConfluence">Resources</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
             </div>
         </div>
         <div class="grid-elements dropdown">
-            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-database"></i> Data
+            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Data
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_exploration/summary" title="Data Exploration" id="dataSummary">
-                    <i class="fas fa-chart-bar"></i> Explore
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_exploration/summary" title="Data Exploration" id="dataSummary">
+                    Explore
                 </a>
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
-                    <i class="fas fa-upload"></i> Submit
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
+                    Submit
                 </a>
                 <div id="myProjectsNav"></div>
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_analysis" title="Data Analysis" id="dataAnalysis">
-                    <i class="fas fa-database"></i> Analyze
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_analysis" title="Data Analysis" id="dataAnalysis">
+                    Analyze
                 </a>
-                <a class="dropdown-item nav-link nav-menu-links" href="#data_request" title="Data Request" id="dataRequest">
-                    <i class="fas fa-database"></i> Request
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_request" title="Data Request" id="dataRequest">
+                    Request
                 </a>
             </div>
         </div>
         <div id="governanceNav"></div>
         <div class="grid-elements">
-            <a class="nav-link nav-menu-links" href="#tutorials" title="Confluence Tutorials" id="platformTutorial"><i class="fas fa-file-video">
+            <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
                 </i> Tutorials
             </a>
         </div>
         <div class="grid-elements">
-            <a class="nav-link nav-menu-links" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
-                <i class="fas fa-bug"></i> Report issue
+            <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
+                Report issue
             </a>
         </div>
         <div class="navbar-nav ml-auto">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <div class="grid-elements dropdown">
-                    <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user"></i> ${JSON.parse(localStorage.parms).name}
+                    <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font"  title="Welcome, ${JSON.parse(localStorage.parms).name}!" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        ${JSON.parse(localStorage.parms).name}
                     </button>
                     <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item nav-link nav-menu-links" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#logout" id="logOutBtn">Log Out</a>
                     </div>
                 </div>
             ` : `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" title="Log Out" href="#logout" id="logOutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    <a class="nav-link nav-menu-links" title="Log Out" href="#logout" id="logOutBtn">Log Out</a>
                 </div>
             `}
             

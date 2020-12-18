@@ -1,9 +1,8 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization, addEventAboutConfluence } from './src/pages/homePage.js';
+import { template as homePage, homePageVisualization, addEventAboutConfluence, infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { footerTemplate } from './src/components/footer.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList, addEventUpdateSummaryStatsData } from './src/event.js';
@@ -12,6 +11,7 @@ import { getFileContent } from './src/visualization.js';
 import { aboutConfluence } from './src/pages/about.js';
 import { confluenceResources } from './src/pages/resources.js';
 import { confluenceContactPage } from './src/pages/contact.js';
+import { footerTemplate } from './src/components/footer.js';
 
 const displayNotification = () => {
     navigator.serviceWorker.getRegistration()
@@ -46,8 +46,6 @@ export const confluence = async () => {
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
 
-    const footer = document.getElementById('footer');
-    footer.innerHTML = footerTemplate();
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
@@ -90,10 +88,10 @@ export const confluence = async () => {
             removeActiveClass('nav-menu-links', 'navbar-active');
             dataSummaryElement.classList.add('navbar-active');
             document.title = 'Confluence - Data Explore';
-            confluenceDiv.innerHTML = dataSummary();
+            confluenceDiv.innerHTML = dataSummary('Summary Statistics');
             addEventUpdateSummaryStatsData();
-            document.getElementById('dataSummaryStatistics').innerHTML = dataSummaryStatisticsTemplate();
-            document.getElementById('dataSummaryFilter').addEventListener('click', e => {
+            dataSummaryStatisticsTemplate();
+            if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
                 const header = document.getElementById('confluenceModalHeader');
                 const body = document.getElementById('confluenceModalBody');
@@ -146,28 +144,28 @@ export const confluence = async () => {
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
-                </div>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+                    My Projects
+                </a>
             `;
             addEventDataGovernanceNavBar(true);
             addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
                 <div class="grid-elements">
-                    <a class="nav-link nav-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
+                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance"><i class="fas fa-file-contract"></i> Data Governance</a>
                 </div>
             `;
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
             document.getElementById('myProjectsNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="dropdown-item nav-link nav-menu-links" href="#my_projects" title="My Projects" id="myProjects"><i class="fas fa-project-diagram"></i> My Projects</a>
-                </div>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+                    My Projects
+                </a>
             `;
             addEventMyProjects();
         }
@@ -176,6 +174,7 @@ export const confluence = async () => {
 };
 
 const manageRouter = async () => {
+    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms !== undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
@@ -186,9 +185,11 @@ const manageRouter = async () => {
         document.title = 'Confluence Data Platform';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
-        confluenceDiv.innerHTML = homePage();
-        addEventAboutConfluence();
-        homePageVisualization();
+        infoDeck();
+        // confluenceDiv.innerHTML = homePage();
+        // addEventAboutConfluence();
+        // homePageVisualization();
+        hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
@@ -223,6 +224,7 @@ const manageRouter = async () => {
 }
 
 const manageHash = () => {
+    document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
@@ -238,7 +240,7 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         dataSummaryElement.classList.add('navbar-active');
         document.title = 'Confluence - Data Explore';
-        confluenceDiv.innerHTML = dataSummary();
+        confluenceDiv.innerHTML = dataSummary('Subset Statistics');
         addEventUpdateSummaryStatsData();
         removeActiveClass('nav-link', 'active');
         document.querySelectorAll('[href="#data_exploration/subset"]')[0].classList.add('active');
@@ -284,9 +286,10 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         document.title = 'Confluence Data Platform';
-        confluenceDiv.innerHTML = homePage();
-        addEventAboutConfluence();
-        homePageVisualization();
+        infoDeckAfterLoggedIn();
+        // confluenceDiv.innerHTML = homePage();
+        // addEventAboutConfluence();
+        // homePageVisualization();
         hideAnimation();
     }
     else if(hash === '#about'){
@@ -326,7 +329,7 @@ const manageHash = () => {
 
 window.onload = async () => {
     const confluenceDiv = document.getElementById('confluenceDiv');
-    confluenceDiv.innerHTML = '';
+    // confluenceDiv.innerHTML = '';
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         await checkAccessTokenValidity();
         inactivityTime();

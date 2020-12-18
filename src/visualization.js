@@ -1,6 +1,6 @@
 import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
-import { addEventVariableDefinitions } from './event.js';
+import { addEventSummaryStatsFilterForm, addEventVariableDefinitions } from './event.js';
 
 const unique = arr => {
     let u={}
@@ -65,22 +65,79 @@ export const getFileContent = async () => {
     renderAllCharts(jsonData, true);
 };
 
+const allFilters = (jsonData) => {
+    document.getElementById('allFilters').innerHTML = '';
+    const div1 = document.createElement('div')
+    div1.classList = ['row gender-select'];
+    let template =`
+        <form method="POST" id="summaryStatsFilterForm">
+            <div class="form-group">
+                <label class="filter-label font-size-13" for="genderSelection">Gender</label>
+                <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
+                    <option selected value='all'>All</option>
+                    <option value='female'>Female</option>
+                    <option value='male'>Male</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
+                <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
+                    <option selected value='all'>All Array</option>
+                    <option value='Confluence chip'>Confluence Array</option>
+                    <option value='Other chip'>Other Array</option>
+                </select>
+            </div>
+    `;
+    template += `<label class="filter-label font-size-13" for="studyConsortiaList">Studies</label>`
+    const obj = aggegrateData(jsonData);
+    for(let consortium in obj){
+        let innerTemplate = `
+                    <ul class="remove-padding-left font-size-15" id="studyConsortiaList">
+                        <li class="custom-borders filter-list-item">
+                            <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                                <i class="fas fa-caret-down"></i>
+                            </button>
+                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
+                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                            <div class="ml-auto">
+                                <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
+                                    ${numberWithCommas(obj[consortium].consortiumTotal)}
+                                </div>
+                            </div>
+                        </li>
+                        <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
+        for(let study in obj[consortium]){
+            if(study !== 'consortiumTotal') {
+                const total = obj[consortium][study].total;
+                innerTemplate += `<li class="filter-list-item">
+                                <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
+                                <label for="label${study}" class="study-name" title="${study}">${study.length > 10 ? `${study.substr(0,10)}...`:study}</label>
+                                <div class="ml-auto">
+                                    <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
+                                        ${numberWithCommas(total)}
+                                    </div>
+                                </div>
+                            </li>`;
+            }
+        }
+        innerTemplate += `</ul></ul>`
+        template += innerTemplate;
+        
+    }
+    template += `</br><button type="submit" class="btn btn-light">Submit</button>
+        <button type="reset" class="btn btn-light">Reset</button>
+    </form>`;
+    div1.innerHTML = template;
+    document.getElementById('allFilters').appendChild(div1);
+    addEventSummaryStatsFilterForm(jsonData);
+    addEventConsortiumSelect();
+}
+
 const chipFilter = (jsonData) => {
     document.getElementById('chipContent').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row genotype-select'];
-    div1.innerHTML = 'Genotyping chip &nbsp; '
-
-    const btn1 = document.createElement('button');
-    btn1.dataset.keyboard = "false";
-    btn1.dataset.backdrop = "static";
-    btn1.dataset.toggle = "modal";
-    btn1.dataset.target = "#confluenceMainModal";
-    btn1.dataset.variable = "chip";
-    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
-    btn1.classList = ['info-btn variable-definition'];
-    btn1.setAttribute('aria-label', 'More info')
-    div1.appendChild(btn1);
+    div1.innerHTML = 'Genotyping chip'
 
     const div2 = document.createElement('div')
     div2.classList = ['row genotype-select'];
@@ -89,7 +146,7 @@ const chipFilter = (jsonData) => {
     btn2.dataset.variable = "chip";
     btn2.dataset.value = "Confluence chip";
     btn2.innerHTML = 'Confluence array'
-    btn2.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    btn2.classList = ['filter-btn genotype-selection-btn'];
     div2.appendChild(btn2);
 
     const div3 = document.createElement('div')
@@ -99,7 +156,7 @@ const chipFilter = (jsonData) => {
     btn3.dataset.variable = "chip";
     btn3.dataset.value = "Other chip";
     btn3.innerHTML = 'Other arrays'
-    btn3.classList = ['filter-btn sub-div-shadow genotype-selection-btn'];
+    btn3.classList = ['filter-btn genotype-selection-btn'];
     div3.appendChild(btn3);
 
     const div4 = document.createElement('div')
@@ -107,7 +164,7 @@ const chipFilter = (jsonData) => {
 
     const btn4 = document.createElement('button');
     btn4.innerHTML = 'All arrays'
-    btn4.classList = ['filter-btn sub-div-shadow genotype-selection-btn genotype-active-btn'];
+    btn4.classList = ['filter-btn genotype-selection-btn genotype-active-btn'];
     div4.appendChild(btn4);
 
     const div5 = document.createElement('div');
@@ -127,18 +184,23 @@ const genderFilter = (jsonData) => {
     document.getElementById('genderFilter').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
-    div1.innerHTML = 'Gender &nbsp;'
+    div1.innerHTML = 'Gender'
 
-    const btn1 = document.createElement('button');
-    btn1.dataset.keyboard = "false";
-    btn1.dataset.backdrop = "static";
-    btn1.dataset.toggle = "modal";
-    btn1.dataset.target = "#confluenceMainModal";
-    btn1.dataset.variable = "sex";
-    btn1.innerHTML = '<i class="fas fa-question-circle cursor-pointer"></i>'
-    btn1.classList = ['info-btn variable-definition'];
-    btn1.setAttribute('aria-label', 'More info')
-    div1.appendChild(btn1);
+    const selectDiv1 = document.createElement('div');
+    selectDiv1.classList = ['row gender-select'];
+
+    const select1 = document.createElement('select');
+    select1.classList = ['form-control'];
+    select1.id = 'genderSelection';
+    select1.required = true;
+    select1.innerHTML = `
+        <option value=''> -- Select Gender -- </option>
+        <option selected value='all'>All</option>
+        <option value='female'>Female</option>
+        <option value='male'>Male</option>
+    `;
+
+    selectDiv1.appendChild(select1);
 
     const div2 = document.createElement('div')
     div2.classList = ['row gender-select'];
@@ -147,7 +209,7 @@ const genderFilter = (jsonData) => {
     btn2.dataset.variable = "sex";
     btn2.dataset.value = "male";
     btn2.innerHTML = 'Male'
-    btn2.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    btn2.classList = ['filter-btn gender-selection-btn'];
     div2.appendChild(btn2);
 
     const div3 = document.createElement('div')
@@ -157,7 +219,7 @@ const genderFilter = (jsonData) => {
     btn3.dataset.variable = "sex";
     btn3.dataset.value = "female";
     btn3.innerHTML = 'Female'
-    btn3.classList = ['filter-btn sub-div-shadow gender-selection-btn'];
+    btn3.classList = ['filter-btn gender-selection-btn'];
     div3.appendChild(btn3);
 
     const div4 = document.createElement('div')
@@ -165,13 +227,14 @@ const genderFilter = (jsonData) => {
 
     const btn4 = document.createElement('button');
     btn4.innerHTML = 'All'
-    btn4.classList = ['filter-btn sub-div-shadow gender-selection-btn gender-active-btn'];
+    btn4.classList = ['filter-btn gender-selection-btn gender-active-btn'];
     div4.appendChild(btn4);
 
     const div5 = document.createElement('div');
     div5.classList = ['custom-hr row'];
 
     document.getElementById('genderFilter').appendChild(div1);
+    document.getElementById('genderFilter').appendChild(selectDiv1);
     document.getElementById('genderFilter').appendChild(div2);
     document.getElementById('genderFilter').appendChild(div3);
     document.getElementById('genderFilter').appendChild(div4);
@@ -196,47 +259,6 @@ const aggegrateData = (jsonData) => {
         }
     });
     return obj;
-}
-
-const filterByStudy = (jsonData) => {
-    const obj = aggegrateData(jsonData);
-    let template = '';
-    for(let consortium in obj){
-        template += `<ul class="remove-padding-left">
-                        <li class="custom-borders filter-list-item">
-                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
-                            <div class="ml-auto">
-                                <div class="filter-btn custom-margin consortia-total sub-div-shadow" data-consortia='${consortium}'>
-                                    ${numberWithCommas(obj[consortium].consortiumTotal)}
-                                </div> 
-                                <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                    <i class="fas fa-caret-down"></i>
-                                </button>
-                            </div>
-                        </li>
-                        <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
-        for(let study in obj[consortium]){
-            if(study !== 'consortiumTotal') {
-                const total = obj[consortium][study].total;
-                template += `<li class="filter-list-item">
-                                <button class="row collapsible-items filter-studies filter-studies-btn" data-consortium=${consortium} data-study=${study}>
-                                    <div class="study-name">${study}</div>
-                                    <div class="ml-auto">
-                                        <div class="filter-btn custom-margin study-total sub-div-shadow" data-consortia-study='${consortium}@#$${study}'>
-                                            ${numberWithCommas(total)}
-                                        </div>
-                                    </div>
-                                </button>
-                            </li>`;
-            }
-        }
-        template += `</ul></ul>`;
-    }
-    document.getElementById('studyFilter').innerHTML = template;
-    addEventConsortiumSelect();
-    addEventFilterCharts(jsonData);
-    addEventSelectEntireConsortia(jsonData);
 }
 
 const addEventGenderFilter = (jsonData, element) => {
@@ -295,7 +317,7 @@ const addEventGenotypeBtnSelection = (jsonData, element) => {
     });
 }
 
-const addEventConsortiumSelect = () => {
+export const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
@@ -309,44 +331,32 @@ const addEventConsortiumSelect = () => {
             }
         });
     });
-}
 
-const addEventSelectEntireConsortia = (jsonData) => {
-    const elements = document.getElementsByClassName('select-consortium');
-    Array.from(elements).forEach(el => {
+    const consortiums = document.getElementsByClassName('select-consortium');
+    Array.from(consortiums).forEach(el => {
         el.addEventListener('click', () => {
             if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-studies')).forEach(btns => btns.classList.add('active-filter'));
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
             }
             else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-studies')).forEach(btns => btns.classList.remove('active-filter'));
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
-            let selectedConsortia = [];
-            Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
-                if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
-            });
-            
-            const array = getSelectedStudies();
-            const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
-            const variable = genotypeSelected.dataset.variable;
-            const variableValue = genotypeSelected.dataset.value;
-
-            const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
-            const variable1 = selectedGenderElement.dataset.variable;
-            const variableValue1 = selectedGenderElement.dataset.value;
-            let finalData = jsonData;
-            if(variable1) {
-                finalData = finalData.filter(dt => dt[variable1] === variableValue1);
-            }
-            if(variable) {
-                finalData = finalData.filter(dt => dt[variable] === variableValue);
-            }
-            if(array.length > 0){
-                finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
-            }
-            renderAllCharts(finalData);
         });
     });
+
+    const studies = document.querySelectorAll('.select-study');
+    Array.from(studies).forEach(element => {
+        element.addEventListener('click', () => {
+            const allStudiesInConsortium = element.parentElement.parentElement.querySelectorAll('.select-study').length
+            const selectedStudiesInConsortium = element.parentElement.parentElement.querySelectorAll('input:checked.select-study').length
+            if(allStudiesInConsortium === selectedStudiesInConsortium) {
+                element.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = true;
+            }
+            else {
+                element.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = false;
+            }
+        });
+    })
 }
 
 const addEventFilterCharts = (jsonData) => {
@@ -392,37 +402,40 @@ const addEventFilterCharts = (jsonData) => {
 
 
 
-const renderAllCharts = (finalData, showFilter) => {
+export const renderAllCharts = (finalData, showFilter) => {
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', finalData);
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6', finalData)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
-    if(showFilter) chipFilter(finalData);
-    if(showFilter) genderFilter(finalData);
-    if(showFilter) filterByStudy(finalData);
-    addEventVariableDefinitions();
+    if(showFilter) {
+        allFilters(finalData);
+        // chipFilter(finalData);
+        // genderFilter(finalData);
+        // filterByStudy(finalData);
+    };
+    // addEventVariableDefinitions();
 }
 
-const updateCounts = (data) => {
+export const updateCounts = (data) => {
     const obj = aggegrateData(data);
     for(let consortia in obj){
         const elements = document.querySelectorAll(`[data-consortia="${consortia}"]`);
         Array.from(elements).forEach(element => {
-            element.innerHTML = obj[consortia].consortiumTotal;
+            element.innerHTML = numberWithCommas(obj[consortia].consortiumTotal);
         });
         for(let study in obj[consortia]){
             const studyElements = document.querySelectorAll(`[data-consortia-study="${consortia}@#$${study}"]`);
             Array.from(studyElements).forEach(element => {
-                element.innerHTML = obj[consortia][study].total;
+                element.innerHTML = numberWithCommas(obj[consortia][study].total);
             });
         };
     };
 }
 
-const getSelectedStudies = () => {
-    const elements = document.querySelectorAll(`[class="row collapsible-items filter-studies filter-studies-btn active-filter"]`);
+export const getSelectedStudies = () => {
+    const elements = document.querySelectorAll(`input:checked.select-study`);
     const array = [];
     Array.from(elements).forEach(element => {
         const consortium = element.dataset.consortium;
@@ -452,7 +465,8 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
@@ -475,7 +489,8 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
@@ -486,7 +501,8 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const values = [ mapReduce(jsonData, 'ER_statusIndex_pos'), mapReduce(jsonData, 'ER_statusIndex_neg'), mapReduce(jsonData, 'ER_statusIndex_DK') ];
     const labels = ['Positive', 'Negative', 'Don\'t know'];
     const d3 = Plotly.d3
@@ -537,7 +553,8 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const data = [
         {
             x: ['Case', 'Control'],
@@ -565,7 +582,8 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
@@ -608,7 +626,8 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
