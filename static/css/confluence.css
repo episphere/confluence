@@ -86,6 +86,7 @@ body {
 
 #missingnessTable {
     margin-left: 1rem;
+    margin-bottom: 1rem;
 }
 
 .left-10 {
@@ -816,8 +817,12 @@ label {
     padding-left: 0px !important;
     margin-bottom: 0px !important;
     list-style-type: none;
-    margin-right: -30px;
+    margin-right: -10px;
     margin-left: -4px;
+}
+
+#summaryStatsFilterForm {
+    width: 100%;
 }
 
 .consortia-folder, .share-folder, .file-access-stats {
@@ -871,10 +876,6 @@ label {
 
 .active-filter {
     background-color: #e7bcbc !important;
-}
-
-.custom-borders {
-    border-bottom: 1px solid rgba(0,0,0,.1);
 }
 
 #tabHeading {
@@ -1092,6 +1093,11 @@ label {
 .vertical-line {
     border-right: 2px solid #000000;
     margin: 0 1rem;
+}
+
+.filter-label {
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .font-size-28 {
@@ -1531,6 +1537,7 @@ form {
     background-color: #ffffff;
     border-radius: 0.25rem;
     padding-left: 15px;
+    margin: 0px !important;
 }
 
 #midsetChart {

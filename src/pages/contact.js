@@ -9,8 +9,6 @@ export const confluenceContactPage = () => {
                 </div>
                 <div class="main-summary-row confluence-resources white-bg div-border">
                     <div class="col">
-                        <span class="confluence-pink">Contacts:</span></br>
-                        </br>
                         <span class="text-bold">Interested in participating in Confluence?</span></br>
                         <strong>Email to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>
                         </br>

@@ -53,7 +53,7 @@ export const dataSummaryStatisticsTemplate = () => {
     <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
         <div class="card">
             <div class="card-header align-left card-filter-header">
-                <strong class="side-panel-header">Filter</strong>
+                <strong class="side-panel-header font-size-17">Filter</strong>
             </div>
             <div id="cardContent" class="card-body">
                 <div id="allFilters" class="align-left"></div>
@@ -111,7 +111,7 @@ export const dataSummaryMissingTemplate = async () => {
     div2.innerHTML = '<button id="filterBarToggle" class="left-10"><i class="fas fa-caret-left"></i></button>';
 
     const row = document.createElement('div');
-    row.classList = ['main-summary-row'];
+    row.classList = ['main-summary-row div-border'];
     row.id = 'missingnessTable'
 
     div2.appendChild(row);
