@@ -1,6 +1,6 @@
 import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
-import { txt2dt } from '../visualization.js';
+import { txt2dt, addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
 export const template = (pageHeader) => {
@@ -134,188 +134,136 @@ const sortArray = (array) => {
 const renderFilter = (data, acceptedVariables, headers, status, studies, ancestory) => {
     let template = '';
     template += `
-    <div class="card midset-Card">
+    <div class="card midset-card">
         <div class="card-header align-left card-filter-header">
             <strong class="side-panel-header">Filter</strong>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="cardContent">
             <div id="midsetFilterData" class="align-left"></div>
-        </div>
-    </div>
-    <div class="card midset-Card">
-        <div class="card-header variable-selection-header" style="white-space: nowrap;">
-            <strong class="side-panel-header">Variable Selection</strong>
-            <div class="filter-btn custom-margin variable-selection-total" id="selectedVariablesCount"></div>
-        </div>
-        <div class="card-body">
-            <div id="midsetVariables" class="align-left"></div>
         </div>
     </div>
     `
     document.getElementById('missingnessFilter').innerHTML = template;
-    renderMidsetVariables(data, acceptedVariables, headers);
     renderMidsetFilterData(data, acceptedVariables, headers, status, studies, ancestory);
 }
 
 const renderMidsetFilterData = (data, acceptedVariables, headers, status, studies, ancestory) => {
     let template = '';
-    template += '<div class="row status-select">Status</div>'
-    template += `<ul class="remove-padding-left" id="statusList">`;
-    status.push('All');
-    status.forEach(variable => {
-        template += `<li class="filter-list-item">
-                        <button class="${variable === 'All' ? 'active-filter ': ''}filter-btn collapsible-items filter-midset-data-status filter-midset-data-btn" data-variable="${variable}">
-                            <div class="variable-name">${variable.replace(new RegExp('status_', 'i'), '')}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-    template += '<div class="custom-hr row"></div><div class="row study-select">Ancestry</div>'
-    template += `<ul class="remove-padding-left" id="ancestoryList">`;
     ancestory.splice(ancestory.indexOf('ethnicityClass_Other'), 1);
     ancestory.sort();
     ancestory.push('ethnicityClass_Other');
     ancestory.push('All');
+    template += `
+        <form id="midsetFilterForm" method="POST">
+            <div class="form-group" id="statusList">
+                <label class="filter-label" for="statusSelection">Status</label>
+                <select class="form-control" id="statusSelection">
+                    <option selected value='all'>All</option>
+                    <option value='status_case'>case</option>
+                    <option value='status_control'>control</option>
+                </select>
+            </div>
+            <div class="form-group" id="ancestryList">
+                <label class="filter-label" for="ancestrySelection">Ancestry</label>
+                <select class="form-control" id="ancestrySelection">`
     ancestory.forEach(anc => {
-        template += `<li class="filter-list-item">
-                        <button class="${anc === 'All' ? 'active-filter ': ''}filter-btn collapsible-items filter-midset-data-ancestory filter-midset-data-btn" data-variable="${anc}">
-                            <div class="variable-name">${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-
-    template += '<div class="custom-hr row"></div>'
-    
-    template += '<div id="studiesList">'
+        template += `<option value="${anc}" ${anc === 'All' ? 'selected':''}>${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</option>`
+    }) 
+                
+    template += `</select>
+            </div>
+            <div class="form-group">
+                <label class="filter-label" for="studiesList">Studies</label>
+                <div id="studiesList">`
     for(let consortium in studies){
-        template += `<ul class="remove-padding-left">
-                        <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
-                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
-                            <div class="ml-auto">
-                                <button ${Object.keys(studies[consortium]).length !== 0 ? ``:`disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                    <i class="fas fa-caret-down"></i>
-                                </button>
-                            </div>
-                        </li>`
+        let innerTemplate = `
+            <ul class="remove-padding-left">
+                <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
+                    <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
+                    <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                    <div class="ml-auto">
+                        <button type="button" ${Object.keys(studies[consortium]).length !== 0 ? ``:`disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+                    </div>
+                </li>
+        `;
         if(Object.keys(studies[consortium]).length !== 0) {
-            template += `<ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
+            innerTemplate += `<ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
 
             for(let study in studies[consortium]){
-                template += `<li class="filter-list-item">
-                                <button class="filter-btn collapsible-items filter-midset-data-study filter-midset-data-btn" data-consortium="${consortium}" data-variable="${study}">
-                                    <div class="variable-name">${study}</div>
-                                </button>
-                            </li>`;
+                innerTemplate += `
+                    <li class="filter-list-item">
+                        <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
+                        <label for="label${study}" class="study-name" title="${study}">${study.length > 10 ? `${study.substr(0,10)}...`:study}</label>
+                    </li>`;
             }
-            template += `</ul>`;
+            innerTemplate += `</ul>`;
         }
-        template += `</ul>`;
+        innerTemplate += '</ul>'
+        template += innerTemplate
     }
-    template += `</div>`
-
+    template +=`
+                </div>
+            </div>
+            <div class="form-group" id="midsetVariables">
+                <label class="filter-label" for="variableSelectionList">Variable Selection</label>
+                <ul class="remove-padding-left" id="variableSelectionList">
+            `
+    headers.forEach(variable => {
+        template += `<li class="filter-list-item">
+                        <input type="checkbox" ${acceptedVariables.indexOf(variable) !== -1 ? 'checked': ''} data-variable="${variable}" id="label${variable}" class="select-variable"/>
+                        <label for="label${variable}" class="variable-name" title="${variable}">${variable.replace('_Data available', '').length > 20 ? `${variable.replace('_Data available', '').slice(0,20)}...`: `${variable.replace('_Data available', '')}`}</label>
+                    </li>`;
+    });
+    template += `</ul></div></br>
+            <button type="submit" class="btn btn-light">Submit</button>
+            <button type="reset" class="btn btn-light">Reset</button>
+        </form>
+    `
     document.getElementById('midsetFilterData').innerHTML = template;
-    addEventFilterDataStatus(data, acceptedVariables, headers);
+    addEventConsortiumSelect();
+    addEventMidsetFilterForm(data, acceptedVariables, headers);
 }
 
-const addEventFilterDataStatus = (data) => {
-    const elements = document.getElementsByClassName('filter-midset-data-status');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) return;
-            removeActiveClass('filter-midset-data-status', 'active-filter')
-            element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
-    });
+const addEventMidsetFilterForm = (data) => {
+    const form = document.getElementById('midsetFilterForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const status = document.getElementById('statusSelection').value;
+        const ancestry = document.getElementById('ancestrySelection').value;
+        const selectedVariables = getSelectedVariables('midsetVariables');
+        const studiesSelection = getSelectedStudies().map(dt => dt.split('@#$')[1]);
+        const consortiaSelection = Array.from(document.querySelectorAll(`input:checked.select-consortium`)).map(dt => dt.dataset.consortia);
 
-    const elements2 = document.getElementsByClassName('filter-midset-data-study');
-    Array.from(elements2).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
-            else element.classList.add('active-filter');
-            document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = false;
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-            let allStudiesSelected = true;
-            const constortiaStudyElements = element.parentNode.parentNode.querySelectorAll('.filter-midset-data-study');
-            Array.from(constortiaStudyElements).forEach(el => {
-                if(!allStudiesSelected) return;
-                if(el.classList.contains('active-filter') === false) allStudiesSelected = false;
-            });
-            if(allStudiesSelected) document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = true;
-            
-        })
-    });
+        let newData = data;
+        if(studiesSelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studiesSelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
+        
+        if(status !== 'all') {
+            newData = newData.filter(dt => dt[status] === '1');
+        }
+        
+        if(ancestry !== 'All') {
+            newData = newData.filter(dt => dt[ancestry] === '1');
+        }
 
-    const elements3 = document.getElementsByClassName('filter-midset-data-ancestory');
-    Array.from(elements3).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) return;
-            removeActiveClass('filter-midset-data-ancestory', 'active-filter')
-            element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
+        midset(newData, selectedVariables);
     });
-
-    const elements4 = document.getElementsByClassName('select-consortium');
-    Array.from(elements4).forEach(el => {
-        el.addEventListener('click', () => {
-            if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.add('active-filter'));
-            }
-            else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.filter-midset-data-study')).forEach(btns => btns.classList.remove('active-filter'));
-            }
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'));
-        })
-    })
 };
 
 const getSelectedVariables = (parentId) => {
     const selections = [];
     let cardBody = document.getElementById(parentId);
-    const variables = cardBody.querySelectorAll('.active-filter');
+    const variables = cardBody.querySelectorAll('input:checked');
     Array.from(variables).forEach(el => selections.push(el.dataset.variable));
     return selections;
-}
-
-const renderMidsetVariables = (data, acceptedVariables, headers) => {
-    let template = '';
-    template += `<ul class="remove-padding-left">`;
-    headers.forEach(variable => {
-        template += `<li class="filter-list-item">
-                        <button class="row collapsible-items filter-midset-variable filter-midset-variable-btn ${acceptedVariables.indexOf(variable) !== -1 ? 'active-filter' : ''}" title="${variable.replace('_Data available', '')}" data-variable="${variable}">
-                            <div class="variable-name">${variable.replace('_Data available', '').length > 20 ? `${variable.replace('_Data available', '').slice(0,20)}...`: `${variable.replace('_Data available', '')}`}</div>
-                        </button>
-                    </li>`;
-    });
-    template += `</ul>`;
-    document.getElementById('midsetVariables').innerHTML = template;
-    addEventFilterMidset(data, headers);
-}
-
-const addEventFilterMidset = (data, headers) => {
-    const elements = document.getElementsByClassName('filter-midset-variable');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')) element.classList.remove('active-filter');
-            else element.classList.add('active-filter');
-            const newData = computeNewData(data);
-            midset(newData, getSelectedVariables('midsetVariables'), headers);
-        });
-    });
 }
 
 const midset = (data, acceptedVariables) => {
     let template = '';
     let plotData = [];
     let headerData = '';
-    document.getElementById('selectedVariablesCount').innerHTML = acceptedVariables.length;
+
     if(acceptedVariables.length === 0){
         template += 'No variable selected.';
         hideAnimation();

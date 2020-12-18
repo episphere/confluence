@@ -123,6 +123,7 @@ body {
 
 #cardContent {
     max-height: 800px;
+    min-height: fit-content;
     overflow: auto;
 }
 
@@ -821,7 +822,7 @@ label {
     margin-left: -4px;
 }
 
-#summaryStatsFilterForm {
+#summaryStatsFilterForm, #midsetFilterForm {
     width: 100%;
 }
 
@@ -1564,8 +1565,7 @@ form {
     padding-left: 10px !important;
 }
 
-.midset-Card {
-    max-height: 400px;
+.midset-card {
     overflow: auto;
 }
 
@@ -1590,7 +1590,7 @@ form {
     display: flex;
 }
 
-.select-consortium, .select-study {
+.select-consortium, .select-study, .select-variable {
     margin-top: 5px;
     margin-right: 2px;
 }

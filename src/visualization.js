@@ -131,7 +131,6 @@ const allFilters = (jsonData) => {
     document.getElementById('allFilters').appendChild(div1);
     addEventSummaryStatsFilterForm(jsonData);
     addEventConsortiumSelect();
-    addEventSelectEntireConsortia();
 }
 
 const chipFilter = (jsonData) => {
@@ -262,47 +261,6 @@ const aggegrateData = (jsonData) => {
     return obj;
 }
 
-const filterByStudy = (jsonData) => {
-    const obj = aggegrateData(jsonData);
-    let template = '';
-    for(let consortium in obj){
-        template += `<ul class="remove-padding-left">
-                        <li class="custom-borders filter-list-item">
-                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
-                            <div class="ml-auto">
-                                <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
-                                    ${numberWithCommas(obj[consortium].consortiumTotal)}
-                                </div> 
-                                <button class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                    <i class="fas fa-caret-down"></i>
-                                </button>
-                            </div>
-                        </li>
-                        <ul class="collapse no-list-style custom-padding" id="toggle${consortium.replace(/ /g, '')}">`;
-        for(let study in obj[consortium]){
-            if(study !== 'consortiumTotal') {
-                const total = obj[consortium][study].total;
-                template += `<li class="filter-list-item">
-                                <button class="row collapsible-items filter-studies filter-studies-btn" data-consortium=${consortium} data-study=${study}>
-                                    <div class="study-name">${study}</div>
-                                    <div class="ml-auto">
-                                        <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
-                                            ${numberWithCommas(total)}
-                                        </div>
-                                    </div>
-                                </button>
-                            </li>`;
-            }
-        }
-        template += `</ul></ul>`;
-    }
-    document.getElementById('studyFilter').innerHTML = template;
-    addEventConsortiumSelect();
-    addEventFilterCharts(jsonData);
-    addEventSelectEntireConsortia(jsonData);
-}
-
 const addEventGenderFilter = (jsonData, element) => {
     element.addEventListener('click', () => {
         if(element.classList.contains('gender-active-btn')) return
@@ -359,7 +317,7 @@ const addEventGenotypeBtnSelection = (jsonData, element) => {
     });
 }
 
-const addEventConsortiumSelect = () => {
+export const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
@@ -370,6 +328,18 @@ const addEventConsortiumSelect = () => {
             } else {
                 element.lastElementChild.classList.add('fa-caret-up');
                 element.lastElementChild.classList.remove('fa-caret-down');
+            }
+        });
+    });
+
+    const consortiums = document.getElementsByClassName('select-consortium');
+    Array.from(consortiums).forEach(el => {
+        el.addEventListener('click', () => {
+            if(el.checked){
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+            }
+            else {
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
         });
     });
@@ -387,44 +357,6 @@ const addEventConsortiumSelect = () => {
             }
         });
     })
-}
-
-const addEventSelectEntireConsortia = () => {
-    const elements = document.getElementsByClassName('select-consortium');
-    Array.from(elements).forEach(el => {
-        el.addEventListener('click', () => {
-            if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
-            }
-            else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
-            }
-            // let selectedConsortia = [];
-            // Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
-            //     if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
-            // });
-            
-            // const array = getSelectedStudies();
-            // const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
-            // const variable = genotypeSelected.dataset.variable;
-            // const variableValue = genotypeSelected.dataset.value;
-
-            // const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
-            // const variable1 = selectedGenderElement.dataset.variable;
-            // const variableValue1 = selectedGenderElement.dataset.value;
-            // let finalData = jsonData;
-            // if(variable1) {
-            //     finalData = finalData.filter(dt => dt[variable1] === variableValue1);
-            // }
-            // if(variable) {
-            //     finalData = finalData.filter(dt => dt[variable] === variableValue);
-            // }
-            // if(array.length > 0){
-            //     finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
-            // }
-            // renderAllCharts(finalData);
-        });
-    });
 }
 
 const addEventFilterCharts = (jsonData) => {
