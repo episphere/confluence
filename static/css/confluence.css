@@ -1117,6 +1117,14 @@ label {
     font-size: 14px !important;
 }
 
+.font-size-13 {
+    font-size: 13px !important;
+}
+
+.font-size-15 {
+    font-size: 15px !important;
+}
+
 .font-white {
     color: #ffffff;
 }
@@ -1567,6 +1575,10 @@ form {
 
 .midset-card {
     overflow: auto;
+}
+
+.other-variable-count {
+    color: #AC1053 !important;
 }
 
 .cell-equal-width {

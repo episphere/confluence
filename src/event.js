@@ -1654,7 +1654,7 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         document.getElementById('listFilters').innerHTML = `
         <span class="font-weight-bold font-size-17">Gender: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-weight-bold font-size-17">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
-        <span class="vertical-line"></span><span class="font-weight-bold font-size-17">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and ${selectedStudies.length-1} other`:``}
+        <span class="vertical-line"></span><span class="font-weight-bold font-size-17">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
         `:``}`
         renderAllCharts(finalData);
     })

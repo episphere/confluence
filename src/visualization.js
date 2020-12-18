@@ -72,27 +72,27 @@ const allFilters = (jsonData) => {
     let template =`
         <form method="POST" id="summaryStatsFilterForm">
             <div class="form-group">
-                <label class="filter-label" for="genderSelection">Gender</label>
-                <select class="form-control" id="genderSelection" data-variable='sex'>
+                <label class="filter-label font-size-13" for="genderSelection">Gender</label>
+                <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
                     <option selected value='all'>All</option>
                     <option value='female'>Female</option>
                     <option value='male'>Male</option>
                 </select>
             </div>
             <div class="form-group">
-                <label class="filter-label" for="genotypingChipSelection">Genotyping chip</label>
-                <select class="form-control" id="genotypingChipSelection" data-variable='chip'>
+                <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
+                <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Array</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
                 </select>
             </div>
     `;
-    template += `<label class="filter-label" for="studyConsortiaList">Studies</label>`
+    template += `<label class="filter-label font-size-13" for="studyConsortiaList">Studies</label>`
     const obj = aggegrateData(jsonData);
     for(let consortium in obj){
         let innerTemplate = `
-                    <ul class="remove-padding-left" id="studyConsortiaList">
+                    <ul class="remove-padding-left font-size-15" id="studyConsortiaList">
                         <li class="custom-borders filter-list-item" style="padding-bottom: 0.125rem !important;padding-top: 0.125rem !important;">
                             <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                 <i class="fas fa-caret-down"></i>

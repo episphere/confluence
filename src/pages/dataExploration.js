@@ -63,9 +63,9 @@ export const dataSummaryStatisticsTemplate = () => {
     <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
         <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>
         <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
-            <div class="col white-bg div-border align-left" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-weight-bold font-size-17">Gender:</span> All<span class="vertical-line"></span>
-                <span class="font-weight-bold font-size-17">Genotyping chip:</span> All Arrays
+            <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
+                <span class="font-weight-bold">Gender:</span> All<span class="vertical-line"></span>
+                <span class="font-weight-bold">Genotyping chip:</span> All Arrays
             </div>
         </div>
         <div class="main-summary-row">
@@ -156,16 +156,16 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     template += `
         <form id="midsetFilterForm" method="POST">
             <div class="form-group" id="statusList">
-                <label class="filter-label" for="statusSelection">Status</label>
-                <select class="form-control" id="statusSelection">
+                <label class="filter-label font-size-13" for="statusSelection">Status</label>
+                <select class="form-control font-size-15" id="statusSelection">
                     <option selected value='all'>All</option>
                     <option value='status_case'>case</option>
                     <option value='status_control'>control</option>
                 </select>
             </div>
             <div class="form-group" id="ancestryList">
-                <label class="filter-label" for="ancestrySelection">Ancestry</label>
-                <select class="form-control" id="ancestrySelection">`
+                <label class="filter-label font-size-13" for="ancestrySelection">Ancestry</label>
+                <select class="form-control font-size-15" id="ancestrySelection">`
     ancestory.forEach(anc => {
         template += `<option value="${anc}" ${anc === 'All' ? 'selected':''}>${anc.replace(new RegExp('ethnicityClass_', 'i'), '')}</option>`
     }) 
@@ -173,8 +173,8 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     template += `</select>
             </div>
             <div class="form-group">
-                <label class="filter-label" for="studiesList">Studies</label>
-                <div id="studiesList">`
+                <label class="filter-label font-size-13" for="studiesList">Studies</label>
+                <div id="studiesList" class="font-size-15">`
     for(let consortium in studies){
         let innerTemplate = `
             <ul class="remove-padding-left">
@@ -207,8 +207,8 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                 </div>
             </div>
             <div class="form-group" id="midsetVariables">
-                <label class="filter-label" for="variableSelectionList">Variable Selection</label>
-                <ul class="remove-padding-left" id="variableSelectionList">
+                <label class="filter-label font-size-13" for="variableSelectionList">Variable Selection</label>
+                <ul class="remove-padding-left font-size-15" id="variableSelectionList">
             `
     headers.forEach(variable => {
         template += `<li class="filter-list-item">
