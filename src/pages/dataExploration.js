@@ -7,7 +7,7 @@ export const template = (pageHeader) => {
     return `
         <div class="general-bg">
             <div class="container body-min-height">
-                <div class="main-summary-row white-bg">
+                <div class="main-summary-row white-bg div-border">
                     <button class="sub-menu-btn"><a class="nav-link active black-font" href="#data_exploration/summary"><strong>Summary statistics</strong></a></button>
                     <button class="sub-menu-btn"><a class="nav-link black-font" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
                 </div>
