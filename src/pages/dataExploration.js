@@ -106,13 +106,14 @@ export const dataSummaryMissingTemplate = async () => {
     div1.classList = ['col-xl-2 filter-column'];
     div1.id = 'missingnessFilter';
 
+
     const div2 = document.createElement('div');
     div2.classList = ['col-xl-10'];
     div2.innerHTML = `
         <button id="filterBarToggle" class="left-10">
             <i class="fas fa-caret-left"></i>
         </button>
-        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+        <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;margin-left: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-weight-bold">Status:</span> All<span class="vertical-line"></span>
                 <span class="font-weight-bold">Ancestry:</span> All
