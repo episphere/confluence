@@ -1620,6 +1620,8 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         e.preventDefault();
         const gender = document.getElementById('genderSelection').value;
         const chip = document.getElementById('genotypingChipSelection').value;
+        const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
+        const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
         
         const elements = document.getElementsByClassName('select-consortium');
         Array.from(elements).forEach(el => {
@@ -1636,7 +1638,6 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
             if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
         });
-        console.log(selectedConsortia)
         const array = getSelectedStudies();
         let finalData = jsonData;
         if(gender !== 'all') {
@@ -1649,6 +1650,12 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         if(array.length > 0){
             finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
         }
+        const selectedStudies = array.map(s => s.split('@#$')[1]);
+        document.getElementById('listFilters').innerHTML = `
+        <span class="font-weight-bold font-size-17">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+        <span class="font-weight-bold font-size-17">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-weight-bold font-size-17">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and ${selectedStudies.length-1} other`:``}
+        `:``}`
         renderAllCharts(finalData);
     })
 }
