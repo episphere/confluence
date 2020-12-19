@@ -195,11 +195,11 @@ export const homePageVisualization = async () => {
 export const infoDeck = () => {
     let template = '';
     template += `
-        <div class="secondary-bg">
+        <div class="secondary-bg" style="padding-bottom: 1rem;">
             <div class="confluence-banner">
                 <img src="./static/images/hero-banner.jpg" height="100%" width="100%" alt="Confluence logo">
                 <div class="banner-overlay-text row justify-content-center text-center">
-                    <div class="col-md-12">
+                    <div class="col-xl-12">
                         <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
                         <div class="banner-overlay-line"></div>
                         <h3 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h3>
@@ -299,7 +299,7 @@ export const infoDeckAfterLoggedIn = () => {
 
 const cardContents = (obj) => {
     return `
-        <div class="col-lg card confluence-cards">
+        <div class="col-xl card confluence-cards">
             <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
                 <i class="fas ${obj.icon} fa-2x icon-padding font-white"></i>
             </div>

@@ -1,8 +1,8 @@
 {
   "name": "Confluence Data Platform",
   "short_name": "Confluence",
-  "theme_color": "#2f3f59",
-  "background_color": "#ffffff",
+  "theme_color": "#A41652",
+  "background_color": "#2f3f59",
   "display": "standalone",
   "start_url": "/confluence/",
   "icons": [
