@@ -1007,14 +1007,14 @@ label {
 
 .banner-overlay-line {
     box-sizing: border-box;
-    border-bottom: 3px solid #ffffff;
-    margin: 12px 85px;
+    border-bottom: 2.5px solid #ffffff;
+    margin: 3% 16%;
 }
 
 .banner-overlay-text {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 53%;
     transform: translate(-50%,-50%);
 }
 
@@ -1031,6 +1031,7 @@ label {
     color: #ffffff;
     font-weight: bold;
     font-family: 'Helvetica Neue', sans-serif;
+    margin: 0px !important;
 }
 
 .banner-overlay-h3 {
