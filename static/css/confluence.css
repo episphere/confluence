@@ -250,9 +250,6 @@ body {
     margin: 1rem 0;
 }
 
-.card {
-    margin: 0rem 0rem 1rem 0rem !important;
-}
 
 #confluenceInfo {
     margin: 1rem 0;
@@ -928,11 +925,6 @@ label {
     text-align: end;
 }
 
-.card {
-    border-radius: 0.25rem;
-    margin-bottom: 30px;
-}
-
 .skip-links {
     padding: 0;
     margin: 0;
@@ -1145,7 +1137,8 @@ label {
     align-items: center;
     border: 1px solid rgb(218, 219, 230) !important;
     border-radius: 0.5rem !important;
-    margin: 0px 15px 48px 15px !important;
+    padding: 0px !important;
+    margin: 0 1rem 2rem 0rem !important;
 }
 
 .stretched-link:hover {
@@ -1647,5 +1640,6 @@ form {
 }
 
 .banner-logo {
-    height: 100px;
+    max-width: 100%;
+    height: auto;
 }
