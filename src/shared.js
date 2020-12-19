@@ -234,7 +234,7 @@ export const refreshToken = async () => {
     });
     if(response.status === 200){
         const newToken = await response.json();
-        const newParms = Object.assign(parms, newToken);
+        const newParms = {...parms, ...newToken};
         localStorage.parms = JSON.stringify(newParms);
         return true;
     }
@@ -734,8 +734,8 @@ export const convertTextToJson = async (fileIds) => {
             }
         }
         if(jsonData[data.BCAC_ID]){
-            // jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
-            jsonData[data.BCAC_ID] = Object.assign(jsonData[data.BCAC_ID], data);
+            jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
+            // jsonData[data.BCAC_ID] = Object.assign(jsonData[data.BCAC_ID], data);
         }else{
             jsonData[data.BCAC_ID] = {};
             jsonData[data.BCAC_ID] = data;

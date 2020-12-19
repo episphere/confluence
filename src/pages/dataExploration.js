@@ -1,4 +1,4 @@
-import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csvJSON, csv2Json, showAnimation, removeActiveClass, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
+import { getFolderItems, getFile, hideAnimation, showError, disableCheckBox, convertTextToJson, uploadFile, getFileJSON, csv2Json, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
 import { studyDropDownTemplate } from '../components/elements.js';
 import { txt2dt, addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventStudiesCheckBox, addEventDataTypeCheckBox, addEventSearchDataType, addEventSearchStudies, addEventSelectAllStudies, addEventSelectAllDataType, addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
@@ -32,7 +32,7 @@ export const template = (pageHeader) => {
 }
 
 const dataVisulizationCards = (obj) => `
-        <div class="col-xl-4 padding-right-zero">
+        <div class="col-xl-4 padding-right-zero" style="margin-bottom: 1rem;">
             <div id="${obj.divId}">
                 <div class="card">
                     <div class="card-header">

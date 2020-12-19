@@ -1,6 +1,6 @@
-import { hideAnimation, getFileJSON, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
+import { hideAnimation, getFile, csvJSON, removeActiveClass, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
-import { addEventSummaryStatsFilterForm, addEventVariableDefinitions } from './event.js';
+import { addEventSummaryStatsFilterForm } from './event.js';
 
 const unique = arr => {
     let u={}

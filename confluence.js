@@ -59,7 +59,7 @@ export const confluence = async () => {
         showAnimation();
         if (response) {
             const lclStr = JSON.parse(localStorage.parms);
-            localStorage.parms = JSON.stringify(Object.assign(lclStr, response));
+            localStorage.parms = JSON.stringify({...lclStr, ...response});
         }
         navBarOptions.innerHTML = template();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
