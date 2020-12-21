@@ -202,14 +202,14 @@ const manageRouter = async () => {
         // addEventAboutList();
         // document.getElementById('item1').click();
     }
-    else if(hash === '#resources'){
+    else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
-        confluenceDiv.innerHTML = confluenceResources();
+        confluenceResources();
     }
     else if(hash === '#contact'){
         const element = document.getElementById('contactConfluence');
@@ -304,14 +304,14 @@ const manageHash = () => {
         // document.getElementById('item1').click();
         hideAnimation();
     }
-    else if(hash === '#resources'){
+    else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         document.title = 'Confluence - Resources';
-        confluenceDiv.innerHTML = confluenceResources();
+        confluenceResources();
         hideAnimation();
     }
     else if(hash === '#contact'){

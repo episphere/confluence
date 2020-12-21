@@ -11,7 +11,7 @@ export const template = () => {
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about" id="aboutConfluence">Learn about Confluence</a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#resources" id="resourcesConfluence">Resources</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join" id="resourcesConfluence">Resources</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
             </div>
         </div>

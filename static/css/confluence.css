@@ -129,6 +129,10 @@ body {
     min-height: calc(100vh - 220px) !important;
 }
 
+.consortia-desc {
+    margin: 1rem 0;
+}
+
 .container {
     max-width: 85% !important;
     margin: 0 auto;

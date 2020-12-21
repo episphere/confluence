@@ -1,24 +1,58 @@
 export const confluenceResources = () => {
-    return `
+    let template = `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
                 <div class="main-summary-row">
                     <div class="align-left">
-                        <h1 class="page-header">Resources</h1>
+                        <h1 class="page-header">Join a Participanting Consortia</h1>
                     </div>
                 </div>
-                <div class="main-summary-row confluence-resources div-border white-bg">
-                    <div class="col">
-                        <span class="confluence-pink">Links:</span></br>
-                        <ul>
-                            <li><a href="http://bcac.ccge.medschl.cam.ac.uk/" rel="noopener" target="_blank">BCAC - The Breast Cancer Association Consortium</a></li>
-                            <li><a href="http://cimba.ccge.medschl.cam.ac.uk/" rel="noopener" target="_blank">CIMBA - Consortium of Investigators of Modifiers of BRCA1/2</a></li>
-                            <li>LAGENO - The Latin America Genomics Breast Cancer Consortium</li>
-                            <li><a href="http://enigmaconsortium.org/" rel="noopener" target="_blank">ENIGMA - Evidence-based Network for the Interpretation of Germline Mutant Alleles</a></li>
-                        </ul>
-                    </div>
+                <div class="main-summary-row white-bg div-border">
+                    <div class="col font-size-18 align-left">
+                        </br>
+                        <div>Participate in Confluence by joining one of the following breast cancer consortia:</div>
+                        <div class="consortia-desc">
+                            <a href="http://bcac.ccge.medschl.cam.ac.uk/" target="__blank">Breast Cancer Association Consortium</a> (BCAC)</br>
+                            The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
+                        </div>
+
+                        <div class="consortia-desc">
+                            <a href="https://projectreporter.nih.gov/project_info_description.cfm?aid=9040408&icde=30184576&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC" target="__blank">African Ancestry Breast Cancer Genetic Study</a> (AABCGS)</br>
+                            The AABCGS is a GWAS of over 16,000 African-American breast cancer cases and similar number of controls.
+                        </div>
+
+                        <div class="consortia-desc">
+                            <a href="mailto:lfejerman@ucdavis.edu">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
+                            The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
+                        </div>
+
+                        <div class="consortia-desc">
+                            <a href="mailto:wei.zheng@vanderbilt.edu">Asia Breast Cancer Consortium</a> (ABCC)</br>
+                            The ABCC is a GWAS of over XX,000 Asian breast cancer cases and similar number of controls.
+                        </div>
+
+                        <div class="consortia-desc">
+                            <a href="http://cimba.ccge.medschl.cam.ac.uk/" target="__blank">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
+                            The CIMBA was formed by a collaborative group of researchers working on genetic modifiers of cancer risk in BRCA1 and BRCA2 mutation carriers. The aim of CIMBA is to provide sufficient sample sizes to allow large scale studies in order to evaluate reliably the effects of genetic modifiers.
+                        </div>
+
+                        <div class="consortia-desc">
+                            <a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer GWAS Consortium</a> (MALES-BC)</br>
+                            The MALES-BC is a GWAS of over XX,000 male breast cancer cases and similar number of controls.
+                        </div>
+
+                        <div class="consortia-desc">
+                            You can also participate through a direct collaboration with the NCI Division of Cancer Epidemiology and Genetics coordinating the Confluence Project.
+                        </div>
+                        <div class="consortia-desc">
+                            For more information:</br>
+                            Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
+                            Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                        </div>
+                    <div>
                 <div>
             <div>
         <div>
     `;
+    document.getElementById('confluenceDiv').innerHTML = template;
 }
