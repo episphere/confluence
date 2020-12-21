@@ -198,9 +198,9 @@ const manageRouter = async () => {
         document.title = 'Confluence - About';
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
-        confluenceDiv.innerHTML = aboutConfluence();
-        addEventAboutList();
-        document.getElementById('item1').click();
+        aboutConfluence();
+        // addEventAboutList();
+        // document.getElementById('item1').click();
     }
     else if(hash === '#resources'){
         const element = document.getElementById('resourcesConfluence');
@@ -299,9 +299,9 @@ const manageHash = () => {
         removeActiveClass('nav-menu-links', 'navbar-active');
         element.classList.add('navbar-active');
         document.title = 'Confluence - About';
-        confluenceDiv.innerHTML = aboutConfluence();
-        addEventAboutList();
-        document.getElementById('item1').click();
+        aboutConfluence();
+        // addEventAboutList();
+        // document.getElementById('item1').click();
         hideAnimation();
     }
     else if(hash === '#resources'){

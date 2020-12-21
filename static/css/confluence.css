@@ -96,12 +96,10 @@ body {
 #filterBarToggle {
     background: transparent;
     border: 0px;
-    padding: 0px;
     height: fit-content;
     position: absolute;
     z-index: 9;
-    left: 10px;
-    margin-right: 4px;
+    left: -10px;
 }
 
 #filterBarToggle:hover {
@@ -386,10 +384,9 @@ label {
 }
 
 .align-left {
-    text-align: left;
+    text-align: left !important;
     list-style-type: none;
     padding: 0px;
-    /*     padding: 0px !important; */
 }
 
 .create-project-btn {
@@ -1624,7 +1621,7 @@ form {
     background: #555; 
 }
 
-#dataLastModified {
+#dataLastModified, .data-last-modified {
     font-style: italic;
     color: #7e7e7e;
     font-size: 12px;
