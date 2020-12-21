@@ -195,7 +195,7 @@ export const homePageVisualization = async () => {
 export const infoDeck = () => {
     let template = '';
     template += `
-        <div class="secondary-bg" style="padding-bottom: 1rem;">
+        <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
                 <img src="./static/images/hero-banner.jpg" class="banner-logo" alt="Confluence logo">
                 <div class="banner-overlay-text row justify-content-center text-center">
@@ -247,7 +247,7 @@ export const infoDeck = () => {
 export const infoDeckAfterLoggedIn = () => {
     let template = '';
     template += `
-        <div class="secondary-bg">
+        <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
                 <img src="./static/images/hero-banner.jpg" class="banner-logo" alt="Confluence logo">
                 <div class="banner-overlay-text row justify-content-center text-center">
