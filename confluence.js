@@ -9,7 +9,7 @@ import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 import { aboutConfluence } from './src/pages/about.js';
-import { confluenceResources } from './src/pages/resources.js';
+import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 

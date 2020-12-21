@@ -1304,7 +1304,7 @@ span.icon {
 }
 
 .allow-overflow {
-    overflow: auto;
+    overflow: auto !important;
 }
 
 .collapsible-items {
