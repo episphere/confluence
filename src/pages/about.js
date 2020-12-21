@@ -47,7 +47,7 @@ export const aboutConfluence = async () => {
         <div class="font-size-28 font-weight-bold">Confluence Data Summary</div>
         <div class="main-summary-row">
             <div class="col font-size-18 align-center">
-                <table class="table table-bordered">
+                <table class="table table-bordered table-responsive">
                     <thead>
                         <th>Consortia</th>
                         <th>Studies</th>
