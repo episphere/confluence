@@ -61,7 +61,7 @@ export const dataSummaryStatisticsTemplate = () => {
         </div>
     </div>
     <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
-        <button id="filterBarToggle"><i class="fas fa-caret-left"></i></button>
+        <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
         <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-weight-bold">Gender:</span> All<span class="vertical-line"></span>
@@ -110,8 +110,8 @@ export const dataSummaryMissingTemplate = async () => {
     const div2 = document.createElement('div');
     div2.classList = ['col-xl-10'];
     div2.innerHTML = `
-        <button id="filterBarToggle" class="left-10">
-            <i class="fas fa-caret-left"></i>
+        <button id="filterBarToggle">
+            <i class="fas fa-lg fa-caret-left"></i>
         </button>
         <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;margin-left: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">

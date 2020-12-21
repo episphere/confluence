@@ -3,23 +3,23 @@ export const footerTemplate = () => {
         <div id="footer">
             <div class="footer-content container">
                 <div class="row">
-                    <span class="division-of-cancer-e">Division of Cancer Epidemiology and Genetics</span>
+                    <span class="division-of-cancer-e align-left">Division of Cancer Epidemiology and Genetics</span>
                 </div>
                 <div class="row">
                     <span class="at-the-national-canc">at the National Cancer Institute</span>
                 </div>
                 <div class="row align-left">
-                    <div class="col zero-padding">
+                    <div class="col-lg-4 zero-padding">
                         <div class="footer-heading">CONTACT INFORMATION</div>
                         <div class="footer-body">Contact Us</div>
                     </div>
-                    <div class="col zero-padding">
+                    <div class="col-lg-4 zero-padding">
                         <div class="footer-heading">MORE INFORMATION</div>
                         <div class="footer-body">DOC Home</div>
                         <div class="footer-body">Site Map</div>
                         <div class="footer-body">Support</div>
                     </div>
-                    <div class="col zero-padding">
+                    <div class="col-lg-4 zero-padding">
                         <div class="footer-heading">POLICIES</div>
                         <div class="footer-body">Accessibility</div>
                         <div class="footer-body">Disclaimer</div>
