@@ -13,7 +13,7 @@ export const template = async () => {
                                 <h1 class="page-header">Data Submission</h1>
                             </div>
                         </div>
-                        <div class="data-submission div-border" style="padding-left: 1rem;">
+                        <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
                             No folder found for Data Submission
                         </div>
                     </div>
@@ -24,7 +24,7 @@ export const template = async () => {
     
     template += `
         <div class="general-bg padding-bottom-1rem">
-            <div class="container body-min-height">
+            <div class="container body-min-height font-size-18">
                 <div class="main-summary-row">
                     <div class="align-left">
                         <h1 class="page-header">Data Submission</h1>

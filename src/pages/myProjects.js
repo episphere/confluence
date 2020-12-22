@@ -13,7 +13,7 @@ export const myProjectsTemplate = async () => {
                     <h1 class="page-header">My Projects</h1>
                 </div>
             </div>
-            <div class="my-projects-div white-bg div-border" id="myProjectsList">${fileVersionsModal()}</div>
+            <div class="my-projects-div white-bg div-border font-size-18" id="myProjectsList">${fileVersionsModal()}</div>
         </div></div>`
     const ul =  document.createElement('ul');
     ul.classList = ['ul-list-style first-list-item'];

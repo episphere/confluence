@@ -7,7 +7,7 @@ export const dataAnalysisTemplate = () => {
                         <h1 class="page-header">Analyze</h1>
                     </div>
                 </div>
-                <div class="data-submission div-border">
+                <div class="data-submission div-border font-size-18">
                     <div class="row data-analysis">
                         <div class="col-lg-6 allow-overflow">
                             <h4>Video explaining how to connect Box backend for Confluence researchers</h4>
