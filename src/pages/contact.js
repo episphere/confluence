@@ -21,8 +21,8 @@ export const confluenceContactPage = () => {
                         </br></br>
                         <span class="text-bold">Scientific Steering Committee</span></br>
                         <div class="row">
-                            <div class="col allow-overflow">
-                                <table class="table table-bordered">
+                            <div class="col">
+                                <table class="table table-bordered table-responsive w-100 d-block d-md-table">
                                     <thead>
                                         <tr><th>Member</th><th>Affiliation</th><th>Representing/coordinating</th></tr>
                                     </thead>
