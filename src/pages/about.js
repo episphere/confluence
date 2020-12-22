@@ -1,6 +1,6 @@
 import { getPublicFile, numberWithCommas, publicDataFileId } from "./../shared.js";
 
-export const aboutConfluence = async () => {
+export const aboutConfluence = () => {
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
@@ -38,23 +38,41 @@ export const aboutConfluence = async () => {
                                 Genotyping and harmonization of data is expected to be completed in 2022.
                             </span>
                         </div>
-                    </div>`
-    const response = await getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId);
-    const data = response.data;
-    if(data){
-        template += `
+                    </div>
+                    <div class="align-left" id="confluenceDataSummary">
+
+                    </div>
+                    <div class="main-summary-row align-left">
+                        <div class="col">
+                            For more information:</br>
+                            Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
+                            Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('confluenceDiv').innerHTML = template;
+    getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId).then(response => {
+        const data = response.data;
+        if(!data) return;
+        const element = document.getElementById('confluenceDataSummary');
+        let summary = '';
+        summary += `
         </br>
-        <div class="font-size-28 font-weight-bold">Confluence Data Summary</div>
-        <div class="main-summary-row">
-            <div class="col font-size-18 align-center">
-                <table class="table table-bordered table-responsive w-100 d-block d-md-table">
-                    <thead>
-                        <th>Consortia</th>
-                        <th>Studies</th>
-                        <th>Cases</th>
-                        <th>Controls</th>
-                    </thead>
-                    <tbody>`;
+        <div class="align-center">
+            <div class="font-size-28 font-weight-bold">Confluence Data Summary</div>
+            <div class="main-summary-row">
+                <div class="col font-size-18 align-center">
+                    <table class="table table-bordered table-responsive w-100 d-block d-md-table">
+                        <thead>
+                            <th>Consortia</th>
+                            <th>Studies</th>
+                            <th>Cases</th>
+                            <th>Controls</th>
+                        </thead>
+                        <tbody>`;
         let totalCases = 0;
         let totalControls = 0;
         let totalStudies = 0;
@@ -63,31 +81,18 @@ export const aboutConfluence = async () => {
             totalCases += data[key].cases;
             totalControls += data[key].controls;
             totalStudies += data[key].studies;
-            template += `<tr>
+            summary += `<tr>
                             <td>${data[key].name}</td>
                             <td>${numberWithCommas(data[key].studies)}</td>
                             <td>${numberWithCommas(data[key].cases)}</td>
                             <td>${numberWithCommas(data[key].controls)}</td>
                         </tr>`
         }
-        if(totalStudies !== 0 && totalCases !== 0 && totalControls !== 0 ) template += `<tr><td>Total #</td><td>${numberWithCommas(totalStudies)}</td><td>${numberWithCommas(totalCases)}</td><td>${numberWithCommas(totalControls)}</td></tr>`
-        template +=
+        summary += `<tr><td>Total #</td><td>${numberWithCommas(totalStudies)}</td><td>${numberWithCommas(totalCases)}</td><td>${numberWithCommas(totalControls)}</td></tr>`
+        summary +=
                     `</tbody>
                 </table>
-                <div class="data-last-modified align-left">${new Date(data['dataModifiedAt']).toLocaleString()}</div>
-                <div class="align-left">
-                    For more information:</br>
-                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
-                    Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
-                </div>
-            </div>
-        </div>
-        `
-    }
-    template += `
-                </div>
-            </div>
-        </div>
-    `;
-    document.getElementById('confluenceDiv').innerHTML = template;
+                <div class="data-last-modified align-left">${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>`
+        element.innerHTML = summary;
+    })
 }
