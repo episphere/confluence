@@ -64,8 +64,8 @@ export const dataSummaryStatisticsTemplate = () => {
         <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
         <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-weight-bold">Gender:</span> All<span class="vertical-line"></span>
-                <span class="font-weight-bold">Genotyping chip:</span> All Arrays
+                <span class="font-bold">Gender:</span> All<span class="vertical-line"></span>
+                <span class="font-bold">Genotyping chip:</span> All Arrays
             </div>
         </div>
         <div class="main-summary-row">
@@ -115,10 +115,10 @@ export const dataSummaryMissingTemplate = async () => {
         </button>
         <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;margin-left: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-weight-bold">Status:</span> All<span class="vertical-line"></span>
-                <span class="font-weight-bold">Ancestry:</span> All
+                <span class="font-bold">Status:</span> All<span class="vertical-line"></span>
+                <span class="font-bold">Ancestry:</span> All
                 ${initialSelection.length > 0 ? `
-                    <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} others</span>`:``}
+                    <span class="vertical-line"></span><span class="font-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} others</span>`:``}
                 `:``}
             </div>
         </div>
@@ -260,13 +260,13 @@ const addEventMidsetFilterForm = (data) => {
             newData = newData.filter(dt => dt[ancestry] === '1');
         }
         document.getElementById('listFilters').innerHTML = `
-        <span class="font-weight-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
-        <span class="font-weight-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
+        <span class="font-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
+        <span class="font-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
         ${studiesSelection.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-weight-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} others</span>`:``}
+            <span class="vertical-line"></span><span class="font-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} others</span>`:``}
         `:``}
         ${selectedVariables.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-weight-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} others</span>`:``}
+            <span class="vertical-line"></span><span class="font-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} others</span>`:``}
         `:``}
         `
         midset(newData, selectedVariables);

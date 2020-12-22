@@ -62,7 +62,7 @@ export const aboutConfluence = () => {
         summary += `
         </br>
         <div class="align-center">
-            <div class="font-size-28 font-weight-bold">Confluence Data Summary</div>
+            <div class="font-size-28 font-bold">Confluence Data Summary</div>
             <div class="main-summary-row">
                 <div class="col font-size-18 align-center">
                     <table class="table table-bordered table-responsive w-100 d-block d-md-table">

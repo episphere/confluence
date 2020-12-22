@@ -1121,10 +1121,10 @@ label {
 }
 
 .font-white {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
-.font-weight-bold {
+.font-bold {
     font-weight: bold !important;
 }
 

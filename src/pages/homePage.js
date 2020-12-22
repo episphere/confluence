@@ -216,7 +216,7 @@ export const infoDeck = () => {
         </div>
         <div class="secondary-bg inverse-triangle"></div>
         <div class="container align-center">
-            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
+            <div class="font-size-28 font-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
@@ -269,7 +269,7 @@ export const infoDeckAfterLoggedIn = () => {
         </div>
         <div class="secondary-bg inverse-triangle"></div>
         <div class="container align-center">
-            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
+            <div class="font-size-28 font-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
@@ -313,9 +313,7 @@ const cardContents = (obj) => {
             </div>
 
             <div class="white-bg border-top-0 card-footer" style="width: 100%;">
-                <button type="button" class="my-2 border border-0 font-weight-bold btn primary-bg" style="width: 90%;">
-                    <a class="stretched-link font-white" href="${obj.href}" style="text-decoration: none;">${obj.button}</a>
-                </button>
+                <a class="stretched-link font-white my-2 border border-0 font-bold btn primary-bg" style="width: 90%;" href="${obj.href}" style="text-decoration: none;">${obj.button}</a>
             </div>
         </div>
         `;
