@@ -1572,6 +1572,7 @@ export const addEventFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
             document.getElementById('dataLastModified').classList.remove('offset-xl-2')
             document.getElementById('dataLastModified').classList.remove('padding-left-30')
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
         else {
             child.classList.remove('fa-caret-right');
@@ -1582,6 +1583,7 @@ export const addEventFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
             document.getElementById('dataLastModified').classList.add('offset-xl-2')
             document.getElementById('dataLastModified').classList.add('padding-left-30')
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
     })
 }
@@ -1599,6 +1601,7 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
             document.getElementById('dataLastModified').classList.remove('offset-xl-2');
             document.getElementById('dataLastModified').classList.remove('padding-left-30');
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
         else {
             child.classList.remove('fa-caret-right');
@@ -1609,6 +1612,7 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
             document.getElementById('dataLastModified').classList.add('offset-xl-2');
             document.getElementById('dataLastModified').classList.add('padding-left-30');
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
     })
 }
