@@ -216,7 +216,7 @@ export const infoDeck = () => {
         </div>
         <div class="secondary-bg inverse-triangle"></div>
         <div class="container align-center">
-            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals">OUR GOALS</div>
+            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
@@ -225,7 +225,7 @@ export const infoDeck = () => {
             <br>
             <div class="row">
                 <div class="col-lg-3"></div>
-                <div class="col-lg-auto font-size-18 align-left">
+                <div class="col-lg-auto font-size-18 align-left mb-3">
                     <ul>
                         <li>Discover variants for breast cancer risk overall and by subtype</li>
                         <li>Develop multi-ancestry polygenic risk scores for personalized risk assessment</li>
@@ -269,7 +269,7 @@ export const infoDeckAfterLoggedIn = () => {
         </div>
         <div class="secondary-bg inverse-triangle"></div>
         <div class="container align-center">
-            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals">OUR GOALS</div>
+            <div class="font-size-28 font-weight-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
@@ -278,7 +278,7 @@ export const infoDeckAfterLoggedIn = () => {
             <br>
             <div class="row">
                 <div class="col-lg-3"></div>
-                <div class="col-lg-auto font-size-18 align-left">
+                <div class="col-lg-auto font-size-18 align-left mb-3">
                     <ul>
                         <li>Discover variants for breast cancer risk overall and by subtype</li>
                         <li>Develop multi-ancestry polygenic risk scores for personalized risk assessment</li>
