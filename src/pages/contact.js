@@ -7,7 +7,7 @@ export const confluenceContactPage = () => {
                         <h1 class="page-header">Contact</h1>
                     </div>
                 </div>
-                <div class="main-summary-row confluence-resources white-bg div-border">
+                <div class="main-summary-row confluence-resources white-bg div-border font-size-18">
                     <div class="col">
                         <span class="text-bold">Interested in participating in Confluence?</span></br>
                         <strong>Email to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>

@@ -9,9 +9,9 @@ export const aboutConfluence = () => {
                         <h1 class="page-header">Learn about Confluence</h1>
                     </div>
                 </div>
-                <div class="home-page-stats">
+                <div class="home-page-stats font-size-18">
                     <div class="main-summary-row">
-                        <div class="col font-size-18 align-left">
+                        <div class="col align-left">
                             </br>
                             <span>
                                 Confluence includes breast cancer case-control studies, case series or clinical trials of female or male breast cancer (invasive or in situ) with the following:
