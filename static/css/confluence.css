@@ -48,7 +48,7 @@ body {
     border-radius: 0;
     border: 0;
     background-color: #333B4D !important;
-    font-size: 18px;
+    font-size: 16px;
     margin: 0;
     padding: 0 !important;
     min-height: 45px !important;
@@ -968,7 +968,7 @@ label {
 }
 
 .navbar-active {
-    border-bottom: 5px solid #A41652 !important;
+    border-bottom: 4px solid #A41652 !important;
     background-color: #ffffff !important;
     color: #A41652 !important;
 }

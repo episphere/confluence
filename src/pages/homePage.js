@@ -208,8 +208,8 @@ export const infoDeck = () => {
             </div>
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
-                    template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#home', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
-                    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#home', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortia.'})
+                    template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
+                    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#join', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortia.'})
                     template += cardContents({header: 'Request Data Access', button: 'Request Data Access', href: '#home', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
             </div>
