@@ -842,7 +842,7 @@ export const getAllFileStructure = async (array) => {
 
 export const notificationTemplate = (top, header, body) => {
     return `
-        <div style="position: absolute; top: ${top}rem; right: 2rem; z-index: 9;">
+        <div style="position: absolute; top: ${top}rem; right: 2rem; z-index: 10;">
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">${header}</strong>

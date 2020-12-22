@@ -865,7 +865,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
     dataGovernanceElement.addEventListener('click', async () => {
         if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
-        assignNavbarActive(dataGovernanceElement, 1);
+        assignNavbarActive(dataGovernanceElement);
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
