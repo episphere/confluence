@@ -202,7 +202,7 @@ export const infoDeck = () => {
                     <div class="col-xl-12">
                         <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
                         <div class="banner-overlay-line"></div>
-                        <h3 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h3>
+                        <h2 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h2>
                     </div>
                 </div>
             </div>
@@ -254,7 +254,7 @@ export const infoDeckAfterLoggedIn = () => {
                     <div class="col-md-12">
                         <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
                         <div class="banner-overlay-line"></div>
-                        <h3 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h3>
+                        <h2 class="banner-overlay-h3" style="font-size:1.7vw;">Uncovering breast cancer genetic susceptibility</h2>
                     </div>
                 </div>
             </div>
