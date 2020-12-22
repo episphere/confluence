@@ -1564,6 +1564,7 @@ export const addEventFilterBarToggle = () => {
     button.addEventListener('click', () => {
         const child = Array.from(button.childNodes)[0];
         if(child.classList.contains('fa-caret-left')) {
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
             document.getElementById('summaryFilterSiderBar').classList = ['d-none'];
@@ -1572,9 +1573,9 @@ export const addEventFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
             document.getElementById('dataLastModified').classList.remove('offset-xl-2')
             document.getElementById('dataLastModified').classList.remove('padding-left-30')
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
         else {
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
             child.classList.remove('fa-caret-right');
             child.classList.add('fa-caret-left');
             document.getElementById('summaryFilterSiderBar').classList = ['col-xl-2 filter-column'];
@@ -1583,7 +1584,6 @@ export const addEventFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
             document.getElementById('dataLastModified').classList.add('offset-xl-2')
             document.getElementById('dataLastModified').classList.add('padding-left-30')
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
     })
 }
@@ -1593,6 +1593,7 @@ export const addEventMissingnessFilterBarToggle = () => {
     button.addEventListener('click', () => {
         const child = button.querySelector('.fas');
         if(child.classList.contains('fa-caret-left')) {
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
             document.getElementById('missingnessFilter').classList = ['d-none'];
@@ -1601,9 +1602,9 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.remove('padding-left-30');
             document.getElementById('dataLastModified').classList.remove('offset-xl-2');
             document.getElementById('dataLastModified').classList.remove('padding-left-30');
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
         else {
+            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
             child.classList.remove('fa-caret-right');
             child.classList.add('fa-caret-left');
             document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
@@ -1612,7 +1613,6 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-30');
             document.getElementById('dataLastModified').classList.add('offset-xl-2');
             document.getElementById('dataLastModified').classList.add('padding-left-30');
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
         }
     })
 }
