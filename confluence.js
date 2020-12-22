@@ -73,7 +73,7 @@ export const confluence = async () => {
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(dataSubmissionElement)
+            assignNavbarActive(dataSubmissionElement, 1)
             document.title = 'Confluence - Data Submit';
             confluenceDiv.innerHTML = await dataSubmissionTemplate();
             lazyload();
@@ -84,7 +84,7 @@ export const confluence = async () => {
         });
         dataSummaryElement.addEventListener('click', () => {
             showAnimation();
-            assignNavbarActive(dataSummaryElement)
+            assignNavbarActive(dataSummaryElement, 1)
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary('Summary Statistics');
             addEventUpdateSummaryStatsData();
@@ -104,7 +104,7 @@ export const confluence = async () => {
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(dataRequestElement)
+            assignNavbarActive(dataRequestElement, 1)
             document.title = 'Confluence - Data Request';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
@@ -112,7 +112,7 @@ export const confluence = async () => {
         platformTutorialElement.addEventListener('click', () => {
             if (platformTutorialElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(platformTutorialElement)
+            assignNavbarActive(platformTutorialElement, 1)
             document.title = 'Confluence Platform Tutorials';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
@@ -120,7 +120,7 @@ export const confluence = async () => {
         dataAnalysisElement.addEventListener('click', () => {
             if (dataAnalysisElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(dataAnalysisElement);
+            assignNavbarActive(dataAnalysisElement, 1);
             document.title = 'Confluence - Data Analysis';
             confluenceDiv.innerHTML = dataAnalysisTemplate();
             hideAnimation();
@@ -187,7 +187,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - About';
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         aboutConfluence();
     }
     else if(hash === '#join'){
@@ -195,7 +195,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         confluenceResources();
     }
     else if(hash === '#contact'){
@@ -203,7 +203,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Contact';
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = confluenceContactPage();
     }
     else window.location.hash = '#home';
@@ -223,7 +223,7 @@ const manageHash = () => {
         const confluenceDiv = document.getElementById('confluenceDiv');
         const dataSummaryElement = document.getElementById('dataSummary');
         showAnimation();
-        assignNavbarActive(dataSummaryElement);
+        assignNavbarActive(dataSummaryElement, 1);
         document.title = 'Confluence - Data Explore';
         confluenceDiv.innerHTML = dataSummary('Subset Statistics');
         addEventUpdateSummaryStatsData();
@@ -277,7 +277,7 @@ const manageHash = () => {
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         document.title = 'Confluence - About';
         aboutConfluence();
         hideAnimation();
@@ -286,7 +286,7 @@ const manageHash = () => {
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         document.title = 'Confluence - Resources';
         confluenceResources();
         hideAnimation();
@@ -295,7 +295,7 @@ const manageHash = () => {
         const element = document.getElementById('contactConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, true);
+        assignNavbarActive(element, 1);
         document.title = 'Confluence - Contact';
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();

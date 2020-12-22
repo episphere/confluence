@@ -865,7 +865,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
     dataGovernanceElement.addEventListener('click', async () => {
         if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
-        assignNavbarActive(dataGovernanceElement);
+        assignNavbarActive(dataGovernanceElement, 1);
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
@@ -1107,7 +1107,7 @@ export const addEventMyProjects = () => {
     myProjects.addEventListener('click', async () => {
         if(myProjects.classList.contains('navbar-active')) return;
         showAnimation();
-        assignNavbarActive(myProjects);
+        assignNavbarActive(myProjects, 2);
         document.title = 'Confluence - My Projects';
         myProjectsTemplate();
     });

@@ -1051,8 +1051,9 @@ export const mapReduce = (data, variable) => {
 
 export const assignNavbarActive = (element, parent) => {
     removeActiveClass('nav-menu-links', 'navbar-active');
+    removeActiveClass('grid-elements', 'navbar-active');
     element.classList.add('navbar-active');
-    if(parent) {
-        element.parentElement.previousElementSibling.classList.add('navbar-active');
-    }
+    if(parent && parent === 1) element.parentElement.previousElementSibling.classList.add('navbar-active');
+    if(parent && parent === 2) element.parentElement.parentElement.previousElementSibling.classList.add('navbar-active');
+    
 }
