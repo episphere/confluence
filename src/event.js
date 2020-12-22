@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -295,6 +295,7 @@ export const addEventStudyRadioBtn = () => {
 
 export const addEventConsortiaSelect = () => {
     const element = document.getElementById('selectConsortiaUIS');
+    if(!element) return
     element.addEventListener('change', async () => {
         const selectStudyUIS = document.getElementById('selectStudyUIS');
         if(!selectStudyUIS) return;
@@ -864,8 +865,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
     dataGovernanceElement.addEventListener('click', async () => {
         if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        dataGovernanceElement.classList.add('navbar-active');
+        assignNavbarActive(dataGovernanceElement);
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         if(bool){
@@ -1107,8 +1107,7 @@ export const addEventMyProjects = () => {
     myProjects.addEventListener('click', async () => {
         if(myProjects.classList.contains('navbar-active')) return;
         showAnimation();
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        myProjects.classList.add('navbar-active');
+        assignNavbarActive(myProjects);
         document.title = 'Confluence - My Projects';
         myProjectsTemplate();
     });

@@ -1048,3 +1048,11 @@ export const missingnessStatsFileId = 653087731560;
 export const mapReduce = (data, variable) => {
     return data.map(dt => parseInt(dt[variable])).reduce((a,b) => a+b);
 }
+
+export const assignNavbarActive = (element, parent) => {
+    removeActiveClass('nav-menu-links', 'navbar-active');
+    element.classList.add('navbar-active');
+    if(parent) {
+        element.parentElement.previousElementSibling.classList.add('navbar-active');
+    }
+}

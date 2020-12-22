@@ -4,7 +4,7 @@ import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSu
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -73,8 +73,7 @@ export const confluence = async () => {
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
             showAnimation();
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            dataSubmissionElement.classList.add('navbar-active');
+            assignNavbarActive(dataSubmissionElement)
             document.title = 'Confluence - Data Submit';
             confluenceDiv.innerHTML = await dataSubmissionTemplate();
             lazyload();
@@ -85,8 +84,7 @@ export const confluence = async () => {
         });
         dataSummaryElement.addEventListener('click', () => {
             showAnimation();
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            dataSummaryElement.classList.add('navbar-active');
+            assignNavbarActive(dataSummaryElement)
             document.title = 'Confluence - Data Explore';
             confluenceDiv.innerHTML = dataSummary('Summary Statistics');
             addEventUpdateSummaryStatsData();
@@ -106,8 +104,7 @@ export const confluence = async () => {
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            dataRequestElement.classList.add('navbar-active');
+            assignNavbarActive(dataRequestElement)
             document.title = 'Confluence - Data Request';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
@@ -115,8 +112,7 @@ export const confluence = async () => {
         platformTutorialElement.addEventListener('click', () => {
             if (platformTutorialElement.classList.contains('navbar-active')) return;
             showAnimation();
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            platformTutorialElement.classList.add('navbar-active');
+            assignNavbarActive(platformTutorialElement)
             document.title = 'Confluence Platform Tutorials';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
@@ -124,8 +120,7 @@ export const confluence = async () => {
         dataAnalysisElement.addEventListener('click', () => {
             if (dataAnalysisElement.classList.contains('navbar-active')) return;
             showAnimation();
-            removeActiveClass('nav-menu-links', 'navbar-active');
-            dataAnalysisElement.classList.add('navbar-active');
+            assignNavbarActive(dataAnalysisElement);
             document.title = 'Confluence - Data Analysis';
             confluenceDiv.innerHTML = dataAnalysisTemplate();
             hideAnimation();
@@ -183,12 +178,8 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence Data Platform';
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element)
         infoDeck();
-        // confluenceDiv.innerHTML = homePage();
-        // addEventAboutConfluence();
-        // homePageVisualization();
         hideAnimation();
     }
     else if(hash === '#about'){
@@ -196,19 +187,15 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - About';
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         aboutConfluence();
-        // addEventAboutList();
-        // document.getElementById('item1').click();
     }
     else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         confluenceResources();
     }
     else if(hash === '#contact'){
@@ -216,8 +203,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Contact';
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         confluenceDiv.innerHTML = confluenceContactPage();
     }
     else window.location.hash = '#home';
@@ -237,8 +223,7 @@ const manageHash = () => {
         const confluenceDiv = document.getElementById('confluenceDiv');
         const dataSummaryElement = document.getElementById('dataSummary');
         showAnimation();
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        dataSummaryElement.classList.add('navbar-active');
+        assignNavbarActive(dataSummaryElement);
         document.title = 'Confluence - Data Explore';
         confluenceDiv.innerHTML = dataSummary('Subset Statistics');
         addEventUpdateSummaryStatsData();
@@ -283,33 +268,25 @@ const manageHash = () => {
         const element = document.getElementById('homePage');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element);
         document.title = 'Confluence Data Platform';
         infoDeckAfterLoggedIn();
-        // confluenceDiv.innerHTML = homePage();
-        // addEventAboutConfluence();
-        // homePageVisualization();
         hideAnimation();
     }
     else if(hash === '#about'){
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         document.title = 'Confluence - About';
         aboutConfluence();
-        // addEventAboutList();
-        // document.getElementById('item1').click();
         hideAnimation();
     }
     else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         document.title = 'Confluence - Resources';
         confluenceResources();
         hideAnimation();
@@ -318,8 +295,7 @@ const manageHash = () => {
         const element = document.getElementById('contactConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        removeActiveClass('nav-menu-links', 'navbar-active');
-        element.classList.add('navbar-active');
+        assignNavbarActive(element, true);
         document.title = 'Confluence - Contact';
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
@@ -329,7 +305,7 @@ const manageHash = () => {
 
 window.onload = async () => {
     const confluenceDiv = document.getElementById('confluenceDiv');
-    // confluenceDiv.innerHTML = '';
+    confluenceDiv.innerHTML = '';
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {
         await checkAccessTokenValidity();
         inactivityTime();

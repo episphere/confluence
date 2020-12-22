@@ -64,7 +64,6 @@ body {
 }
 
 .active {
-    /* background-color: #aaaaaa; */
     border-bottom: 2px solid #A41652;
 }
 
@@ -99,7 +98,7 @@ body {
     height: fit-content;
     position: absolute;
     z-index: 9;
-    left: -10px;
+    left: 0px;
 }
 
 #filterBarToggle:hover {
@@ -975,7 +974,7 @@ label {
 }
 
 .dropdown-btn {
-    background-color: #333B4D !important;
+    background-color: #333B4D;
     border: 0px;
     width: 100%;
     text-align: left;
