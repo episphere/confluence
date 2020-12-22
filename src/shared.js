@@ -1055,5 +1055,4 @@ export const assignNavbarActive = (element, parent) => {
     element.classList.add('navbar-active');
     if(parent && parent === 1) element.parentElement.previousElementSibling.classList.add('navbar-active');
     if(parent && parent === 2) element.parentElement.parentElement.previousElementSibling.classList.add('navbar-active');
-    
 }
