@@ -2,56 +2,6 @@ import { hideAnimation, getFile, csvJSON, removeActiveClass, numberWithCommas, s
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 
-const unique = arr => {
-    let u={}
-    arr.forEach(v => {
-        if (v=='888' || v=='777' || v=="" ) v = undefined // 888 undefined code
-        if (!u[v]) u[v] = 0
-        u[v]++
-    })
-    return u
-}
-
-export const txt2dt = txt => {
-    let dt = txt.split(/\n/g).map(tx => tx.split(/\t/g))
-    // trailing blank
-    if((txt.split(/\n+/).slice(-1).length == 1) && (txt.slice(-1)[0].length)){
-        dt.pop()
-    }
-    let tab = {}
-    let hh = dt[0].forEach((h,j)=>{ // headers
-        tab[h] = []
-        dt.slice(1).forEach((vv,i)=>{
-            tab[h][i] = vv[j]
-        })
-    });
-
-    let uni = {}
-    Object.keys(tab).forEach(k => {
-        uni[k] = unique(tab[k])
-    })
-    return {
-        tab:tab,
-        uni:uni
-    }
-};
-
-export const getData = (studyEntries, studyIds, values) => {
-    let allIds = {};
-    studyIds.forEach(id => {
-        const dataEntries = studyEntries[parseInt(id)].dataEntries;
-        let selectedDataIds = [];
-        values.forEach(value => {
-            const selectedDataEntries = Object.keys(dataEntries).filter(key => dataEntries[key].name === value);
-            if(selectedDataEntries.length > 0) selectedDataIds.push(parseInt(selectedDataEntries[0]));
-        });
-
-        selectedDataIds.forEach(dataId => {
-            let fileEntries = dataEntries[dataId].fileEntries;
-            // allIds = {...allIds, ...fileEntries};
-        });
-    });
-}
 
 export const getFileContent = async () => {
     const jsonData = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
@@ -133,117 +83,6 @@ const allFilters = (jsonData) => {
     addEventConsortiumSelect();
 }
 
-const chipFilter = (jsonData) => {
-    document.getElementById('chipContent').innerHTML = '';
-    const div1 = document.createElement('div')
-    div1.classList = ['row genotype-select'];
-    div1.innerHTML = 'Genotyping chip'
-
-    const div2 = document.createElement('div')
-    div2.classList = ['row genotype-select'];
-
-    const btn2 = document.createElement('button');
-    btn2.dataset.variable = "chip";
-    btn2.dataset.value = "Confluence chip";
-    btn2.innerHTML = 'Confluence array'
-    btn2.classList = ['filter-btn genotype-selection-btn'];
-    div2.appendChild(btn2);
-
-    const div3 = document.createElement('div')
-    div3.classList = ['row genotype-select'];
-
-    const btn3 = document.createElement('button');
-    btn3.dataset.variable = "chip";
-    btn3.dataset.value = "Other chip";
-    btn3.innerHTML = 'Other arrays'
-    btn3.classList = ['filter-btn genotype-selection-btn'];
-    div3.appendChild(btn3);
-
-    const div4 = document.createElement('div')
-    div4.classList = ['row genotype-select'];
-
-    const btn4 = document.createElement('button');
-    btn4.innerHTML = 'All arrays'
-    btn4.classList = ['filter-btn genotype-selection-btn genotype-active-btn'];
-    div4.appendChild(btn4);
-
-    const div5 = document.createElement('div');
-    div5.classList = ['custom-hr row'];
-
-    document.getElementById('chipContent').appendChild(div1);
-    document.getElementById('chipContent').appendChild(div2);
-    document.getElementById('chipContent').appendChild(div3);
-    document.getElementById('chipContent').appendChild(div4);
-    document.getElementById('chipContent').appendChild(div5);
-    addEventGenotypeBtnSelection(jsonData, btn2);
-    addEventGenotypeBtnSelection(jsonData, btn3);
-    addEventGenotypeBtnSelection(jsonData, btn4);
-}
-
-const genderFilter = (jsonData) => {
-    document.getElementById('genderFilter').innerHTML = '';
-    const div1 = document.createElement('div')
-    div1.classList = ['row gender-select'];
-    div1.innerHTML = 'Gender'
-
-    const selectDiv1 = document.createElement('div');
-    selectDiv1.classList = ['row gender-select'];
-
-    const select1 = document.createElement('select');
-    select1.classList = ['form-control'];
-    select1.id = 'genderSelection';
-    select1.required = true;
-    select1.innerHTML = `
-        <option value=''> -- Select Gender -- </option>
-        <option selected value='all'>All</option>
-        <option value='female'>Female</option>
-        <option value='male'>Male</option>
-    `;
-
-    selectDiv1.appendChild(select1);
-
-    const div2 = document.createElement('div')
-    div2.classList = ['row gender-select'];
-
-    const btn2 = document.createElement('button');
-    btn2.dataset.variable = "sex";
-    btn2.dataset.value = "male";
-    btn2.innerHTML = 'Male'
-    btn2.classList = ['filter-btn gender-selection-btn'];
-    div2.appendChild(btn2);
-
-    const div3 = document.createElement('div')
-    div3.classList = ['row gender-select'];
-
-    const btn3 = document.createElement('button');
-    btn3.dataset.variable = "sex";
-    btn3.dataset.value = "female";
-    btn3.innerHTML = 'Female'
-    btn3.classList = ['filter-btn gender-selection-btn'];
-    div3.appendChild(btn3);
-
-    const div4 = document.createElement('div')
-    div4.classList = ['row gender-select'];
-
-    const btn4 = document.createElement('button');
-    btn4.innerHTML = 'All'
-    btn4.classList = ['filter-btn gender-selection-btn gender-active-btn'];
-    div4.appendChild(btn4);
-
-    const div5 = document.createElement('div');
-    div5.classList = ['custom-hr row'];
-
-    document.getElementById('genderFilter').appendChild(div1);
-    document.getElementById('genderFilter').appendChild(selectDiv1);
-    document.getElementById('genderFilter').appendChild(div2);
-    document.getElementById('genderFilter').appendChild(div3);
-    document.getElementById('genderFilter').appendChild(div4);
-    document.getElementById('genderFilter').appendChild(div5);
-    addEventGenderFilter(jsonData, btn2);
-    addEventGenderFilter(jsonData, btn3);
-    addEventGenderFilter(jsonData, btn4);
-}
-
 const aggegrateData = (jsonData) => {
     let obj = {};
     jsonData.forEach(value => {
@@ -259,62 +98,6 @@ const aggegrateData = (jsonData) => {
         }
     });
     return obj;
-}
-
-const addEventGenderFilter = (jsonData, element) => {
-    element.addEventListener('click', () => {
-        if(element.classList.contains('gender-active-btn')) return
-        removeActiveClass('gender-selection-btn', 'gender-active-btn');
-        element.classList.add('gender-active-btn');
-        const array = getSelectedStudies();
-        const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
-        const variable = genotypeSelected.dataset.variable;
-        const variableValue = genotypeSelected.dataset.value;
-
-        const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
-        const variable1 = selectedGenderElement.dataset.variable;
-        const variableValue1 = selectedGenderElement.dataset.value;
-        let finalData = jsonData;
-        if(variable1) {
-            finalData = finalData.filter(dt => dt[variable1] === variableValue1);
-        }
-        if(variable) {
-            finalData = finalData.filter(dt => dt[variable] === variableValue);
-        }
-        updateCounts(finalData);
-        if(array.length > 0){
-            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
-        }
-        renderAllCharts(finalData);
-    })
-}
-
-const addEventGenotypeBtnSelection = (jsonData, element) => {
-    element.addEventListener('click', () => {
-        if(element.classList.contains('genotype-active-btn')) return
-        removeActiveClass('genotype-selection-btn', 'genotype-active-btn');
-        element.classList.add('genotype-active-btn');
-        const array = getSelectedStudies();
-        const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
-        const variable = genotypeSelected.dataset.variable;
-        const variableValue = genotypeSelected.dataset.value;
-
-        const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
-        const variable1 = selectedGenderElement.dataset.variable;
-        const variableValue1 = selectedGenderElement.dataset.value;
-        let finalData = jsonData;
-        if(variable1) {
-            finalData = finalData.filter(dt => dt[variable1] === variableValue1);
-        }
-        if(variable) {
-            finalData = finalData.filter(dt => dt[variable] === variableValue);
-        }
-        updateCounts(finalData);
-        if(array.length > 0){
-            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
-        }
-        renderAllCharts(finalData);
-    });
 }
 
 export const addEventConsortiumSelect = () => {
@@ -359,61 +142,15 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-const addEventFilterCharts = (jsonData) => {
-    const elements = document.getElementsByClassName('filter-studies');
-    Array.from(elements).forEach(element => {
-        element.addEventListener('click', () => {
-            if(element.classList.contains('active-filter')){
-                element.classList.remove('active-filter');
-                document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = false;
-            }
-            else{
-                element.classList.add('active-filter');
-            }
-            let allStudiesSelected = true;
-            const constortiaStudyElements = element.parentNode.parentNode.querySelectorAll('.filter-studies');
-            Array.from(constortiaStudyElements).forEach(el => {
-                if(!allStudiesSelected) return;
-                if(el.classList.contains('active-filter') === false) allStudiesSelected = false;
-            });
-            if(allStudiesSelected) document.querySelectorAll(`[type="checkbox"][data-consortia="${element.dataset.consortium}"]`)[0].checked = true;
-            const array = getSelectedStudies();
-            const genotypeSelected = document.getElementsByClassName('genotype-active-btn')[0];
-            const variable = genotypeSelected.dataset.variable;
-            const variableValue = genotypeSelected.dataset.value;
-
-            const selectedGenderElement = document.getElementsByClassName('gender-active-btn')[0];
-            const variable1 = selectedGenderElement.dataset.variable;
-            const variableValue1 = selectedGenderElement.dataset.value;
-            let finalData = jsonData;
-            if(variable1) {
-                finalData = finalData.filter(dt => dt[variable1] === variableValue1);
-            }
-            if(variable) {
-                finalData = finalData.filter(dt => dt[variable] === variableValue);
-            }
-            if(array.length > 0){
-                finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1)
-            }
-            renderAllCharts(finalData);
-        });
-    });
-};
-
-
-
 export const renderAllCharts = (finalData, showFilter) => {
-    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'selectedRange3', 'chartDiv3', finalData);
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'selectedRange6', 'chartDiv6', finalData)
-    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'selectedRange5', 'chartDiv5');
-    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'selectedRange4', 'chartDiv4');
-    renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'selectedRange2', 'chartDiv2');
+    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'chartDiv3', finalData);
+    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData)
+    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
+    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4');
+    renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
         allFilters(finalData);
-        // chipFilter(finalData);
-        // genderFilter(finalData);
-        // filterByStudy(finalData);
     };
     // addEventVariableDefinitions();
 }
@@ -446,7 +183,7 @@ export const getSelectedStudies = () => {
     return array;
 };
 
-export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
+const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
@@ -469,7 +206,7 @@ export const generateBarChart = (parameter, id, labelID, rangeLabelID, chartDiv,
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv, jsonData) => {
+const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
@@ -493,7 +230,7 @@ const generateBarSingleSelect = (parameter, id, labelID, rangeLabelID, chartDiv,
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -501,7 +238,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, rangeLabelID, ch
     }else{
         pieLabel = parameter;
     }
-    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const values = [ mapReduce(jsonData, 'ER_statusIndex_pos'), mapReduce(jsonData, 'ER_statusIndex_neg'), mapReduce(jsonData, 'ER_statusIndex_DK') ];
     const labels = ['Positive', 'Negative', 'Don\'t know'];
@@ -540,12 +277,8 @@ const countStatus = (value, jsonData) => {
     return jsonData.filter(dt => {if(dt.status === value) return dt}).map(dt => dt['total']).reduce((a,b) => a+b);
 }
 
-const countEthnicity = (value, jsonData) => {
-    const array = jsonData.filter(dt => {if(dt.ethnicityClass === value) return dt}).map(dt => dt['total']);
-    if(array.length > 0) return array.reduce((a,b) => a+b);
-}
 
-const renderStatusPieChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+const renderStatusPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -582,7 +315,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
     }else{
         pieLabel = parameter;
     }
-    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
     const allLabels = getUniqueConsortium(jsonData, parameter);
@@ -618,7 +351,7 @@ const getUniqueConsortium = (jsonData, parameter) => {
     return array;
 }
 
-const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID, chartDiv) => {
+const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -626,7 +359,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, rangeLabelID,
     }else{
         pieLabel = parameter;
     }
-    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
+    
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];

@@ -1,11 +1,11 @@
 import { template } from './src/components/navBarMenuItems.js';
-import { template as homePage, homePageVisualization, addEventAboutConfluence, infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
+import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive } from './src/shared.js';
-import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventAboutList, addEventUpdateSummaryStatsData } from './src/event.js';
+import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 import { aboutConfluence } from './src/pages/about.js';
@@ -13,19 +13,6 @@ import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 
-const displayNotification = () => {
-    navigator.serviceWorker.getRegistration()
-        .then(reg => {
-            const title = 'Hello confluence user';
-            const options = {
-                body: 'This is notification body',
-                icon: './static/images/icons/icon-96x96.png',
-                vibrate: [100, 50, 100],
-                data: { primaryKey: 1 }
-            }
-            reg.showNotification(title, options)
-        });
-}
 
 export const confluence = async () => {
     if('serviceWorker' in navigator){
@@ -36,9 +23,6 @@ export const confluence = async () => {
             console.log(error);
         }
     }
-    // Notification.requestPermission(status => {
-    //     if(status === "granted") displayNotification();
-    // });
 
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');

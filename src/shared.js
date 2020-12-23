@@ -91,37 +91,6 @@ export const getFile = async (id) => {
     }
 };
 
-export const getFileJSON = async (id) => {
-    try{
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
-        headers:{
-            Authorization:"Bearer "+access_token
-            }
-        });
-        if(r.status === 401){
-            if((await refreshToken()) === true) return await getFileJSON(id);
-        }
-        else if(r.status === 200){
-            return r.json()
-        }
-        else if(r.status === 404){
-            hideAnimation();
-            console.error(r);
-            return null;
-        }
-        else{
-            hideAnimation();
-            console.error(r);
-        }
-    }
-    catch(err) {
-        if(err.message !== 'Failed to fetch'){
-            if((await refreshToken()) === true) return await getFileJSON(id);
-        }
-    }
-};
-
 export const getFileInfo = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
@@ -212,7 +181,6 @@ export const storeAccessToken = async () => {
     }
 }
 
-
 export const refreshToken = async () => {
     if(!localStorage.parms) return;
     const parms = JSON.parse(localStorage.parms);
@@ -253,21 +221,6 @@ const searchParms = () => {
         })
     }
     return parms
-};
-
-export const downloadFileTxt = async (fileId, fileName) => {
-    const access_token = JSON.parse(localStorage.parms).access_token;
-    let fileData = await getFile(fileId, access_token);
-    let element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileData));
-    element.setAttribute('download', fileName);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
 };
 
 export const createFolder = async (folderId, folderName) => {
@@ -328,37 +281,6 @@ export const copyFile = async (fileId, parentId) => {
     }
     catch(err) {
         if((await refreshToken()) === true) return await copyFile(fileId, parentId);
-    }
-};
-
-export const uploadFileBox = async (folderId, fileName, file) => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        const form = new FormData();
-        form.append('file', file);
-        form.append('name', fileName);
-        form.append('parent_id', folderId);
-    
-        let response = await fetch("https://upload.box.com/api/2.0/files/content", {
-            method: "POST",
-            headers:{
-                Authorization:"Bearer "+access_token
-            },
-            body: form,
-            contentType: false
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file);
-        }
-        else if(response.status === 201){
-            return response.json();
-        }
-        else{
-            return {status: response.status, statusText: response.statusText};
-        };
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await uploadFileBox(folderId, fileName, file);
     }
 };
 
@@ -576,172 +498,11 @@ export const updateBoxCollaborator = async (id, role) => {
     }
 }
 
-export const getAllWebHooks = async () => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        const response = await fetch(`https://api.box.com/2.0/webhooks`, {
-            method: 'GET',
-            headers: {
-                Authorization: "Bearer "+access_token
-            }
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await getAllWebHooks();
-        }
-        else{
-            return response;
-        }
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await getAllWebHooks();
-    }    
-}
-
-export const createWebHook = async () => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        const obj = {
-            address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
-            target: {id: '90879959998', type: "folder"}, 
-            triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
-        }
-        const response = await fetch(`https://api.box.com/2.0/webhooks`, {
-            method: 'POST',
-            headers: {
-                Authorization: "Bearer "+access_token
-            },
-            body: JSON.stringify(obj)
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await createWebHook();
-        }
-        else{
-            return response;
-        }
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await createWebHook();
-    }
-}
-
-export const updateWebHook = async () => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        const obj = {
-            address: 'https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/boxWebHook', 
-            target: {id: '90879959998', type: "folder"}, 
-            triggers: ["FILE.UPLOADED", "FILE.PREVIEWED", "FILE.DOWNLOADED", "FILE.TRASHED", "FILE.DELETED", "FILE.RESTORED", "FILE.COPIED", "FILE.MOVED", "FILE.LOCKED", "FILE.UNLOCKED", "FILE.RENAMED", "COMMENT.CREATED", "COMMENT.UPDATED", "COMMENT.DELETED", "TASK_ASSIGNMENT.CREATED", "TASK_ASSIGNMENT.UPDATED", "METADATA_INSTANCE.CREATED", "METADATA_INSTANCE.UPDATED", "METADATA_INSTANCE.DELETED", "FOLDER.CREATED", "FOLDER.RENAMED", "FOLDER.DOWNLOADED", "FOLDER.RESTORED", "FOLDER.DELETED", "FOLDER.COPIED", "FOLDER.MOVED", "FOLDER.TRASHED", "WEBHOOK.DELETED", "COLLABORATION.CREATED", "COLLABORATION.ACCEPTED", "COLLABORATION.REJECTED", "COLLABORATION.REMOVED", "COLLABORATION.UPDATED", "SHARED_LINK.DELETED", "SHARED_LINK.CREATED", "SHARED_LINK.UPDATED"]
-        }
-        const response = await fetch(`https://api.box.com/2.0/webhooks/249492740`, {
-            method: 'PUT',
-            headers: {
-                Authorization: "Bearer "+access_token
-            },
-            body: JSON.stringify(obj)
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await updateWebHook();
-        }
-        else{
-            return response;
-        }
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await updateWebHook();
-    }
-}
-
-export const updateLocalStorage = async (parentId, newFolderId, newFolderName, newFolderType) => {
-    let data_summary = JSON.parse(localStorage.data_summary);
-    for(let consortia in data_summary){
-        const consortiaId = parseInt(consortia);
-        let studyEntries = data_summary[consortiaId].studyEntries;
-        if(consortiaId === parentId){
-            studyEntries[newFolderId] = {};
-            studyEntries[newFolderId].name = newFolderName;
-            studyEntries[newFolderId].type = newFolderType;
-            studyEntries[newFolderId].dataEntries = {};
-        }
-        else{
-            for(let study in studyEntries){
-                const studyId = parseInt(study);
-                let dataEntries = studyEntries[studyId].dataEntries;
-                if(studyId === parentId){
-                    dataEntries[newFolderId] = {};
-                    dataEntries[newFolderId].name = newFolderName;
-                    dataEntries[newFolderId].type = newFolderType;
-                    dataEntries[newFolderId].fileEntries = {};
-                }
-                else{
-                    for(let data in dataEntries){
-                        const dataId = parseInt(data);
-                        let fileEntries = dataEntries[dataId].fileEntries;
-                        if(dataId === parentId){
-                            fileEntries[newFolderId] = {};
-                            fileEntries[newFolderId].name = newFolderName;
-                            fileEntries[newFolderId].type = newFolderType;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    localStorage.data_summary = JSON.stringify(data_summary);
-}
-
 export const removeActiveClass = (className, activeClass) => {
     let fileIconElement = document.getElementsByClassName(className);
     Array.from(fileIconElement).forEach(elm => {
         elm.classList.remove(activeClass);
     });
-}
-
-export const convertTextToJson = async (fileIds) => {
-    let allObjs = [];
-    for(const id in fileIds){
-        if(fileIds[id].name.slice(fileIds[id].name.lastIndexOf('.')+1, fileIds[id].name.length) === 'json'){
-            const intId = parseInt(id);
-            let rawData = await getFile(intId);
-            let obj = JSON.parse(rawData);
-            allObjs = allObjs.concat(obj);
-        }
-        else if(fileIds[id].name.slice(fileIds[id].name.lastIndexOf('.')+1, fileIds[id].name.length) === 'txt'){
-            const intId = parseInt(id);
-            let rawData = await getFile(intId);
-            let rows = rawData.split(/\n/g).map(tx=>tx.split(/\t/g))
-            if((rawData.split(/\n+/).slice(-1).length==1) && (rawData.slice(-1)[0].length)){
-                rows.pop()
-            };
-            const headings = rows[0];
-            rows.splice(0, 1);
-            let obj = rows.map(function (el) {
-                let obj = {};
-                for (let i = 0; i < el.length; i++) {
-                obj[headings[i].trim()] = el[i];
-                }
-                return obj;
-            });
-            allObjs = allObjs.concat(obj);
-        }
-    };
-    let jsonData = {};
-    
-    for(let data of allObjs){
-        for(const key in data){
-            const value = data[key];
-            if(value !== "" && variables.BCAC[key] && variables.BCAC[key][value]){
-                data[key] = variables.BCAC[key][value];
-            }
-        }
-        if(jsonData[data.BCAC_ID]){
-            jsonData[data.BCAC_ID] = {...jsonData[data.BCAC_ID], ...data}
-            // jsonData[data.BCAC_ID] = Object.assign(jsonData[data.BCAC_ID], data);
-        }else{
-            jsonData[data.BCAC_ID] = {};
-            jsonData[data.BCAC_ID] = data;
-        }
-    }
-    return Object.values(jsonData);
 }
 
 export const sessionExpired = () => {
@@ -757,86 +518,12 @@ export const hideAnimation = () => {
     if(document.getElementById('loadingAnimation')) document.getElementById('loadingAnimation').style.display = 'none';
 }
 
-export const showError = (errorMessage) => {
-    document.getElementById('error').innerHTML = errorMessage;
-}
-export const disableCheckBox = (value) => {
-    const studiesCheckBox = document.getElementsByName('studiesCheckBox');
-    Array.from(studiesCheckBox).forEach(element => {
-        element.disabled = value;
-    });
-
-    const dataTypeCheckBox = document.getElementsByName('dataTypeCheckBox');
-    Array.from(dataTypeCheckBox).forEach(element => {
-        element.disabled = value;
-    });
-
-//     document.getElementById('studySelectAll').disabled = value;
-//     document.getElementById('dataTypeSelectAll').disabled = value;
-//     document.getElementById('searchStudies').disabled = value;
-//     document.getElementById('searchdataTypes').disabled = value;
-}
-
 export const getparameters = (query) => {
     const array = query.split('&');
     let obj = {};
     array.forEach(value => {
         obj[value.split('=')[0]] = value.split('=')[1];
     });
-    return obj;
-}
-
-export const getAllFileStructure = async (array) => {
-    let obj = {};
-    for(let i = 0; i < array.length; i++){
-        const ID = array[i].id;
-        obj[ID] = {};
-        obj[ID].name = array[i].name;
-        obj[ID].type = array[i].type;
-        obj[ID].studyEntries = {};
-        obj[ID].count = 0;
-        const studies = await getFolderItems(ID);
-        
-        if(studies.total_count && studies.total_count > 0){
-            const allStudies = filterStudies(studies.entries);
-            for(let j = 0; j < allStudies.length; j++){
-                if(allStudies[j].type === 'folder'){
-                    const studyId = allStudies[j].id;
-                    obj[ID].studyEntries[studyId] = {};
-                    obj[ID].studyEntries[studyId].name = allStudies[j].name;
-                    obj[ID].studyEntries[studyId].type = allStudies[j].type;
-                    obj[ID].studyEntries[studyId].dataEntries = {};
-                    obj[ID].count++;
-                    obj[ID].studyEntries[studyId].count = 0;
-                    const dataTypes = await getFolderItems(studyId);
-                    if(dataTypes.total_count && dataTypes.total_count === 0) return;
-                    const allDataTypes = dataTypes.entries;
-                    for(let k = 0; k < allDataTypes.length; k++){
-                        if(allDataTypes[k].type === 'folder' && allDataTypes[k].name.trim().toLowerCase() !== 'samples'){
-                            const dataId = allDataTypes[k].id;
-                            obj[ID].studyEntries[studyId].dataEntries[dataId] = {}
-                            obj[ID].studyEntries[studyId].dataEntries[dataId].name = allDataTypes[k].name;
-                            obj[ID].studyEntries[studyId].dataEntries[dataId].type = allDataTypes[k].type;
-                            obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries = {};
-                            obj[ID].studyEntries[studyId].count++;
-                            obj[ID].studyEntries[studyId].dataEntries[dataId].count = 0
-                            const files = await getFolderItems(dataId);
-                            if(files.total_count && files.total_count === 0) return;
-                            const allFiles = files.entries;
-                            for(let l = 0; l < allFiles.length ; l++){
-                                if(allFiles[l].type !== 'file') return;
-                                const fileId = allFiles[l].id;
-                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId] = {};
-                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].name = allFiles[l].name;
-                                obj[ID].studyEntries[studyId].dataEntries[dataId].fileEntries[fileId].type = allFiles[l].type;
-                                obj[ID].studyEntries[studyId].dataEntries[dataId].count++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
     return obj;
 }
 
@@ -1007,28 +694,15 @@ export const csv2Json = (csv) => {
     return {data:result, headers};
 }
 
-export const jsonToTSVTxt = (json) => {
-    const fields = Object.keys(json[0])
-    const replacer = (key, value) => { return value === null ? '' : value } 
-    let tsv = json.map((row) => {
-        return fields.map((fieldName) => {
-            return JSON.stringify(row[fieldName], replacer)
-        }).join('\t')
-    })
-    tsv.unshift(fields.join('\t')) // add header column
-    tsv = tsv.join('\r\n');
-    return tsv;
-}
-
 export const json2csv = (json, fields) => {
     if(!fields.includes('study')) fields.push('study');
     const replacer = (key, value) => { return value === null ? '' : value } 
     let csv = json.map((row) => {
         return fields.map((fieldName) => {
             return JSON.stringify(row[fieldName], replacer)
-        }).join(',')
+        }).join(',') // \t for tsv
     })
-    csv.unshift(fields.join(',')) // add header column
+    csv.unshift(fields.join(',')) // add header column  \t for tsv
     csv = csv.join('\r\n');
     return csv;
 }
