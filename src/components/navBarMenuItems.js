@@ -30,6 +30,7 @@ export const template = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
                     Submit
                 </a>
+                <div id="governanceNav" class="grid-elements"></div>
                 <div id="myProjectsNav" class="grid-elements"></div>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_analysis" title="Data Analysis" id="dataAnalysis">
                     Analyze
@@ -39,7 +40,6 @@ export const template = () => {
                 </a>
             </div>
         </div>
-        <div id="governanceNav" class="grid-elements"></div>
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
                 </i> Tutorials
