@@ -96,7 +96,7 @@ export const confluence = async () => {
         platformTutorialElement.addEventListener('click', () => {
             if (platformTutorialElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(platformTutorialElement, 1)
+            assignNavbarActive(platformTutorialElement)
             document.title = 'Confluence Platform Tutorials';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
@@ -122,9 +122,9 @@ export const confluence = async () => {
         }
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance">Data Governance</a>
-                </div>
+                <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance">
+                    Data Governance
+                </a>
             `;
             document.getElementById('myProjectsNav').innerHTML = `
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
@@ -135,9 +135,9 @@ export const confluence = async () => {
             addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
-                <div class="grid-elements">
-                    <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance">Data Governance</a>
-                </div>
+                <a class="nav-link nav-menu-links white-font" href="#data_governance" title="Data Governance" id="dataGovernance">
+                    Data Governance
+                </a>
             `;
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
