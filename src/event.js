@@ -1,5 +1,5 @@
 import { countSpecificData, clearGraphAndParameters } from './pages/dataExploration.js';
-import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive } from './shared.js';
+import { showAnimation, disableCheckBox, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots } from './shared.js';
 import { parameterListTemplate } from './components/elements.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -1564,7 +1564,7 @@ export const addEventFilterBarToggle = () => {
     button.addEventListener('click', () => {
         const child = Array.from(button.childNodes)[0];
         if(child.classList.contains('fa-caret-left')) {
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
+            reSizePlots();
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
             document.getElementById('summaryFilterSiderBar').classList = ['d-none'];
@@ -1575,7 +1575,7 @@ export const addEventFilterBarToggle = () => {
             document.getElementById('dataLastModified').classList.remove('padding-left-30')
         }
         else {
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
+            reSizePlots();
             child.classList.remove('fa-caret-right');
             child.classList.add('fa-caret-left');
             document.getElementById('summaryFilterSiderBar').classList = ['col-xl-2 filter-column'];
@@ -1593,7 +1593,7 @@ export const addEventMissingnessFilterBarToggle = () => {
     button.addEventListener('click', () => {
         const child = button.querySelector('.fas');
         if(child.classList.contains('fa-caret-left')) {
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
+            reSizePlots();
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
             document.getElementById('missingnessFilter').classList = ['d-none'];
@@ -1604,7 +1604,7 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.getElementById('dataLastModified').classList.remove('padding-left-30');
         }
         else {
-            document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
+            reSizePlots();
             child.classList.remove('fa-caret-right');
             child.classList.add('fa-caret-left');
             document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
@@ -1657,7 +1657,7 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         document.getElementById('listFilters').innerHTML = `
         <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
-        <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} others</span>`:``}
+        <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
         `:``}`
         renderAllCharts(finalData);
     })

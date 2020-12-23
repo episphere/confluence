@@ -118,7 +118,7 @@ export const dataSummaryMissingTemplate = async () => {
                 <span class="font-bold">Status:</span> All<span class="vertical-line"></span>
                 <span class="font-bold">Ancestry:</span> All
                 ${initialSelection.length > 0 ? `
-                    <span class="vertical-line"></span><span class="font-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} others</span>`:``}
+                    <span class="vertical-line"></span><span class="font-bold">Variable: </span>${initialSelection[0]} ${initialSelection.length > 1 ? `and <span class="other-variable-count">${initialSelection.length-1} other</span>`:``}
                 `:``}
             </div>
         </div>
@@ -263,10 +263,10 @@ const addEventMidsetFilterForm = (data) => {
         <span class="font-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
         <span class="font-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
         ${selectedVariables.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} others</span>`:``}
+            <span class="vertical-line"></span><span class="font-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} other</span>`:``}
         `:``}
         ${studiesSelection.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} others</span>`:``}
+            <span class="vertical-line"></span><span class="font-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} other</span>`:``}
         `:``}
         `
         midset(newData, selectedVariables);
