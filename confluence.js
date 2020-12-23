@@ -50,6 +50,7 @@ export const confluence = async () => {
 
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
+        const dataSummarySubsetElement = document.getElementById('dataSummarySubset');
         const dataRequestElement = document.getElementById('dataRequest');
         const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
@@ -67,6 +68,7 @@ export const confluence = async () => {
             hideAnimation();
         });
         dataSummaryElement.addEventListener('click', () => {
+            if (dataSummaryElement.classList.contains('navbar-active')) return;
             showAnimation();
             assignNavbarActive(dataSummaryElement, 1)
             document.title = 'Confluence - Data Explore';
@@ -85,6 +87,18 @@ export const confluence = async () => {
             })
             getFileContent();
         });
+        dataSummarySubsetElement.addEventListener('click', () => {
+            if (dataSummarySubsetElement.classList.contains('navbar-active')) return;
+            const confluenceDiv = document.getElementById('confluenceDiv');
+            showAnimation();
+            assignNavbarActive(dataSummarySubsetElement, 1);
+            document.title = 'Confluence - Data Explore';
+            confluenceDiv.innerHTML = dataSummary('Subset Statistics');
+            addEventUpdateSummaryStatsData();
+            removeActiveClass('nav-link', 'active');
+            document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
+            dataSummaryMissingTemplate();
+        })
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
@@ -204,16 +218,9 @@ const manageHash = () => {
         element.click();
     }
     else if(hash === '#data_exploration/subset') {
-        const confluenceDiv = document.getElementById('confluenceDiv');
-        const dataSummaryElement = document.getElementById('dataSummary');
-        showAnimation();
-        assignNavbarActive(dataSummaryElement, 1);
-        document.title = 'Confluence - Data Explore';
-        confluenceDiv.innerHTML = dataSummary('Subset Statistics');
-        addEventUpdateSummaryStatsData();
-        removeActiveClass('nav-link', 'active');
-        document.querySelectorAll('[href="#data_exploration/subset"]')[0].classList.add('active');
-        dataSummaryMissingTemplate();
+        const element = document.getElementById('dataSummarySubset');
+        if(!element) return;
+        element.click()
     }
     else if (hash === '#data_analysis') {
         const element = document.getElementById('dataAnalysis');
