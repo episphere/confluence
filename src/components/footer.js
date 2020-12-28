@@ -9,17 +9,17 @@ export const footerTemplate = () => {
                     <span class="at-the-national-canc">at the National Cancer Institute</span>
                 </div>
                 <div class="row align-left">
-                    <div class="col-lg-4 zero-padding">
+                    <div class="col-md-4 zero-padding">
                         <div class="footer-heading">CONTACT INFORMATION</div>
                         <div class="footer-body">Contact Us</div>
                     </div>
-                    <div class="col-lg-4 zero-padding">
+                    <div class="col-md-4 zero-padding">
                         <div class="footer-heading">MORE INFORMATION</div>
                         <div class="footer-body">DOC Home</div>
                         <div class="footer-body">Site Map</div>
                         <div class="footer-body">Support</div>
                     </div>
-                    <div class="col-lg-4 zero-padding">
+                    <div class="col-md-4 zero-padding">
                         <div class="footer-heading">POLICIES</div>
                         <div class="footer-body">Accessibility</div>
                         <div class="footer-body">Disclaimer</div>
