@@ -11,7 +11,7 @@ export const template = (pageHeader) => {
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset statistics</strong></a></button>
                 </div>
                 <div class="main-summary-row">
-                    <div class="offset-xl-2 col-xl-10 align-left padding-left-30">
+                    <div class="offset-xl-2 col-xl-10 align-left padding-left-20">
                         <h1 class="page-header">${pageHeader}</h1>
                     </div>
                 </div>
@@ -22,7 +22,7 @@ export const template = (pageHeader) => {
                 <div class="main-summary-row" id="dataSummaryStatistics"></div>
                 <div class="main-summary-row">
                     <div class="col">
-                        <div class="offset-xl-2 padding-left-30 align-left" id="dataLastModified"></div>
+                        <div class="offset-xl-2 padding-left-20 align-left" id="dataLastModified"></div>
                     </div>
                 </div>
             </div>
