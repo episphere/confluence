@@ -8,7 +8,8 @@ const { CacheableResponse, CacheableResponsePlugin } = workbox.cacheableResponse
 const googleAnalytics = workbox.googleAnalytics;
 googleAnalytics.initialize();
 registerRoute(/\.(?:js|css)$/, new NetworkFirst({cacheName: 'static-cache'}));
-registerRoute(new RegExp('https://fonts.googleapis.com/.+'), new NetworkFirst({cacheName: 'static-cache'}));
+registerRoute(new RegExp('https://fonts.googleapis.com/.+'), new StaleWhileRevalidate({cacheName: 'static-cache'}));
+registerRoute(new RegExp('https:.*min\.(css|js)'), new StaleWhileRevalidate({cacheName: 'static-cache'}));
 registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|webp)$/,
     new CacheFirst({
         cacheName: 'images-cache',
@@ -45,4 +46,7 @@ registerRoute(
     })
 );
 
-workbox.precaching.precacheAndRoute([{url: 'index.html', revision: '29'}]);
+workbox.precaching.precacheAndRoute([
+        {url: 'index.html', revision: 'a72j829'}
+    ]
+);
