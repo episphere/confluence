@@ -123,7 +123,7 @@ export const dataSummaryMissingTemplate = async () => {
         `;
 
     const row = document.createElement('div');
-    row.classList = ['main-summary-row div-border allow-overflow'];
+    row.classList = ['main-summary-row div-border overflow-x'];
     row.id = 'missingnessTable'
 
     div2.appendChild(row);
@@ -363,7 +363,7 @@ const midset = (data, acceptedVariables) => {
             template += '</tr>';
         }
         
-        template += '<tbody></table>';
+        template += '</tbody></table>';
     }
     else template += 'Data not available.'
     hideAnimation();

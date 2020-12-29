@@ -1317,6 +1317,10 @@ span.icon {
     overflow: auto !important;
 }
 
+.overflow-x {
+    overflow-x: auto !important;
+}
+
 .collapsible-items {
     white-space: nowrap;
     overflow: auto;
@@ -1549,7 +1553,7 @@ form {
 }
 
 .missingness-table {
-    font-size: 0.8rem;
+    font-size: 12px;
     overflow: auto !important;
     background-color: #ffffff;
     border-radius: 0.25rem;
