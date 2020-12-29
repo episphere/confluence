@@ -1,4 +1,4 @@
-import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId } from '../shared.js';
+import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId, reSizePlots } from '../shared.js';
 import { addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
@@ -371,6 +371,7 @@ const midset = (data, acceptedVariables) => {
     addEventVariableDefinitions();
     renderMidsetPlot(plotData.reverse(), 'midsetChart');
     renderMidsetHeader(acceptedVariables, Object.values(headerData), 'midsetHeader');
+    reSizePlots();
 }
 
 const renderMidsetHeader = (x, y, id) => {

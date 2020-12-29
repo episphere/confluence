@@ -434,7 +434,6 @@ label {
 }
 
 .main-summary-row {
-    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     height: inherit;
     display: flex;
