@@ -1,4 +1,4 @@
-import { getPublicFile, numberWithCommas, publicDataFileId } from "./../shared.js";
+import { getFile, getPublicFile, csv2Json, numberWithCommas, publicDataFileId } from "./../shared.js";
 
 export const aboutConfluence = () => {
     let template = `
@@ -92,7 +92,33 @@ export const aboutConfluence = () => {
         summary +=
                     `</tbody>
                 </table>
-                <div class="data-last-modified align-left">${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>`
+                <div class="data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>`
         element.innerHTML = summary;
-    })
+    });
+    // getFile(751291483842).then(data => {
+    //     data.split(/[\r\n]+/g).forEach(dt => console.log(dt))
+    //     const json = csv2Json(data).data;
+        
+    //     let studyAcronym = '';
+    //     let study = '';
+    //     let studyDesign = '';
+    //     let country = '';
+    //     let newJson = {};
+    //     json.forEach(obj => {
+    //         if(obj['Study Acronym']) {
+    //             studyAcronym = obj['Study Acronym'];
+    //             study = obj['Study'];
+    //             studyDesign = obj['Study design'];
+    //             country = obj['Country'];
+    //         }
+    //         else {
+    //             obj['Study Acronym'] = studyAcronym;
+    //             obj['Study'] = study;
+    //             obj['Study design'] = studyDesign;
+    //             obj['Country'] = country;
+    //         }
+    //         if(newJson[obj['Study Acronym']] === undefined) newJson[obj['Study Acronym']] = [];
+    //         newJson[obj['Study Acronym']].push({...obj});
+    //     });
+    // })
 }
