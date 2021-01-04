@@ -32,7 +32,7 @@ const allFilters = (jsonData) => {
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
                 <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
-                    <option selected value='all'>All Array</option>
+                    <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
                 </select>
