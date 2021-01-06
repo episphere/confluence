@@ -76,7 +76,7 @@ export const aboutConfluence = () => {
             totalCases += data[key].cases;
             totalControls += data[key].controls;
             totalStudies += data[key].studies;
-            summary += `<div class="row" style="margin:2px 2px;"><input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
+            summary += `<div class="row font-size-16" style="margin:2px 2px;"><input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
                     <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
         }         
         summary += `</div>
@@ -119,22 +119,22 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
     document.getElementById('renderDataSummaryCounts').innerHTML = `
         <div class="row">
             <div class="col">
-                <span class="font-size-18">Consortia</span></br>
-                <span class="font-size-22">${numberWithCommas(totalConsortia)}</span>
+                <span class="font-size-22">Consortia</span></br>
+                <span class="font-size-32">${numberWithCommas(totalConsortia)}</span>
             </div>
             <div class="col">
-                <span class="font-size-18">Study</span></br>
-                <span class="font-size-22">${numberWithCommas(totalStudies)}</span>
+                <span class="font-size-22">Study</span></br>
+                <span class="font-size-32">${numberWithCommas(totalStudies)}</span>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <span class="font-size-18">Cases</span></br>
-                <span class="font-size-22">${numberWithCommas(totalCases)}</span>
+                <span class="font-size-22">Cases</span></br>
+                <span class="font-size-32">${numberWithCommas(totalCases)}</span>
             </div>
             <div class="col">
-                <span class="font-size-18">Controls</span></br>
-                <span class="font-size-22">${numberWithCommas(totalControls)}</span>
+                <span class="font-size-22">Controls</span></br>
+                <span class="font-size-32">${numberWithCommas(totalControls)}</span>
             </div>
         </div>
     `
