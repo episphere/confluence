@@ -68,8 +68,10 @@ export const aboutConfluence = () => {
         summary += `
         </br>
         <div class="align-center">
-            <div class="main-summary-row">
-                <div class="col-md-2 div-border allow-overflow" style="margin: 0px 8px 10px 16px;max-height: 151px;">`
+            <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
+                <div class="col-md-2" style="padding-left: 0px">
+                    <div class="div-border allow-overflow" style="max-height: 164px; height:100%;padding-left: 5px !important">`
+                    
         for(let key in data) {
             if(key === 'dataModifiedAt') continue;
             ++totalConsortia;
@@ -79,9 +81,9 @@ export const aboutConfluence = () => {
             summary += `<div class="row font-size-16" style="margin:2px 2px;"><input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
                     <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
         }         
-        summary += `</div>
-                    <div class="col-md-9 div-border align-center" style="margin: 0px 10px 10px 8px" id="renderDataSummaryCounts"></div>
-                    <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>
+        summary += `</div></div>
+                    <div class="col-md-10 align-center div-border" id="renderDataSummaryCounts"></div></div>
+                    <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
                     `
         element.innerHTML = summary;
         renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
