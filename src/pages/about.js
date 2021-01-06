@@ -1,3 +1,4 @@
+import { addEventConsortiaFilter } from "../event.js";
 import { getFile, getPublicFile, csv2Json, numberWithCommas, publicDataFileId } from "./../shared.js";
 
 export const aboutConfluence = () => {
@@ -58,42 +59,33 @@ export const aboutConfluence = () => {
         const data = response.data;
         if(!data) return;
         const element = document.getElementById('confluenceDataSummary');
+        let totalConsortia = 0;
+        let totalCases = 0;
+        let totalControls = 0;
+        let totalStudies = 0;
+        
         let summary = '';
         summary += `
         </br>
         <div class="align-center">
-            <div class="font-size-28 font-bold">Confluence Data Summary</div>
             <div class="main-summary-row">
-                <div class="col font-size-18 align-center">
-                    <table class="table table-bordered table-responsive w-100 d-block d-md-table">
-                        <thead>
-                            <th>Consortia</th>
-                            <th>Studies</th>
-                            <th>Cases</th>
-                            <th>Controls</th>
-                        </thead>
-                        <tbody>`;
-        let totalCases = 0;
-        let totalControls = 0;
-        let totalStudies = 0;
+                <div class="col-md-2 div-border allow-overflow" style="margin: 0px 8px 10px 16px;max-height: 151px;">`
         for(let key in data) {
             if(key === 'dataModifiedAt') continue;
+            ++totalConsortia;
             totalCases += data[key].cases;
             totalControls += data[key].controls;
             totalStudies += data[key].studies;
-            summary += `<tr>
-                            <td>${data[key].name}</td>
-                            <td>${numberWithCommas(data[key].studies)}</td>
-                            <td>${numberWithCommas(data[key].cases)}</td>
-                            <td>${numberWithCommas(data[key].controls)}</td>
-                        </tr>`
-        }
-        summary += `<tr><td>Total #</td><td>${numberWithCommas(totalStudies)}</td><td>${numberWithCommas(totalCases)}</td><td>${numberWithCommas(totalControls)}</td></tr>`
-        summary +=
-                    `</tbody>
-                </table>
-                <div class="data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>`
+            summary += `<div class="row" style="margin:2px 2px;"><input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
+                    <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
+        }         
+        summary += `</div>
+                    <div class="col-md-9 div-border align-center" style="margin: 0px 10px 10px 8px" id="renderDataSummaryCounts"></div>
+                    <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div></div></div>
+                    `
         element.innerHTML = summary;
+        renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+        addEventConsortiaFilter(data);
     });
     // getFile(751291483842).then(data => {
     //     data.split(/[\r\n]+/g).forEach(dt => console.log(dt))
@@ -121,4 +113,29 @@ export const aboutConfluence = () => {
     //         newJson[obj['Study Acronym']].push({...obj});
     //     });
     // })
+}
+
+export const renderDataSummary = (totalConsortia, totalStudies, totalCases, totalControls) => {
+    document.getElementById('renderDataSummaryCounts').innerHTML = `
+        <div class="row">
+            <div class="col">
+                <span class="font-size-18">Consortia</span></br>
+                <span class="font-size-22">${numberWithCommas(totalConsortia)}</span>
+            </div>
+            <div class="col">
+                <span class="font-size-18">Study</span></br>
+                <span class="font-size-22">${numberWithCommas(totalStudies)}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span class="font-size-18">Cases</span></br>
+                <span class="font-size-22">${numberWithCommas(totalCases)}</span>
+            </div>
+            <div class="col">
+                <span class="font-size-18">Controls</span></br>
+                <span class="font-size-22">${numberWithCommas(totalControls)}</span>
+            </div>
+        </div>
+    `
 }

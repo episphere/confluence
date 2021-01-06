@@ -1,5 +1,5 @@
 import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots } from './shared.js';
-import { parameterListTemplate } from './components/elements.js';
+import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
@@ -1229,5 +1229,36 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
         `:``}`
         renderAllCharts(finalData);
+    })
+}
+
+export const addEventConsortiaFilter = (data) => {
+    const checkboxs = document.getElementsByClassName('checkbox-consortia');
+    Array.from(checkboxs).forEach(checkbox => {
+        checkbox.addEventListener('click', () => {
+            const selectedConsortium = Array.from(checkboxs).filter(dt => dt.checked).map(dt => dt.dataset.consortia);
+            delete data['dataModifiedAt'];
+            if(selectedConsortium.length > 0) {
+                const newData = Object.values(data).filter(dt => selectedConsortium.includes(dt.name));
+                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0;
+                newData.forEach(obj => {
+                    totalConsortia++;
+                    totalStudies += obj.studies;
+                    totalCases += obj.cases;
+                    totalControls += obj.controls;
+                });
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+            }
+            else {
+                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0;
+                Object.values(data).forEach(obj => {
+                    totalConsortia++;
+                    totalStudies += obj.studies;
+                    totalCases += obj.cases;
+                    totalControls += obj.controls;
+                });
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+            }
+        })
     })
 }

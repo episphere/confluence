@@ -3,10 +3,6 @@ h4 {
     font-family:sans-serif;
 }
 
-a {
-    text-decoration: none;
-}
-
 .fa-copy, .getAllFileversions, .fa-folder-minus {
     color: #0085c8 !important;
     cursor: pointer !important;
@@ -1108,6 +1104,10 @@ label {
     font-size: 28px !important;
 }
 
+.font-size-22 {
+    font-size: 32px !important;
+}
+
 .font-size-17 {
     font-size: 17px !important;
 }
@@ -1284,7 +1284,6 @@ span.icon {
 }
 
 .footer-links:hover {
-    text-decoration: none;
     color: #ffffff;
 }
 
@@ -1616,6 +1615,11 @@ form {
 
 .select-consortium, .select-study, .select-variable {
     margin-top: 4px;
+    margin-right: 3px;
+}
+
+.checkbox-consortia {
+    margin-top: 6px;
     margin-right: 3px;
 }
 
