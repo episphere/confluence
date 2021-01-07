@@ -69,8 +69,8 @@ export const aboutConfluence = () => {
         </br>
         <div class="align-center">
             <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
-                <div class="col-md-2" style="padding-left: 0px">
-                    <div class="div-border allow-overflow align-left" style="max-height: 164px; height:100%;padding-left: 5px !important">
+                <div class="col-md-2" style="padding: 0px">
+                    <div class="div-border allow-overflow align-left" style="max-height: 164px; height:100%;padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-22">Filter</span></br>`
                     
         for(let key in data) {
@@ -85,7 +85,9 @@ export const aboutConfluence = () => {
                     <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
         }         
         summary += `</div></div>
-                    <div class="col-md-10 align-center div-border" id="renderDataSummaryCounts"></div></div>
+                    <div class="col-md-10 align-center" style="padding: 0px">
+                        <div class="div-border" style="margin-right: 15px" id="renderDataSummaryCounts"></div>
+                    </div></div>
                     <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
                     `
         element.innerHTML = summary;
