@@ -158,7 +158,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
     ancestory.push('ethnicityClass_Other');
     ancestory.push('All');
     template += `
-        <form id="midsetFilterForm" method="POST">
+        <div style="width:100%;">
             <div class="form-group" id="statusList">
                 <label class="filter-label font-size-13" for="statusSelection">Status</label>
                 <select class="form-control font-size-15" id="statusSelection">
@@ -221,9 +221,7 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
                     </li>`;
     });
     template += `</ul></div></br>
-            <button type="submit" class="btn btn-light">Submit</button>
-            <button type="reset" class="btn btn-light">Reset</button>
-        </form>
+        </div>
     `
     document.getElementById('midsetFilterData').innerHTML = template;
     addEventConsortiumSelect();
@@ -231,38 +229,67 @@ const renderMidsetFilterData = (data, acceptedVariables, headers, status, studie
 }
 
 const addEventMidsetFilterForm = (data) => {
-    const form = document.getElementById('midsetFilterForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const status = document.getElementById('statusSelection').value;
-        const ancestry = document.getElementById('ancestrySelection').value;
-        const selectedVariables = getSelectedVariables('midsetVariables');
-        const studiesSelection = getSelectedStudies().map(dt => dt.split('@#$')[1]);
-        const consortiaSelection = Array.from(document.querySelectorAll(`input:checked.select-consortium`)).map(dt => dt.dataset.consortia);
+    const status = document.getElementById('statusSelection');
+    status.addEventListener('change', () => {
+        filterMidsetData(data)
+    });
 
-        let newData = data;
-        if(studiesSelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studiesSelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
-        
-        if(status !== 'All') {
-            newData = newData.filter(dt => dt[status] === '1');
-        }
-        
-        if(ancestry !== 'All') {
-            newData = newData.filter(dt => dt[ancestry] === '1');
-        }
-        document.getElementById('listFilters').innerHTML = `
-        <span class="font-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
-        <span class="font-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
-        ${selectedVariables.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} other</span>`:``}
-        `:``}
-        ${studiesSelection.length > 0 ? `
-            <span class="vertical-line"></span><span class="font-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} other</span>`:``}
-        `:``}
-        `
-        midset(newData, selectedVariables);
+    const ancestry = document.getElementById('ancestrySelection');
+    ancestry.addEventListener('change', () => {
+        filterMidsetData(data)
+    });
+
+    const variables = document.getElementsByClassName('select-variable');
+    Array.from(variables).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterMidsetData(data)
+        })
+    })
+
+    const consortias = document.getElementsByClassName('select-consortium');
+    Array.from(consortias).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterMidsetData(data)
+        })
+    });
+
+    const studies = document.getElementsByClassName('select-study');
+    Array.from(studies).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterMidsetData(data)
+        })
     });
 };
+
+const filterMidsetData = (data) => {
+    const status = document.getElementById('statusSelection').value;
+    const ancestry = document.getElementById('ancestrySelection').value;
+    const selectedVariables = getSelectedVariables('midsetVariables');
+    const studiesSelection = getSelectedStudies().map(dt => dt.split('@#$')[1]);
+    const consortiaSelection = Array.from(document.querySelectorAll(`input:checked.select-consortium`)).map(dt => dt.dataset.consortia);
+
+    let newData = data;
+    if(studiesSelection.length > 0 || consortiaSelection.length > 0) newData = newData.filter(dt => (studiesSelection.indexOf(dt['study']) !== -1 || consortiaSelection.indexOf(dt['Consortia']) !== -1 ));
+    
+    if(status !== 'All') {
+        newData = newData.filter(dt => dt[status] === '1');
+    }
+    
+    if(ancestry !== 'All') {
+        newData = newData.filter(dt => dt[ancestry] === '1');
+    }
+    document.getElementById('listFilters').innerHTML = `
+    <span class="font-bold">Status: </span>${status.replace('status_', '')}<span class="vertical-line"></span>
+    <span class="font-bold">Ancestry: </span>${ancestry.replace('ethnicityClass_', '')}
+    ${selectedVariables.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-bold">Variable: </span>${selectedVariables[0]} ${selectedVariables.length > 1 ? `and <span class="other-variable-count">${selectedVariables.length-1} other</span>`:``}
+    `:``}
+    ${studiesSelection.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-bold">Study: </span>${studiesSelection[0]} ${studiesSelection.length > 1 ? `and <span class="other-variable-count">${studiesSelection.length-1} other</span>`:``}
+    `:``}
+    `
+    midset(newData, selectedVariables);
+}
 
 const getSelectedVariables = (parentId) => {
     const selections = [];
