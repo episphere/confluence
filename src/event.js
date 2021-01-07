@@ -1187,49 +1187,66 @@ export const addEventMissingnessFilterBarToggle = () => {
 }
 
 export const addEventSummaryStatsFilterForm = (jsonData) => {
-    const form = document.getElementById('summaryStatsFilterForm');
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const gender = document.getElementById('genderSelection').value;
-        const chip = document.getElementById('genotypingChipSelection').value;
-        const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
-        const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
-        
-        const elements = document.getElementsByClassName('select-consortium');
-        Array.from(elements).forEach(el => {
-            el.addEventListener('click', () => {
-                if(el.checked){
-                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
-                }
-                else {
-                    Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
-                }
-            })
+    const genderSelection = document.getElementById('genderSelection');
+    genderSelection.addEventListener('change', () => {
+        filterData(jsonData);
+    });
+
+    const chipSelection = document.getElementById('genotypingChipSelection');
+    chipSelection.addEventListener('change', () => {
+        filterData(jsonData);
+    });
+
+    const elements = document.getElementsByClassName('select-consortium');
+    Array.from(elements).forEach((el,index) => {
+        el.addEventListener('click', () => {
+            if(el.checked){
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+            }
+            else {
+                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
+            }
+            filterData(jsonData);
         })
-        let selectedConsortia = [];
-        Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
-            if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
-        });
-        const array = getSelectedStudies();
-        let finalData = jsonData;
-        if(gender !== 'all') {
-            finalData = finalData.filter(dt => dt['sex'] === gender);
-        }
-        if(chip !== 'all') {
-            finalData = finalData.filter(dt => dt['chip'] === chip);
-        }
-        updateCounts(finalData);
-        if(array.length > 0){
-            finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
-        }
-        const selectedStudies = array.map(s => s.split('@#$')[1]);
-        document.getElementById('listFilters').innerHTML = `
-        <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
-        <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
-        <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
-        `:``}`
-        renderAllCharts(finalData);
     })
+
+    const studyElements = document.getElementsByClassName('select-study');
+    Array.from(studyElements).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterData(jsonData)
+        })
+    });
+};
+
+const filterData = (jsonData) => {
+    const gender = document.getElementById('genderSelection').value;
+    const chip = document.getElementById('genotypingChipSelection').value;
+    const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
+    const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
+    
+    let selectedConsortia = [];
+    Array.from(document.getElementsByClassName('select-consortium')).forEach(dt => {
+        if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
+    });
+    const array = getSelectedStudies();
+    let finalData = jsonData;
+    if(gender !== 'all') {
+        finalData = finalData.filter(dt => dt['sex'] === gender);
+    }
+    if(chip !== 'all') {
+        finalData = finalData.filter(dt => dt['chip'] === chip);
+    }
+    updateCounts(finalData);
+    if(array.length > 0){
+        finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
+    }
+    const selectedStudies = array.map(s => s.split('@#$')[1]);
+    document.getElementById('listFilters').innerHTML = `
+    <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+    <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+    <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
+    `:``}`
+    renderAllCharts(finalData);
 }
 
 export const addEventConsortiaFilter = (data) => {

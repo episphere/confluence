@@ -20,7 +20,7 @@ const allFilters = (jsonData) => {
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
     let template =`
-        <form method="POST" id="summaryStatsFilterForm">
+        <div style="width: 100%;">
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genderSelection">Gender</label>
                 <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
@@ -74,9 +74,8 @@ const allFilters = (jsonData) => {
         template += innerTemplate;
         
     }
-    template += `</br><button type="submit" class="btn btn-light">Submit</button>
-        <button type="reset" class="btn btn-light">Reset</button>
-    </form>`;
+    template += `</br>
+    </div>`;
     div1.innerHTML = template;
     document.getElementById('allFilters').appendChild(div1);
     addEventSummaryStatsFilterForm(jsonData);
