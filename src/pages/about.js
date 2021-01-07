@@ -70,7 +70,8 @@ export const aboutConfluence = () => {
         <div class="align-center">
             <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
                 <div class="col-md-2" style="padding-left: 0px">
-                    <div class="div-border allow-overflow" style="max-height: 164px; height:100%;padding-left: 5px !important">`
+                    <div class="div-border allow-overflow align-left" style="max-height: 164px; height:100%;padding-left: 5px !important">
+                    <span class="font-size-22">Filter</span></br>`
                     
         for(let key in data) {
             if(key === 'dataModifiedAt') continue;
@@ -78,7 +79,9 @@ export const aboutConfluence = () => {
             totalCases += data[key].cases;
             totalControls += data[key].controls;
             totalStudies += data[key].studies;
-            summary += `<div class="row font-size-16" style="margin:2px 2px;"><input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
+            summary += `<div class="row font-size-16" style="margin:2px 2px;">
+            
+                <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
                     <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
         }         
         summary += `</div></div>

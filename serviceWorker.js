@@ -9,7 +9,7 @@ const googleAnalytics = workbox.googleAnalytics;
 googleAnalytics.initialize();
 registerRoute(/\.(?:js|css)$/, new NetworkFirst({cacheName: 'static-cache'}));
 registerRoute(new RegExp('https://fonts.googleapis.com/.+'), new StaleWhileRevalidate({cacheName: 'static-cache'}));
-registerRoute(new RegExp('https:.*min\.(css|js)'), new StaleWhileRevalidate({cacheName: 'static-cache'}));
+registerRoute(new RegExp('https:.*min\.(css|js)'), new CacheFirst({cacheName: 'static-cache'}));
 registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|webp)$/,
     new CacheFirst({
         cacheName: 'images-cache',
@@ -47,6 +47,6 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([
-        {url: 'index.html', revision: 'a72j829'}
+        {url: 'index.html', revision: 'asd783'}
     ]
 );
