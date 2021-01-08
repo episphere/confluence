@@ -51,7 +51,7 @@ const getDescription = async () => {
             newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
         }
     });
-    console.log(newJsons)
+    
     const allCountries = Object.values(newJsons).map(dt => dt['Country']);
     const allStudyDesigns = Object.values(newJsons).filter(dt => dt['Study design'] !== undefined).map(dt => dt['Study design']);
     const allConsortium = Object.values(newJsons).map(dt => dt['Consortium']);
@@ -210,9 +210,9 @@ const filterDataBasedOnSelection = (descriptions) => {
     const consortiumSelected = Array.from(document.getElementsByClassName('select-consortium')).filter(dt => dt.checked).map(dt => dt.dataset.consortium);
     const studyDesignSelected = Array.from(document.getElementsByClassName('select-study-design')).filter(dt => dt.checked).map(dt => dt.dataset.studyDesign);
     const countrySelected = Array.from(document.getElementsByClassName('select-country')).filter(dt => dt.checked).map(dt => dt.dataset.country);
-    console.log(consortiumSelected)
-    console.log(studyDesignSelected)
+    
     let filteredData = descriptions
+
     if(consortiumSelected.length > 0) {
         filteredData = filteredData.filter(dt => consortiumSelected.indexOf(dt['Consortium']) !== -1);
     }
