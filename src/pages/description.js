@@ -1,4 +1,4 @@
-import { getFile, tsv2Json } from "./../shared.js";
+import { getFile, shortenText, tsv2Json } from "./../shared.js";
 
 export const renderDescription = () => {
     let template = `
@@ -12,7 +12,7 @@ export const renderDescription = () => {
         <div class="main-summary-row">
             <div class="col-xl-2 filter-column div-border white-bg align-left p-2">
                 <div class="main-summary-row">
-                    <div class="col-xl-12">
+                    <div class="col-xl-12 pl-1">
                         <span class="font-size-17 font-bold">Filter</span>
                         <div id="filterDataCatalogue" class="align-left"></div>
                     </div>
@@ -51,22 +51,65 @@ const getDescription = async () => {
             newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
         }
     });
+    console.log(newJsons)
     const allCountries = Object.values(newJsons).map(dt => dt['Country']);
-    const allStudyDesigns = Object.values(newJsons).map(dt => dt['Study design']);
+    const allStudyDesigns = Object.values(newJsons).filter(dt => dt['Study design'] !== undefined).map(dt => dt['Study design']);
+    const allConsortium = Object.values(newJsons).map(dt => dt['Consortium']);
     
     const countries = allCountries.filter((d,i) => allCountries.indexOf(d) === i).sort();
+    const uniqueConsortium = allConsortium.filter((d,i) => allConsortium.indexOf(d) === i).sort();
+    const uniqueStudyDesign = allStudyDesigns.filter((d,i) => allStudyDesigns.indexOf(d) === i).sort();
+    
     let filterTemplate = `
         <div class="main-summary-row">
             <div style="width: 100%;">
-                <div class="form-group filter-sub-div allow-overflow" margin:0px>
+                <div class="form-group" margin:0px>
+                    <label class="filter-label font-size-13" for="consortiumList">Consortium</label>
+                    <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="consortiumList">
+                    `
+                    uniqueConsortium.forEach(consortium => {
+                        filterTemplate += `
+                            <li class="filter-list-item">
+                                <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="select-consortium" style="margin-left: 1px !important;">
+                                <label for="label${consortium}" class="country-name" title="${consortium}">${shortenText(consortium, 15)}</label>
+                            </li>
+                        `
+                    })
+        filterTemplate +=`
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main-summary-row">
+            <div style="width: 100%;">
+                <div class="form-group" margin:0px>
+                    <label class="filter-label font-size-13" for="studyDesignList">Study Design</label>
+                    <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="studyDesignList">
+                    `
+                    uniqueStudyDesign.forEach(sd => {
+                        filterTemplate += `
+                            <li class="filter-list-item">
+                                <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="select-study-design" style="margin-left: 1px !important;">
+                                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 15)}</label>
+                            </li>
+                        `
+                    })
+        filterTemplate +=`
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main-summary-row">
+            <div style="width: 100%;">
+                <div class="form-group" margin:0px>
                     <label class="filter-label font-size-13" for="countriesList">Country</label>
-                    <ul class="remove-padding-left font-size-15" id="countriesList">
+                    <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="countriesList">
                         `
         countries.forEach(country => {
             filterTemplate += `
                 <li class="filter-list-item">
                     <input type="checkbox" data-country="${country}" id="label${country}" class="select-country" style="margin-left: 1px !important;">
-                    <label for="label${country}" class="country-name" title="${country}">${country.length > 22 ? `${country.substr(0,22)}...`:country}</label>
+                    <label for="label${country}" class="country-name" title="${country}">${shortenText(country, 15)}</label>
                 </li>
             `
         })
@@ -125,12 +168,26 @@ const renderStudyDescription = (descriptions, pageSize) => {
 }
 
 const addEventFilterDataCatalogue = (descriptions) => {
+    const consortiumSelection = document.getElementsByClassName('select-consortium');
+    Array.from(consortiumSelection).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterDataBasedOnSelection(descriptions)
+        });
+    });
+
+    const studyDesignSelection = document.getElementsByClassName('select-study-design');
+    Array.from(studyDesignSelection).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterDataBasedOnSelection(descriptions)
+        });
+    });
+
     const countrySelection = document.getElementsByClassName('select-country');
     Array.from(countrySelection).forEach(ele => {
         ele.addEventListener('click', () => {
             filterDataBasedOnSelection(descriptions)
         });
-    })
+    });
 }
 
 const addEventToggleCollapsePanelBtn = () => {
@@ -150,14 +207,23 @@ const addEventToggleCollapsePanelBtn = () => {
 }
 
 const filterDataBasedOnSelection = (descriptions) => {
+    const consortiumSelected = Array.from(document.getElementsByClassName('select-consortium')).filter(dt => dt.checked).map(dt => dt.dataset.consortium);
+    const studyDesignSelected = Array.from(document.getElementsByClassName('select-study-design')).filter(dt => dt.checked).map(dt => dt.dataset.studyDesign);
     const countrySelected = Array.from(document.getElementsByClassName('select-country')).filter(dt => dt.checked).map(dt => dt.dataset.country);
+    console.log(consortiumSelected)
+    console.log(studyDesignSelected)
     let filteredData = descriptions
+    if(consortiumSelected.length > 0) {
+        filteredData = filteredData.filter(dt => consortiumSelected.indexOf(dt['Consortium']) !== -1);
+    }
+    if(studyDesignSelected.length > 0) {
+        filteredData = filteredData.filter(dt => studyDesignSelected.indexOf(dt['Study design']) !== -1);
+    }
     if(countrySelected.length > 0) {
-        filteredData = filteredData.filter(dt => countrySelected.indexOf(dt['Country']) !== -1)
-        // filteredData = filteredData.filter(dt => countrySelected.forEach(cntry => {
-        //     if(dt['Country'].includes(cntry)) return dt;
-        // }))
-    } else filteredData = descriptions
+        filteredData = filteredData.filter(dt => countrySelected.indexOf(dt['Country']) !== -1);
+    }
+    
+    if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0)filteredData = descriptions
     renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
     paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);

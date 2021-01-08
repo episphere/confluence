@@ -1621,12 +1621,12 @@ form {
     display: flex;
 }
 
-.select-consortium, .select-study, .select-variable, .select-country {
+.select-consortium, .select-study, .select-variable, .select-country, .select-study-design {
     margin-top: 4px;
     margin-right: 3px;
 }
 
-#countriesList {
+#countriesList, #consortiumList, #studyDesignList {
     width: 100%;
 }
 

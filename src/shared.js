@@ -753,3 +753,7 @@ export const assignNavbarActive = (element, parent) => {
 export const reSizePlots = () => {
     document.querySelectorAll('.js-plotly-plot').forEach(e => Plotly.Plots.resize(e))
 }
+
+export const shortenText = (str, size) => {
+    return str.length > size ? `${str.substr(0,size)}...`: str;
+}
