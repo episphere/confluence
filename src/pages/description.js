@@ -129,7 +129,8 @@ const getDescription = async () => {
 };
 
 const renderStudyDescription = (descriptions, pageSize) => {
-    let template = `<div class="row m-0 pt-md-1 align-left">
+    let template = `
+        <div class="row m-0 pt-md-1 align-left">
             <div class="col-md-3 font-bold">Study</div>
             <div class="col-md-3 font-bold">Study Acronym</div>
             <div class="col-md-3 font-bold">Study Design</div>
@@ -138,30 +139,33 @@ const renderStudyDescription = (descriptions, pageSize) => {
         </div>`
     descriptions.forEach((desc, index) => {
         if(index > pageSize ) return
-        template += `<div class="card mt-1 mb-1 align-left">
-        <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym']}">
-            <div class="row">
-                <div class="col-md-3">${desc['Study'] ? desc['Study'] : ''}</div>
-                <div class="col-md-3">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
-                <div class="col-md-3">${desc['Study design'] ? desc['Study design'] : ''}</div>
-                <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
-                <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Study Acronym']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+        template += `
+        <div class="card mt-1 mb-1 align-left">
+            <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym']}">
+                <div class="row">
+                    <div class="col-md-3">${desc['Study'] ? desc['Study'] : ''}</div>
+                    <div class="col-md-3">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
+                    <div class="col-md-3">${desc['Study design'] ? desc['Study design'] : ''}</div>
+                    <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
+                    <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Study Acronym']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                </div>
             </div>
-        </div>
-        <div id="study${desc['Study Acronym']}" class="collapse" aria-labelledby="heading${desc['Study Acronym']}">
-            <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
-                ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
-                ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
-            `
-            if(desc['pis'].length > 0) {
-                desc['pis'].forEach(info => {
-                    template += `<div class="row"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
-                })
-            }
-            template +=`</div>
-        </div>
-    </div>`
+            <div id="study${desc['Study Acronym']}" class="collapse" aria-labelledby="heading${desc['Study Acronym']}">
+                <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+                    ${desc['Consortium'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Consortium</div><div class="col">${desc['Consortium']}</div></div>`: ``}
+                    ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
+                    ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
+                    ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
+                `
+                if(desc['pis'].length > 0) {
+                    desc['pis'].forEach(info => {
+                        template += `<div class="row"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
+                    })
+                }
+                template +=`
+                </div>
+            </div>
+        </div>`
     });
     document.getElementById('descriptionBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
