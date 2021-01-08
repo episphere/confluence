@@ -1,60 +1,71 @@
 import { addEventConsortiaFilter } from "../event.js";
-import { getFile, getPublicFile, csv2Json, numberWithCommas, publicDataFileId } from "./../shared.js";
+import { getPublicFile, numberWithCommas, publicDataFileId } from "./../shared.js";
 
-export const aboutConfluence = () => {
+export const aboutConfluence = (activeTab, showDescripton) => {
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
-                <div class="main-summary-row">
-                    <div class="align-left">
-                        <h1 class="page-header">Learn about Confluence</h1>
-                    </div>
+                <div class="main-summary-row white-bg div-border">
+                    <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></button>
+                    ${showDescripton ? `<button class="sub-menu-btn"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></button>`:``}
                 </div>
-                <div class="home-page-stats font-size-18">
-                    <div class="main-summary-row">
-                        <div class="col align-left">
-                            </br>
-                            <span>
-                                Confluence includes breast cancer case-control studies, case series or clinical trials of female or male breast cancer (invasive or in situ) with the following:
-                            </span>
-                            </br>
-                            <ul>
-                                <li>Genome-wide genotyping data</li>
-                                <li>Risk factor, pathology, treatment, toxicities and survival data</li>
-                                <li>Ethics approval and consent for germline genetic</li>
-                            </ul>
-                            </br>
-                            <span>
-                                The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 
-                                cases and 200,000 controls and double it by generating new genotypes from at least 150,000 
-                                additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 
-                                300,000 controls of different ancestries.
-                            </span>
-                            </br></br>
-                            <span>
-                                Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies.
-                            </span>
-                            </br></br>
-                            <span>
-                                Genotyping and harmonization of data is expected to be completed in 2022.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="align-left" id="confluenceDataSummary">
-
-                    </div>
-                    <div class="main-summary-row align-left">
-                        <div class="col">
-                            For more information:</br>
-                            Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
-                            Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
-                        </div>
-                    </div>
-                </div>
+                <div id="overview"></div>
             </div>
         </div>
     `;
     document.getElementById('confluenceDiv').innerHTML = template;
+}
+
+export const renderOverView = () => {
+    let template = `
+        <div class="main-summary-row">
+            <div class="align-left">
+                <h1 class="page-header">Learn about Confluence</h1>
+            </div>
+        </div>
+        <div class="home-page-stats font-size-18">
+            <div class="main-summary-row">
+                <div class="col align-left">
+                    </br>
+                    <span>
+                        Confluence includes breast cancer case-control studies, case series or clinical trials of female or male breast cancer (invasive or in situ) with the following:
+                    </span>
+                    </br>
+                    <ul>
+                        <li>Genome-wide genotyping data</li>
+                        <li>Risk factor, pathology, treatment, toxicities and survival data</li>
+                        <li>Ethics approval and consent for germline genetic</li>
+                    </ul>
+                    </br>
+                    <span>
+                        The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 
+                        cases and 200,000 controls and double it by generating new genotypes from at least 150,000 
+                        additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 
+                        300,000 controls of different ancestries.
+                    </span>
+                    </br></br>
+                    <span>
+                        Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies.
+                    </span>
+                    </br></br>
+                    <span>
+                        Genotyping and harmonization of data is expected to be completed in 2022.
+                    </span>
+                </div>
+            </div>
+            <div class="align-left" id="confluenceDataSummary">
+
+            </div>
+            <div class="main-summary-row align-left">
+                <div class="col">
+                    For more information:</br>
+                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
+                    Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('overview').innerHTML = template;
     getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId).then(response => {
         const data = response.data;
         if(!data) return;
@@ -94,32 +105,6 @@ export const aboutConfluence = () => {
         renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
         addEventConsortiaFilter(data);
     });
-    // getFile(751291483842).then(data => {
-    //     data.split(/[\r\n]+/g).forEach(dt => console.log(dt))
-    //     const json = csv2Json(data).data;
-        
-    //     let studyAcronym = '';
-    //     let study = '';
-    //     let studyDesign = '';
-    //     let country = '';
-    //     let newJson = {};
-    //     json.forEach(obj => {
-    //         if(obj['Study Acronym']) {
-    //             studyAcronym = obj['Study Acronym'];
-    //             study = obj['Study'];
-    //             studyDesign = obj['Study design'];
-    //             country = obj['Country'];
-    //         }
-    //         else {
-    //             obj['Study Acronym'] = studyAcronym;
-    //             obj['Study'] = study;
-    //             obj['Study design'] = studyDesign;
-    //             obj['Country'] = country;
-    //         }
-    //         if(newJson[obj['Study Acronym']] === undefined) newJson[obj['Study Acronym']] = [];
-    //         newJson[obj['Study Acronym']].push({...obj});
-    //     });
-    // })
 }
 
 export const renderDataSummary = (totalConsortia, totalStudies, totalCases, totalControls) => {

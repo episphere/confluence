@@ -4,14 +4,15 @@ import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSu
 import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
-import { aboutConfluence } from './src/pages/about.js';
+import { aboutConfluence, renderOverView } from './src/pages/about.js';
 import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
+import { renderDescription } from './src/pages/description.js';
 
 
 export const confluence = async () => {
@@ -180,13 +181,14 @@ const manageRouter = async () => {
         infoDeck();
         hideAnimation();
     }
-    else if(hash === '#about'){
+    else if(hash === '#about/overview'){
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - About';
         assignNavbarActive(element, 1);
-        aboutConfluence();
+        aboutConfluence('overview');
+        renderOverView();
     }
     else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
@@ -207,7 +209,7 @@ const manageRouter = async () => {
     else window.location.hash = '#home';
 }
 
-const manageHash = () => {
+const manageHash = async () => {
     document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
@@ -264,13 +266,32 @@ const manageHash = () => {
         infoDeckAfterLoggedIn();
         hideAnimation();
     }
-    else if(hash === '#about'){
+    else if(hash === '#about/overview'){
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
-        if(element.classList.contains('navbar-active')) return;
+        // if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
         document.title = 'Confluence - About';
-        aboutConfluence();
+        const fileInfo = await getFileInfo(761599566277);
+        aboutConfluence('overview', fileInfo ? true : false);
+        renderOverView();
+        hideAnimation();
+    }
+    else if(hash === '#about/description'){
+        const element = document.getElementById('aboutConfluence');
+        if(!element) return;
+        // if(element.classList.contains('navbar-active')) return;
+        assignNavbarActive(element, 1);
+        document.title = 'Confluence - About';
+        showAnimation();
+        const fileInfo = await getFileInfo(761599566277);
+        if(!fileInfo) {
+            location.hash = '#about/overview';
+            hideAnimation();
+            return;
+        }
+        aboutConfluence('description', fileInfo ? true : false);
+        renderDescription();
         hideAnimation();
     }
     else if(hash === '#join'){

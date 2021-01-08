@@ -505,7 +505,7 @@ label {
 }
 
 #pageSizeSelector {
-    height: 2rem;
+    height: 2.40rem;
 }
 
 .table td {
@@ -1621,9 +1621,23 @@ form {
     display: flex;
 }
 
-.select-consortium, .select-study, .select-variable {
+.select-consortium, .select-study, .select-variable, .select-country {
     margin-top: 4px;
     margin-right: 3px;
+}
+
+#countriesList {
+    width: 100%;
+}
+
+.transparent-btn {
+    background-color: transparent;
+    border: 0px;
+    color: #000000
+}
+
+.filter-sub-div {
+    max-height: 155px;
 }
 
 .checkbox-consortia {
@@ -1669,4 +1683,10 @@ form {
 .banner-logo {
     max-width: 100%;
     height: auto;
+}
+
+.active-page {
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+    border-color: #343a40 !important;
 }
