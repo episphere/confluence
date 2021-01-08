@@ -12,7 +12,7 @@ export const renderDescription = () => {
         <div class="main-summary-row">
             <div class="col-xl-2 filter-column div-border white-bg align-left p-2">
                 <div class="main-summary-row">
-                    <div class="col-xl-12 pl-1">
+                    <div class="col-xl-12 pl-1 pr-0">
                         <span class="font-size-17 font-bold">Filter</span>
                         <div id="filterDataCatalogue" class="align-left"></div>
                     </div>
