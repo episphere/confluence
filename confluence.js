@@ -185,7 +185,7 @@ const manageRouter = async () => {
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - About';
+        document.title = 'Confluence - Overview';
         assignNavbarActive(element, 1);
         aboutConfluence('overview');
         renderOverView();
@@ -271,7 +271,7 @@ const manageHash = async () => {
         if(!element) return;
         // if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
-        document.title = 'Confluence - About';
+        document.title = 'Confluence - Overview';
         const fileInfo = await getFileInfo(761599566277);
         aboutConfluence('overview', fileInfo ? true : false);
         renderOverView();
@@ -282,7 +282,7 @@ const manageHash = async () => {
         if(!element) return;
         // if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
-        document.title = 'Confluence - About';
+        document.title = 'Confluence - Study Description';
         showAnimation();
         const fileInfo = await getFileInfo(761599566277);
         if(!fileInfo) {
