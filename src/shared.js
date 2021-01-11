@@ -678,7 +678,7 @@ export const csvJSON = (csv) => {
 }
 
 export const tsv2Json = (tsv) => {
-    const lines = tsv.replace(/"/g,'').replace(/\n/g, '').split(/[\r]+/g);
+    const lines = tsv.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,'').replace(/\n/g, '').split(/[\r]+/g);
     const result = [];
     const headers = lines[0].replace(/"/g,'').split(/[\t]/g);
     for(let i=1; i < lines.length; i++){
