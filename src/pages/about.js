@@ -5,10 +5,10 @@ export const aboutConfluence = (activeTab, showDescripton) => {
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
-                <div class="main-summary-row white-bg div-border">
+                ${showDescripton ? `<div class="main-summary-row white-bg div-border">
                     <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></button>
-                    ${showDescripton ? `<button class="sub-menu-btn"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></button>`:``}
-                </div>
+                    <button class="sub-menu-btn"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></button>
+                </div>`:``}
                 <div id="overview"></div>
             </div>
         </div>
