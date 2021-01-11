@@ -72,7 +72,7 @@ export const confluence = async () => {
             if (dataSummaryElement.classList.contains('navbar-active')) return;
             showAnimation();
             assignNavbarActive(dataSummaryElement, 1)
-            document.title = 'Confluence - Data Explore';
+            document.title = 'Confluence - Summary Statistics';
             confluenceDiv.innerHTML = dataSummary('Summary Statistics');
             addEventUpdateSummaryStatsData();
             dataSummaryStatisticsTemplate();
@@ -93,7 +93,7 @@ export const confluence = async () => {
             const confluenceDiv = document.getElementById('confluenceDiv');
             showAnimation();
             assignNavbarActive(dataSummarySubsetElement, 1);
-            document.title = 'Confluence - Data Explore';
+            document.title = 'Confluence - Subset Statistics';
             confluenceDiv.innerHTML = dataSummary('Subset Statistics');
             addEventUpdateSummaryStatsData();
             removeActiveClass('nav-link', 'active');
