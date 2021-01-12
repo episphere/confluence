@@ -291,7 +291,7 @@ const manageHash = async () => {
             return;
         }
         aboutConfluence('description', fileInfo ? true : false);
-        renderDescription();
+        renderDescription(fileInfo['content_modified_at']);
         hideAnimation();
     }
     else if(hash === '#join'){

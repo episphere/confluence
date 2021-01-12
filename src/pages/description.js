@@ -1,6 +1,6 @@
 import { getFile, shortenText, tsv2Json } from "./../shared.js";
 
-export const renderDescription = () => {
+export const renderDescription = (modified_at) => {
     let template = `
     <div class="main-summary-row">
             <div class="row align-left w-100 m-0">
@@ -25,6 +25,11 @@ export const renderDescription = () => {
                         <div class="p-2 allow-overflow" style="max-height:700px; height:500px" id="descriptionBody"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="main-summary-row">
+            <div class="offset-xl-2 col data-last-modified align-left mt-3 mb-0">
+                Data last modified at - ${new Date(modified_at).toLocaleString()}
             </div>
         </div>
     `;
