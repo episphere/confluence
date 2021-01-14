@@ -54,7 +54,7 @@ export const renderOverView = () => {
                 </div>
             </div>
             <div class="align-left" id="confluenceDataSummary">
-
+                Loading summary counts...
             </div>
             <div class="main-summary-row align-left">
                 <div class="col">
