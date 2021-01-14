@@ -22,7 +22,7 @@ export const renderDescription = (modified_at) => {
             </div>
             <div class="col-xl-10 padding-right-zero font-size-16">
                 <div class="main-summary-row">
-                    <div class="col-xl-12 pb-2 pr-0 white-bg div-border">
+                    <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
                         <div class="p-2 allow-overflow" style="max-height:700px; height:500px" id="descriptionBody"></div>
                     </div>
                 </div>
