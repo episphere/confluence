@@ -392,6 +392,10 @@ label {
     text-align: right !important;
 }
 
+#confluenceDataSummary {
+    min-height: 235px;
+}
+
 .create-project-btn {
     margin-bottom: 1rem;
 }
