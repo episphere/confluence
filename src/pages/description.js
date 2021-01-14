@@ -1,4 +1,5 @@
 import { getFile, shortenText, tsv2Json } from "./../shared.js";
+let previousValue = '';
 
 export const renderDescription = (modified_at) => {
     let template = `
@@ -21,7 +22,7 @@ export const renderDescription = (modified_at) => {
             </div>
             <div class="col-xl-10 padding-right-zero font-size-16">
                 <div class="main-summary-row">
-                    <div class="col-xl-12 pr-0 white-bg div-border">
+                    <div class="col-xl-12 pb-2 pr-0 white-bg div-border">
                         <div class="p-2 allow-overflow" style="max-height:700px; height:500px" id="descriptionBody"></div>
                     </div>
                 </div>
@@ -66,6 +67,13 @@ const getDescription = async () => {
     const uniqueStudyDesign = allStudyDesigns.filter((d,i) => allStudyDesigns.indexOf(d) === i).sort();
     
     let filterTemplate = `
+        <div class="main-summary-row">
+            <div style="width: 100%;">
+                <div class="form-group" margin:0px>
+                    <div id="searchContainer"></div>
+                </div>
+            </div>
+        </div>
         <div class="main-summary-row">
             <div style="width: 100%;">
                 <div class="form-group" margin:0px>
@@ -126,6 +134,15 @@ const getDescription = async () => {
     `;
     document.getElementById('filterDataCatalogue').innerHTML = filterTemplate;
     const descriptions = Object.values(newJsons);
+    document.getElementById('searchContainer').innerHTML = `
+    <div class="input-group">
+        <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search min. 3 characters" id="searchDataCatalog" aria-describedby="search-addon" />
+        <span class="input-group-text border-0 search-input">
+            <i class="fas fa-search"></i>
+        </span>
+    </div>
+    `;
+    // addEventSearchDataCatalog(descriptions)
     addEventFilterDataCatalogue(descriptions);
     renderStudyDescription(descriptions, 20);
     paginationHandler(descriptions, 20);
@@ -194,9 +211,13 @@ const addEventFilterDataCatalogue = (descriptions) => {
     const countrySelection = document.getElementsByClassName('select-country');
     Array.from(countrySelection).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterDataBasedOnSelection(descriptions)
+            filterDataBasedOnSelection(descriptions);
         });
     });
+    const input = document.getElementById('searchDataCatalog');
+    input.addEventListener('input', () => {
+        filterDataBasedOnSelection(descriptions);
+    })
 }
 
 const addEventToggleCollapsePanelBtn = () => {
@@ -232,11 +253,29 @@ const filterDataBasedOnSelection = (descriptions) => {
         filteredData = filteredData.filter(dt => countrySelected.indexOf(dt['Country']) !== -1);
     }
     
-    if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0)filteredData = descriptions
-    renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
-    paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);
-    addEventPageSizeSelection(filteredData);
+    if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
+    const input = document.getElementById('searchDataCatalog');
+    const currentValue = input.value.trim().toLowerCase();
+    if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+        renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
+        paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);
+        addEventPageSizeSelection(filteredData);
+        return;
+    }
+    previousValue = currentValue;
+    let searchedData = JSON.parse(JSON.stringify(filteredData));
+    searchedData = searchedData.filter(dt => dt['Country'].toLowerCase().includes(currentValue) || dt['Study Acronym'].toLowerCase().includes(currentValue) || dt['Study'].toLowerCase().includes(currentValue))
+    searchedData = searchedData.map(dt => {
+        dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['Study'] = dt['Study'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        return dt;
+    })
+    renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value);
+    paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData);
+    addEventPageSizeSelection(searchedData);
 }
 
 const paginationHandler = (data, pageSize) => {
@@ -248,7 +287,7 @@ const paginationHandler = (data, pageSize) => {
         array.push(i+1);
     }
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
-    addEventPageBtns(pageSize, data)
+    addEventPageBtns(pageSize, data);
 }
 
 const pageSizeTemplate = (array) => {

@@ -388,6 +388,10 @@ label {
     padding: 0px;
 }
 
+.align-right {
+    text-align: right !important;
+}
+
 .create-project-btn {
     margin-bottom: 1rem;
 }
@@ -1624,6 +1628,14 @@ form {
 .select-consortium, .select-study, .select-variable, .select-country, .select-study-design {
     margin-top: 4px;
     margin-right: 3px;
+}
+
+.search-input {
+    right: 1px;
+    position: absolute;
+    top: 5px;
+    background: #ffffff !important;
+    z-index: 9;
 }
 
 #countriesList, #consortiumList, #studyDesignList {
