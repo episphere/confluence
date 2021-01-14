@@ -142,7 +142,6 @@ const getDescription = async () => {
         </span>
     </div>
     `;
-    // addEventSearchDataCatalog(descriptions)
     addEventFilterDataCatalogue(descriptions);
     renderStudyDescription(descriptions, 20);
     paginationHandler(descriptions, 20);
@@ -265,10 +264,18 @@ const filterDataBasedOnSelection = (descriptions) => {
     }
     previousValue = currentValue;
     let searchedData = JSON.parse(JSON.stringify(filteredData));
-    searchedData = searchedData.filter(dt => dt['Country'].toLowerCase().includes(currentValue) || dt['Study Acronym'].toLowerCase().includes(currentValue) || dt['Study'].toLowerCase().includes(currentValue))
+    searchedData = searchedData.filter(dt => {
+        let found = false;
+        if(dt['Country'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Study'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
+        if(found) return dt;
+    })
     searchedData = searchedData.map(dt => {
         dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         dt['Study'] = dt['Study'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         return dt;
     })
