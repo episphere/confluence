@@ -136,7 +136,7 @@ const getDescription = async () => {
     const descriptions = Object.values(newJsons);
     document.getElementById('searchContainer').innerHTML = `
     <div class="input-group">
-        <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search min. 3 characters" id="searchDataCatalog" aria-describedby="search-addon" />
+        <input type="search" class="form-control rounded" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
         <span class="input-group-text border-0 search-input">
             <i class="fas fa-search"></i>
         </span>
