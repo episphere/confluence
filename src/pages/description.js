@@ -152,10 +152,10 @@ const getDescription = async () => {
 const renderStudyDescription = (descriptions, pageSize) => {
     let template = `
         <div class="row m-0 pt-md-1 align-left">
-            <div class="col-md-3 font-bold">Study</div>
-            <div class="col-md-3 font-bold">Study Acronym</div>
-            <div class="col-md-3 font-bold">Study Design</div>
-            <div class="col-md-2 font-bold">Country</div>
+            <div class="col-md-3 font-bold">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-3 font-bold">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-3 font-bold">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-2 font-bold">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-1"></div>
         </div>`
     descriptions.forEach((desc, index) => {
@@ -190,6 +190,18 @@ const renderStudyDescription = (descriptions, pageSize) => {
     });
     document.getElementById('descriptionBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
+    addEventSortColumn(descriptions, pageSize);
+}
+
+const addEventSortColumn = (descriptions, pageSize) => {
+    const btns = document.getElementsByClassName('sort-column');
+    Array.from(btns).forEach(btn => {
+        btn.addEventListener('click', () => {
+            const columnName = btn.dataset.columnName;
+            descriptions = descriptions.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
+            renderStudyDescription(descriptions, columnName)
+        })
+    })
 }
 
 const addEventFilterDataCatalogue = (descriptions) => {
