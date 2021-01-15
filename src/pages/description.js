@@ -23,7 +23,7 @@ export const renderDescription = (modified_at) => {
             <div class="col-xl-10 padding-right-zero font-size-16">
                 <div class="main-summary-row">
                     <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
-                        <div class="p-2 allow-overflow" style="max-height:1200px; height:1000px" id="descriptionBody"></div>
+                        <div class="p-2 allow-overflow" style="height: calc(100vh - 210px) !important;" id="descriptionBody"></div>
                     </div>
                 </div>
             </div>
@@ -136,7 +136,7 @@ const getDescription = async () => {
     const descriptions = Object.values(newJsons);
     document.getElementById('searchContainer').innerHTML = `
     <div class="input-group">
-        <input type="search" class="form-control rounded" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
+        <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
         <span class="input-group-text border-0 search-input">
             <i class="fas fa-search"></i>
         </span>
