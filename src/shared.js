@@ -1,5 +1,4 @@
 import { config } from "./config.js";
-import { variables } from "./variables.js";
 import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
 
