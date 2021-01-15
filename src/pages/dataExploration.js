@@ -12,7 +12,7 @@ export const template = (pageHeader) => {
                 </div>
                 <div class="main-summary-row">
                     <div class="offset-xl-2 col-xl-10 align-left padding-left-20">
-                        <h1 class="page-header">${pageHeader}</h1>
+                        <h1 class="page-header" style="margin-left:15px">${pageHeader}</h1>
                     </div>
                 </div>
                 
