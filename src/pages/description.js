@@ -57,8 +57,14 @@ const getDescription = async () => {
             newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
         }
     });
-    
-    const allCountries = Object.values(newJsons).map(dt => dt['Country']);
+    const allCountries = [];
+    Object.values(newJsons).forEach(dt => {
+        dt['Country'].split(',').forEach(ctr => {
+            ctr.split(' and ').forEach(c => {
+                if(c.trim()) allCountries.push(c.trim())
+            });
+        })
+    });
     const allStudyDesigns = Object.values(newJsons).filter(dt => dt['Study design'] !== undefined).map(dt => dt['Study design']);
     const allConsortium = Object.values(newJsons).map(dt => dt['Consortium']);
     
@@ -261,7 +267,14 @@ const filterDataBasedOnSelection = (descriptions) => {
         filteredData = filteredData.filter(dt => studyDesignSelected.indexOf(dt['Study design']) !== -1);
     }
     if(countrySelected.length > 0) {
-        filteredData = filteredData.filter(dt => countrySelected.indexOf(dt['Country']) !== -1);
+        filteredData = filteredData.filter(dt => {
+            let found = false
+            countrySelected.forEach(ctr => {
+                if(found) return
+                if(dt['Country'].match(new RegExp(ctr, 'ig'))) found = true;
+            })
+            if(found) return dt;
+        });
     }
     
     if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
