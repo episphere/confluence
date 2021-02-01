@@ -66,10 +66,10 @@ export const infoDeckAfterLoggedIn = () => {
             </div>
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
+                template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about/overview', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
                 template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#data_submission', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br></br>You can always view, modify or download any data you submit.'})
                 template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
                 template += cardContents({header: 'Submit a Proposal', button: 'Submit a Proposal', href: '#home', icon: 'fa-file-upload', explanation: 'Submit a proposal to access data for analyses. </br></br>Proposals will be reviewed by DACCs from all relevant consortia.'})
-                template += cardContents({header: 'My Projects', button: 'My Projects', href: '#my_projects', icon: 'fa-database', explanation: 'Analyze data for projects approved by all relevant DACCs. </br></br>Requires data agreements.'})
                 template += `</div>
             </div>
         </div>
