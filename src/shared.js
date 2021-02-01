@@ -165,7 +165,7 @@ export const storeAccessToken = async () => {
         });
         if(response.status && response.status === 200) {
             localStorage.parms = JSON.stringify(await response.json());
-            window.history.replaceState({},'', './#data_exploration/summary');
+            window.history.replaceState({},'', './#home');
             confluence();
             document.getElementById('loginBoxAppDev').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;

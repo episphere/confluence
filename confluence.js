@@ -312,7 +312,7 @@ const manageHash = async () => {
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
     }
-    else window.location.hash = '#data_exploration/summary';
+    else window.location.hash = '#home';
 };
 
 window.onload = async () => {
