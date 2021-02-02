@@ -1,4 +1,9 @@
 export const template = () => {
+    // <div class="grid-elements">
+    //      <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
+    //          </i> Tutorials
+    //      </a>
+    // </div>
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
@@ -39,11 +44,6 @@ export const template = () => {
                     Request
                 </a>
             </div>
-        </div>
-        <div class="grid-elements">
-            <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
-                </i> Tutorials
-            </a>
         </div>
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">

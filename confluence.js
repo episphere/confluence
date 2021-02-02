@@ -108,14 +108,14 @@ export const confluence = async () => {
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
-        platformTutorialElement.addEventListener('click', () => {
-            if (platformTutorialElement.classList.contains('navbar-active')) return;
-            showAnimation();
-            assignNavbarActive(platformTutorialElement)
-            document.title = 'Confluence Platform Tutorials';
-            confluenceDiv.innerHTML = dataRequestTemplate();
-            hideAnimation();
-        });
+        // platformTutorialElement.addEventListener('click', () => {
+        //     if (platformTutorialElement.classList.contains('navbar-active')) return;
+        //     showAnimation();
+        //     assignNavbarActive(platformTutorialElement)
+        //     document.title = 'Confluence Platform Tutorials';
+        //     confluenceDiv.innerHTML = dataRequestTemplate();
+        //     hideAnimation();
+        // });
         dataAnalysisElement.addEventListener('click', () => {
             if (dataAnalysisElement.classList.contains('navbar-active')) return;
             showAnimation();
@@ -232,10 +232,10 @@ const manageHash = async () => {
         const element = document.getElementById('dataRequest');
         element.click();
     }
-    else if (hash === '#tutorials') {
-        const element = document.getElementById('platformTutorial');
-        element.click();
-    }
+    // else if (hash === '#tutorials') {
+    //     const element = document.getElementById('platformTutorial');
+    //     element.click();
+    // }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
         element.click();
