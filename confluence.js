@@ -13,6 +13,7 @@ import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 import { renderDescription } from './src/pages/description.js';
+import { dataDictionaryTemplate } from './src/pages/dictionary.js';
 
 
 export const confluence = async () => {
@@ -52,6 +53,7 @@ export const confluence = async () => {
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataSummarySubsetElement = document.getElementById('dataSummarySubset');
+        const dataDictionaryElement = document.getElementById('dataDictionary');
         const dataRequestElement = document.getElementById('dataRequest');
         const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
@@ -99,6 +101,19 @@ export const confluence = async () => {
             removeActiveClass('nav-link', 'active');
             document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
             dataSummaryMissingTemplate();
+        })
+        dataDictionaryElement.addEventListener('click', () => {
+            if (dataDictionaryElement.classList.contains('navbar-active')) return;
+            const confluenceDiv = document.getElementById('confluenceDiv');
+            showAnimation();
+            assignNavbarActive(dataDictionaryElement, 1);
+            document.title = 'Confluence - Data Dictionary';
+            confluenceDiv.innerHTML = dataSummary('Data Dictionary');
+            addEventUpdateSummaryStatsData();
+            removeActiveClass('nav-link', 'active');
+            document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
+            // dataSummaryMissingTemplate();
+            dataDictionaryTemplate();
         })
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
@@ -221,6 +236,11 @@ const manageHash = async () => {
     }
     else if(hash === '#data_exploration/subset') {
         const element = document.getElementById('dataSummarySubset');
+        if(!element) return;
+        element.click()
+    }
+    else if(hash === '#data_exploration/dictionary') {
+        const element = document.getElementById('dataDictionary');
         if(!element) return;
         element.click()
     }

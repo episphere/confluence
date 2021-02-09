@@ -237,7 +237,7 @@ const addEventFilterDataCatalogue = (descriptions) => {
     })
 }
 
-const addEventToggleCollapsePanelBtn = () => {
+export const addEventToggleCollapsePanelBtn = () => {
     const btns = document.getElementsByClassName('collapse-panel-btn');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {

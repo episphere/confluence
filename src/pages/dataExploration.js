@@ -9,6 +9,7 @@ export const template = (pageHeader) => {
                 <div class="main-summary-row white-bg div-border">
                     <button class="sub-menu-btn"><a class="nav-link active black-font font-size-14" href="#data_exploration/summary"><strong>Summary Statistics</strong></a></button>
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></button>
+                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 </div>
                 <div class="main-summary-row">
                     <div class="offset-xl-2 col-xl-10 align-left padding-left-20">
