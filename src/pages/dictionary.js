@@ -34,7 +34,19 @@ export const dataDictionaryTemplate = async () => {
     document.getElementById('dataSummaryStatistics').innerHTML = template;
     renderDataDictionary(dictionary, 20);
     addEventFilterBarToggle();
+    addEventSortColumn(dictionary, 20);
     hideAnimation();
+}
+
+const addEventSortColumn = (dictionary, pageSize) => {
+    const btns = document.getElementsByClassName('sort-column');
+    Array.from(btns).forEach(btn => {
+        btn.addEventListener('click', () => {
+            const columnName = btn.dataset.columnName;
+            dictionary = dictionary.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
+            renderDataDictionary(dictionary, pageSize)
+        })
+    })
 }
 
 const renderDataDictionary = (dictionary, pageSize) => {

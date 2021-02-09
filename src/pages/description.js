@@ -205,7 +205,7 @@ const addEventSortColumn = (descriptions, pageSize) => {
         btn.addEventListener('click', () => {
             const columnName = btn.dataset.columnName;
             descriptions = descriptions.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
-            renderStudyDescription(descriptions, columnName)
+            renderStudyDescription(descriptions, pageSize)
         })
     })
 }
