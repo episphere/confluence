@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, tsv2Json } from "./../shared.js"
+import { getFile, hideAnimation, shortenText, tsv2Json } from "./../shared.js"
 import { addEventToggleCollapsePanelBtn } from "./description.js"
 
 export const dataDictionaryTemplate = async () => {
@@ -7,12 +7,12 @@ export const dataDictionaryTemplate = async () => {
     const dictionary = tsv2Json(data).data;
     let template = `
     <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
-        <div class="card">
-            <div class="card-header align-left card-filter-header">
-                <strong class="side-panel-header font-size-17">Filter</strong>
-            </div>
-            <div id="cardContent" class="card-body">
-                <div id="allFilters" class="align-left"></div>
+        <div class="div-border white-bg align-left p-2">
+            <div class="main-summary-row">
+                <div class="col-xl-12 pl-1 pr-0">
+                    <span class="font-size-17 font-bold">Filter</span>
+                    <div id="filterDataDictionary" class="align-left"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -32,10 +32,40 @@ export const dataDictionaryTemplate = async () => {
     </div>
     `;
     document.getElementById('dataSummaryStatistics').innerHTML = template;
+    renderDataDictionaryFilters(dictionary);
     renderDataDictionary(dictionary, 20);
     addEventFilterBarToggle();
     addEventSortColumn(dictionary, 20);
     hideAnimation();
+}
+
+const renderDataDictionaryFilters = (dictionary) => {
+    const allVariableType = Object.values(dictionary).map(dt => dt['Variable type']);
+    const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i).sort();
+    
+    let template = '';
+    template += `
+    <div class="main-summary-row">
+        <div style="width: 100%;">
+            <div class="form-group" margin:0px>
+                <label class="filter-label font-size-13" for="variableTypeList">Variable type</label>
+                <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="variableTypeList">
+                `
+                uniqueType.forEach(vt => {
+                    template += `
+                        <li class="filter-list-item">
+                            <input type="checkbox" data-variable-type="${vt}" id="label${vt}" class="select-variable-type" style="margin-left: 1px !important;">
+                            <label for="label${vt}" class="country-name" title="${vt}">${shortenText(vt, 20)}</label>
+                        </li>
+                    `
+                })
+                template +=`
+                </ul>
+            </div>
+        </div>
+    </div>
+    `
+    document.getElementById('filterDataDictionary').innerHTML = template;
 }
 
 const addEventSortColumn = (dictionary, pageSize) => {
