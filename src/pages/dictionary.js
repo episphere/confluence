@@ -1,6 +1,6 @@
 import { addEventFilterBarToggle } from "../event.js";
 import { getFile, hideAnimation, shortenText, tsv2Json } from "./../shared.js"
-import { addEventToggleCollapsePanelBtn } from "./description.js"
+import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js"
 
 export const dataDictionaryTemplate = async () => {
     const data = await getFile(774486143425);
@@ -34,9 +34,45 @@ export const dataDictionaryTemplate = async () => {
     document.getElementById('dataSummaryStatistics').innerHTML = template;
     renderDataDictionaryFilters(dictionary);
     renderDataDictionary(dictionary, 20);
+    paginationHandler(dictionary, 20);
     addEventFilterBarToggle();
     addEventSortColumn(dictionary, 20);
     hideAnimation();
+}
+
+const paginationHandler = (data, pageSize) => {
+    const dataLength = data.length;
+    const pages = Math.ceil(dataLength/pageSize);
+    const array = [];
+
+    for(let i = 0; i< pages; i++){
+        array.push(i+1);
+    }
+    document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
+    addEventPageBtns(pageSize, data);
+}
+
+const addEventPageBtns = (pageSize, data) => {
+    const elements = document.getElementsByClassName('page-link');
+    Array.from(elements).forEach(element => {
+        element.addEventListener('click', () => {
+            const previous = element.dataset.previous;
+            const next = element.dataset.next;
+            const pageNumber = previous ? parseInt(previous) - 1 : next ? parseInt(next) + 1 :parseInt(element.dataset.page);
+            
+            if(pageNumber < 1 || pageNumber > Math.ceil(data.length/pageSize)) return;
+            
+            if(!element.classList.contains('active-page')){
+                let start = (pageNumber - 1) * pageSize;
+                let end = pageNumber * pageSize;
+                document.getElementById('previousPage').dataset.previous = pageNumber;
+                document.getElementById('nextPage').dataset.next = pageNumber;
+                renderDataDictionary(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value);
+                Array.from(elements).forEach(ele => ele.classList.remove('active-page'));
+                document.querySelector(`button[data-page="${pageNumber}"]`).classList.add('active-page');
+            }
+        })
+    });
 }
 
 const renderDataDictionaryFilters = (dictionary) => {
@@ -66,6 +102,29 @@ const renderDataDictionaryFilters = (dictionary) => {
     </div>
     `
     document.getElementById('filterDataDictionary').innerHTML = template;
+    addEventFilterDataDictionary(dictionary);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary);
+};
+
+const addEventFilterDataDictionary = (dictionary) => {
+    const variableTypeSelection = document.getElementsByClassName('select-variable-type');
+    Array.from(variableTypeSelection).forEach(ele => {
+        ele.addEventListener('click', () => {
+            filterDataBasedOnSelection(dictionary)
+        });
+    });
+}
+
+const filterDataBasedOnSelection = (dictionary) => {
+    const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
+    
+    let filteredData = dictionary;
+    if(variableTypeSelection.length > 0) {
+        filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Variable type']) !== -1);
+    }
+
+    if(variableTypeSelection.length === 0) filteredData = dictionary;
+    renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
 }
 
 const addEventSortColumn = (dictionary, pageSize) => {

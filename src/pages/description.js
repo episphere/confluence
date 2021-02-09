@@ -322,7 +322,7 @@ const paginationHandler = (data, pageSize) => {
     addEventPageBtns(pageSize, data);
 }
 
-const pageSizeTemplate = (array) => {
+export const pageSizeTemplate = (array) => {
     const contentSize = Math.ceil(array.length / 20) * 20;
     let pageSizes = [];
     for(let i = 20; i <= contentSize; i += 20) {
@@ -347,7 +347,7 @@ const addEventPageSizeSelection = (data) => {
     })
 }
 
-const paginationTemplate = (array) => {
+export const paginationTemplate = (array) => {
     let template = `
         <nav aria-label="Page navigation example">
             <ul class="pagination m-0">`
@@ -380,7 +380,7 @@ const paginationTemplate = (array) => {
     return template;
 }
 
-const dataPagination = (start, end, data) => {
+export const dataPagination = (start, end, data) => {
     const paginatedData = [];
     for(let i=start; i<end; i++){
         if(data[i]) paginatedData.push(data[i]);

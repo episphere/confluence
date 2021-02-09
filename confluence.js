@@ -108,11 +108,10 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataDictionaryElement, 1);
             document.title = 'Confluence - Data Dictionary';
-            confluenceDiv.innerHTML = dataSummary('Data Dictionary');
+            confluenceDiv.innerHTML = dataSummary('Data Dictionary', true);
             addEventUpdateSummaryStatsData();
             removeActiveClass('nav-link', 'active');
             document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
-            // dataSummaryMissingTemplate();
             dataDictionaryTemplate();
         })
         dataRequestElement.addEventListener('click', () => {

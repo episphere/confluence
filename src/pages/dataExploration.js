@@ -2,7 +2,7 @@ import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpda
 import { addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
-export const template = (pageHeader) => {
+export const template = (pageHeader, showPages) => {
     return `
         <div class="general-bg">
             <div class="container body-min-height">
@@ -12,8 +12,12 @@ export const template = (pageHeader) => {
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 </div>
                 <div class="main-summary-row">
-                    <div class="offset-xl-2 col-xl-10 align-left padding-left-20">
-                        <h1 class="page-header" style="margin-left:15px">${pageHeader}</h1>
+                    <div class="row align-left w-100 m-0">
+                        <h1 class="col page-header pl-0 pt-2">${pageHeader}</h1>
+                        ${showPages ? `
+                            <div class="ml-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
+                            <div class="ml-auto mt-3 mb-3" id="pageSizeContainer"></div>
+                        `: ``}
                     </div>
                 </div>
                 
