@@ -20,8 +20,7 @@ export const dataDictionaryTemplate = async () => {
         <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
         <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-bold">Gender:</span> All<span class="vertical-line"></span>
-                <span class="font-bold">Genotyping chip:</span> All Arrays
+                <span class="font-bold">Variable type:</span> All
             </div>
         </div>
         <div class="main-summary-row pl-3">
@@ -104,7 +103,17 @@ const renderDataDictionaryFilters = (dictionary) => {
     document.getElementById('filterDataDictionary').innerHTML = template;
     addEventFilterDataDictionary(dictionary);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary);
+    addEventPageSizeSelection(dictionary);
 };
+
+const addEventPageSizeSelection = (data) => {
+    const select = document.getElementById('pageSizeSelector');
+    select.addEventListener('change', () => {
+        const value = select.value;
+        renderDataDictionary(data, value)
+        paginationHandler(data, value)
+    })
+}
 
 const addEventFilterDataDictionary = (dictionary) => {
     const variableTypeSelection = document.getElementsByClassName('select-variable-type');
@@ -124,6 +133,12 @@ const filterDataBasedOnSelection = (dictionary) => {
     }
 
     if(variableTypeSelection.length === 0) filteredData = dictionary;
+    
+    document.getElementById('listFilters').innerHTML = `
+    ${variableTypeSelection.length > 0 ? `
+        <span class="font-bold">Variable type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
+    `:`<span class="font-bold">Variable type:</span> All`}
+    `
     renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
 }
 
