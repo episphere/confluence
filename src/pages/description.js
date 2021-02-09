@@ -278,6 +278,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     }
     
     if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
+    
     const input = document.getElementById('searchDataCatalog');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {

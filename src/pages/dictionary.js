@@ -1,6 +1,7 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, shortenText, tsv2Json } from "./../shared.js"
-import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js"
+import { getFile, hideAnimation, shortenText, tsv2Json } from "./../shared.js";
+import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
+let previousValue = '';
 
 export const dataDictionaryTemplate = async () => {
     const data = await getFile(774486143425);
@@ -35,7 +36,6 @@ export const dataDictionaryTemplate = async () => {
     renderDataDictionary(dictionary, 20);
     paginationHandler(dictionary, 20);
     addEventFilterBarToggle();
-    addEventSortColumn(dictionary, 20);
     hideAnimation();
 }
 
@@ -83,6 +83,18 @@ const renderDataDictionaryFilters = (dictionary) => {
     <div class="main-summary-row">
         <div style="width: 100%;">
             <div class="form-group" margin:0px>
+                <div class="input-group">
+                    <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataDictionary" aria-describedby="search-addon" />
+                    <span class="input-group-text border-0 search-input">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-summary-row">
+        <div style="width: 100%;">
+            <div class="form-group" margin:0px>
                 <label class="filter-label font-size-13" for="variableTypeList">Variable type</label>
                 <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="variableTypeList">
                 `
@@ -101,6 +113,7 @@ const renderDataDictionaryFilters = (dictionary) => {
     </div>
     `
     document.getElementById('filterDataDictionary').innerHTML = template;
+
     addEventFilterDataDictionary(dictionary);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary);
     addEventPageSizeSelection(dictionary);
@@ -122,6 +135,11 @@ const addEventFilterDataDictionary = (dictionary) => {
             filterDataBasedOnSelection(dictionary)
         });
     });
+
+    const input = document.getElementById('searchDataDictionary');
+    input.addEventListener('input', () => {
+        filterDataBasedOnSelection(dictionary);
+    })
 }
 
 const filterDataBasedOnSelection = (dictionary) => {
@@ -138,8 +156,37 @@ const filterDataBasedOnSelection = (dictionary) => {
     ${variableTypeSelection.length > 0 ? `
         <span class="font-bold">Variable type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
     `:`<span class="font-bold">Variable type:</span> All`}
-    `
-    renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
+    `;
+
+    const input = document.getElementById('searchDataDictionary');
+    const currentValue = input.value.trim().toLowerCase();
+    if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+        renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
+        paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);
+        addEventPageSizeSelection(filteredData);
+        return;
+    }
+    previousValue = currentValue;
+    let searchedData = JSON.parse(JSON.stringify(filteredData));
+    searchedData = searchedData.filter(dt => {
+        let found = false;
+        if(dt['Variable'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Label'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Variable type'].toLowerCase().includes(currentValue)) found = true;
+        if(found) return dt;
+    })
+    searchedData = searchedData.map(dt => {
+        dt['Variable'] = dt['Variable'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['Label'] = dt['Label'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['Variable type'] = dt['Variable type'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        return dt;
+    })
+
+    renderDataDictionary(searchedData, document.getElementById('pageSizeSelector').value);
+    paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData);
+    addEventPageSizeSelection(searchedData);
 }
 
 const addEventSortColumn = (dictionary, pageSize) => {
@@ -188,4 +235,5 @@ const renderDataDictionary = (dictionary, pageSize) => {
     });
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
+    addEventSortColumn(dictionary, pageSize);
 }
