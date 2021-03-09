@@ -18,17 +18,17 @@ export const confluenceResources = () => {
 
                         <div class="consortia-desc">
                             <a href="https://projectreporter.nih.gov/project_info_description.cfm?aid=9040408&icde=30184576&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC" target="__blank">African Ancestry Breast Cancer Genetic Study</a> (AABCGS)</br>
-                            The AABCGS is a GWAS of over 16,000 African-American breast cancer cases and similar number of controls.
+                            The AABCGS is a GWAS of African-American breast cancer cases and similar number of controls.
                         </div>
 
                         <div class="consortia-desc">
                             <a href="mailto:lfejerman@ucdavis.edu">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
-                            The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
+                            The LAGENO is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                         </div>
 
                         <div class="consortia-desc">
                             <a href="mailto:wei.zheng@vanderbilt.edu">Asia Breast Cancer Consortium</a> (ABCC)</br>
-                            The ABCC is a GWAS of over XX,000 Asian breast cancer cases and similar number of controls.
+                            The ABCC is a GWAS of Asian breast cancer cases and similar number of controls.
                         </div>
 
                         <div class="consortia-desc">
@@ -38,11 +38,11 @@ export const confluenceResources = () => {
 
                         <div class="consortia-desc">
                             <a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer GWAS Consortium</a> (MALES-BC)</br>
-                            The MALES-BC is a GWAS of over XX,000 male breast cancer cases and similar number of controls.
+                            The MALES-BC is a GWAS of male breast cancer cases and similar number of controls.
                         </div>
 
                         <div class="consortia-desc">
-                            You can also participate through a direct collaboration with the NCI Division of Cancer Epidemiology and Genetics coordinating the Confluence Project.
+                            You can also participate through a direct collaboration with the NCI Division of Cancer Epidemiology and Genetics.
                         </div>
                         <div class="consortia-desc">
                             For more information:</br>
