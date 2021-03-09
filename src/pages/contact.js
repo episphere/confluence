@@ -9,11 +9,8 @@ export const confluenceContactPage = () => {
                 </div>
                 <div class="main-summary-row confluence-resources white-bg div-border font-size-18">
                     <div class="col">
-                        <span class="text-bold">Interested in participating in Confluence?</span></br>
+                        <span class="text-bold">Interested in participating in Confluence or have questions?</span></br>
                         <strong>Email to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>
-                        </br>
-                        <span class="text-bold">Have questions?</span></br>
-                        <strong>Email:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
                         </br></br>
                         <span class="text-bold">Confluence Project Manager</span></br>
                         Dr. Thomas Ahearn</br>
@@ -69,7 +66,7 @@ export const confluenceContactPage = () => {
                                         </tr>
                                         <tr>
                                             <td>Laura Fejerman</td>
-                                            <td>University of California in  San Francisco (UCSF), USA</td>
+                                            <td>University of California, Davis, USA</td>
                                             <td>LAGENO-BC</td>
                                         </tr>
                                         <tr>
