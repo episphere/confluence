@@ -1,9 +1,4 @@
-export const template = () => {
-    // <div class="grid-elements">
-    //      <a class="nav-link nav-menu-links white-font" href="#tutorials" title="Confluence Tutorials" id="platformTutorial">
-    //          </i> Tutorials
-    //      </a>
-    // </div>
+export const navBarMenutemplate = (dictionary) => {
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
@@ -32,9 +27,12 @@ export const template = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/subset" title="Subset Statistics" id="dataSummarySubset">
                     Subset Statistics
                 </a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/dictionary" title="Data Dictionary" id="dataDictionary">
-                    Dictionary
-                </a>
+                ${dictionary ? `
+                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/dictionary" title="Data Dictionary" id="dataDictionary">
+                        Dictionary
+                    </a>
+                `:``}
+                
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
                     Submit
                 </a>
