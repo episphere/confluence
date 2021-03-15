@@ -221,11 +221,11 @@ const renderDataDictionary = (dictionary, pageSize) => {
             </div>
             <div id="study${desc['Variable']}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                    ${desc['Confluence Variable'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
-                    ${desc['Variable type'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
                     ${desc['Category'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Category</div><div class="col">${desc['Category']}</div></div>`: ``}
                     ${desc['Coding'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
+                    ${desc['Variable type'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
                     ${desc['Comment'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
+                    ${desc['Confluence Variable'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
                 `;
                 template +=`
                 </div>
