@@ -151,7 +151,7 @@ const getDescription = async () => {
     addEventFilterDataCatalogue(descriptions);
     renderStudyDescription(descriptions, 20);
     paginationHandler(descriptions, 20);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, 20);
     addEventPageSizeSelection(descriptions);
 };
 
@@ -284,7 +284,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
         addEventPageSizeSelection(filteredData);
         return;
     }
@@ -307,7 +307,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     })
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 20);
     addEventPageSizeSelection(searchedData);
 }
 
@@ -323,10 +323,10 @@ const paginationHandler = (data, pageSize) => {
     addEventPageBtns(pageSize, data);
 }
 
-export const pageSizeTemplate = (array) => {
+export const pageSizeTemplate = (array, startPageSize) => {
     const contentSize = Math.ceil(array.length / 20) * 20;
     let pageSizes = [];
-    for(let i = 20; i <= contentSize; i += 20) {
+    for(let i = startPageSize; i <= contentSize; i += 20) {
         pageSizes.push(i);
     }
     let template = `

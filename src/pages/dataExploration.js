@@ -2,7 +2,7 @@ import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpda
 import { addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
-export const template = (pageHeader, showPages) => {
+export const template = (pageHeader, showPages, showUpdateButton) => {
     return `
         <div class="general-bg">
             <div class="container body-min-height">
@@ -21,7 +21,7 @@ export const template = (pageHeader, showPages) => {
                     </div>
                 </div>
                 
-                ${localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
+                ${showUpdateButton && localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
                     <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
                 `:``}
                 <div class="main-summary-row" id="dataSummaryStatistics"></div>
