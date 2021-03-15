@@ -25,7 +25,7 @@ export const dataDictionaryTemplate = async () => {
             </div>
         </div>
         <div class="main-summary-row pl-3">
-            <div class="col-xl-12 pb-2 pr-0 white-bg div-border">
+            <div class="col-xl-12 pb-2 pr-0 pl-0 white-bg div-border">
                 <div class="p-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="dataDictionaryBody"></div>
             </div>
         </div>
