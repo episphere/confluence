@@ -15,7 +15,7 @@ export const infoDeck = () => {
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
                     template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about/overview', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
-                    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#join', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortia.'})
+                    template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#join', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortium.'})
                     template += cardContents({header: 'Request Data Access', button: 'Request Data Access', href: '#home', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
             </div>
@@ -25,7 +25,7 @@ export const infoDeck = () => {
             <div class="font-size-28 font-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
-                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
+                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of approximately 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
                 <div class="col-lg-3"></div>
             </div>
             <br>
@@ -78,7 +78,7 @@ export const infoDeckAfterLoggedIn = () => {
             <div class="font-size-28 font-bold font-family-helvetica our-goals mt-3 mb-2">OUR GOALS</div>
             <div class="row">
                 <div class="col-lg-3"></div>
-                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of at least 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
+                <div class="col-lg-6 font-size-18 align-left">To build a large research data resource of approximately 300,000 breast cancer cases and 300,000 controls for multi-ancestry genome wide association studies (GWAS) to:</div>
                 <div class="col-lg-3"></div>
             </div>
             <br>

@@ -1150,7 +1150,6 @@ export const addEventFilterBarToggle = () => {
             document.getElementById('summaryFilterSiderBar').classList = ['col-xl-2 filter-column'];
             document.getElementById('summaryStatsCharts').classList = ['col-xl-10 padding-right-zero'];
             document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
-            document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-20');
             document.getElementById('dataLastModified').classList.add('offset-xl-2')
             document.getElementById('dataLastModified').classList.add('padding-left-20')
         }
@@ -1179,7 +1178,6 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
             document.getElementById('missingnessTable').parentNode.classList = ['col-xl-10 padding-right-zero'];
             document.querySelector('[class="page-header"]').parentNode.classList.add('offset-xl-2');
-            document.querySelector('[class="page-header"]').parentNode.classList.add('padding-left-20');
             document.getElementById('dataLastModified').classList.add('offset-xl-2');
             document.getElementById('dataLastModified').classList.add('padding-left-20');
         }

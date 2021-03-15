@@ -151,7 +151,7 @@ const getDescription = async () => {
     addEventFilterDataCatalogue(descriptions);
     renderStudyDescription(descriptions, 20);
     paginationHandler(descriptions, 20);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, 20);
     addEventPageSizeSelection(descriptions);
 };
 
@@ -205,7 +205,7 @@ const addEventSortColumn = (descriptions, pageSize) => {
         btn.addEventListener('click', () => {
             const columnName = btn.dataset.columnName;
             descriptions = descriptions.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
-            renderStudyDescription(descriptions, columnName)
+            renderStudyDescription(descriptions, pageSize)
         })
     })
 }
@@ -237,7 +237,7 @@ const addEventFilterDataCatalogue = (descriptions) => {
     })
 }
 
-const addEventToggleCollapsePanelBtn = () => {
+export const addEventToggleCollapsePanelBtn = () => {
     const btns = document.getElementsByClassName('collapse-panel-btn');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {
@@ -278,12 +278,13 @@ const filterDataBasedOnSelection = (descriptions) => {
     }
     
     if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
+    
     const input = document.getElementById('searchDataCatalog');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
         addEventPageSizeSelection(filteredData);
         return;
     }
@@ -306,7 +307,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     })
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 20);
     addEventPageSizeSelection(searchedData);
 }
 
@@ -322,10 +323,10 @@ const paginationHandler = (data, pageSize) => {
     addEventPageBtns(pageSize, data);
 }
 
-const pageSizeTemplate = (array) => {
+export const pageSizeTemplate = (array, startPageSize) => {
     const contentSize = Math.ceil(array.length / 20) * 20;
     let pageSizes = [];
-    for(let i = 20; i <= contentSize; i += 20) {
+    for(let i = startPageSize; i <= contentSize; i += 20) {
         pageSizes.push(i);
     }
     let template = `
@@ -347,7 +348,7 @@ const addEventPageSizeSelection = (data) => {
     })
 }
 
-const paginationTemplate = (array) => {
+export const paginationTemplate = (array) => {
     let template = `
         <nav aria-label="Page navigation example">
             <ul class="pagination m-0">`
@@ -380,7 +381,7 @@ const paginationTemplate = (array) => {
     return template;
 }
 
-const dataPagination = (start, end, data) => {
+export const dataPagination = (start, end, data) => {
     const paginatedData = [];
     for(let i=start; i<end; i++){
         if(data[i]) paginatedData.push(data[i]);

@@ -1,7 +1,7 @@
-import { template } from './src/components/navBarMenuItems.js';
+import { navBarMenutemplate } from './src/components/navBarMenuItems.js';
 import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
-import { template as dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
-import { template as dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
+import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
+import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo } from './src/shared.js';
@@ -13,6 +13,7 @@ import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 import { renderDescription } from './src/pages/description.js';
+import { dataDictionaryTemplate } from './src/pages/dictionary.js';
 
 
 export const confluence = async () => {
@@ -46,14 +47,16 @@ export const confluence = async () => {
             const lclStr = JSON.parse(localStorage.parms);
             localStorage.parms = JSON.stringify({...lclStr, ...response});
         }
-        navBarOptions.innerHTML = template();
+        const fileInfo = await getFileInfo(774486143425);
+        navBarOptions.innerHTML = navBarMenutemplate(fileInfo);
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
         const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataSummarySubsetElement = document.getElementById('dataSummarySubset');
+        const dataDictionaryElement = document.getElementById('dataDictionary');
         const dataRequestElement = document.getElementById('dataRequest');
-        const platformTutorialElement = document.getElementById('platformTutorial');
+        // const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
 
         dataSubmissionElement.addEventListener('click', async () => {
@@ -73,7 +76,7 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataSummaryElement, 1)
             document.title = 'Confluence - Summary Statistics';
-            confluenceDiv.innerHTML = dataSummary('Summary Statistics');
+            confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true, fileInfo);
             addEventUpdateSummaryStatsData();
             dataSummaryStatisticsTemplate();
             if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
@@ -94,12 +97,26 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataSummarySubsetElement, 1);
             document.title = 'Confluence - Subset Statistics';
-            confluenceDiv.innerHTML = dataSummary('Subset Statistics');
+            confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true, fileInfo);
             addEventUpdateSummaryStatsData();
             removeActiveClass('nav-link', 'active');
             document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
             dataSummaryMissingTemplate();
         })
+        if(dataDictionaryElement){
+            dataDictionaryElement.addEventListener('click', () => {
+                if (dataDictionaryElement.classList.contains('navbar-active')) return;
+                const confluenceDiv = document.getElementById('confluenceDiv');
+                showAnimation();
+                assignNavbarActive(dataDictionaryElement, 1);
+                document.title = 'Confluence - Data Dictionary';
+                confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false, fileInfo);
+                addEventUpdateSummaryStatsData();
+                removeActiveClass('nav-link', 'active');
+                document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
+                dataDictionaryTemplate();
+            })
+        }
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
@@ -214,6 +231,7 @@ const manageHash = async () => {
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
+    const dictionary = await getFileInfo(774486143425);
     if(hash === '#data_exploration/summary') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
@@ -221,6 +239,11 @@ const manageHash = async () => {
     }
     else if(hash === '#data_exploration/subset') {
         const element = document.getElementById('dataSummarySubset');
+        if(!element) return;
+        element.click()
+    }
+    else if(dictionary && hash === '#data_exploration/dictionary') {
+        const element = document.getElementById('dataDictionary');
         if(!element) return;
         element.click()
     }

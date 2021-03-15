@@ -1,7 +1,7 @@
 import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
-export const template = async () => {
+export const dataSubmissionTemplate = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
     if(array.length <= 0) {
