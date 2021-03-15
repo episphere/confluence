@@ -393,10 +393,11 @@ const addEventPageBtns = (pageSize, data) => {
     const elements = document.getElementsByClassName('page-link');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            const previous = element.dataset.previous;
-            const next = element.dataset.next;
-            const pageNumber = previous ? parseInt(previous) - 1 : next ? parseInt(next) + 1 :parseInt(element.dataset.page);
-            
+            let previous = parseInt(element.dataset.previous);
+            let next = parseInt(element.dataset.next);
+            if(previous && !isNaN(previous) && previous === 1) previous = document.querySelectorAll('[data-page]').length + 1;
+            if(next && !isNaN(next) && next === document.querySelectorAll('[data-page]').length) next = 0;
+            const pageNumber = !isNaN(previous) ? previous - 1 : !isNaN(next) ? next + 1 : element.dataset.page;
             if(pageNumber < 1 || pageNumber > Math.ceil(data.length/pageSize)) return;
             
             if(!element.classList.contains('active-page')){
