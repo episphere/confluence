@@ -151,7 +151,6 @@ const filterDataBasedOnSelection = (dictionary) => {
     if(variableTypeSelection.length > 0) {
         filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Data Type']) !== -1);
     }
-
     if(variableTypeSelection.length === 0) filteredData = dictionary;
     
     document.getElementById('listFilters').innerHTML = `
@@ -163,9 +162,11 @@ const filterDataBasedOnSelection = (dictionary) => {
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+        // previousValue = currentValue;
         renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
-        paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 60);
+        const pageSize = filteredData.length < 60 ? Math.floor(filteredData.length / 10) * 10 === 0 ? 10 : Math.floor(filteredData.length / 10) * 10 : 60;
+        paginationHandler(filteredData, pageSize);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, pageSize);
         addEventPageSizeSelection(filteredData);
         return;
     }
@@ -176,17 +177,19 @@ const filterDataBasedOnSelection = (dictionary) => {
         if(dt['Variable'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Label'].toLowerCase().includes(currentValue)) found = true;
         if(found) return dt;
-    })
-    searchedData = searchedData.map(dt => {
+    });
+    let highlightData = JSON.parse(JSON.stringify(searchedData));
+    highlightData.map(dt => {
         dt['Variable'] = dt['Variable'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         dt['Label'] = dt['Label'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         return dt;
     })
 
-    renderDataDictionary(searchedData, document.getElementById('pageSizeSelector').value);
-    paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 60);
-    addEventPageSizeSelection(searchedData);
+    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value);
+    const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
+    paginationHandler(highlightData, pageSize);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
+    addEventPageSizeSelection(highlightData);
 }
 
 const addEventSortColumn = (dictionary, pageSize) => {
