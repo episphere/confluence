@@ -1,10 +1,16 @@
 import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
-
+const chartLabels = {
+    'yes': 'Yes',
+    'no': 'No',
+    'DK': 'Don\'t know',
+    'pos': 'Positive',
+    'neg': 'Negative'
+}
 
 export const getFileContent = async () => {
-    const jsonData = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
+    const {jsonData, headers} = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
     const lastModified = (await getFileInfo(summaryStatsFileId)).modified_at;
     document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     hideAnimation();
@@ -12,7 +18,7 @@ export const getFileContent = async () => {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
-    renderAllCharts(jsonData, true);
+    renderAllCharts(jsonData, true, headers);
 };
 
 const allFilters = (jsonData) => {
@@ -141,11 +147,11 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-export const renderAllCharts = (finalData, showFilter) => {
+export const renderAllCharts = (finalData, showFilter, headers) => {
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'chartDiv3', finalData);
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData)
+    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
-    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4');
+    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
@@ -195,7 +201,7 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -205,31 +211,33 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData) => {
+const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, headers) => {
+    let x = headers.filter(dt => /famHist_/.test(dt))
+    const y = x.map(dt => mapReduce(jsonData, dt));
+    x = x.map(dt => chartLabels[dt.replace(/famHist_/, '')] ? chartLabels[dt.replace(/famHist_/, '')] : dt.replace(/famHist_/, ''));
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
-            x: ['Yes', 'No', 'Don\'t know'],
-            y: [ mapReduce(jsonData, 'famHist_yes'), mapReduce(jsonData, 'famHist_no'), mapReduce(jsonData, 'famHist_DK') ],
+            x: x,
+            y: y,
             marker:{
-                color: ['#BF1B61', '#f7b6d2', '#7F7F7F']
+                color: ['#BF1B61', '#f7b6d2', '#7F7F7F', '#cccccc']
             },
           type: 'bar'
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 
-    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
+const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, headers) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -239,8 +247,8 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
     }
     
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
-    const values = [ mapReduce(jsonData, 'ER_statusIndex_pos'), mapReduce(jsonData, 'ER_statusIndex_neg'), mapReduce(jsonData, 'ER_statusIndex_DK') ];
-    const labels = ['Positive', 'Negative', 'Don\'t know'];
+    const values = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => mapReduce(jsonData, dt));
+    const labels = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => chartLabels[dt.replace(/ER_statusIndex_/, '')] ? chartLabels[dt.replace(/ER_statusIndex_/, '')] : dt.replace(/ER_statusIndex_/, ''));
     const d3 = Plotly.d3
     const format = d3.format(',3f')
     const total = values.reduce((a, b) => a + b)
@@ -260,7 +268,7 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
             automargin: true,
             showlegend: false,
             marker:{
-                colors: ['#BF1B61', '#f7b6d2', '#7F7F7F']
+                colors: ['#BF1B61', '#f7b6d2', '#7F7F7F', '#cccccc']
             },
             hole: .4
         }
@@ -317,12 +325,12 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
     
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
-    const allLabels = getUniqueConsortium(jsonData, parameter);
+    let allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
         valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
     }
-    
+    // allLabels = allLabels.map(dt => dt.length > 5 ? dt.substr(0,5)+'...' : dt)
     const data = [
         {
             x: allLabels,
@@ -334,7 +342,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -376,7 +384,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartDiv) => 
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'

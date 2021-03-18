@@ -673,7 +673,7 @@ export const csvJSON = (csv) => {
     for(let obj of result){
         obj.total = parseInt(obj['statusTotal']);
     }
-    return result;
+    return {jsonData:result, headers};
 }
 
 export const tsv2Json = (tsv) => {
@@ -738,7 +738,7 @@ export const summaryStatsFileId = 691143057533;
 export const missingnessStatsFileId = 653087731560;
 
 export const mapReduce = (data, variable) => {
-    return data.map(dt => parseInt(dt[variable])).reduce((a,b) => a+b);
+    return data.map(dt => parseInt(dt[variable])).filter(dt => isNaN(dt) === false).reduce((a,b) => a+b);
 }
 
 export const assignNavbarActive = (element, parent) => {
