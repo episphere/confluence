@@ -1184,15 +1184,15 @@ export const addEventMissingnessFilterBarToggle = () => {
     })
 }
 
-export const addEventSummaryStatsFilterForm = (jsonData) => {
+export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
     const genderSelection = document.getElementById('genderSelection');
     genderSelection.addEventListener('change', () => {
-        filterData(jsonData);
+        filterData(jsonData, headers);
     });
 
     const chipSelection = document.getElementById('genotypingChipSelection');
     chipSelection.addEventListener('change', () => {
-        filterData(jsonData);
+        filterData(jsonData, headers);
     });
 
     const elements = document.getElementsByClassName('select-consortium');
@@ -1204,19 +1204,19 @@ export const addEventSummaryStatsFilterForm = (jsonData) => {
             else {
                 Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
-            filterData(jsonData);
+            filterData(jsonData, headers);
         })
     })
 
     const studyElements = document.getElementsByClassName('select-study');
     Array.from(studyElements).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterData(jsonData)
+            filterData(jsonData, headers)
         })
     });
 };
 
-const filterData = (jsonData) => {
+const filterData = (jsonData, headers) => {
     const gender = document.getElementById('genderSelection').value;
     const chip = document.getElementById('genotypingChipSelection').value;
     const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
@@ -1244,7 +1244,7 @@ const filterData = (jsonData) => {
     <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
     <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
-    renderAllCharts(finalData);
+    renderAllCharts(finalData, headers);
 }
 
 export const addEventConsortiaFilter = (data) => {

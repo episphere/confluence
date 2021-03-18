@@ -18,10 +18,10 @@ export const getFileContent = async () => {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     }
-    renderAllCharts(jsonData, true, headers);
+    renderAllCharts(jsonData, headers, true);
 };
 
-const allFilters = (jsonData) => {
+const allFilters = (jsonData, headers) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
@@ -84,7 +84,7 @@ const allFilters = (jsonData) => {
     </div>`;
     div1.innerHTML = template;
     document.getElementById('allFilters').appendChild(div1);
-    addEventSummaryStatsFilterForm(jsonData);
+    addEventSummaryStatsFilterForm(jsonData, headers);
     addEventConsortiumSelect();
 }
 
@@ -147,7 +147,7 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-export const renderAllCharts = (finalData, showFilter, headers) => {
+export const renderAllCharts = (finalData, headers, showFilter) => {
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'chartDiv3', finalData);
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
@@ -155,7 +155,7 @@ export const renderAllCharts = (finalData, showFilter, headers) => {
     renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
-        allFilters(finalData);
+        allFilters(finalData, headers);
     };
     // addEventVariableDefinitions();
 }
