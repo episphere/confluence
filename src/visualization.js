@@ -192,8 +192,8 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
-            x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99', '100-109'],
-            y: [ mapReduce(jsonData, '10-19'), mapReduce(jsonData, '20-29'), mapReduce(jsonData, '30-39'), mapReduce(jsonData, '40-49'), mapReduce(jsonData, '50-59'), mapReduce(jsonData, '60-69'), mapReduce(jsonData, '70-79'), mapReduce(jsonData, '80-89'), mapReduce(jsonData, '90-99'), mapReduce(jsonData, '100-109') ],
+            x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '>=90'],
+            y: [ mapReduce(jsonData, '10-19'), mapReduce(jsonData, '20-29'), mapReduce(jsonData, '30-39'), mapReduce(jsonData, '40-49'), mapReduce(jsonData, '50-59'), mapReduce(jsonData, '60-69'), mapReduce(jsonData, '70-79'), mapReduce(jsonData, '80-89'), mapReduce(jsonData, '90-99') + mapReduce(jsonData, '100-109') ],
             marker:{
                 color: ['#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61']
             },
