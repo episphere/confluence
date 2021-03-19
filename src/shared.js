@@ -664,6 +664,7 @@ export const csvJSON = (csv) => {
             if(value === 'age70.79') value = '70-79';
             if(value === 'age80.89') value = '80-89';
             if(value === 'age90.99') value = '90-99';
+            if(value === 'age100.109') value = '100-109';
             obj[value] = currentline[j];
         }
         if(obj.study !== undefined) {
@@ -738,7 +739,9 @@ export const summaryStatsFileId = 691143057533;
 export const missingnessStatsFileId = 653087731560;
 
 export const mapReduce = (data, variable) => {
-    return data.map(dt => parseInt(dt[variable])).filter(dt => isNaN(dt) === false).reduce((a,b) => a+b);
+    const filteredData = data.map(dt => parseInt(dt[variable])).filter(dt => isNaN(dt) === false);
+    if(filteredData.length > 0) return filteredData.reduce((a,b) => a+b);
+    else return 0;
 }
 
 export const assignNavbarActive = (element, parent) => {
