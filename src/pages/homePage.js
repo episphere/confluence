@@ -3,7 +3,7 @@ export const infoDeck = () => {
     template += `
         <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
-                <img src="./static/images/hero-banner.jpg" class="banner-logo" alt="Confluence logo">
+                <img src="./static/images/hero-banner.jpg" class="banner-logo" style="min-height: 120px;" alt="Confluence logo">
                 <div class="banner-overlay-text row justify-content-center text-center">
                     <div class="col-xl-12">
                         <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>
@@ -55,7 +55,7 @@ export const infoDeckAfterLoggedIn = () => {
     template += `
         <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
-                <img src="./static/images/hero-banner.jpg" class="banner-logo" alt="Confluence logo">
+                <img src="./static/images/hero-banner.jpg" class="banner-logo" style="min-height: 120px;" alt="Confluence logo">
                 <div class="banner-overlay-text row justify-content-center text-center">
                     <div class="col-md-12">
                         <h1 class="banner-overlay-h1">CONFLUENCE DATA PLATFORM</h1>

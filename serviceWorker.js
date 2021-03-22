@@ -47,6 +47,6 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([
-        {url: 'index.html', revision: 'kdfu78'}
+        {url: 'index.html', revision: 'asuwe67hs'}
     ]
 );
