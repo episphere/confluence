@@ -206,10 +206,14 @@ const addEventSortColumn = (dictionary, pageSize) => {
 const renderDataDictionary = (dictionary, pageSize) => {
     let template = `
         <div class="row m-0 pt-md-1 align-left">
-            <div class="col-md-3 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-4 font-bold">Label <button class="transparent-btn sort-column" data-column-name="Label"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-4 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-1"></div>
+            <div class="col-md-11">
+                <div class="row">
+                    <div class="col-md-4 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-5 font-bold">Label <button class="transparent-btn sort-column" data-column-name="Label"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-3 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
+                </div>
+            </div>
+            <div class="ml-auto"></div>
         </div>`
 
     dictionary.forEach((desc, index) => {
@@ -218,10 +222,16 @@ const renderDataDictionary = (dictionary, pageSize) => {
         <div class="card mt-1 mb-1 align-left">
             <div style="padding: 10px" aria-expanded="false" id="heading${desc['Variable']}">
                 <div class="row">
-                    <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
-                    <div class="col-md-4">${desc['Label'] ? desc['Label'] : ''}</div>
-                    <div class="col-md-4">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
-                    <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                    <div class="col-md-11">
+                        <div class="row">
+                            <div class="col-md-4">${desc['Variable'] ? desc['Variable'] : ''}</div>
+                            <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
+                            <div class="col-md-3">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
+                        </div>
+                    </div>
+                    <div class="ml-auto">
+                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                    </div>
                 </div>
             </div>
             <div id="study${desc['Variable']}" class="collapse" aria-labelledby="heading${desc['Variable']}">
