@@ -26,7 +26,7 @@ export const dataDictionaryTemplate = async () => {
         </div>
         <div class="main-summary-row pl-3">
             <div class="col-xl-12 pb-2 pr-0 pl-0 white-bg div-border">
-                <div class="p-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="dataDictionaryBody"></div>
+                <div class="allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="dataDictionaryBody"></div>
             </div>
         </div>
     </div>
@@ -205,7 +205,7 @@ const addEventSortColumn = (dictionary, pageSize) => {
 
 const renderDataDictionary = (dictionary, pageSize) => {
     let template = `
-        <div class="row m-0 pt-md-1 align-left">
+        <div class="row pt-md-1 m-0 align-left div-sticky">
             <div class="col-md-11">
                 <div class="row">
                     <div class="col-md-4 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
@@ -214,13 +214,15 @@ const renderDataDictionary = (dictionary, pageSize) => {
                 </div>
             </div>
             <div class="ml-auto"></div>
-        </div>`
+        </div>
+        <div class="row m-0 align-left allow-overflow w-100">
+        `
 
     dictionary.forEach((desc, index) => {
         if(index > pageSize ) return
         template += `
-        <div class="card mt-1 mb-1 align-left">
-            <div style="padding: 10px" aria-expanded="false" id="heading${desc['Variable']}">
+        <div class="card border-0 mt-1 mb-1 align-left w-100 pt-md-1">
+            <div class="pl-3 pt-1 pr-3 pb-1" aria-expanded="false" id="heading${desc['Variable']}">
                 <div class="row">
                     <div class="col-md-11">
                         <div class="row">
@@ -247,6 +249,7 @@ const renderDataDictionary = (dictionary, pageSize) => {
             </div>
         </div>`
     });
+    template += `</div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(dictionary, pageSize);

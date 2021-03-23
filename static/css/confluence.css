@@ -1328,6 +1328,15 @@ span.icon {
     border-left: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+.div-sticky {
+    position: sticky;
+    top: 0;
+    padding-top: -10px;
+    z-index: 9;
+    width: 100%;
+    background-color: #ffffff;
+}
+
 .expand-collapse-header {
     text-align: center;
 }
