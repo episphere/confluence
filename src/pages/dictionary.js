@@ -205,7 +205,7 @@ const addEventSortColumn = (dictionary, pageSize) => {
 
 const renderDataDictionary = (dictionary, pageSize) => {
     let template = `
-        <div class="row pt-md-1 m-0 align-left div-sticky">
+        <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
             <div class="col-md-11">
                 <div class="row">
                     <div class="col-md-4 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
@@ -231,7 +231,7 @@ const renderDataDictionary = (dictionary, pageSize) => {
                             <div class="col-md-3">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
                         </div>
                     </div>
-                    <div class="ml-auto div-border-left">
+                    <div class="ml-auto">
                         <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>

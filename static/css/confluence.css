@@ -1324,10 +1324,6 @@ span.icon {
     border-left: 1px solid #7b7474;
 }
 
-.div-border-left {
-    border-left: 1px solid rgba(0, 0, 0, 0.12);
-}
-
 .div-sticky {
     position: sticky;
     top: 0;
