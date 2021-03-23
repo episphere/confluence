@@ -229,7 +229,7 @@ const renderDataDictionary = (dictionary, pageSize) => {
                             <div class="col-md-3">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
                         </div>
                     </div>
-                    <div class="ml-auto">
+                    <div class="ml-auto div-border-left">
                         <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
