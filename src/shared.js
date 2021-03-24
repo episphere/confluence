@@ -27,6 +27,27 @@ export const getFolderItems = async (id) => {
     }
 }
 
+export const getDownloadURL = async (id = '751586322923') => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const downloadFile = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
+        headers: {"Authorization": `Bearer ${access_token}`}, signal
+    });
+    controller.abort();
+    return downloadFile.url;
+}
+
+export const getFileRange = async (url, start, end) => {
+    const r = await fetch(url,{
+        method:'GET',
+        headers:{
+            'range': `bytes=${start}-${end}`
+        }
+    });
+    return r.text();
+}
+
 export const getFolderInfo = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
