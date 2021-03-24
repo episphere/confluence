@@ -157,7 +157,6 @@ export const renderAllCharts = (finalData, headers, showFilter) => {
     if(showFilter) {
         allFilters(finalData, headers);
     };
-    // addEventVariableDefinitions();
 }
 
 export const updateCounts = (data) => {
@@ -207,14 +206,21 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
-    // document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']} <button class="info-btn variable-definition" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" aria-label="More info" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, headers) => {
     let x = headers.filter(dt => /famHist_/.test(dt))
-    const y = x.map(dt => mapReduce(jsonData, dt));
+    let y = x.map(dt => mapReduce(jsonData, dt));
     x = x.map(dt => chartLabels[dt.replace(/famHist_/, '')] ? chartLabels[dt.replace(/famHist_/, '')] : dt.replace(/famHist_/, ''));
+    
+    let tmpObj = {};
+    x.forEach((l,i) => tmpObj[l] = y[i])
+    for(let obj in tmpObj) {
+        if(tmpObj[obj] === 0) delete tmpObj[obj];
+    }
+    x = Object.keys(tmpObj);
+    y = Object.values(tmpObj);
     document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
@@ -247,8 +253,15 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, header
     }
     
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
-    const values = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => mapReduce(jsonData, dt));
-    const labels = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => chartLabels[dt.replace(/ER_statusIndex_/, '')] ? chartLabels[dt.replace(/ER_statusIndex_/, '')] : dt.replace(/ER_statusIndex_/, ''));
+    let values = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => mapReduce(jsonData, dt));
+    let labels = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => chartLabels[dt.replace(/ER_statusIndex_/, '')] ? chartLabels[dt.replace(/ER_statusIndex_/, '')] : dt.replace(/ER_statusIndex_/, ''));
+    let tmpObj = {};
+    labels.forEach((l,i) => tmpObj[l] = values[i])
+    for(let obj in tmpObj) {
+        if(tmpObj[obj] === 0) delete tmpObj[obj];
+    }
+    values = Object.values(tmpObj);
+    labels = Object.keys(tmpObj);
     const d3 = Plotly.d3
     const format = d3.format(',3f')
     const total = values.reduce((a, b) => a + b)
@@ -293,7 +306,6 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
     }else{
         pieLabel = parameter;
     }
-    // document.getElementById(labelID).innerHTML = `${pieLabel} <button class="info-btn variable-definition" aria-label="More info" data-variable='${parameter}' data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"><i class="fas fa-question-circle cursor-pointer"></i></button>`;
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const data = [
         {
@@ -330,7 +342,6 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
     for(let studyDesign of allLabels){
         valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
     }
-    // allLabels = allLabels.map(dt => dt.length > 5 ? dt.substr(0,5)+'...' : dt)
     const data = [
         {
             x: allLabels,
