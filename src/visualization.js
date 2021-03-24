@@ -1,6 +1,8 @@
 import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
+const plotTextSize = 10;
+
 const chartLabels = {
     'yes': 'Yes',
     'no': 'No',
@@ -200,8 +202,8 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
-        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -233,8 +235,8 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
-        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -276,6 +278,9 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, header
             values,
             type: 'pie',
             textinfo: 'label+percent',
+            textfont : {
+                size: plotTextSize
+            },
             hoverinfo: text,
             textposition: 'outside',
             automargin: true,
@@ -318,8 +323,8 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true},
-        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
+        xaxis: {fixedrange: true, automargin: true, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -353,8 +358,8 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) =
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
-        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
@@ -395,8 +400,8 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartDiv) => 
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickangle: 45},
-        yaxis: {title:`Count`, fixedrange: true, tickformat:',d'},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };

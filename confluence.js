@@ -25,7 +25,6 @@ export const confluence = async () => {
             console.log(error);
         }
     }
-
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
 
@@ -361,3 +360,9 @@ window.onstorage = () => {
         document.getElementById('loginBoxAppProd').hidden = true;
     }
 };
+
+window.addEventListener('beforeinstallprompt', e => {
+    e.userChoice.then(choiceResult => {
+        gtag('send', 'event', 'A2H', choiceResult.outcome); 
+    });
+});
