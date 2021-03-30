@@ -16,7 +16,7 @@ export const infoDeck = () => {
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
                     template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about/overview', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
                     template += cardContents({header: 'Join a Participating Consortia', button: 'Join a Consortia', href: '#join', icon: 'fa-chart-bar', explanation: 'You can participate in Confluence by joining a breast cancer consortium.'})
-                    template += cardContents({header: 'Request Data Access', button: 'Request Data Access', href: '#home', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
+                    template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
             </div>
         </div>
@@ -68,8 +68,7 @@ export const infoDeckAfterLoggedIn = () => {
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
                 template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about/overview', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
                 template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#data_submission', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br></br>You can always view, modify or download any data you submit.'})
-                template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
-                template += cardContents({header: 'Submit a Proposal', button: 'Submit a Proposal', href: '#home', icon: 'fa-file-upload', explanation: 'Submit a proposal to access data for analyses. </br></br>Proposals will be reviewed by DACCs from all relevant consortia.'})
+                template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
             </div>
         </div>

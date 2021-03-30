@@ -47,6 +47,6 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([
-        {url: 'index.html', revision: 'asuwe67hs'}
+        {url: 'index.html', revision: 'aloid32'}
     ]
 );

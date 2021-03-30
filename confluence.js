@@ -223,6 +223,14 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = confluenceContactPage();
     }
+    else if (hash === '#data_request') {
+        const element = document.getElementById('dataRequest');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Contact';
+        assignNavbarActive(element, 1);
+        confluenceDiv.innerHTML = dataRequestTemplate();
+    }
     else window.location.hash = '#home';
 }
 
