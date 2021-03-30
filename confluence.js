@@ -4,7 +4,7 @@ import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js'
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginAppProd, logOut } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -17,6 +17,7 @@ import { dataDictionaryTemplate } from './src/pages/dictionary.js';
 
 
 export const confluence = async () => {
+    // handleRangeRequests();
     if('serviceWorker' in navigator){
         try {
             navigator.serviceWorker.register('./serviceWorker.js');
@@ -366,3 +367,5 @@ window.addEventListener('beforeinstallprompt', e => {
         gtag('send', 'event', 'A2H', choiceResult.outcome); 
     });
 });
+
+

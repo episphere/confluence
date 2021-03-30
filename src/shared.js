@@ -27,25 +27,15 @@ export const getFolderItems = async (id) => {
     }
 }
 
-export const getDownloadURL = async (id = '751586322923') => {
+export const getFileRange = async (id, start, end) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
-    const controller = new AbortController();
-    const signal = controller.signal;
-    const downloadFile = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
-        headers: {"Authorization": `Bearer ${access_token}`}, signal
-    });
-    controller.abort();
-    return downloadFile.url;
-}
-
-export const getFileRange = async (url, start, end) => {
-    const r = await fetch(url,{
-        method:'GET',
-        headers:{
+    const response = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
+        headers: {
+            "Authorization": `Bearer ${access_token}`,
             'range': `bytes=${start}-${end}`
-        }
+        }, 
     });
-    return r.text();
+    return response.text();
 }
 
 export const getFolderInfo = async (id) => {
@@ -779,4 +769,28 @@ export const reSizePlots = () => {
 
 export const shortenText = (str, size) => {
     return str.length > size ? `${str.substr(0,size)}...`: str;
+}
+
+export const handleRangeRequests = async () => {
+    const fileInfo = await getFileInfo('751586322923');
+    const fileSize = fileInfo.size;
+    console.log(`File size ${fileSize/1000000} MB`)
+    const rangeStart = 0;
+    const rangeEnd = 10000000;
+    console.time('Downloading 10 MB of data')
+    const rangeData = await getFileRange('751586322923', rangeStart, rangeEnd);
+    console.timeEnd('Downloading 10 MB of data')
+    console.time('Parsing')
+    const lines = rangeData.trim().split(/[\n]/g);
+    const header = lines[0];
+    const headerArray = header.split(/[\s]/g);
+    console.log(headerArray)
+    const dataArray = [];
+    lines.forEach((l,i) => {
+        if(rangeStart === 0 && i === 0) return;
+        if(i === lines.length - 1) return;
+        dataArray.push(l.split(/[\s]/g));
+    })
+    console.timeEnd('Parsing')
+    console.log(dataArray)
 }

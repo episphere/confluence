@@ -32,8 +32,8 @@ export const dataSubmissionTemplate = async () => {
                 </div>
                 <div class="row create-study">
                     <div class="upload-in-study">
-                        <button data-toggle="modal" id="uploadDataBtn" title="Upload data" data-target="#uploadInStudy" class="btn btn-light">
-                            <i class="fas fa-upload"></i> Upload data
+                        <button data-toggle="modal" id="uploadDataBtn" title="Submit data" data-target="#uploadInStudy" class="btn btn-light div-border">
+                            <i class="fas fa-upload"></i> Submit data
                         </button>
                     </div>
                 </div>`;
