@@ -66,7 +66,7 @@ export const infoDeckAfterLoggedIn = () => {
             </div>
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
-                template += cardContents({header: 'Learn about Confluence', button: 'Learn about Confluence', href: '#about/overview', icon: 'fa-download', explanation: 'Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data.'})
+                template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
                 template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#data_submission', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br></br>You can always view, modify or download any data you submit.'})
                 template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
