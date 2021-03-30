@@ -154,7 +154,7 @@ export const renderAllCharts = (finalData, headers, showFilter) => {
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
-    renderStatusPieChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
+    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
         allFilters(finalData, headers);
@@ -303,7 +303,7 @@ const countStatus = (value, jsonData) => {
 }
 
 
-const renderStatusPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
+const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
     document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
@@ -323,7 +323,7 @@ const renderStatusPieChart = (jsonData, parameter, id, labelID, chartDiv) => {
         }
     ];
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickfont: {size : plotTextSize}},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
