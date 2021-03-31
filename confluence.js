@@ -227,7 +227,7 @@ const manageRouter = async () => {
         const element = document.getElementById('dataRequest');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Contact';
+        document.title = 'Confluence - Data Request';
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
