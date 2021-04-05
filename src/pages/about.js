@@ -72,6 +72,8 @@ export const renderOverView = () => {
         let totalCases = 0;
         let totalControls = 0;
         let totalStudies = 0;
+        let totalBRCA1 = 0;
+        let totalBRCA2 = 0;
         
         let summary = '';
         summary += `
@@ -79,7 +81,7 @@ export const renderOverView = () => {
         <div class="align-center">
             <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
                 <div class="col-md-2" style="padding: 0px">
-                    <div class="div-border allow-overflow align-left" style="max-height: 164px; height:100%;padding-left: 5px !important; margin-right: 15px;">
+                    <div class="div-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-22">Filter</span></br>`
                     
         for(let key in data) {
@@ -88,6 +90,8 @@ export const renderOverView = () => {
             totalCases += data[key].cases;
             totalControls += data[key].controls;
             totalStudies += data[key].studies;
+            if(data[key].BRCA1) totalBRCA1 += data[key].BRCA1
+            if(data[key].BRCA2) totalBRCA2 += data[key].BRCA2
             summary += `<div class="row font-size-16" style="margin:2px 2px;">
             
                 <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
@@ -100,12 +104,12 @@ export const renderOverView = () => {
                     <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
                     `
         element.innerHTML = summary;
-        renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+        renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2);
         addEventConsortiaFilter(data);
     });
 }
 
-export const renderDataSummary = (totalConsortia, totalStudies, totalCases, totalControls) => {
+export const renderDataSummary = (totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2) => {
     document.getElementById('renderDataSummaryCounts').innerHTML = `
         <div class="row">
             <div class="col">
@@ -125,6 +129,16 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
             <div class="col">
                 <span class="font-size-22">Controls</span></br>
                 <span class="font-size-32">${numberWithCommas(totalControls)}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span class="font-size-22">BRCA1</span></br>
+                <span class="font-size-32">${numberWithCommas(totalBRCA1)}</span>
+            </div>
+            <div class="col">
+                <span class="font-size-22">BRCA2</span></br>
+                <span class="font-size-32">${numberWithCommas(totalBRCA2)}</span>
             </div>
         </div>
     `

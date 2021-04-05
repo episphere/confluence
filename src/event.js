@@ -1240,9 +1240,9 @@ const filterData = (jsonData, headers) => {
     }
     const selectedStudies = array.map(s => s.split('@#$')[1]);
     document.getElementById('listFilters').innerHTML = `
-    <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
-    <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
-    <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
+        <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+        <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
     renderAllCharts(finalData, headers);
 }
@@ -1255,24 +1255,28 @@ export const addEventConsortiaFilter = (data) => {
             delete data['dataModifiedAt'];
             if(selectedConsortium.length > 0) {
                 const newData = Object.values(data).filter(dt => selectedConsortium.includes(dt.name));
-                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0;
+                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;
                 newData.forEach(obj => {
                     totalConsortia++;
                     totalStudies += obj.studies;
                     totalCases += obj.cases;
                     totalControls += obj.controls;
+                    if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
+                    if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2);
             }
             else {
-                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0;
+                let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;
                 Object.values(data).forEach(obj => {
                     totalConsortia++;
                     totalStudies += obj.studies;
                     totalCases += obj.cases;
                     totalControls += obj.controls;
+                    if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
+                    if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls);
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2);
             }
         })
     })
