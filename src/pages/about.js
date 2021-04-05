@@ -121,7 +121,7 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
                 <span class="font-size-32">${numberWithCommas(totalStudies)}</span>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col">
                 <span class="font-size-22">Cases</span></br>
                 <span class="font-size-32">${numberWithCommas(totalCases)}</span>
@@ -131,7 +131,7 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
                 <span class="font-size-32">${numberWithCommas(totalControls)}</span>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col">
                 <span class="font-size-22">BRCA1</span></br>
                 <span class="font-size-32">${numberWithCommas(totalBRCA1)}</span>
