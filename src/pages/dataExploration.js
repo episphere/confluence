@@ -45,10 +45,10 @@ const dataVisulizationCards = (obj, showTabs) => `
                     ${showTabs ? `
                         <div class="main-summary-row white-bg">
                             <div class="col">
-                                <button id="caseControlStatusChart" style="white-space: nowrap;" data-parameter='status' class="col sub-menu-btn nav-link active-chart black-font font-size-17 font-bold toggle-chart">Case-control status</button>
+                                <button id="caseControlStatusChart" style="white-space: nowrap;" data-parameter='status' class="col sub-menu-btn nav-link active-chart black-font font-size-17 toggle-chart">Case-control status</button>
                             </div>
                             <div class="col">
-                                <button id="mutationChart" data-parameter='Mutation' class="col sub-menu-btn nav-link black-font font-size-17 font-bold toggle-chart">Mutation</button>
+                                <button id="mutationChart" data-parameter='Mutation' class="col sub-menu-btn nav-link black-font font-size-17 toggle-chart">Mutation</button>
                             </div>
                         </div>
                     `: ``}
