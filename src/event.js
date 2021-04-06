@@ -1093,6 +1093,8 @@ const addEventUpdateSummaryStatsForm = () => {
                         publicDataObj[consortium].studies = 0;
                         publicDataObj[consortium].cases = 0;
                         publicDataObj[consortium].controls = 0;
+                        publicDataObj[consortium].BRCA1 = 0;
+                        publicDataObj[consortium].BRCA2 = 0;
                     }
                     if(uniqueStudies.indexOf(obj.study) === -1) {
                         uniqueStudies.push(obj.study);
@@ -1100,6 +1102,8 @@ const addEventUpdateSummaryStatsForm = () => {
                     }
                     if(obj.status === 'case') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
                     if(obj.status === 'control') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
+                    if(obj['Mutation'] && obj['Mutation'] === 'BRCA1') publicDataObj[consortium].BRCA1 += parseInt(obj.statusTotal);
+                    if(obj['Mutation'] && obj['Mutation'] === 'BRCA2') publicDataObj[consortium].BRCA2 += parseInt(obj.statusTotal);
                 })
             }
             masterArray = masterArray.concat(jsonArray);

@@ -155,7 +155,6 @@ export const renderAllCharts = (finalData, headers, showFilter) => {
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
     renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
-    // renderStatusBarChart(finalData, 'Mutation', 'dataSummaryVizChart22', 'dataSummaryVizLabel22', 'chartDiv22', 'BRCA1', 'BRCA2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
         allFilters(finalData, headers);
@@ -319,12 +318,6 @@ const countStatus = (value, jsonData, parameter) => {
 
 
 const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv, x1, x2) => {
-    let pieLabel = ''
-    if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
-        pieLabel = variables.BCAC[parameter]['label'];
-    }else{
-        pieLabel = parameter;
-    }
     const yvalues = [countStatus(x1, jsonData, parameter), countStatus(x2, jsonData, parameter)];
     const data = [
         {
