@@ -46,7 +46,17 @@ const allFilters = (jsonData, headers) => {
                 </select>
             </div>
     `;
-    template += `<label class="filter-label font-size-13" for="studyConsortiaList">Studies</label>`
+    template += `<label class="filter-label font-size-13" for="studyConsortiaList">Consortium</label>
+    <div class="main-summary-row font-size-13">
+        <div class="col p-0">
+            <button id="allOtherConsortium" style="white-space:nowrap" class="col sub-menu-btn nav-link active-chart black-font toggle-chart">Other consortium</button>
+        </div>
+        <div class="col p-0">
+            <button id="cimbaConsortium" class="col sub-menu-btn nav-link black-font toggle-chart">CIMBA</button>
+        </div>
+    </div>
+    
+    `
     const obj = aggegrateData(jsonData);
     for(let consortium in obj){
         let innerTemplate = `
@@ -159,22 +169,22 @@ export const renderAllCharts = (finalData, headers, showFilter) => {
     if(showFilter) {
         allFilters(finalData, headers);
     };
-    const caseControlStatusChart = document.getElementById('caseControlStatusChart');
-    const mutationChart = document.getElementById('mutationChart');
-    toggleCharts(caseControlStatusChart, finalData);
-    toggleCharts(mutationChart, finalData);
+    // const caseControlStatusChart = document.getElementById('caseControlStatusChart');
+    // const mutationChart = document.getElementById('mutationChart');
+    // toggleCharts(caseControlStatusChart, finalData);
+    // toggleCharts(mutationChart, finalData);
 }
 
-const toggleCharts = (element, finalData) => {
-    element.addEventListener('click', () => {
-        removeActiveClass('toggle-chart', 'active-chart');
-        element.classList.add('active-chart');
-        const parameter = element.dataset.parameter;
-        console.log(parameter)
-        if(parameter === 'Mutation') renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'BRCA1', 'BRCA2');
-        else renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
-    });
-}
+// const toggleCharts = (element, finalData) => {
+//     element.addEventListener('click', () => {
+//         removeActiveClass('toggle-chart', 'active-chart');
+//         element.classList.add('active-chart');
+//         const parameter = element.dataset.parameter;
+//         console.log(parameter)
+//         if(parameter === 'Mutation') renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'BRCA1', 'BRCA2');
+//         else renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
+//     });
+// }
 
 export const updateCounts = (data) => {
     const obj = aggegrateData(data);
@@ -318,6 +328,13 @@ const countStatus = (value, jsonData, parameter) => {
 
 
 const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv, x1, x2) => {
+    let pieLabel = ''
+    if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
+        pieLabel = variables.BCAC[parameter]['label'];
+    }else{
+        pieLabel = parameter;
+    }
+    document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const yvalues = [countStatus(x1, jsonData, parameter), countStatus(x2, jsonData, parameter)];
     const data = [
         {
