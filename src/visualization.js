@@ -1,4 +1,4 @@
-import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
+import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, removeActiveClass } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 const plotTextSize = 10;
@@ -154,11 +154,27 @@ export const renderAllCharts = (finalData, headers, showFilter) => {
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
-    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2');
+    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
+    // renderStatusBarChart(finalData, 'Mutation', 'dataSummaryVizChart22', 'dataSummaryVizLabel22', 'chartDiv22', 'BRCA1', 'BRCA2');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
         allFilters(finalData, headers);
     };
+    const caseControlStatusChart = document.getElementById('caseControlStatusChart');
+    const mutationChart = document.getElementById('mutationChart');
+    toggleCharts(caseControlStatusChart, finalData);
+    toggleCharts(mutationChart, finalData);
+}
+
+const toggleCharts = (element, finalData) => {
+    element.addEventListener('click', () => {
+        removeActiveClass('toggle-chart', 'active-chart');
+        element.classList.add('active-chart');
+        const parameter = element.dataset.parameter;
+        console.log(parameter)
+        if(parameter === 'Mutation') renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'BRCA1', 'BRCA2');
+        else renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
+    });
 }
 
 export const updateCounts = (data) => {
@@ -190,7 +206,6 @@ export const getSelectedStudies = () => {
 };
 
 const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
-    document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
             x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '>=90'],
@@ -223,7 +238,6 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
     }
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
-    document.getElementById(chartDiv).classList = ['background-white'];
     const data = [
         {
             x: x,
@@ -246,7 +260,6 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
 }
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, headers) => {
-    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -298,24 +311,25 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, header
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const countStatus = (value, jsonData) => {
-    return jsonData.filter(dt => {if(dt.status === value) return dt}).map(dt => dt['total']).reduce((a,b) => a+b);
+const countStatus = (value, jsonData, parameter) => {
+    let tmpArray = jsonData.filter(dt => {if(dt[parameter] === value) return dt}).map(dt => dt['total']);
+    if(tmpArray.length === 0) return 0;
+    return tmpArray.reduce((a,b) => a+b);
 }
 
 
-const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white'];
+const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv, x1, x2) => {
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
     }else{
         pieLabel = parameter;
     }
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    const yvalues = [countStatus(x1, jsonData, parameter), countStatus(x2, jsonData, parameter)];
     const data = [
         {
-            x: ['Case', 'Control'],
-            y: [countStatus('case', jsonData), countStatus('control', jsonData)],
+            x: [x1, x2],
+            y: yvalues,
             type: 'bar',
             marker:{
                 color: ['#BF1B61', '#f7b6d2']
@@ -332,7 +346,6 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
 }
 
 const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -375,7 +388,6 @@ const getUniqueConsortium = (jsonData, parameter) => {
 }
 
 const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
-    document.getElementById(chartDiv).classList = ['background-white'];
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];

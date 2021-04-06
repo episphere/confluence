@@ -37,16 +37,24 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, dictionary)
     `;
 }
 
-const dataVisulizationCards = (obj) => `
+const dataVisulizationCards = (obj, showTabs) => `
         <div class="col-xl-4 padding-right-zero" style="margin-bottom: 1rem;">
-            <div id="${obj.divId}">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="${obj.cardHeaderId}"></label></span>
-                    </div>
-                    <div class="card-body viz-card-body">
-                        <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
-                    </div>
+            <div id="${obj.divId}" style="height:100%" class="card div-border background-white">
+                <div class="card-header">
+                    ${obj.cardHeaderId ? `<span class="data-summary-label-wrap"><label class="font-size-17 font-bold" id="${obj.cardHeaderId}"></label></span>`: ``}
+                    ${showTabs ? `
+                        <div class="main-summary-row white-bg">
+                            <div class="col">
+                                <button id="caseControlStatusChart" style="white-space: nowrap;" data-parameter='status' class="col sub-menu-btn nav-link active-chart black-font font-size-17 font-bold toggle-chart">Case-control status</button>
+                            </div>
+                            <div class="col">
+                                <button id="mutationChart" data-parameter='Mutation' class="col sub-menu-btn nav-link black-font font-size-17 font-bold toggle-chart">Mutation</button>
+                            </div>
+                        </div>
+                    `: ``}
+                </div>
+                <div class="card-body viz-card-body">
+                    <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
                 </div>
             </div>
         </div>
@@ -77,7 +85,7 @@ export const dataSummaryStatisticsTemplate = () => {
         <div class="main-summary-row">
         `
         template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
-        template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
+        template += dataVisulizationCards({divId: 'chartDiv2', cardBodyId: 'dataSummaryVizChart2'}, true)
         template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
         template += `</div><div class="main-summary-row">`
 
