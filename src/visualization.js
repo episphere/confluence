@@ -19,7 +19,7 @@ export const getFileContent = async () => {
     if(jsonData.length === 0) {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
-    }
+    };
     renderAllCharts(jsonData, headers, true);
 };
 
@@ -46,21 +46,20 @@ const allFilters = (jsonData, headers) => {
                 </select>
             </div>
     `;
-    template += `<label class="filter-label font-size-13" for="studyConsortiaList">Consortium</label>
-    <div class="main-summary-row font-size-13">
-        <div class="col p-0">
-            <button id="allOtherConsortium" style="white-space:nowrap" class="col sub-menu-btn nav-link active-chart black-font toggle-chart">Other consortium</button>
-        </div>
-        <div class="col p-0">
-            <button id="cimbaConsortium" class="col sub-menu-btn nav-link black-font toggle-chart">CIMBA</button>
-        </div>
+    template += `
+    <div class="form-group">
+        <label class="filter-label font-size-13" for="consortiumSelection">Consortium</label>
+        <select class="form-control font-size-15" id="consortiumSelection">
+            <option value='allOther'>Other consortium</option>
+            <option value='cimba'>CIMBA</option>
+        </select>
     </div>
-    
     `
     const obj = aggegrateData(jsonData);
     for(let consortium in obj){
+        if(consortium === 'CIMBA') continue;
         let innerTemplate = `
-                    <ul class="remove-padding-left font-size-15" id="studyConsortiaList">
+                    <ul class="remove-padding-left font-size-15">
                         <li class="custom-borders filter-list-item">
                             <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                 <i class="fas fa-caret-down"></i>
@@ -159,32 +158,30 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-export const renderAllCharts = (finalData, headers, showFilter) => {
+export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
+    let finalData = '';
+    if(onlyCIMBA) finalData = data.filter(dt => dt.consortium === 'CIMBA');
+    else finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'chartDiv3', finalData);
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
-    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
+    renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
         allFilters(finalData, headers);
     };
-    // const caseControlStatusChart = document.getElementById('caseControlStatusChart');
-    // const mutationChart = document.getElementById('mutationChart');
-    // toggleCharts(caseControlStatusChart, finalData);
-    // toggleCharts(mutationChart, finalData);
+    toggleCharts(data, headers, false);
+
 }
 
-// const toggleCharts = (element, finalData) => {
-//     element.addEventListener('click', () => {
-//         removeActiveClass('toggle-chart', 'active-chart');
-//         element.classList.add('active-chart');
-//         const parameter = element.dataset.parameter;
-//         console.log(parameter)
-//         if(parameter === 'Mutation') renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'BRCA1', 'BRCA2');
-//         else renderStatusBarChart(finalData, parameter, 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', 'case', 'control');
-//     });
-// }
+const toggleCharts = (finalData, headers, showFilter) => {
+    const consortiumSelection = document.getElementById('consortiumSelection');
+    consortiumSelection.addEventListener('change', () => {
+        const parameter = consortiumSelection.value;
+        renderAllCharts(finalData, headers, showFilter, parameter === 'cimba' ? true : false)
+    });
+}
 
 export const updateCounts = (data) => {
     const obj = aggegrateData(data);
@@ -236,6 +233,7 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
 }
 
 const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, headers) => {
+    document.getElementById(id).innerHTML = '';
     let x = headers.filter(dt => /famHist_/.test(dt))
     let y = x.map(dt => mapReduce(jsonData, dt));
     x = x.map(dt => chartLabels[dt.replace(/famHist_/, '')] ? chartLabels[dt.replace(/famHist_/, '')] : dt.replace(/famHist_/, ''));
@@ -247,6 +245,10 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
     }
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
+    if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
+        document.getElementById(id).innerHTML = `${variables.BCAC[parameter]['label']} data not available!`;
+        return;
+    }
     const data = [
         {
             x: x,

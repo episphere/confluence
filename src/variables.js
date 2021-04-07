@@ -1,5 +1,8 @@
 export const variables = {
     BCAC: {
+        Carrier_status: {
+            'label': 'Carrier status'
+        },
         studyDesign: {
             'label': 'Study design'
         },
