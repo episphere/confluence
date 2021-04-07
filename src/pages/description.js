@@ -210,8 +210,8 @@ const addEventSortColumn = (descriptions, pageSize) => {
 }
 
 const addEventFilterDataCatalogue = (descriptions) => {
-    const consortiumSelection = document.getElementsByClassName('select-consortium');
-    Array.from(consortiumSelection).forEach(ele => {
+    const consortiumTypeSelection = document.getElementsByClassName('select-consortium');
+    Array.from(consortiumTypeSelection).forEach(ele => {
         ele.addEventListener('click', () => {
             filterDataBasedOnSelection(descriptions)
         });

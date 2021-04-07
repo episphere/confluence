@@ -88,14 +88,15 @@ const countPublicStatistics = (d, caseControl) => {
                 <div class="col-md-2" style="padding: 0px">
                     <div class="div-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-17 font-bold">Filter</span></br>
-                    
-                    <div class="form-group pr-1">
-                        <label class="filter-label font-size-13" for="overviewConsortiumSelection">Consortium</label>
-                        <select class="form-control font-size-15" id="overviewConsortiumSelection">
-                            <option value='allOther'>Other consortium</option>
-                            <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
-                        </select>
-                    </div>
+                    ${data['CIMBA'] ? `
+                        <div class="form-group pr-1">
+                            <label class="filter-label font-size-13" for="overviewConsortiumSelection">Consortium</label>
+                            <select class="form-control font-size-15" id="overviewConsortiumSelection">
+                                <option value='allOther'>Other consortium</option>
+                                <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
+                            </select>
+                        </div>
+                    `:``}
     `
     if(caseControl) delete data['CIMBA'];
     for(let key in data) {
@@ -128,6 +129,7 @@ const countPublicStatistics = (d, caseControl) => {
 
 const addEventOverviewConsortiumSelection = (data) => {
     const select = document.getElementById('overviewConsortiumSelection');
+    if(!select) return;
     select.addEventListener('change', () => {
         const selectedValue = select.value;
         if(selectedValue === 'cimba') countPublicStatistics(data, false);

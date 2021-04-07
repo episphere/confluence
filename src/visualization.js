@@ -27,6 +27,7 @@ const allFilters = (jsonData, headers, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
+    const obj = aggegrateData(jsonData);
     let template =`
         <div style="width: 100%;">
             <div class="form-group">
@@ -46,16 +47,18 @@ const allFilters = (jsonData, headers, cimba) => {
                 </select>
             </div>
     `;
-    template += `
-    <div class="form-group">
-        <label class="filter-label font-size-13" for="consortiumSelection">Consortium</label>
-        <select class="form-control font-size-15" id="consortiumSelection">
-            <option value='allOther'>Other consortium</option>
-            <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
-        </select>
-    </div>
-    `
-    const obj = aggegrateData(jsonData);
+    if(obj['CIMBA']) {
+        template += `
+        <div class="form-group">
+            <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
+            <select class="form-control font-size-15" id="consortiumTypeSelection">
+                <option value='allOther'>Other consortium</option>
+                <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
+            </select>
+        </div>
+        `
+    }
+    
     for(let consortium in obj){
         if(consortium === 'CIMBA') continue;
         let innerTemplate = `
@@ -176,9 +179,10 @@ export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
 }
 
 const toggleCharts = (finalData, headers, showFilter) => {
-    const consortiumSelection = document.getElementById('consortiumSelection');
-    consortiumSelection.addEventListener('change', () => {
-        const parameter = consortiumSelection.value;
+    const consortiumTypeSelection = document.getElementById('consortiumTypeSelection');
+    if(!consortiumTypeSelection) return;
+    consortiumTypeSelection.addEventListener('change', () => {
+        const parameter = consortiumTypeSelection.value;
         renderAllCharts(finalData, headers, showFilter, parameter === 'cimba' ? true : false)
     });
 }
