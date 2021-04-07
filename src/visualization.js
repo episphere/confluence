@@ -23,7 +23,7 @@ export const getFileContent = async () => {
     renderAllCharts(jsonData, headers, true);
 };
 
-const allFilters = (jsonData, headers) => {
+const allFilters = (jsonData, headers, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
@@ -31,7 +31,7 @@ const allFilters = (jsonData, headers) => {
         <div style="width: 100%;">
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genderSelection">Gender</label>
-                <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
+                <select ${cimba ? 'disabled': ''} class="form-control font-size-15" id="genderSelection" data-variable='sex'>
                     <option selected value='all'>All</option>
                     <option value='female'>Female</option>
                     <option value='male'>Male</option>
@@ -39,7 +39,7 @@ const allFilters = (jsonData, headers) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
-                <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
+                <select ${cimba ? 'disabled': ''} class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
@@ -51,7 +51,7 @@ const allFilters = (jsonData, headers) => {
         <label class="filter-label font-size-13" for="consortiumSelection">Consortium</label>
         <select class="form-control font-size-15" id="consortiumSelection">
             <option value='allOther'>Other consortium</option>
-            <option value='cimba'>CIMBA</option>
+            <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
         </select>
     </div>
     `
@@ -169,9 +169,9 @@ export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
     renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control');
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
     if(showFilter) {
-        allFilters(finalData, headers);
+        allFilters(finalData, headers, onlyCIMBA);
     };
-    toggleCharts(data, headers, false);
+    toggleCharts(data, headers, true);
 
 }
 
