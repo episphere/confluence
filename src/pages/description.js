@@ -18,7 +18,6 @@ export const renderDescription = (modified_at) => {
                         <div id="filterDataCatalogue" class="align-left"></div>
                     </div>
                 </div>
-                
             </div>
             <div class="col-xl-10 padding-right-zero font-size-16">
                 <div class="main-summary-row">
@@ -211,8 +210,8 @@ const addEventSortColumn = (descriptions, pageSize) => {
 }
 
 const addEventFilterDataCatalogue = (descriptions) => {
-    const consortiumSelection = document.getElementsByClassName('select-consortium');
-    Array.from(consortiumSelection).forEach(ele => {
+    const consortiumTypeSelection = document.getElementsByClassName('select-consortium');
+    Array.from(consortiumTypeSelection).forEach(ele => {
         ele.addEventListener('click', () => {
             filterDataBasedOnSelection(descriptions)
         });

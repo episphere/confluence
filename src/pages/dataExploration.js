@@ -39,14 +39,12 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, dictionary)
 
 const dataVisulizationCards = (obj) => `
         <div class="col-xl-4 padding-right-zero" style="margin-bottom: 1rem;">
-            <div id="${obj.divId}">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="data-summary-label-wrap"><label class="dataSummary-label" id="${obj.cardHeaderId}"></label></span>
-                    </div>
-                    <div class="card-body viz-card-body">
-                        <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
-                    </div>
+            <div id="${obj.divId}" style="height:100%" class="card div-border background-white">
+                <div class="card-header">
+                    ${obj.cardHeaderId ? `<span class="data-summary-label-wrap"><label class="font-size-17 font-bold" id="${obj.cardHeaderId}"></label></span>`: ``}
+                </div>
+                <div class="card-body viz-card-body">
+                    <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
                 </div>
             </div>
         </div>

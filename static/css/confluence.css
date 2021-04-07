@@ -698,12 +698,7 @@ label {
 }
 
 .dataSummary-chart {
-    max-height: 360px;
-}
-
-.dataSummary-label{
-    font-weight: bold;
-    font-size: 1.2rem;
+    max-height: 325px;
 }
 
 .side-panel-header {
@@ -1322,6 +1317,10 @@ span.icon {
 
 .grid-border {
     border-left: 1px solid #7b7474;
+}
+
+.active-chart {
+    border-bottom: 2px solid #A41652;
 }
 
 .div-sticky {
