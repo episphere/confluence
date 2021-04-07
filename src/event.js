@@ -1272,6 +1272,7 @@ export const addEventConsortiaFilter = (d) => {
                 renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, true);
             }
             else {
+                delete data['CIMBA']
                 let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;
                 Object.values(data).forEach(obj => {
                     totalConsortia++;
