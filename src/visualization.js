@@ -47,17 +47,15 @@ const allFilters = (jsonData, headers, cimba) => {
                 </select>
             </div>
     `;
-    if(obj['CIMBA']) {
-        template += `
-        <div class="form-group">
-            <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
-            <select class="form-control font-size-15" id="consortiumTypeSelection">
-                <option value='allOther'>Other consortium</option>
-                <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
-            </select>
-        </div>
-        `
-    }
+    template += `
+    <div class="form-group">
+        <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
+        <select class="form-control font-size-15" id="consortiumTypeSelection">
+            <option value='allOther'>Other consortium</option>
+            <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
+        </select>
+    </div>
+    `
     
     for(let consortium in obj){
         if(consortium === 'CIMBA') continue;
