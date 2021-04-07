@@ -1257,6 +1257,7 @@ export const addEventConsortiaFilter = (data) => {
         checkbox.addEventListener('click', () => {
             const selectedConsortium = Array.from(checkboxs).filter(dt => dt.checked).map(dt => dt.dataset.consortia);
             delete data['dataModifiedAt'];
+            delete data['CIMBA'];
             if(selectedConsortium.length > 0) {
                 const newData = Object.values(data).filter(dt => selectedConsortium.includes(dt.name));
                 let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;

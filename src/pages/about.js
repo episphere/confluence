@@ -68,7 +68,6 @@ export const renderOverView = () => {
         const data = response.data;
         if(!data) return;
         countPublicStatistics(data, true);
-        addEventConsortiaFilter(data);
     });
 }
 
@@ -90,7 +89,7 @@ const countPublicStatistics = (d, caseControl) => {
                     <div class="div-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-17 font-bold">Filter</span></br>
                     
-                    <div class="form-group">
+                    <div class="form-group pr-1">
                         <label class="filter-label font-size-13" for="overviewConsortiumSelection">Consortium</label>
                         <select class="form-control font-size-15" id="overviewConsortiumSelection">
                             <option value='allOther'>Other consortium</option>
@@ -99,7 +98,6 @@ const countPublicStatistics = (d, caseControl) => {
                     </div>
     `
     if(caseControl) delete data['CIMBA'];
-    console.log(data)
     for(let key in data) {
         if(!caseControl && key !== 'CIMBA') continue;
         if(key === 'dataModifiedAt') continue;
@@ -110,9 +108,11 @@ const countPublicStatistics = (d, caseControl) => {
         if(data[key].BRCA1) totalBRCA1 += data[key].BRCA1
         if(data[key].BRCA2) totalBRCA2 += data[key].BRCA2
         summary += `<div class="row font-size-16" style="margin:2px 2px;">
-        
-            <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
-                <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label></div>`
+            ${key !== 'CIMBA' ? `
+                <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
+                    <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 10 ? `${data[key].name.substr(0,10)}...`:data[key].name}</label>
+            `:``}
+            </div>`
     }         
     summary += `</div></div>
                 <div class="col-md-10 align-center" style="padding: 0px">
@@ -122,6 +122,7 @@ const countPublicStatistics = (d, caseControl) => {
                 `
     element.innerHTML = summary;
     addEventOverviewConsortiumSelection(d);
+    addEventConsortiaFilter(d)
     renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, caseControl);
 }
 
