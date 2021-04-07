@@ -1268,7 +1268,7 @@ export const addEventConsortiaFilter = (data) => {
                     if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2);
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, true);
             }
             else {
                 let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;
@@ -1280,7 +1280,7 @@ export const addEventConsortiaFilter = (data) => {
                     if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2);
+                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, true);
             }
         })
     })

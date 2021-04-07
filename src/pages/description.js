@@ -18,7 +18,6 @@ export const renderDescription = (modified_at) => {
                         <div id="filterDataCatalogue" class="align-left"></div>
                     </div>
                 </div>
-                
             </div>
             <div class="col-xl-10 padding-right-zero font-size-16">
                 <div class="main-summary-row">
