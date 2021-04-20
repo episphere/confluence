@@ -107,7 +107,7 @@ export const dataSummaryMissingTemplate = async () => {
         `;
 
     const row = document.createElement('div');
-    row.classList = ['main-summary-row div-border overflow-x'];
+    row.classList = ['main-summary-row div-border overflow-x mb-2'];
     row.id = 'missingnessTable'
 
     div2.appendChild(row);
