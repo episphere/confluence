@@ -1,4 +1,4 @@
-import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, removeActiveClass } from './shared.js';
+import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, removeActiveClass, reSizePlots } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 const plotTextSize = 10;
@@ -271,6 +271,11 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
     y = Object.values(tmpObj);
     if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
         document.getElementById(chartRow).removeChild(div);
+        Array.from(document.getElementById(chartRow).children).forEach(e => {
+            e.classList.remove('col-xl-4');
+            e.classList.add('col-xl-6');
+        });
+        reSizePlots();
         return;
     }
     const data = [
