@@ -92,7 +92,7 @@ const countPublicStatistics = (d, caseControl) => {
                         <div class="form-group pr-1">
                             <label class="filter-label font-size-13" for="overviewConsortiumSelection">Consortium</label>
                             <select class="form-control font-size-15" id="overviewConsortiumSelection">
-                                <option value='allOther'>Other consortium</option>
+                                <option value='allOther'>Non-CIMBA</option>
                                 <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
                             </select>
                         </div>

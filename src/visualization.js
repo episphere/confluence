@@ -51,7 +51,7 @@ const allFilters = (jsonData, headers, cimba) => {
     <div class="form-group">
         <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
         <select class="form-control font-size-15" id="consortiumTypeSelection">
-            <option value='allOther'>Other consortium</option>
+            <option value='allOther'>Non-CIMBA</option>
             <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
         </select>
     </div>
@@ -163,18 +163,7 @@ export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
     let finalData = '';
     if(onlyCIMBA) finalData = data.filter(dt => dt.consortium === 'CIMBA');
     else finalData = data.filter(dt => dt.consortium !== 'CIMBA');
-    // `<div class="main-summary-row">
-    // `
-    // template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
-    // template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
-    // template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
-    // template += `</div><div class="main-summary-row">`
-
-    // template += dataVisulizationCards({divId: 'chartDiv3', cardHeaderId: 'dataSummaryVizLabel3', cardBodyId: 'dataSummaryVizChart3'})
-    // template += dataVisulizationCards({divId: 'chartDiv6', cardHeaderId: 'dataSummaryVizLabel6', cardBodyId: 'dataSummaryVizChart6'})
-    // template += dataVisulizationCards({divId: 'chartDiv4', cardHeaderId: 'dataSummaryVizLabel4', cardBodyId: 'dataSummaryVizChart4'})
     
-    // template += `</div>`
     document.getElementById('chartRow1').innerHTML = '';
     document.getElementById('chartRow2').innerHTML = '';
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
