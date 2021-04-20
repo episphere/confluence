@@ -32,7 +32,7 @@ const allFilters = (jsonData, headers, cimba) => {
         <div style="width: 100%;">
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genderSelection">Gender</label>
-                <select ${cimba ? 'disabled': ''} class="form-control font-size-15" id="genderSelection" data-variable='sex'>
+                <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
                     <option selected value='all'>All</option>
                     <option value='female'>Female</option>
                     <option value='male'>Male</option>
@@ -40,7 +40,7 @@ const allFilters = (jsonData, headers, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
-                <select ${cimba ? 'disabled': ''} class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
+                <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
@@ -58,9 +58,8 @@ const allFilters = (jsonData, headers, cimba) => {
     `
     
     for(let consortium in obj){
-        if(consortium === 'CIMBA') continue;
         let innerTemplate = `
-                    <ul class="remove-padding-left font-size-15">
+                    <ul class="remove-padding-left font-size-15 consortium-ul" data-consortium="${consortium}" ${consortium === 'CIMBA' ? 'style="display:none"': ''}>
                         <li class="custom-borders filter-list-item">
                             <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
                                 <i class="fas fa-caret-down"></i>
@@ -159,11 +158,7 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
-    let finalData = '';
-    if(onlyCIMBA) finalData = data.filter(dt => dt.consortium === 'CIMBA');
-    else finalData = data.filter(dt => dt.consortium !== 'CIMBA');
-    
+export const renderAllCharts = (finalData, headers, showFilter, onlyCIMBA) => {
     document.getElementById('chartRow1').innerHTML = '';
     document.getElementById('chartRow2').innerHTML = '';
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
@@ -175,17 +170,6 @@ export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
     if(showFilter) {
         allFilters(finalData, headers, onlyCIMBA);
     };
-    toggleCharts(data, headers, true);
-
-}
-
-const toggleCharts = (finalData, headers, showFilter) => {
-    const consortiumTypeSelection = document.getElementById('consortiumTypeSelection');
-    if(!consortiumTypeSelection) return;
-    consortiumTypeSelection.addEventListener('change', () => {
-        const parameter = consortiumTypeSelection.value;
-        renderAllCharts(finalData, headers, showFilter, parameter === 'cimba' ? true : false)
-    });
 }
 
 export const updateCounts = (data) => {
