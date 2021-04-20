@@ -37,19 +37,6 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, dictionary)
     `;
 }
 
-const dataVisulizationCards = (obj) => `
-        <div class="col-xl-4 padding-right-zero" style="margin-bottom: 1rem;">
-            <div id="${obj.divId}" style="height:100%" class="card div-border background-white">
-                <div class="card-header">
-                    ${obj.cardHeaderId ? `<span class="data-summary-label-wrap"><label class="font-size-17 font-bold" id="${obj.cardHeaderId}"></label></span>`: ``}
-                </div>
-                <div class="card-body viz-card-body">
-                    <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
-                </div>
-            </div>
-        </div>
-    `;
-
 export const dataSummaryStatisticsTemplate = () => {
     let template = '';
     
@@ -72,18 +59,10 @@ export const dataSummaryStatisticsTemplate = () => {
                 <span class="font-bold">Genotyping chip:</span> All Arrays
             </div>
         </div>
-        <div class="main-summary-row">
-        `
-        template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
-        template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
-        template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
-        template += `</div><div class="main-summary-row">`
+        <div class="main-summary-row" id="chartRow1"></div>
+        <div class="main-summary-row" id="chartRow2"></div>
 
-        template += dataVisulizationCards({divId: 'chartDiv3', cardHeaderId: 'dataSummaryVizLabel3', cardBodyId: 'dataSummaryVizChart3'})
-        template += dataVisulizationCards({divId: 'chartDiv6', cardHeaderId: 'dataSummaryVizLabel6', cardBodyId: 'dataSummaryVizChart6'})
-        template += dataVisulizationCards({divId: 'chartDiv4', cardHeaderId: 'dataSummaryVizLabel4', cardBodyId: 'dataSummaryVizChart4'})
-        
-        template += `</div></div>
+    </div>
     `;
     document.getElementById('dataSummaryStatistics').innerHTML = template;
     addEventFilterBarToggle();

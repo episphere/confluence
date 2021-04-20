@@ -21,9 +21,11 @@ export const navBarMenutemplate = (dictionary) => {
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <h6 class="dropdown-header dropdown-header-bg font-bold">Explore Data</h6>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/summary" title="Summary Statistics" id="dataSummary">
-                    Summary Statistics
-                </a>
+                <div class="pl-4 pr-4">
+                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_exploration/summary" title="Summary Statistics" id="dataSummary">
+                        Summary Statistics
+                    </a>
+                </div>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/subset" title="Subset Statistics" id="dataSummarySubset">
                     Subset Statistics
                 </a>

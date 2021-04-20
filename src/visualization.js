@@ -163,12 +163,26 @@ export const renderAllCharts = (data, headers, showFilter, onlyCIMBA) => {
     let finalData = '';
     if(onlyCIMBA) finalData = data.filter(dt => dt.consortium === 'CIMBA');
     else finalData = data.filter(dt => dt.consortium !== 'CIMBA');
-    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', 'chartDiv3', finalData);
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'chartDiv6', finalData, headers)
-    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartDiv5');
-    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', 'chartDiv4', headers);
-    renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'chartDiv2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control');
-    renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartDiv7');
+    // `<div class="main-summary-row">
+    // `
+    // template += dataVisulizationCards({divId: 'chartDiv7', cardHeaderId: 'dataSummaryVizLabel7', cardBodyId: 'dataSummaryVizChart7'})
+    // template += dataVisulizationCards({divId: 'chartDiv2', cardHeaderId: 'dataSummaryVizLabel2', cardBodyId: 'dataSummaryVizChart2'})
+    // template += dataVisulizationCards({divId: 'chartDiv5', cardHeaderId: 'dataSummaryVizLabel5', cardBodyId: 'dataSummaryVizChart5'})
+    // template += `</div><div class="main-summary-row">`
+
+    // template += dataVisulizationCards({divId: 'chartDiv3', cardHeaderId: 'dataSummaryVizLabel3', cardBodyId: 'dataSummaryVizChart3'})
+    // template += dataVisulizationCards({divId: 'chartDiv6', cardHeaderId: 'dataSummaryVizLabel6', cardBodyId: 'dataSummaryVizChart6'})
+    // template += dataVisulizationCards({divId: 'chartDiv4', cardHeaderId: 'dataSummaryVizLabel4', cardBodyId: 'dataSummaryVizChart4'})
+    
+    // template += `</div>`
+    document.getElementById('chartRow1').innerHTML = '';
+    document.getElementById('chartRow2').innerHTML = '';
+    renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
+    renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control', 'chartRow1');
+    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
+    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
     if(showFilter) {
         allFilters(finalData, headers, onlyCIMBA);
     };
@@ -213,7 +227,11 @@ export const getSelectedStudies = () => {
     return array;
 };
 
-const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
+const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
     const data = [
         {
             x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '>=90'],
@@ -234,7 +252,11 @@ const generateBarChart = (parameter, id, labelID, chartDiv, jsonData) => {
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, headers) => {
+const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, chartRow) => {
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
     document.getElementById(id).innerHTML = '';
     let x = headers.filter(dt => /famHist_/.test(dt))
     let y = x.map(dt => mapReduce(jsonData, dt));
@@ -248,7 +270,7 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
     if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
-        document.getElementById(id).innerHTML = `${variables.BCAC[parameter]['label']} data not available!`;
+        document.getElementById(chartRow).removeChild(div);
         return;
     }
     const data = [
@@ -272,7 +294,11 @@ const generateBarSingleSelect = (parameter, id, labelID, chartDiv, jsonData, hea
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const renderPlotlyPieChart = (jsonData, parameter, id, labelID, chartDiv, headers) => {
+const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -331,13 +357,18 @@ const countStatus = (value, jsonData, parameter) => {
 }
 
 
-const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv, x1, x2) => {
+const renderStatusBarChart = (jsonData, parameter, id, labelID, x1, x2, chartRow) => {
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
     }else{
         pieLabel = parameter;
     }
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
+
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const yvalues = [countStatus(x1, jsonData, parameter), countStatus(x2, jsonData, parameter)];
     const data = [
@@ -359,13 +390,18 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, chartDiv, x1, x2
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
 }
 
-const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
+const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) => {
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
     }else{
         pieLabel = parameter;
     }
+
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
     
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
@@ -401,13 +437,17 @@ const getUniqueConsortium = (jsonData, parameter) => {
     return array;
 }
 
-const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartDiv) => {
+const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => {
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
     }else{
         pieLabel = parameter;
     }
+    const div = document.createElement('div');
+    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
+    document.getElementById(chartRow).appendChild(div);
     
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
@@ -442,3 +482,15 @@ const getColors = (n) => {
     }
     return colors;
 }
+
+const dataVisulizationCards = (obj) => `
+        <div style="height:100%" class="card div-border background-white">
+            <div class="card-header">
+                ${obj.cardHeaderId ? `<span class="data-summary-label-wrap"><label class="font-size-17 font-bold" id="${obj.cardHeaderId}"></label></span>`: ``}
+            </div>
+            <div class="card-body viz-card-body">
+                <div class="dataSummary-chart" id="${obj.cardBodyId}"></div>
+            </div>
+        </div>
+    `;
+
