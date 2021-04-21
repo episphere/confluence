@@ -20,7 +20,8 @@ export const getFileContent = async () => {
         document.getElementById('confluenceDiv').innerHTML = `You don't have access to summary level data, please contact NCI for the access.`
         return;
     };
-    renderAllCharts(jsonData, headers, true);
+    renderAllCharts(jsonData, headers);
+    allFilters(jsonData, headers, false);
 };
 
 const allFilters = (jsonData, headers, cimba) => {
@@ -158,18 +159,18 @@ export const addEventConsortiumSelect = () => {
     })
 }
 
-export const renderAllCharts = (finalData, headers, showFilter, onlyCIMBA) => {
+export const renderAllCharts = (data, headers, onlyCIMBA) => {
     document.getElementById('chartRow1').innerHTML = '';
     document.getElementById('chartRow2').innerHTML = '';
+    let finalData = {};
+    if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
+    else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
     renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control', 'chartRow1');
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
     generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
-    if(showFilter) {
-        allFilters(finalData, headers, onlyCIMBA);
-    };
 }
 
 export const updateCounts = (data) => {

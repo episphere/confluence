@@ -1258,7 +1258,7 @@ const filterData = (jsonData, headers) => {
         if(dt.checked) selectedConsortia.push(dt.dataset.consortia);
     });
     const array = getSelectedStudies();
-    console.log(array);
+    
     if(gender !== 'all') {
         finalData = finalData.filter(dt => dt['sex'] === gender);
     }
@@ -1275,7 +1275,7 @@ const filterData = (jsonData, headers) => {
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
-    renderAllCharts(finalData, headers, false, onlyCIMBA);
+    renderAllCharts(finalData, headers, onlyCIMBA);
 }
 
 export const addEventConsortiaFilter = (d) => {
