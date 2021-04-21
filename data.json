@@ -1,14 +1,27 @@
 {
-    "NCI-DCEG": {
-        "cases": 2182,
-        "controls": 1083,
-        "studies": 2,
-        "name": "NCI-DCEG"
-    },
     "BCAC": {
-        "cases": 149838,
-        "controls": 123709,
-        "studies": 68,
-        "name": "BCAC"
-    }
+        "name": "BCAC",
+        "studies": 85,
+        "cases": 135150,
+        "controls": 97560,
+        "BRCA1": 0,
+        "BRCA2": 0
+    },
+    "CIMBA": {
+        "name": "CIMBA",
+        "studies": 6,
+        "cases": 0,
+        "controls": 0,
+        "BRCA1": 155,
+        "BRCA2": 80
+    },
+    "NCI-DCEG": {
+        "name": "NCI-DCEG",
+        "studies": 16,
+        "cases": 22350,
+        "controls": 6586,
+        "BRCA1": 0,
+        "BRCA2": 0
+    },
+    "dataModifiedAt": "2021-04-16T20:07:04.215Z"
 }
