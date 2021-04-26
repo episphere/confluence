@@ -217,7 +217,7 @@ const renderDataDictionary = (dictionary, pageSize) => {
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
         `
-
+    console.log(dictionary)
     dictionary.forEach((desc, index) => {
         if(index > pageSize ) return
         template += `
@@ -232,11 +232,11 @@ const renderDataDictionary = (dictionary, pageSize) => {
                         </div>
                     </div>
                     <div class="ml-auto">
-                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/[<b>|<\/b>]+/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
             </div>
-            <div id="study${desc['Variable']}" class="collapse" aria-labelledby="heading${desc['Variable']}">
+            <div id="study${desc['Variable'].replace(/[<b>|<\/b>]+/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
                     ${desc['Category'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Category</div><div class="col">${desc['Category']}</div></div>`: ``}
                     ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}

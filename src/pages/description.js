@@ -174,10 +174,10 @@ const renderStudyDescription = (descriptions, pageSize) => {
                     <div class="col-md-3">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
                     <div class="col-md-3">${desc['Study design'] ? desc['Study design'] : ''}</div>
                     <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
-                    <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Study Acronym']}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                    <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                 </div>
             </div>
-            <div id="study${desc['Study Acronym']}" class="collapse" aria-labelledby="heading${desc['Study Acronym']}">
+            <div id="study${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
                     ${desc['Consortium'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Consortium</div><div class="col">${desc['Consortium']}</div></div>`: ``}
                     ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
