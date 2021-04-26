@@ -16,7 +16,7 @@ export const aboutConfluence = (activeTab, showDescripton) => {
     document.getElementById('confluenceDiv').innerHTML = template;
 }
 
-export const renderOverView = () => {
+export const renderOverView = async () => {
     let template = `
         <div class="main-summary-row">
             <div class="align-left">
@@ -64,11 +64,13 @@ export const renderOverView = () => {
         </div>
     `;
     document.getElementById('overview').innerHTML = template;
-    getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId).then(response => {
-        const data = response.data;
-        if(!data) return;
-        countPublicStatistics(data, true);
-    });
+    // getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId).then(response => {
+    //     const data = response.data;
+    //     if(!data) return;
+    //     countPublicStatistics(data, true);
+    // });
+    const response = await fetch('./data.json');
+    countPublicStatistics(await response.json(), true);
 }
 
 const countPublicStatistics = (d, caseControl) => {
