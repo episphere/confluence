@@ -1113,8 +1113,9 @@ const addEventUpdateSummaryStatsForm = () => {
         if(dataType === 'summary') {
             publicDataObj['dataModifiedAt'] = new Date().toISOString();
             await uploadFileVersion(masterCSV, summaryStatsFileId, 'text/csv');
-            await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
-            form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+            // await uploadFileVersion(publicDataObj, publicDataFileId, 'application/json');
+            // form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+            form.innerHTML = JSON.stringify(publicDataObj, null, 2);
             await getFile(summaryStatsFileId);
             await getFileInfo(summaryStatsFileId);
         }
@@ -1124,7 +1125,7 @@ const addEventUpdateSummaryStatsForm = () => {
             await getFile(missingnessStatsFileId);
             await getFileInfo(missingnessStatsFileId);
         }
-        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
+        // form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Update data';
         removeActiveClass('update-summary-stats-btn', 'active-filter');
         let template = notificationTemplate(top, `<span class="successMsg">Data updated</span>`, `Data successfully updated, please reload to see updated data.`);
         document.getElementById('showNotification').innerHTML = template;
