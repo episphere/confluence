@@ -28,7 +28,6 @@ export const confluence = async () => {
     }
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navBarOptions');
-
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
 
