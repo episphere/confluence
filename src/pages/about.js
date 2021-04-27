@@ -69,7 +69,7 @@ export const renderOverView = async () => {
     //     if(!data) return;
     //     countPublicStatistics(data, true);
     // });
-    const response = await fetch('./data.json');
+    const response = await fetch('./publicDataSet.json');
     countPublicStatistics(await response.json(), true);
 }
 
