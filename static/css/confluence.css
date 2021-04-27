@@ -1660,6 +1660,11 @@ form {
     color: #000000
 }
 
+.custom-btn {
+    background-color: transparent;
+    border: 0px;
+}
+
 .filter-sub-div {
     max-height: 112px;
 }
