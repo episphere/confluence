@@ -43,14 +43,14 @@ const getDescription = async () => {
     let newJsons = {};
     let prevAcronym = '';
     json.forEach(obj => {
-        if(obj['Study Acronym'] && newJsons[obj['Study Acronym']] === undefined) newJsons[obj['Study Acronym']] = {}
+        if(obj['Study Acronym'] && newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] === undefined) newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] = {}
         if(obj['Study Acronym']) {
-            prevAcronym = obj['Study Acronym']
-            newJsons[obj['Study Acronym']] = obj;
-            if(newJsons[obj['Study Acronym']].pis === undefined) newJsons[obj['Study Acronym']].pis = [];
-            newJsons[obj['Study Acronym']].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
-            delete newJsons[obj['Study Acronym']]['PI']
-            delete newJsons[obj['Study Acronym']]['PI_Email']
+            prevAcronym = `${obj['Consortium']}${obj['Study Acronym']}`;
+            newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] = obj;
+            if(newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis === undefined) newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis = [];
+            newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
+            delete newJsons[`${obj['Consortium']}${obj['Study Acronym']}`]['PI']
+            delete newJsons[`${obj['Consortium']}${obj['Study Acronym']}`]['PI_Email']
         }
         else {
             newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
@@ -59,6 +59,7 @@ const getDescription = async () => {
     
     const allCountries = [];
     Object.values(newJsons).forEach(dt => {
+        if(dt['Country'] === undefined) return;
         dt['Country'].split(',').forEach(ctr => {
             ctr.split(' and ').forEach(c => {
                 if(c.trim()) allCountries.push(c.trim())
@@ -270,6 +271,7 @@ const filterDataBasedOnSelection = (descriptions) => {
         filteredData = filteredData.filter(dt => {
             let found = false
             countrySelected.forEach(ctr => {
+                if(dt['Country'] === undefined) return;
                 if(found) return
                 if(dt['Country'].match(new RegExp(ctr, 'ig'))) found = true;
             })
@@ -292,7 +294,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     let searchedData = JSON.parse(JSON.stringify(filteredData));
     searchedData = searchedData.filter(dt => {
         let found = false;
-        if(dt['Country'].toLowerCase().includes(currentValue)) found = true;
+        if(dt['Country'] && dt['Country'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Study'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
