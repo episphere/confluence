@@ -1,27 +1,2 @@
-{
-    "BCAC": {
-        "name": "BCAC",
-        "studies": 85,
-        "cases": 135150,
-        "controls": 97560,
-        "BRCA1": 0,
-        "BRCA2": 0
-    },
-    "CIMBA": {
-        "name": "CIMBA",
-        "studies": 6,
-        "cases": 0,
-        "controls": 0,
-        "BRCA1": 155,
-        "BRCA2": 80
-    },
-    "NCI-DCEG": {
-        "name": "NCI-DCEG",
-        "studies": 16,
-        "cases": 22350,
-        "controls": 6586,
-        "BRCA1": 0,
-        "BRCA2": 0
-    },
-    "dataModifiedAt": "2021-04-16T20:07:04.215Z"
-}
+{ "BCAC": { "name": "BCAC", "studies": 85, "cases": 135150, "controls": 97560, "BRCA1": 0, "BRCA2": 0 }, "CIMBA": { "name": "CIMBA", "studies": 6, "cases": 68, "controls": 167, "BRCA1": 155, "BRCA2": 80 }, "LAGENO": { "name": "LAGENO", "studies": 1, "cases": 27, "controls": 10, "BRCA1": 0, "BRCA2": 0 }, "NCI-DCEG": { "name": "NCI-DCEG", "studies": 16, "cases": 22350, "controls": 6586, "BRCA1": 0, "BRCA2": 0 }, "dataModifiedAt": "2021-04-29T15:09:36.565Z" }
+
