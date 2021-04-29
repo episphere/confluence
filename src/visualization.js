@@ -1,4 +1,4 @@
-import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, removeActiveClass, reSizePlots } from './shared.js';
+import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 const plotTextSize = 10;
@@ -166,11 +166,18 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-    renderStatusBarChart(finalData, onlyCIMBA ? 'Carrier_status' :'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? 'BRCA1' : 'case', onlyCIMBA ? 'BRCA2' : 'control', 'chartRow1');
+    if(onlyCIMBA) {
+        renderStatusBarChart(finalData, 'Carrier_status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'BRCA1', 'BRCA2', 'chartRow1');
+        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'case', 'control', 'chartRow2');
+    }
+    else{
+        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'case', 'control', 'chartRow1');
+        generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
+    }
+
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
 }
 
 export const updateCounts = (data) => {
@@ -243,15 +250,6 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
     }
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
-    if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
-        document.getElementById(chartRow).removeChild(div);
-        Array.from(document.getElementById(chartRow).children).forEach(e => {
-            e.classList.remove('col-xl-4');
-            e.classList.add('col-xl-6');
-        });
-        reSizePlots();
-        return;
-    }
     const data = [
         {
             x: x,
