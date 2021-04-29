@@ -151,7 +151,7 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
                 <span class="font-size-32">${numberWithCommas(totalStudies)}</span>
             </div>
         </div>
-        ${caseControl === true ? `
+        ${totalCases !== 0 &&  totalControls !== 0? `
             <div class="row mt-3">
                 <div class="col">
                     <span class="font-size-22">Cases</span></br>
@@ -162,17 +162,18 @@ export const renderDataSummary = (totalConsortia, totalStudies, totalCases, tota
                     <span class="font-size-32">${numberWithCommas(totalControls)}</span>
                 </div>
             </div>
-        `: `
-        <div class="row mt-3">
-            <div class="col">
-                <span class="font-size-22">BRCA1</span></br>
-                <span class="font-size-32">${numberWithCommas(totalBRCA1)}</span>
+        `: ``}
+        ${totalBRCA1 !== 0 && totalBRCA2 !== 0 ? `
+            <div class="row mt-3">
+                <div class="col">
+                    <span class="font-size-22">BRCA1</span></br>
+                    <span class="font-size-32">${numberWithCommas(totalBRCA1)}</span>
+                </div>
+                <div class="col">
+                    <span class="font-size-22">BRCA2</span></br>
+                    <span class="font-size-32">${numberWithCommas(totalBRCA2)}</span>
+                </div>
             </div>
-            <div class="col">
-                <span class="font-size-22">BRCA2</span></br>
-                <span class="font-size-32">${numberWithCommas(totalBRCA2)}</span>
-            </div>
-        </div>
-        `}
+        `:``}
     `
 }
