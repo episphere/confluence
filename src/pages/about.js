@@ -119,7 +119,7 @@ const countPublicStatistics = (d, caseControl) => {
     }         
     summary += `</div></div>
                 <div class="col-md-10 align-center" style="padding: 0px">
-                    <div class="div-border" style="margin-right: 15px" id="renderDataSummaryCounts"></div>
+                    <div class="div-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts"></div>
                 </div></div>
                 <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
                 `
