@@ -10,8 +10,8 @@
     "CIMBA": {
         "name": "CIMBA",
         "studies": 6,
-        "cases": 0,
-        "controls": 0,
+        "cases": 68,
+        "controls": 167,
         "BRCA1": 155,
         "BRCA2": 80
     },
@@ -23,5 +23,5 @@
         "BRCA1": 0,
         "BRCA2": 0
     },
-    "dataModifiedAt": "2021-04-16T20:07:04.215Z"
+    "dataModifiedAt": "2021-04-29T15:09:36.565Z"
 }
