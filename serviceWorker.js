@@ -37,18 +37,6 @@ registerRoute(
     })
 );
 
-// registerRoute(
-//     new RegExp('https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/.+'),
-//     new NetworkFirst({
-//         cacheName: 'api-cache',
-//         plugins: [
-//             new CacheableResponsePlugin({
-//                 statuses: [200],
-//             })
-//         ]
-//     })
-// );
-
 workbox.precaching.precacheAndRoute([
         {url: 'index.html', revision: 'jshd982734'}
     ]

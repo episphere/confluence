@@ -20,6 +20,15 @@ export const renderDescription = (modified_at) => {
                 </div>
             </div>
             <div class="col-xl-10 padding-right-zero font-size-16">
+                <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;">
+                    <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
+                        <span class="font-bold">Consortium:</span> All
+                        <span class="vertical-line"></span>
+                        <span class="font-bold">Study design:</span> All
+                        <span class="vertical-line"></span>
+                        <span class="font-bold">Country:</span> All
+                    </div>
+                </div>
                 <div class="main-summary-row">
                     <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
                         <div class="p-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
@@ -264,6 +273,7 @@ const filterDataBasedOnSelection = (descriptions) => {
     if(consortiumSelected.length > 0) {
         filteredData = filteredData.filter(dt => consortiumSelected.indexOf(dt['Consortium']) !== -1);
     }
+
     if(studyDesignSelected.length > 0) {
         filteredData = filteredData.filter(dt => studyDesignSelected.indexOf(dt['Study design']) !== -1);
     }
@@ -278,6 +288,26 @@ const filterDataBasedOnSelection = (descriptions) => {
             if(found) return dt;
         });
     }
+
+    document.getElementById('listFilters').innerHTML = `
+        ${consortiumSelected.length > 0 ? `
+            <span class="font-bold">Consortium: </span>${consortiumSelected[0]} ${consortiumSelected.length > 1 ? `and <span class="other-variable-count">${consortiumSelected.length-1} other</span>`: ``}
+        `: `
+            <span class="font-bold">Consortium:</span> All
+        `}
+        <span class="vertical-line"></span>
+        ${studyDesignSelected.length > 0 ? `
+            <span class="font-bold">Study design: </span>${studyDesignSelected[0]} ${studyDesignSelected.length > 1 ? `and <span class="other-variable-count">${studyDesignSelected.length-1} other</span>`: ``}
+        `: `
+            <span class="font-bold">Study design:</span> All
+        `}
+        <span class="vertical-line"></span>
+        ${countrySelected.length > 0 ? `
+            <span class="font-bold">Country: </span>${countrySelected[0]} ${countrySelected.length > 1 ? `and <span class="other-variable-count">${countrySelected.length-1} other</span>`: ``}
+        `: `
+            <span class="font-bold">Country:</span> All
+        `}
+    `
     
     if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
     
@@ -307,6 +337,7 @@ const filterDataBasedOnSelection = (descriptions) => {
         dt['Study'] = dt['Study'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         return dt;
     })
+
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 20);
