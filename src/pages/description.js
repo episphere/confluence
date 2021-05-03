@@ -314,9 +314,9 @@ const filterDataBasedOnSelection = (descriptions) => {
     const input = document.getElementById('searchDataCatalog');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
         addEventPageSizeSelection(filteredData);
         return;
     }
