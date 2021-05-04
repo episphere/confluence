@@ -170,7 +170,8 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
-    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
+    if(onlyCIMBA) renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case', 'control'], 'chartRow2');
+    else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
 }
 
 export const updateCounts = (data) => {
@@ -243,15 +244,6 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
     }
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
-    if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
-        document.getElementById(chartRow).removeChild(div);
-        Array.from(document.getElementById(chartRow).children).forEach(e => {
-            e.classList.remove('col-xl-4');
-            e.classList.add('col-xl-6');
-        });
-        reSizePlots();
-        return;
-    }
     const data = [
         {
             x: x,
