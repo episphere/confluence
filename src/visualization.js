@@ -1,4 +1,4 @@
-import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce } from './shared.js';
+import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, reSizePlots } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 const plotTextSize = 10;
@@ -166,18 +166,11 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-    if(onlyCIMBA) {
-        renderStatusBarChart(finalData, 'Carrier_status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'BRCA1', 'BRCA2', 'chartRow1');
-        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', 'case', 'control', 'chartRow2');
-    }
-    else{
-        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', 'case', 'control', 'chartRow1');
-        generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
-    }
-
+    renderStatusBarChart(finalData, onlyCIMBA ? 'status_carrier': 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'] : ['case', 'control'], 'chartRow1');
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+    generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
 }
 
 export const updateCounts = (data) => {
@@ -250,6 +243,15 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
     }
     x = Object.keys(tmpObj);
     y = Object.values(tmpObj);
+    if(y.length === 0 || y.reduce((a,b) => a+b) === 0) {
+        document.getElementById(chartRow).removeChild(div);
+        Array.from(document.getElementById(chartRow).children).forEach(e => {
+            e.classList.remove('col-xl-4');
+            e.classList.add('col-xl-6');
+        });
+        reSizePlots();
+        return;
+    }
     const data = [
         {
             x: x,
@@ -334,7 +336,7 @@ const countStatus = (value, jsonData, parameter) => {
 }
 
 
-const renderStatusBarChart = (jsonData, parameter, id, labelID, x1, x2, chartRow) => {
+const renderStatusBarChart = (jsonData, parameter, id, labelID, xarray, chartRow) => {
     let pieLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
         pieLabel = variables.BCAC[parameter]['label'];
@@ -347,14 +349,14 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, x1, x2, chartRow
     document.getElementById(chartRow).appendChild(div);
 
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
-    const yvalues = [countStatus(x1, jsonData, parameter), countStatus(x2, jsonData, parameter)];
+    const yvalues = [...xarray.map(x => countStatus(x, jsonData, parameter))];
     const data = [
         {
-            x: [x1, x2],
+            x: xarray,
             y: yvalues,
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#f7b6d2']
+                color: ['#BF1B61', '#f7b6d2','#BF1B61', '#f7b6d2']
             }
         }
     ];
