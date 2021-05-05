@@ -737,6 +737,18 @@ export const json2csv = (json, fields) => {
     return csv;
 }
 
+export const json2other = (json, fields, tsv) => {
+    const replacer = (key, value) => { return value === null ? '' : value } 
+    let csv = json.map((row) => {
+        return fields.map((fieldName) => {
+            return JSON.stringify(row[fieldName], replacer)
+        }).join(`${tsv? '\t': ','}`) // \t for tsv
+    })
+    csv.unshift(fields.join(`${tsv? '\t': ','}`)) // add header column  \t for tsv
+    csv = csv.join('\r\n');
+    return csv;
+}
+
 export const numberWithCommas = (x) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

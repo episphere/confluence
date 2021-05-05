@@ -1,11 +1,13 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, shortenText, tsv2Json } from "./../shared.js";
+import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 
 export const dataDictionaryTemplate = async () => {
     const data = await getFile(774486143425);
-    const dictionary = tsv2Json(data).data;
+    const tsvData = tsv2Json(data);
+    const dictionary = tsvData.data;
+    const headers = tsvData.headers;
     let template = `
     <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
         <div class="div-border white-bg align-left p-2">
@@ -32,14 +34,14 @@ export const dataDictionaryTemplate = async () => {
     </div>
     `;
     document.getElementById('dataSummaryStatistics').innerHTML = template;
-    renderDataDictionaryFilters(dictionary);
-    renderDataDictionary(dictionary, 60);
-    paginationHandler(dictionary, 60);
+    renderDataDictionaryFilters(dictionary, headers);
+    renderDataDictionary(dictionary, 60, headers);
+    paginationHandler(dictionary, 60, headers);
     addEventFilterBarToggle();
     hideAnimation();
 }
 
-const paginationHandler = (data, pageSize) => {
+const paginationHandler = (data, pageSize, headers) => {
     const dataLength = data.length;
     const pages = Math.ceil(dataLength/pageSize);
     const array = [];
@@ -48,10 +50,10 @@ const paginationHandler = (data, pageSize) => {
         array.push(i+1);
     }
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
-    addEventPageBtns(pageSize, data);
+    addEventPageBtns(pageSize, data, headers);
 }
 
-const addEventPageBtns = (pageSize, data) => {
+const addEventPageBtns = (pageSize, data, headers) => {
     const elements = document.getElementsByClassName('page-link');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
@@ -68,7 +70,7 @@ const addEventPageBtns = (pageSize, data) => {
                 let end = pageNumber * pageSize;
                 document.getElementById('previousPage').dataset.previous = pageNumber;
                 document.getElementById('nextPage').dataset.next = pageNumber;
-                renderDataDictionary(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value);
+                renderDataDictionary(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value, headers);
                 Array.from(elements).forEach(ele => ele.classList.remove('active-page'));
                 document.querySelector(`button[data-page="${pageNumber}"]`).classList.add('active-page');
             }
@@ -76,7 +78,7 @@ const addEventPageBtns = (pageSize, data) => {
     });
 }
 
-const renderDataDictionaryFilters = (dictionary) => {
+const renderDataDictionaryFilters = (dictionary, headers) => {
     const allVariableType = Object.values(dictionary).map(dt => dt['Data Type']);
     const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i).sort();
 
@@ -115,36 +117,35 @@ const renderDataDictionaryFilters = (dictionary) => {
     </div>
     `
     document.getElementById('filterDataDictionary').innerHTML = template;
-
-    addEventFilterDataDictionary(dictionary);
+    addEventFilterDataDictionary(dictionary, headers);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary, 60);
-    addEventPageSizeSelection(dictionary);
+    addEventPageSizeSelection(dictionary, headers);
 };
 
-const addEventPageSizeSelection = (data) => {
+const addEventPageSizeSelection = (data, headers) => {
     const select = document.getElementById('pageSizeSelector');
     select.addEventListener('change', () => {
         const value = select.value;
-        renderDataDictionary(data, value)
-        paginationHandler(data, value)
+        renderDataDictionary(data, value, headers)
+        paginationHandler(data, value, headers)
     })
 }
 
-const addEventFilterDataDictionary = (dictionary) => {
+const addEventFilterDataDictionary = (dictionary, headers) => {
     const variableTypeSelection = document.getElementsByClassName('select-variable-type');
     Array.from(variableTypeSelection).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterDataBasedOnSelection(dictionary)
+            filterDataBasedOnSelection(dictionary, headers)
         });
     });
 
     const input = document.getElementById('searchDataDictionary');
     input.addEventListener('input', () => {
-        filterDataBasedOnSelection(dictionary);
+        filterDataBasedOnSelection(dictionary, headers);
     })
 }
 
-const filterDataBasedOnSelection = (dictionary) => {
+const filterDataBasedOnSelection = (dictionary, headers) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
     
     let filteredData = dictionary;
@@ -163,11 +164,11 @@ const filterDataBasedOnSelection = (dictionary) => {
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
         // previousValue = currentValue;
-        renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value);
+        renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value, headers);
         const pageSize = filteredData.length < 60 ? Math.floor(filteredData.length / 10) * 10 === 0 ? 10 : Math.floor(filteredData.length / 10) * 10 : 60;
-        paginationHandler(filteredData, pageSize);
+        paginationHandler(filteredData, pageSize, headers);
         document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, pageSize);
-        addEventPageSizeSelection(filteredData);
+        addEventPageSizeSelection(filteredData, headers);
         return;
     }
     previousValue = currentValue;
@@ -185,25 +186,25 @@ const filterDataBasedOnSelection = (dictionary) => {
         return dt;
     })
 
-    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value);
+    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
     const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
     paginationHandler(highlightData, pageSize);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
     addEventPageSizeSelection(highlightData);
 }
 
-const addEventSortColumn = (dictionary, pageSize) => {
+const addEventSortColumn = (dictionary, pageSize, headers) => {
     const btns = document.getElementsByClassName('sort-column');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {
             const columnName = btn.dataset.columnName;
             dictionary = dictionary.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
-            renderDataDictionary(dictionary, pageSize)
+            renderDataDictionary(dictionary, pageSize, headers)
         })
     })
 }
 
-const renderDataDictionary = (dictionary, pageSize) => {
+const renderDataDictionary = (dictionary, pageSize, headers) => {
     let template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
             <div class="col-md-11">
@@ -213,11 +214,22 @@ const renderDataDictionary = (dictionary, pageSize) => {
                     <div class="col-md-3 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
-            <div class="ml-auto"></div>
+            <div class="ml-auto">
+                <div class="col-md-12 dropdown">
+                    <div class="grid-elements ">
+                        <button title="Download" class="transparent-btn mr-1 dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
+                            <i class="fas fa-download" style="color:#A41652 !important"></i>
+                        </button>
+                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
+                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
         `
-    console.log(dictionary)
     dictionary.forEach((desc, index) => {
         if(index > pageSize ) return
         template += `
@@ -252,5 +264,32 @@ const renderDataDictionary = (dictionary, pageSize) => {
     template += `</div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
-    addEventSortColumn(dictionary, pageSize);
+    downloadFiles(dictionary, headers);
+    addEventSortColumn(dictionary, pageSize, headers);
+}
+
+const downloadFiles = (dictionary, headers) => {
+    const downloadDictionaryCSV = document.getElementById('downloadDictionaryCSV');
+    downloadDictionaryCSV.addEventListener('click', () => {
+        const csvContent = "data:text/csv;charset=utf-8," + json2other(dictionary, headers).replace(/[<b>|<\/b>]+/g, '');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "dictionary.csv");
+        document.body.appendChild(link);
+        link.click(); 
+        document.body.removeChild(link);
+    })
+
+    const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
+    downloadDictionaryTSV.addEventListener('click', () => {
+        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(dictionary, headers, true).replace(/[<b>|<\/b>]+/g, '');
+        const encodedUri = encodeURI(tsvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "dictionary.tsv");
+        document.body.appendChild(link);
+        link.click(); 
+        document.body.removeChild(link);
+    })
 }
