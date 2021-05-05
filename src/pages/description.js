@@ -170,28 +170,33 @@ const renderStudyDescription = (descriptions, pageSize) => {
     if(descriptions.length > 0) {
         template = `
         <div class="row m-0 pt-md-1 align-left">
-            <div class="col-md-3 font-bold">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-3 font-bold">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-3 font-bold">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-2 font-bold">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-2 font-bold ws-nowrap pl-2">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-3 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
+            <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-1"></div>
         </div>`
         descriptions.forEach((desc, index) => {
             if(index > pageSize ) return
             template += `
             <div class="card mt-1 mb-1 align-left">
-                <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym']}">
+                <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}">
                     <div class="row">
+                        <div class="col-md-2">${desc['Consortium'] ? desc['Consortium'] : ''}</div>
                         <div class="col-md-3">${desc['Study'] ? desc['Study'] : ''}</div>
-                        <div class="col-md-3">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
-                        <div class="col-md-3">${desc['Study design'] ? desc['Study design'] : ''}</div>
+                        <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
+                        <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
                         <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
-                        <div class="col-md-1"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                        <div class="col-md-1">
+                            <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Consortium'].replace(/[<b>|<\/b>]+/g, '').trim()}${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}">
+                                <i class="fas fa-caret-down fa-2x"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div id="study${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym']}">
+                <div id="study${desc['Consortium'].replace(/[<b>|<\/b>]+/g, '').trim()}${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym'].replace(/[<b>|<\/b>]+/g, '')}">
                     <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                        ${desc['Consortium'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Consortium</div><div class="col">${desc['Consortium']}</div></div>`: ``}
                         ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
                         ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
@@ -257,13 +262,13 @@ export const addEventToggleCollapsePanelBtn = () => {
     const btns = document.getElementsByClassName('collapse-panel-btn');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {
-            if(btn.childNodes[0].classList.contains('fa-caret-down')) {
-                btn.childNodes[0].classList.remove('fa-caret-down')
-                btn.childNodes[0].classList.add('fa-caret-up')
+            if(btn.querySelector('.fas.fa-2x').classList.contains('fa-caret-down')) {
+                btn.querySelector('.fas.fa-2x').classList.remove('fa-caret-down')
+                btn.querySelector('.fas.fa-2x').classList.add('fa-caret-up')
             }
             else {
-                btn.childNodes[0].classList.remove('fa-caret-up')
-                btn.childNodes[0].classList.add('fa-caret-down')
+                btn.querySelector('.fas.fa-2x').classList.remove('fa-caret-up')
+                btn.querySelector('.fas.fa-2x').classList.add('fa-caret-down')
             }
         })
     })
