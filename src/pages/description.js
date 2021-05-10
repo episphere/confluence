@@ -48,7 +48,8 @@ export const renderDescription = (modified_at) => {
 
 const getDescription = async () => {
     const data = await getFile(761599566277);
-    const json = tsv2Json(data).data;
+    const tsv2json = tsv2Json(data);
+    const json = tsv2json.data;
     let newJsons = {};
     let prevAcronym = '';
     json.forEach(obj => {
@@ -200,6 +201,7 @@ const renderStudyDescription = (descriptions, pageSize) => {
                         ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
                         ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
+                        ${desc['Ascertainment'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment</div><div class="col">${desc['Ascertainment']}</div></div>`: ``}
                     `
                     if(desc['pis'].length > 0) {
                         desc['pis'].forEach(info => {
