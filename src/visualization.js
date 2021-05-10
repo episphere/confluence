@@ -44,6 +44,7 @@ const allFilters = (jsonData, headers, cimba) => {
                 <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
+                    <option value='Re-genotype in Confluence'>Re-genotype in Confluence</option>
                     <option value='Other chip'>Other Array</option>
                 </select>
             </div>
