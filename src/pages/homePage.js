@@ -1,3 +1,5 @@
+import { getFileInfo } from "./../shared.js";
+
 export const infoDeck = () => {
     let template = '';
     template += `
@@ -50,7 +52,9 @@ export const infoDeck = () => {
     document.getElementById('confluenceDiv').innerHTML = template;
 }
 
-export const infoDeckAfterLoggedIn = () => {
+export const infoDeckAfterLoggedIn = async () => {
+    const studyDescription = await getFileInfo(761599566277);
+    const dictionary = await getFileInfo(774486143425);
     let template = '';
     template += `
         <div class="secondary-bg padding-bottom-1rem">
@@ -67,7 +71,8 @@ export const infoDeckAfterLoggedIn = () => {
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
                 template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
-                template += cardContents({header: 'Submit Data', button: 'Submit Data', href: '#data_submission', icon: 'fa-upload', explanation: 'Submit data from your study or consortium. </br></br>You can always view, modify or download any data you submit.'})
+                if(studyDescription) template += cardContents({header: 'Study description', button: 'Study description', href: '#about/description', icon: 'fa-file-alt', explanation: ''})
+                if(dictionary) template += cardContents({header: 'Data dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: ''})
                 template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
             </div>
