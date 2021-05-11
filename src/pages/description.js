@@ -1,4 +1,5 @@
 import { getFile, shortenText, tsv2Json } from "./../shared.js";
+import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
 export const renderDescription = (modified_at) => {
@@ -50,6 +51,7 @@ const getDescription = async () => {
     const data = await getFile(761599566277);
     const tsv2json = tsv2Json(data);
     const json = tsv2json.data;
+    const headers = tsv2json.headers;
     let newJsons = {};
     let prevAcronym = '';
     json.forEach(obj => {
@@ -159,14 +161,14 @@ const getDescription = async () => {
         </span>
     </div>
     `;
-    addEventFilterDataCatalogue(descriptions);
-    renderStudyDescription(descriptions, 20);
-    paginationHandler(descriptions, 20);
+    addEventFilterDataCatalogue(descriptions, headers);
+    renderStudyDescription(descriptions, 20, headers);
+    paginationHandler(descriptions, 20, headers);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, 20);
-    addEventPageSizeSelection(descriptions);
+    addEventPageSizeSelection(descriptions, headers);
 };
 
-const renderStudyDescription = (descriptions, pageSize) => {
+const renderStudyDescription = (descriptions, pageSize, headers) => {
     let template = '';
     if(descriptions.length > 0) {
         template = `
@@ -176,7 +178,19 @@ const renderStudyDescription = (descriptions, pageSize) => {
             <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-1"></div>
+            <div class="col-md-1">
+                <div class="col-md-12 dropdown">
+                    <div class="grid-elements ">
+                        <button title="Download" class="transparent-btn mr-1 dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
+                            <i class="fas fa-download" style="color:#A41652 !important"></i>
+                        </button>
+                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
+                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>`
         descriptions.forEach((desc, index) => {
             if(index > pageSize ) return
@@ -218,45 +232,46 @@ const renderStudyDescription = (descriptions, pageSize) => {
         template += 'Data not found!'
     }
     document.getElementById('descriptionBody').innerHTML = template;
+    downloadFiles(descriptions, headers, 'study_description', true);
     addEventToggleCollapsePanelBtn();
-    addEventSortColumn(descriptions, pageSize);
+    addEventSortColumn(descriptions, pageSize, headers);
 }
 
-const addEventSortColumn = (descriptions, pageSize) => {
+const addEventSortColumn = (descriptions, pageSize, headers) => {
     const btns = document.getElementsByClassName('sort-column');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {
             const columnName = btn.dataset.columnName;
             descriptions = descriptions.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
-            renderStudyDescription(descriptions, pageSize)
+            renderStudyDescription(descriptions, pageSize, headers)
         })
     })
 }
 
-const addEventFilterDataCatalogue = (descriptions) => {
+const addEventFilterDataCatalogue = (descriptions, headers) => {
     const consortiumTypeSelection = document.getElementsByClassName('select-consortium');
     Array.from(consortiumTypeSelection).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterDataBasedOnSelection(descriptions)
+            filterDataBasedOnSelection(descriptions, headers)
         });
     });
 
     const studyDesignSelection = document.getElementsByClassName('select-study-design');
     Array.from(studyDesignSelection).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterDataBasedOnSelection(descriptions)
+            filterDataBasedOnSelection(descriptions, headers)
         });
     });
 
     const countrySelection = document.getElementsByClassName('select-country');
     Array.from(countrySelection).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterDataBasedOnSelection(descriptions);
+            filterDataBasedOnSelection(descriptions, headers);
         });
     });
     const input = document.getElementById('searchDataCatalog');
     input.addEventListener('input', () => {
-        filterDataBasedOnSelection(descriptions);
+        filterDataBasedOnSelection(descriptions, headers);
     })
 }
 
@@ -276,7 +291,7 @@ export const addEventToggleCollapsePanelBtn = () => {
     })
 }
 
-const filterDataBasedOnSelection = (descriptions) => {
+const filterDataBasedOnSelection = (descriptions, headers) => {
     const consortiumSelected = Array.from(document.getElementsByClassName('select-consortium')).filter(dt => dt.checked).map(dt => dt.dataset.consortium);
     const studyDesignSelected = Array.from(document.getElementsByClassName('select-study-design')).filter(dt => dt.checked).map(dt => dt.dataset.studyDesign);
     const countrySelected = Array.from(document.getElementsByClassName('select-country')).filter(dt => dt.checked).map(dt => dt.dataset.country);
@@ -329,9 +344,9 @@ const filterDataBasedOnSelection = (descriptions) => {
     
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
         document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
-        renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value);
-        paginationHandler(filteredData, document.getElementById('pageSizeSelector').value);
-        addEventPageSizeSelection(filteredData);
+        renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value, headers);
+        paginationHandler(filteredData, document.getElementById('pageSizeSelector').value, headers);
+        addEventPageSizeSelection(filteredData, headers);
         return;
     }
     previousValue = currentValue;
@@ -353,12 +368,12 @@ const filterDataBasedOnSelection = (descriptions) => {
     })
 
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 20);
-    renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value);
-    paginationHandler(searchedData, document.getElementById('pageSizeSelector').value);
-    addEventPageSizeSelection(searchedData);
+    renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value, headers);
+    paginationHandler(searchedData, document.getElementById('pageSizeSelector').value, headers);
+    addEventPageSizeSelection(searchedData, headers);
 }
 
-const paginationHandler = (data, pageSize) => {
+const paginationHandler = (data, pageSize, headers) => {
     const dataLength = data.length;
     const pages = Math.ceil(dataLength/pageSize);
     const array = [];
@@ -367,7 +382,7 @@ const paginationHandler = (data, pageSize) => {
         array.push(i+1);
     }
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
-    addEventPageBtns(pageSize, data);
+    addEventPageBtns(pageSize, data, headers);
 }
 
 export const pageSizeTemplate = (array, startPageSize) => {
@@ -386,12 +401,12 @@ export const pageSizeTemplate = (array, startPageSize) => {
     return template;
 };
 
-const addEventPageSizeSelection = (data) => {
+const addEventPageSizeSelection = (data, headers) => {
     const select = document.getElementById('pageSizeSelector');
     select.addEventListener('change', () => {
         const value = select.value;
-        renderStudyDescription(data, value)
-        paginationHandler(data, value)
+        renderStudyDescription(data, value, headers)
+        paginationHandler(data, value, headers)
     })
 }
 
@@ -436,7 +451,7 @@ export const dataPagination = (start, end, data) => {
     return paginatedData;
 }
 
-const addEventPageBtns = (pageSize, data) => {
+const addEventPageBtns = (pageSize, data, headers) => {
     const elements = document.getElementsByClassName('page-link');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
@@ -452,7 +467,7 @@ const addEventPageBtns = (pageSize, data) => {
                 let end = pageNumber * pageSize;
                 document.getElementById('previousPage').dataset.previous = pageNumber;
                 document.getElementById('nextPage').dataset.next = pageNumber;
-                renderStudyDescription(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value);
+                renderStudyDescription(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value, headers);
                 Array.from(elements).forEach(ele => ele.classList.remove('active-page'));
                 document.querySelector(`button[data-page="${pageNumber}"]`).classList.add('active-page');
             }

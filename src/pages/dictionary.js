@@ -264,18 +264,33 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     template += `</div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
-    downloadFiles(dictionary, headers);
+    downloadFiles(dictionary, headers, 'dictionary');
     addEventSortColumn(dictionary, pageSize, headers);
 }
 
-const downloadFiles = (dictionary, headers) => {
+export const downloadFiles = (data, headers, fileName, studyDescription) => {
+    if(studyDescription) {
+        let flatArray = [];
+        data.forEach(dt => {
+            if(dt.pis) {
+                dt.pis.forEach(obj => {
+                    const flatObj = {...dt};
+                    flatObj['PI'] = obj.PI
+                    flatObj['PI_Email'] = obj.PI_Email
+                    flatArray.push(flatObj);
+                });
+            }
+            else flatArray.push(dt);
+        });
+        data = flatArray;
+    }
     const downloadDictionaryCSV = document.getElementById('downloadDictionaryCSV');
     downloadDictionaryCSV.addEventListener('click', () => {
-        const csvContent = "data:text/csv;charset=utf-8," + json2other(dictionary, headers).replace(/[<b>|<\/b>]+/g, '');
+        const csvContent = "data:text/csv;charset=utf-8," + json2other(data, headers).replace(/[<b>|<\/b>]+/g, '');
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "dictionary.csv");
+        link.setAttribute("download", `${fileName}.csv`);
         document.body.appendChild(link);
         link.click(); 
         document.body.removeChild(link);
@@ -283,11 +298,11 @@ const downloadFiles = (dictionary, headers) => {
 
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
     downloadDictionaryTSV.addEventListener('click', () => {
-        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(dictionary, headers, true).replace(/[<b>|<\/b>]+/g, '');
+        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(data, headers, true).replace(/[<b>|<\/b>]+/g, '');
         const encodedUri = encodeURI(tsvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "dictionary.tsv");
+        link.setAttribute("download", `${fileName}.tsv`);
         document.body.appendChild(link);
         link.click(); 
         document.body.removeChild(link);
