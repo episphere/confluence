@@ -21,12 +21,12 @@ export const dataDictionaryTemplate = async () => {
     </div>
     <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
         <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
-        <div class="main-summary-row" style="min-height: 10px;padding-left: 15px;margin-bottom: 1rem;">
+        <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-bold">Data Type:</span> All
             </div>
         </div>
-        <div class="main-summary-row pl-3">
+        <div class="main-summary-row pl-2">
             <div class="col-xl-12 pb-2 pr-0 pl-0 white-bg div-border">
                 <div class="allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="dataDictionaryBody"></div>
             </div>

@@ -1141,8 +1141,10 @@ export const addEventFilterBarToggle = () => {
             reSizePlots();
             child.classList.remove('fa-caret-left');
             child.classList.add('fa-caret-right');
-            document.getElementById('summaryFilterSiderBar').classList = ['d-none'];
-            document.getElementById('summaryStatsCharts').classList = ['col-xl-12 padding-right-zero padding-left-zero'];
+            document.getElementById('summaryFilterSiderBar').classList.remove('col-xl-2');
+            document.getElementById('summaryFilterSiderBar').classList.add('d-none');
+            document.getElementById('summaryStatsCharts').classList.remove('col-xl-10');
+            document.getElementById('summaryStatsCharts').classList.add('col-xl-12');
             document.getElementById('dataLastModified').classList.remove('offset-xl-2')
             document.getElementById('dataLastModified').classList.remove('padding-left-20')
         }
@@ -1150,8 +1152,10 @@ export const addEventFilterBarToggle = () => {
             reSizePlots();
             child.classList.remove('fa-caret-right');
             child.classList.add('fa-caret-left');
-            document.getElementById('summaryFilterSiderBar').classList = ['col-xl-2 filter-column'];
-            document.getElementById('summaryStatsCharts').classList = ['col-xl-10 padding-right-zero'];
+            document.getElementById('summaryFilterSiderBar').classList.add('col-xl-2');
+            document.getElementById('summaryFilterSiderBar').classList.remove('d-none');
+            document.getElementById('summaryStatsCharts').classList.add('col-xl-10');
+            document.getElementById('summaryStatsCharts').classList.remove('col-xl-12');
             document.getElementById('dataLastModified').classList.add('offset-xl-2')
             document.getElementById('dataLastModified').classList.add('padding-left-20')
         }

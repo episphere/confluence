@@ -94,7 +94,8 @@ body {
     height: fit-content;
     position: absolute;
     z-index: 9;
-    left: 0px;
+    left: -0px;
+    margin-right: 5px !important;
 }
 
 #filterBarToggle:hover {

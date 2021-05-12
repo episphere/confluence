@@ -1,3 +1,4 @@
+import { addEventFilterBarToggle } from "../event.js";
 import { getFile, shortenText, tsv2Json } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
@@ -25,7 +26,7 @@ export const renderDescription = (modified_at) => {
             </div>
         </div>
         <div class="main-summary-row">
-            <div class="col-xl-2 filter-column div-border white-bg align-left p-2">
+            <div class="col-xl-2 filter-column div-border white-bg align-left p-2" id="summaryFilterSiderBar">
                 <div class="main-summary-row">
                     <div class="col-xl-12 pl-1 pr-0">
                         <span class="font-size-17 font-bold">Filter</span>
@@ -33,8 +34,9 @@ export const renderDescription = (modified_at) => {
                     </div>
                 </div>
             </div>
-            <div class="col-xl-10 padding-right-zero font-size-16">
-                <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;">
+            <div class="col-xl-10 padding-right-zero font-size-16" id="summaryStatsCharts">
+                <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
+                <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
                     <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                         <span class="font-bold">Consortium:</span> All
                         <span class="vertical-line"></span>
@@ -43,7 +45,7 @@ export const renderDescription = (modified_at) => {
                         <span class="font-bold">Country:</span> All
                     </div>
                 </div>
-                <div class="main-summary-row">
+                <div class="main-summary-row pl-2">
                     <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
                         <div class="pt-0 pl-2 pb-2 pr-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
                     </div>
@@ -51,7 +53,7 @@ export const renderDescription = (modified_at) => {
             </div>
         </div>
         <div class="main-summary-row">
-            <div class="offset-xl-2 col data-last-modified align-left mt-3 mb-0">
+            <div class="offset-xl-2 col data-last-modified align-left mt-3 mb-0 pl-4" id="dataLastModified">
                 Data last modified at - ${new Date(modified_at).toLocaleString()}
             </div>
         </div>
@@ -179,6 +181,7 @@ const getDescription = async () => {
     paginationHandler(descriptions, 20, headers);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, 20);
     addEventPageSizeSelection(descriptions, headers);
+    addEventFilterBarToggle();
 };
 
 const renderStudyDescription = (descriptions, pageSize, headers) => {
