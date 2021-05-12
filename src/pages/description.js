@@ -8,7 +8,20 @@ export const renderDescription = (modified_at) => {
             <div class="row align-left w-100 m-0">
                 <h1 class="col page-header pl-0 pt-2">Learn about Confluence</h1>
                 <div class="ml-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
-                <div class="ml-auto mt-3 mb-3" id="pageSizeContainer"></div>
+                <div class="ml-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
+                <div class="ml-auto mt-3 mb-3" id="downloadContainer">
+                    <div class="col-md-12 p-0 dropdown">
+                        <div class="grid-elements ">
+                            <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
+                                Download <i class="fas fa-download" style="color:#A41652 !important"></i>
+                            </button>
+                            <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                                <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
+                                <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="main-summary-row">
@@ -178,19 +191,7 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
             <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-1">
-                <div class="col-md-12 dropdown">
-                    <div class="grid-elements ">
-                        <button title="Download" class="transparent-btn mr-1 dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
-                            <i class="fas fa-download" style="color:#A41652 !important"></i>
-                        </button>
-                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
-                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
-                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="col-md-1"></div>
         </div>`
         descriptions.forEach((desc, index) => {
             if(index > pageSize ) return
