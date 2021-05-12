@@ -45,7 +45,7 @@ export const renderDescription = (modified_at) => {
                 </div>
                 <div class="main-summary-row">
                     <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
-                        <div class="p-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
+                        <div class="pt-0 pl-2 pb-2 pr-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
                     </div>
                 </div>
             </div>
@@ -185,7 +185,7 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
     let template = '';
     if(descriptions.length > 0) {
         template = `
-        <div class="row m-0 pt-md-1 align-left">
+        <div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
             <div class="col-md-2 font-bold ws-nowrap pl-2">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-3 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
             <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
