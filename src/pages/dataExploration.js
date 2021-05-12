@@ -18,7 +18,20 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, dictionary)
                         <h1 class="col page-header pl-0 pt-2">${pageHeader}</h1>
                         ${showPages ? `
                             <div class="ml-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
-                            <div class="ml-auto mt-3 mb-3" id="pageSizeContainer"></div>
+                            <div class="ml-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
+                            <div class="ml-auto mt-3 mb-3" id="downloadContainer">
+                                <div class="col-md-12 p-0 dropdown">
+                                    <div class="grid-elements ">
+                                        <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
+                                            Download <i class="fas fa-download" style="color:#A41652 !important"></i>
+                                        </button>
+                                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
+                                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         `: ``}
                     </div>
                 </div>

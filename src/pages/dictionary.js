@@ -214,19 +214,7 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                     <div class="col-md-3 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
-            <div class="ml-auto">
-                <div class="col-md-12 dropdown">
-                    <div class="grid-elements ">
-                        <button title="Download" class="transparent-btn mr-1 dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
-                            <i class="fas fa-download" style="color:#A41652 !important"></i>
-                        </button>
-                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
-                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
-                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="ml-auto"></div>
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
         `
