@@ -271,14 +271,20 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
 export const downloadFiles = (data, headers, fileName, studyDescription) => {
     if(studyDescription) {
         let flatArray = [];
+        headers.splice(headers.indexOf('PI'), 1)
+        headers.splice(headers.indexOf('PI_Email'), 1)
         data.forEach(dt => {
             if(dt.pis) {
-                dt.pis.forEach(obj => {
-                    const flatObj = {...dt};
-                    flatObj['PI'] = obj.PI
-                    flatObj['PI_Email'] = obj.PI_Email
-                    flatArray.push(flatObj);
+                const flatObj = {...dt};
+                dt.pis.forEach((obj, index) => {
+                    const piColumnName = `PI_${index+1}`;
+                    const piEmailColumnName = `PI_Email_${index+1}`;
+                    flatObj[piColumnName] = obj.PI;
+                    flatObj[piEmailColumnName] = obj.PI_Email;
+                    if(headers.indexOf(piColumnName) === -1) headers.push(piColumnName);
+                    if(headers.indexOf(piEmailColumnName) === -1) headers.push(piEmailColumnName);
                 });
+                flatArray.push(flatObj);
             }
             else flatArray.push(dt);
         });
