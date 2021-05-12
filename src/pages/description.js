@@ -12,8 +12,8 @@ export const renderDescription = (modified_at) => {
                 <div class="ml-auto mt-3 mb-3" id="downloadContainer">
                     <div class="col-md-12 p-0 dropdown">
                         <div class="grid-elements ">
-                            <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#A41652 !important">
-                                Download <i class="fas fa-download" style="color:#A41652 !important"></i>
+                            <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#000000 !important">
+                                Download <i class="fas fa-download" style="color:#000000 !important"></i>
                             </button>
                             <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
                                 <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
