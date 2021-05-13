@@ -126,7 +126,7 @@ const countPublicStatistics = (d, caseControl) => {
     element.innerHTML = summary;
     addEventOverviewConsortiumSelection(d);
     addEventConsortiaFilter(d)
-    renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, caseControl);
+    renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, caseControl);
 }
 
 const addEventOverviewConsortiumSelection = (data) => {
@@ -139,41 +139,40 @@ const addEventOverviewConsortiumSelection = (data) => {
     })
 }
 
-export const renderDataSummary = (totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, caseControl) => {
+export const renderDataSummary = (obj, caseControl) => {
     document.getElementById('renderDataSummaryCounts').innerHTML = `
         <div class="row">
             <div class="col">
                 <span class="font-size-22">Consortia</span></br>
-                <span class="font-size-32">${numberWithCommas(totalConsortia)}</span>
+                <span class="font-size-32">${numberWithCommas(obj.totalConsortia)}</span>
             </div>
             <div class="col">
                 <span class="font-size-22">Study</span></br>
-                <span class="font-size-32">${numberWithCommas(totalStudies)}</span>
+                <span class="font-size-32">${numberWithCommas(obj.totalStudies)}</span>
             </div>
         </div>
-        ${totalCases !== 0 &&  totalControls !== 0? `
+        ${caseControl? `
             <div class="row mt-3">
                 <div class="col">
                     <span class="font-size-22">Cases</span></br>
-                    <span class="font-size-32">${numberWithCommas(totalCases)}</span>
+                    <span class="font-size-32">${numberWithCommas(obj.totalCases)}</span>
                 </div>
                 <div class="col">
                     <span class="font-size-22">Controls</span></br>
-                    <span class="font-size-32">${numberWithCommas(totalControls)}</span>
+                    <span class="font-size-32">${numberWithCommas(obj.totalControls)}</span>
                 </div>
             </div>
-        `: ``}
-        ${totalBRCA1 !== 0 && totalBRCA2 !== 0 ? `
-            <div class="row mt-3">
+        `: `
+        <div class="row mt-3">
                 <div class="col">
                     <span class="font-size-22">BRCA1</span></br>
-                    <span class="font-size-32">${numberWithCommas(totalBRCA1)}</span>
+                    <span class="font-size-32">${numberWithCommas(obj.totalBRCA1)}</span>
                 </div>
                 <div class="col">
                     <span class="font-size-22">BRCA2</span></br>
-                    <span class="font-size-32">${numberWithCommas(totalBRCA2)}</span>
+                    <span class="font-size-32">${numberWithCommas(obj.totalBRCA2)}</span>
                 </div>
             </div>
-        `:``}
+        `}
     `
 }

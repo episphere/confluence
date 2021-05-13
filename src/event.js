@@ -1301,7 +1301,7 @@ export const addEventConsortiaFilter = (d) => {
                     if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, true);
+                renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, true);
             }
             else {
                 delete data['CIMBA']
@@ -1314,7 +1314,7 @@ export const addEventConsortiaFilter = (d) => {
                     if(obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if(obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
-                renderDataSummary(totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2, true);
+                renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, true);
             }
         })
     })
