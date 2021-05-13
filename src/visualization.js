@@ -204,7 +204,7 @@ export const getSelectedStudies = () => {
 
 const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     const data = [
@@ -229,7 +229,7 @@ const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
 
 const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     document.getElementById(id).innerHTML = '';
@@ -267,7 +267,7 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     let pieLabel = ''
@@ -336,7 +336,7 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, xarray, chartRow
         pieLabel = parameter;
     }
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
 
@@ -370,7 +370,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     }
 
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
@@ -416,7 +416,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
         pieLabel = parameter;
     }
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 padding-right-zero mb-3'];
+    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     

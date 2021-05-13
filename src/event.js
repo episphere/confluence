@@ -1173,7 +1173,7 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.getElementById('missingnessFilter').classList = ['d-none'];
             document.getElementById('missingnessTable').parentNode.classList = ['col-xl-12 padding-right-zero padding-left-zero'];
             document.getElementById('dataLastModified').classList.remove('offset-xl-2');
-            document.getElementById('dataLastModified').classList.remove('padding-left-20');
+            document.getElementById('dataLastModified').classList.remove('pl-4');
         }
         else {
             reSizePlots();
@@ -1182,7 +1182,7 @@ export const addEventMissingnessFilterBarToggle = () => {
             document.getElementById('missingnessFilter').classList = ['col-xl-2 filter-column'];
             document.getElementById('missingnessTable').parentNode.classList = ['col-xl-10 padding-right-zero'];
             document.getElementById('dataLastModified').classList.add('offset-xl-2');
-            document.getElementById('dataLastModified').classList.add('padding-left-20');
+            document.getElementById('dataLastModified').classList.add('pl-4');
         }
     })
 }

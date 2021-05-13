@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, shortenText, tsv2Json } from "./../shared.js";
+import { defaultPageSize, getFile, shortenText, tsv2Json } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
@@ -177,9 +177,9 @@ const getDescription = async () => {
     </div>
     `;
     addEventFilterDataCatalogue(descriptions, headers);
-    renderStudyDescription(descriptions, 20, headers);
-    paginationHandler(descriptions, 20, headers);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, 20);
+    renderStudyDescription(descriptions, defaultPageSize, headers);
+    paginationHandler(descriptions, defaultPageSize, headers);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, defaultPageSize);
     addEventPageSizeSelection(descriptions, headers);
     addEventFilterBarToggle();
 };
@@ -347,7 +347,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
     const currentValue = input.value.trim().toLowerCase();
     
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, 20);
+        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, defaultPageSize);
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value, headers);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value, headers);
         addEventPageSizeSelection(filteredData, headers);
@@ -371,7 +371,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
         return dt;
     })
 
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, 20);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, defaultPageSize);
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value, headers);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value, headers);
     addEventPageSizeSelection(searchedData, headers);
@@ -390,9 +390,9 @@ const paginationHandler = (data, pageSize, headers) => {
 }
 
 export const pageSizeTemplate = (array, startPageSize) => {
-    const contentSize = Math.ceil(array.length / 20) * 20;
+    const contentSize = Math.ceil(array.length / defaultPageSize) * defaultPageSize;
     let pageSizes = [];
-    for(let i = startPageSize; i <= contentSize; i += 20) {
+    for(let i = startPageSize; i <= contentSize; i += defaultPageSize) {
         pageSizes.push(i);
     }
     let template = `

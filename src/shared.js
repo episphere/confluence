@@ -785,6 +785,8 @@ export const shortenText = (str, size) => {
     return str.length > size ? `${str.substr(0,size)}...`: str;
 }
 
+export const defaultPageSize = 40;
+
 export const handleRangeRequests = async () => {
     const fileInfo = await getFileInfo('751586322923');
     const fileSize = fileInfo.size;
