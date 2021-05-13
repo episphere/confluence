@@ -606,7 +606,7 @@ const addEventHideNotification = () => {
 export const addEventDataGovernanceNavBar = (bool) => {
     const dataGovernanceElement = document.getElementById('dataGovernance');
     dataGovernanceElement.addEventListener('click', async () => {
-        if(dataGovernanceElement.classList.contains('navbar-active')) return;
+        // if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
         assignNavbarActive(dataGovernanceElement, 2 );
         document.title = 'Confluence - Data Governance';

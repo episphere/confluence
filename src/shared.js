@@ -578,8 +578,10 @@ export const getValidConsortium = async () => {
     return filterConsortiums(response.entries);
 }
 
+const consortiums = ['Confluence_NCI', 'Confluence_BCAC', 'Confluence_LAGENO', 'Confluence_OCPL'];
+
 export const filterConsortiums = (array) => {
-    return array.filter(obj => obj.type === 'folder' && ( obj.name === 'Confluence_NCI' || obj.name === 'Confluence_BCAC' || obj.name === 'Confluence_LAGENO' || obj.name === 'Confluence_OCPL'));
+    return array.filter(obj => obj.type === 'folder' && consortiums.includes(obj.name));
 }
 
 export const filterStudies = (array) => {
