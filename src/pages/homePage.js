@@ -70,8 +70,8 @@ export const infoDeckAfterLoggedIn = async () => {
             </div>
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
-                if(studyDescription) template += cardContents({header: 'Study Description', button: 'Study description', href: '#about/description', icon: 'fa-file-alt', explanation: ''})
-                if(dictionary) template += cardContents({header: 'Data Dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: ''})
+                if(studyDescription) template += cardContents({header: 'Study Description', button: 'Study description', href: '#about/description', icon: 'fa-file-alt', explanation: 'Review descriptions of participating studies in Confluence.'})
+                if(dictionary) template += cardContents({header: 'Data Dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: 'See the variables that are requested from studies by Confluence.'})
                 template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses. </br></br>Does not require DACC review.'})
                 template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
