@@ -166,7 +166,7 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-    renderStatusBarChart(finalData, onlyCIMBA ? 'status_carrier': 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'] : ['case', 'control'], 'chartRow1');
+    renderStatusBarChart(finalData, onlyCIMBA ? 'Status_Carrier': 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'] : ['case', 'control'], 'chartRow1');
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
