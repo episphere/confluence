@@ -70,14 +70,18 @@ const getDescription = async () => {
     let newJsons = {};
     let prevAcronym = '';
     json.forEach(obj => {
-        if(obj['Study Acronym'] && newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] === undefined) newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] = {}
-        if(obj['Study Acronym']) {
-            prevAcronym = `${obj['Consortium']}${obj['Study Acronym']}`;
-            newJsons[`${obj['Consortium']}${obj['Study Acronym']}`] = obj;
-            if(newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis === undefined) newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis = [];
-            newJsons[`${obj['Consortium']}${obj['Study Acronym']}`].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
-            delete newJsons[`${obj['Consortium']}${obj['Study Acronym']}`]['PI']
-            delete newJsons[`${obj['Consortium']}${obj['Study Acronym']}`]['PI_Email']
+        if(obj['Consortium']) obj['Consortium'] = obj['Consortium'].trim();
+        if(obj['Study Acronym']) obj['Study Acronym'] = obj['Study Acronym'].trim();
+        const consortium = obj['Consortium'] ? obj['Consortium'] : undefined;
+        const studyAcronym = obj['Study Acronym'] ? obj['Study Acronym'] : undefined;
+        if(studyAcronym && newJsons[`${consortium}${studyAcronym}`] === undefined) newJsons[`${consortium}${studyAcronym}`] = {}
+        if(studyAcronym) {
+            prevAcronym = `${consortium}${studyAcronym}`;
+            newJsons[`${consortium}${studyAcronym}`] = obj;
+            if(newJsons[`${consortium}${studyAcronym}`].pis === undefined) newJsons[`${consortium}${studyAcronym}`].pis = [];
+            newJsons[`${consortium}${studyAcronym}`].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
+            delete newJsons[`${consortium}${studyAcronym}`]['PI']
+            delete newJsons[`${consortium}${studyAcronym}`]['PI_Email']
         }
         else {
             newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
