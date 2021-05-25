@@ -223,6 +223,10 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                         ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
                         ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
+                        ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
+                        ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
+                        ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
+                        ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
                     `
                     if(desc['pis'].length > 0) {
                         desc['pis'].forEach(info => {
