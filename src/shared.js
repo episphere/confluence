@@ -644,16 +644,39 @@ export const inactivityTime = () => {
     const resetTimer = () => {
         clearTimeout(time);
         time = setTimeout(() => {
-            const r = confirm('You were inactive for more than 20 minutes, would you like to extend your session?');
-            if(r) {
-                
-            }
-            else {
+            const resposeTimeout = setTimeout(() => {
+                // log out user if they don't respond to warning after 5 mins.
                 logOut();
-            }
+            }, 300000);
+            
+            const button = document.createElement('button');
+            button.dataset.toggle = 'modal';
+            button.dataset.target = '#confluenceMainModal'
+            document.body.appendChild(button);
+            button.click();
+            const header = document.getElementById('confluenceModalHeader');
+            const body = document.getElementById('confluenceModalBody');
+            header.innerHTML = `<h5 class="modal-title">Inactive</h5>`;
+
+            body.innerHTML = `You were inactive for 20 minutes, would you like to extend your session?
+                            <div class="modal-footer">
+                                <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
+                                <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
+                            </div>`
+            document.body.removeChild(button);
+            Array.from(document.getElementsByClassName('log-out-user')).forEach(e => {
+                e.addEventListener('click', () => {
+                    logOut();
+                })
+            })
+            Array.from(document.getElementsByClassName('extend-user-session')).forEach(e => {
+                e.addEventListener('click', () => {
+                    clearTimeout(resposeTimeout);
+                    resetTimer;
+                })
+            });
         }, 1200000);
     }
-
     window.onload = resetTimer;
     document.onmousemove = resetTimer;
     document.onkeypress = resetTimer;
