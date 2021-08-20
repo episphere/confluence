@@ -10,7 +10,7 @@ export const dataSubmissionTemplate = async () => {
                     <div class="container body-min-height">
                         <div class="main-summary-row">
                             <div class="align-left">
-                                <h1 class="page-header">Data Submission</h1>
+                                <h1 class="page-header">Data Submitted</h1>
                             </div>
                         </div>
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
@@ -27,7 +27,7 @@ export const dataSubmissionTemplate = async () => {
             <div class="container body-min-height font-size-18">
                 <div class="main-summary-row">
                     <div class="align-left">
-                        <h1 class="page-header">Data Submission</h1>
+                        <h1 class="page-header">Data Submitted</h1>
                     </div>
                 </div>
                 <div class="row create-study">

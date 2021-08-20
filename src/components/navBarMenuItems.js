@@ -33,8 +33,8 @@ export const navBarMenutemplate = (dictionary) => {
                     </a>
                 `:``}
                 
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submission" id="dataSubmission"> 
-                    Submit
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
+                    Submitted
                 </a>
                 <div id="governanceNav" class="grid-elements"></div>
                 <div id="myProjectsNav" class="grid-elements"></div>
