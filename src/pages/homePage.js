@@ -109,7 +109,7 @@ export const infoDeckAfterLoggedIn = async () => {
 
 const cardContents = (obj) => {
     return `
-        <div class="col-xl card confluence-cards">
+        <div class="col-xl card confluence-cards" style="min-width:225px">
             <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
                 <i class="fas ${obj.icon} fa-2x icon-padding font-white"></i>
             </div>
