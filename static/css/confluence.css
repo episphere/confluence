@@ -590,6 +590,11 @@ label {
     color: #58aef2;
 }
 
+.fa-external-link-alt {
+    font-size: 0.6em;
+    color: #df8723;
+}
+
 .fa-download {
     color: #343fdb;
 }
