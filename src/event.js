@@ -85,6 +85,7 @@ export const addEventConsortiaSelect = () => {
 
 export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
+    if(!form) return;
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const file = document.getElementById('uploadDataUIS').files[0]; 

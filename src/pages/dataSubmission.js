@@ -1,9 +1,15 @@
-import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation } from "../shared.js";
+import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
 export const dataSubmissionTemplate = async () => {
     const response = await getFolderItems(0);
     const array = filterConsortiums(response.entries);
+    let bool = false;
+    for(let consortia of array){
+        if(bool) continue;
+        const permitted = checkDataSubmissionPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), JSON.parse(localStorage.parms).login);
+        if(permitted) bool = true;
+    }
     if(array.length <= 0) {
         hideAnimation();
         return `<div class="general-bg padding-bottom-1rem">
@@ -30,13 +36,15 @@ export const dataSubmissionTemplate = async () => {
                         <h1 class="page-header">Data Submitted</h1>
                     </div>
                 </div>
+                ${bool ? `
                 <div class="row create-study">
                     <div class="upload-in-study">
                         <button data-toggle="modal" id="uploadDataBtn" title="Submit data" data-target="#uploadInStudy" class="btn btn-light div-border">
                             <i class="fas fa-upload"></i> Submit data
                         </button>
                     </div>
-                </div>`;
+                </div>
+                `:``}`;
 
     template += await uploadInStudy('uploadInStudy');
     
