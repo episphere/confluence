@@ -225,8 +225,10 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
                         ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
                         ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
+                        ${desc['Description of Ascertainment Process for Male Subjects'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Subjects</div><div class="col">${desc['Description of Ascertainment Process for Male Subjects']}</div></div>`: ``}
                         ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
                         ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
+                        ${desc['Description of Ascertainment Process for Female Subjects'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Subjects</div><div class="col">${desc['Description of Ascertainment Process for Female Subjects']}</div></div>`: ``}
                     `
                     if(desc['pis'].length > 0) {
                         desc['pis'].forEach(info => {
