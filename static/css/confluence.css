@@ -1671,6 +1671,10 @@ form {
     border: 0px;
 }
 
+.custom-border {
+    border: 3px solid #DDDDDD !important;
+}
+
 .filter-sub-div {
     max-height: 112px;
 }

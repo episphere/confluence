@@ -88,7 +88,7 @@ const countPublicStatistics = (d, caseControl) => {
         <div class="align-center">
             <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
                 <div class="col-md-2" style="padding: 0px">
-                    <div class="div-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
+                    <div class="custom-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-17 font-bold">Filter</span></br>
                     ${data['CIMBA'] ? `
                         <div class="form-group pr-1">
@@ -119,7 +119,7 @@ const countPublicStatistics = (d, caseControl) => {
     }         
     summary += `</div></div>
                 <div class="col-md-10 align-center" style="padding: 0px">
-                    <div class="div-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts"></div>
+                    <div class="custom-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts"></div>
                 </div></div>
                 <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
                 `
