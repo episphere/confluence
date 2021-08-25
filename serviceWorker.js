@@ -24,7 +24,7 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|webp)$/,
 
 registerRoute(
     new RegExp('https://api.box.com/.+'),
-    new StaleWhileRevalidate({
+    new NetworkFirst({
         cacheName: 'api-cache',
         plugins: [
             new CacheableResponsePlugin({
@@ -38,6 +38,6 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([
-        {url: 'index.html', revision: 'jshd982734'}
+        {url: 'index.html', revision: 'v1.0.0.0'}
     ]
 );
