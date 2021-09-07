@@ -297,24 +297,17 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRo
         `)
     const data = [
         {
-            labels,
-            values,
-            type: 'pie',
-            textinfo: 'label+percent',
-            textfont : {
-                size: plotTextSize
-            },
-            hoverinfo: text,
-            textposition: 'outside',
-            automargin: true,
-            showlegend: false,
+            y: values,
+            x: labels,
+            type: 'bar',
             marker:{
-                colors: ['#BF1B61', '#f7b6d2', '#7F7F7F', '#cccccc']
-            },
-            hole: .4
+                color: ['#BF1B61', '#f7b6d2','#7F7F7F', '#cccccc']
+            }
         }
     ];
     const layout = {
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
