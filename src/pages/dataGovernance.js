@@ -4,7 +4,7 @@ import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjec
 
 export const template = async () => {
     const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && 'Confluence_Data_Platform_Shared_with_Investigators'.includes(obj.name));
+    const array = response.entries.filter(obj => obj.type === 'folder' && '137304373658'.includes(obj.id));
     // const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
