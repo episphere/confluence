@@ -1457,9 +1457,13 @@ form {
 .data-governance {
     text-align: left;
     background-color: #fff;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
     padding: 0.5rem 0;
     border-radius: 0.25rem;
+}
+
+.table td, .table th {
+    padding: 0.5rem !important;
 }
 
 .lazy-loading-spinner {
