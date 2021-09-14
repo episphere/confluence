@@ -4,10 +4,11 @@ import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjec
 
 export const template = async () => {
     const response = await getFolderItems(0);
-    const array = filterConsortiums(response.entries);
+    const array = response.entries.filter(obj => obj.type === 'folder' && 'Confluence_Data_Platform_Shared_with_Investigators'.includes(obj.name));
+    // const array = filterConsortiums(response.entries);
     if(array.length <= 0) return;
     
-    let template = `<div class="card" style="border: 0px;"><div class="card-header"><label class="dataSummary-label">Consortium(s)</label></div>`;
+    let template = `<div class="card" style="border: 0px;"><div class="card-header"></div>`;
     
     template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
 
