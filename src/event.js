@@ -375,7 +375,7 @@ export const addEventShowAllCollaborator = () => {
     btn2.addEventListener('click', async () => {
         if(btn2.classList.contains('active-tab')) return;
         const ID = folderToShare.dataset.folderId;
-        const name = folderToShare.dataset.folderName;
+        const folderName = folderToShare.dataset.folderName;
         const type = folderToShare.dataset.objectType;
         btn2.classList.add('active-tab');
         btn1.classList.remove('active-tab');
@@ -394,14 +394,14 @@ export const addEventShowAllCollaborator = () => {
                 const role = entry.role;
                 const status = entry.status;
                 const id = entry.id;
-                const folderName = entry.item.name;
+                // const folderName = entry.item.name;
                 const addedBy = `${entry.created_by.name}`;
                 const addedAt = (new Date(entry.created_at)).toLocaleString();
                 allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
-            table += `<strong>${name}</strong><br><br>
+            table += `<strong>${folderName}</strong><br><br>
                 <table class="table table-borderless table-striped collaborator-table">
                     <thead>
                         <tr>
@@ -418,16 +418,18 @@ export const addEventShowAllCollaborator = () => {
             `;
             allEntries.forEach(entry => {
                 const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
+                const userName = JSON.parse(localStorage.parms).name
+                // ${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}
                 table += `<tr>
                             <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
                             <td title="${email}">${email.length > 15 ? `${email.slice(0, 15)}...` : `${email}`}</td>
-                            <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) ? `
+                            <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
                             <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                         ` : `${role}`}</td>
                             <td>${status}</td>
-                            <td>${addedBy}</td>
+                            <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
                             <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
-                            <td>${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
+                            <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
                         </tr>`
             });
             table += `</tbody></table>`
@@ -612,12 +614,11 @@ export const addEventDataGovernanceNavBar = (bool) => {
         assignNavbarActive(dataGovernanceElement, 2 );
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
-        if(bool){
-            const generalDiv = document.createElement('div');
-            generalDiv.classList = ['general-bg padding-bottom-1rem']
-            const containerDiv = document.createElement('div');
+        // if(bool){
+            confluenceDiv.classList.add('general-bg');
 
-            containerDiv.classList = ['container'];
+            const containerDiv = document.createElement('div');
+            containerDiv.classList = ['container padding-bottom-1rem'];
 
             const headerDiv = document.createElement('div');
             headerDiv.classList = ['main-summary-row'];
@@ -625,12 +626,12 @@ export const addEventDataGovernanceNavBar = (bool) => {
                                         <h1 class="page-header">Data Governance</h1>
                                     </div>`
 
-            const btnDiv = document.createElement('div');
-            btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
-                                    <i class="fas fa-project-diagram"></i> Create project
-                                </button>
-                                ${createProjectModal()}`;
+        //     const btnDiv = document.createElement('div');
+        //     btnDiv.classList = ['align-left create-project-btn'];
+        //     btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+        //                             <i class="fas fa-project-diagram"></i> Create project
+        //                         </button>
+        //                         ${createProjectModal()}`;
 
             const divRow = document.createElement('div');
             divRow.classList = ['main-summary-row white-bg div-border'];
@@ -642,39 +643,39 @@ export const addEventDataGovernanceNavBar = (bool) => {
             hideAnimation();
             divRow.appendChild(div1);
 
-            const div2 = document.createElement('div');
-            div2.classList = ['col-lg-6 align-left'];
-            div2.id = 'dataGovernanceProjects';
-            divRow.appendChild(div2);
+            // const div2 = document.createElement('div');
+            // div2.classList = ['col-lg-6 align-left'];
+            // div2.id = 'dataGovernanceProjects';
+            // divRow.appendChild(div2);
 
             confluenceDiv.innerHTML = ``;
             containerDiv.appendChild(headerDiv)
-            containerDiv.appendChild(btnDiv)
+            // containerDiv.appendChild(btnDiv)
             containerDiv.appendChild(divRow)
-            generalDiv.appendChild(containerDiv)
-            confluenceDiv.appendChild(generalDiv);
-            dataGovernanceProjects();
-        }
-        else{
-            confluenceDiv.innerHTML = ``;
-
-            const btnDiv = document.createElement('div');
-            btnDiv.classList = ['align-left create-project-btn'];
-            btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
-                                    <i class="fas fa-project-diagram"></i> Create project
-                                </button>
-                                ${createProjectModal()}`;
-            
-            const div = document.createElement('div');
-            div.classList = ['align-left'];
-            div.innerHTML = await dataGovernanceTemplate();
-            hideAnimation();
-            confluenceDiv.appendChild(btnDiv);
-            confluenceDiv.appendChild(div);
+            confluenceDiv.appendChild(containerDiv);
+        //     dataGovernanceProjects();
             dataGovernanceLazyLoad();
-        }
+        // }
+        // else{
+            // confluenceDiv.innerHTML = ``;
+
+            // const btnDiv = document.createElement('div');
+            // btnDiv.classList = ['align-left create-project-btn'];
+            // btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+            //                         <i class="fas fa-project-diagram"></i> Create project
+            //                     </button>
+            //                     ${createProjectModal()}`;
+            
+            // const div = document.createElement('div');
+            // div.classList = ['align-left'];
+            // div.innerHTML = await dataGovernanceTemplate();
+            // hideAnimation();
+            // confluenceDiv.appendChild(btnDiv);
+            // confluenceDiv.appendChild(div);
+            // dataGovernanceLazyLoad();
+        // }
         
-        addEventCreateProjectBtn();
+        // addEventCreateProjectBtn();
         dataGovernanceCollaboration();
     });
 };
