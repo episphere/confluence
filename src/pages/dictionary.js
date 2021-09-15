@@ -232,11 +232,11 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                         </div>
                     </div>
                     <div class="ml-auto">
-                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/[<b>|<\/b>]+/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
             </div>
-            <div id="study${desc['Variable'].replace(/[<b>|<\/b>]+/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
+            <div id="study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
                     ${desc['Category'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Category</div><div class="col">${desc['Category']}</div></div>`: ``}
                     ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
@@ -280,7 +280,7 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
     }
     const downloadDictionaryCSV = document.getElementById('downloadDictionaryCSV');
     downloadDictionaryCSV.addEventListener('click', () => {
-        const csvContent = "data:text/csv;charset=utf-8," + json2other(data, headers).replace(/[<b>|<\/b>]+/g, '');
+        const csvContent = "data:text/csv;charset=utf-8," + json2other(data, headers).replace(/(<b>)|(<\/b>)/g, '');
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -292,7 +292,7 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
 
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
     downloadDictionaryTSV.addEventListener('click', () => {
-        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(data, headers, true).replace(/[<b>|<\/b>]+/g, '');
+        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(data, headers, true).replace(/(<b>)|(<\/b>)/g, '');
         const encodedUri = encodeURI(tsvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
