@@ -1660,6 +1660,14 @@ form {
     z-index: 9;
 }
 
+.search-input-collaborator {
+    right: 1px;
+    position: absolute;
+    top: 3px;
+    background: #ffffff !important;
+    z-index: 9;
+}
+
 #countriesList, #consortiumList, #studyDesignList {
     width: 100%;
 }

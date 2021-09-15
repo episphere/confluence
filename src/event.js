@@ -384,9 +384,9 @@ export const addEventShowAllCollaborator = () => {
         const response = await getCollaboration(ID,`${type}s`);
         const userPermission = checkPermissionLevel(response);
         let table = '';
+        let allEntries = [];
         if(response && response.entries.length > 0){
             let entries = response.entries;
-            let allEntries = [];
             
             entries.forEach(entry => {
                 const name = !entry.invite_email ? entry.accessible_by.name : '';
@@ -401,38 +401,20 @@ export const addEventShowAllCollaborator = () => {
             });
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
-            table += `<strong>${folderName}</strong><br><br>
-                <table class="table table-borderless table-striped collaborator-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Added by</th>
-                            <th>Added at</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            table += `
+                <div class="row">
+                    <div class="col"><strong>${folderName}</strong></div>
+                    <div class="col">
+                        <div class="input-group">
+                            <input type="search" class="form-control rounded pt-0 pb-0" style="font-size:0.75rem" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchCollaborators" aria-describedby="search-addon">
+                            <span class="input-group-text border-0 search-input-collaborator">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div><br><br>
+                <table id="collaboratorsList" class="table table-borderless table-striped collaborator-table"></table>
             `;
-            allEntries.forEach(entry => {
-                const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
-                const userName = JSON.parse(localStorage.parms).name
-                // ${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}
-                table += `<tr>
-                            <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
-                            <td title="${email}">${email.length > 15 ? `${email.slice(0, 15)}...` : `${email}`}</td>
-                            <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
-                            <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
-                        ` : `${role}`}</td>
-                            <td>${status}</td>
-                            <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
-                            <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
-                            <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
-                        </tr>`
-            });
-            table += `</tbody></table>`
         }
         else{
             table = 'Collaborators not found!'
@@ -443,10 +425,63 @@ export const addEventShowAllCollaborator = () => {
                 <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
         `;
-        addEventRemoveCollaborator();
-        addEventUpdateCollaborator();
+        renderCollaboratorsList(allEntries, userPermission);
+        addEventSearchCollaborators(allEntries, userPermission);
     });
 };
+
+const renderCollaboratorsList = (allEntries, userPermission) => {
+    if(!document.getElementById('collaboratorsList')) return;
+    let table = `
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Added by</th>
+                <th>Added at</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    allEntries.forEach(entry => {
+        const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
+        const userName = JSON.parse(localStorage.parms).name
+        // ${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}
+        table += `<tr>
+                    <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
+                    <td title="${email}">${email.length > 15 ? `${email.slice(0, 15)}...` : `${email}`}</td>
+                    <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
+                    <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
+                ` : `${role}`}</td>
+                    <td>${status}</td>
+                    <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
+                    <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
+                    <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
+                </tr>`
+    });
+    table += `</tbody>`
+    document.getElementById('collaboratorsList').innerHTML = table;
+    addEventRemoveCollaborator();
+    addEventUpdateCollaborator();
+}
+
+const addEventSearchCollaborators = (allEntries, userPermission) => {
+    const search = document.getElementById('searchCollaborators');
+    let filteredEntries = allEntries;
+    search.addEventListener('input', () => {
+        const searchValue = search.value.trim().toLowerCase();
+        if(searchValue.length < 3) {
+            filteredEntries = allEntries;
+            renderCollaboratorsList(filteredEntries, userPermission);
+            return;
+        }
+        filteredEntries = filteredEntries.filter(dt => dt.name.toLowerCase().includes(searchValue) || dt.email.toLowerCase().includes(searchValue));
+        renderCollaboratorsList(filteredEntries, userPermission)
+    })
+}
 
 const updatePermissionsOptions = (userPermission, role) => {
     if ( userPermission === 'owner') return `<option ${role === 'co-owner' ? `selected` : ``} value="co-owner">co-owner</option><option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option>`
