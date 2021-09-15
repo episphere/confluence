@@ -456,7 +456,7 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
         // ${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}
         table += `<tr>
                     <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
-                    <td title="${email}">${email.length > 15 ? `${email.slice(0, 15)}...` : `${email}`}</td>
+                    <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
                     <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                 ` : `${role}`}</td>
@@ -487,7 +487,7 @@ const addEventSearchCollaborators = (allEntries, userPermission) => {
             renderCollaboratorsList(filteredEntries, userPermission);
             return;
         }
-        filteredEntries = filteredEntries.filter(dt => dt.name.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue) || dt.email.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue));
+        filteredEntries = allEntries.filter(dt => dt.name.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue) || dt.email.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue));
         filteredEntries = filteredEntries.map(dt => {
             dt['name'] = dt['name'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
             dt['email'] = dt['email'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
