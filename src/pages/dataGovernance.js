@@ -10,7 +10,7 @@ export const template = async () => {
     
     let template = `<div class="card" style="border: 0px;"><div class="card-header"></div>`;
     
-    template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items">';
+    template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items p-0 m-0">';
 
     for(let obj of array){
         const ID = obj.id;

@@ -435,7 +435,7 @@ label {
 }
 
 .first-list-item {
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
 }
 
 .main-summary-row {
@@ -539,7 +539,7 @@ label {
 .ul-list-style {
     list-style-type:none;
     margin-right: 1rem;
-    -webkit-transition: max-height 0.35s ease-in-out !important; 
+    -webkit-transition: max-height 0.35s ease-in-out !important;
     transition: max-height 0.35s ease-in-out !important;
 }
 
@@ -1656,6 +1656,14 @@ form {
     right: 1px;
     position: absolute;
     top: 5px;
+    background: #ffffff !important;
+    z-index: 9;
+}
+
+.search-input-collaborator {
+    right: 1px;
+    position: absolute;
+    top: 3px;
     background: #ffffff !important;
     z-index: 9;
 }
