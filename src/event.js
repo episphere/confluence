@@ -402,7 +402,7 @@ export const addEventShowAllCollaborator = () => {
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
             table += `
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col"><strong>${folderName}</strong></div>
                     <div class="col">
                         <div class="input-group">
@@ -412,7 +412,7 @@ export const addEventShowAllCollaborator = () => {
                             </span>
                         </div>
                     </div>
-                </div><br><br>
+                </div>
                 <table id="collaboratorsList" class="table table-borderless table-striped collaborator-table"></table>
             `;
         }
