@@ -431,6 +431,10 @@ export const addEventShowAllCollaborator = () => {
 };
 
 const renderCollaboratorsList = (allEntries, userPermission) => {
+    if(allEntries.length === 0 ) {
+        document.getElementById('collaboratorsList').innerHTML = 'Collaborators not found!';
+        return;
+    }
     if(!document.getElementById('collaboratorsList')) return;
     let table = `
         <thead>
@@ -475,10 +479,20 @@ const addEventSearchCollaborators = (allEntries, userPermission) => {
         const searchValue = search.value.trim().toLowerCase();
         if(searchValue.length < 3) {
             filteredEntries = allEntries;
+            filteredEntries = filteredEntries.map(dt => {
+                dt['name'] = dt['name'].replace(/(<b>)|(<\/b>)/g, '');
+                dt['email'] = dt['email'].replace(/(<b>)|(<\/b>)/g, '')
+                return dt;
+            })
             renderCollaboratorsList(filteredEntries, userPermission);
             return;
         }
-        filteredEntries = filteredEntries.filter(dt => dt.name.toLowerCase().includes(searchValue) || dt.email.toLowerCase().includes(searchValue));
+        filteredEntries = filteredEntries.filter(dt => dt.name.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue) || dt.email.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue));
+        filteredEntries = filteredEntries.map(dt => {
+            dt['name'] = dt['name'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
+            dt['email'] = dt['email'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
+            return dt;
+        })
         renderCollaboratorsList(filteredEntries, userPermission)
     })
 }
