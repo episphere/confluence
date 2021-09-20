@@ -44,7 +44,7 @@ export const logOut = async () => {
         clt = config.iniAppDev;
     }else if(location.origin.indexOf('episphere') !== -1){
         clt = config.iniAppProd
-    }else if(location.origin.indexOf('observablehq') !== -1){
+    }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
         clt = config.iniObs
     }
 
