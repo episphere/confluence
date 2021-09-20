@@ -25,7 +25,7 @@ export const checkAccessTokenValidity = async () => {
 }
 
 export const loginObs = () => {
-    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniObs.client_id}&redirect_uri=https://observablehq.com/@episphere/confluence&state=${config.iniObs.stateIni}`
+    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniObs.client_id}&redirect_uri=https://confluence-stage.cancer.gov&state=${config.iniObs.stateIni}`
 }
 
 export const loginAppDev = () => {
