@@ -179,6 +179,7 @@ export const storeAccessToken = async () => {
             window.history.replaceState({},'', './#home');
             confluence();
             document.getElementById('loginBoxAppDev').hidden = true;
+            document.getElementById('loginBoxAppStage').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;
         }
     }else{
