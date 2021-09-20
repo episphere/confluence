@@ -35,6 +35,7 @@ export const confluence = async () => {
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
+        const loginBoxAppStage = document.getElementById('loginBoxAppStage');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
         if (location.origin.match('confluence-stage.cancer.gov')) loginBoxAppStage.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppProd.hidden = false;
@@ -367,6 +368,7 @@ window.onstorage = () => {
     else {
         confluence();
         document.getElementById('loginBoxAppDev').hidden = true;
+        document.getElementById('loginBoxAppStage').hidden = true;
         document.getElementById('loginBoxAppProd').hidden = true;
     }
 };
