@@ -1,4 +1,4 @@
-export const navBarMenutemplate = (dictionary) => {
+export const navBarMenutemplate = () => {
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
@@ -27,12 +27,9 @@ export const navBarMenutemplate = (dictionary) => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/subset" title="Subset Statistics" id="dataSummarySubset">
                     Subset Statistics
                 </a>
-                ${dictionary ? `
-                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/dictionary" title="Data Dictionary" id="dataDictionary">
-                        Dictionary
-                    </a>
-                `:``}
-                
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/dictionary" title="Data Dictionary" id="dataDictionary">
+                    Dictionary
+                </a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
                     Submitted
                 </a>

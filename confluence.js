@@ -49,8 +49,7 @@ export const confluence = async () => {
             const lclStr = JSON.parse(localStorage.parms);
             localStorage.parms = JSON.stringify({...lclStr, ...response});
         }
-        const fileInfo = await getFileInfo(774486143425);
-        navBarOptions.innerHTML = navBarMenutemplate(fileInfo);
+        navBarOptions.innerHTML = navBarMenutemplate();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
         const dataSubmissionElement = document.getElementById('dataSubmission');
@@ -78,7 +77,7 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataSummaryElement, 1)
             document.title = 'Confluence - Summary Statistics';
-            confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true, fileInfo);
+            confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true);
             addEventUpdateSummaryStatsData();
             dataSummaryStatisticsTemplate();
             if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
@@ -99,7 +98,7 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataSummarySubsetElement, 1);
             document.title = 'Confluence - Subset Statistics';
-            confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true, fileInfo);
+            confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true);
             addEventUpdateSummaryStatsData();
             removeActiveClass('nav-link', 'active');
             document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
@@ -112,7 +111,7 @@ export const confluence = async () => {
                 showAnimation();
                 assignNavbarActive(dataDictionaryElement, 1);
                 document.title = 'Confluence - Data Dictionary';
-                confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false, fileInfo);
+                confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false);
                 addEventUpdateSummaryStatsData();
                 removeActiveClass('nav-link', 'active');
                 document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
@@ -233,6 +232,17 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
+    else if (hash === '#data_exploration/dictionary') {
+        const dataDictionaryElement = document.getElementById('dataDictionary');
+        if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
+        showAnimation();
+        assignNavbarActive(dataDictionaryElement, 1);
+        document.title = 'Confluence - Data Dictionary';
+        confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false, true);
+        removeActiveClass('nav-link', 'active');
+        document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
+        dataDictionaryTemplate();
+    }
     else window.location.hash = '#home';
 }
 
@@ -241,7 +251,6 @@ const manageHash = async () => {
     if(localStorage.parms === undefined) return;
     const hash = decodeURIComponent(window.location.hash);
     if(!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
-    const dictionary = await getFileInfo(774486143425);
     if(hash === '#data_exploration/summary') {
         const element = document.getElementById('dataSummary');
         if(!element) return;
@@ -252,7 +261,7 @@ const manageHash = async () => {
         if(!element) return;
         element.click()
     }
-    else if(dictionary && hash === '#data_exploration/dictionary') {
+    else if(hash === '#data_exploration/dictionary') {
         const element = document.getElementById('dataDictionary');
         if(!element) return;
         element.click()
