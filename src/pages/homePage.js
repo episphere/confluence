@@ -54,7 +54,6 @@ export const infoDeck = () => {
 
 export const infoDeckAfterLoggedIn = async () => {
     const studyDescription = await getFileInfo(761599566277);
-    const dictionary = await getFileInfo(774486143425);
     let template = '';
     template += `
         <div class="secondary-bg padding-bottom-1rem">
@@ -71,7 +70,7 @@ export const infoDeckAfterLoggedIn = async () => {
             <div class="container align-middle text-center" style="margin-top: 70px;">
                 <div class="card-deck" id="infoDeck" style="min-height: 200px;">`
                 if(studyDescription) template += cardContents({header: 'Study Description', button: 'Study description', href: '#about/description', icon: 'fa-file-alt', explanation: 'View descriptions of participating studies.'})
-                if(dictionary) template += cardContents({header: 'Data Dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: 'View variables from participating studies.'})
+                template += cardContents({header: 'Data Dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: 'View variables from participating studies.'})
                 template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses.'})
                 template += cardContents({header: 'Data Request', button: 'Data Request', href: '#data_request', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                 template += `</div>
