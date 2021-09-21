@@ -232,6 +232,17 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
+    else if (hash === '#data_exploration/dictionary') {
+        const dataDictionaryElement = document.getElementById('dataDictionary');
+        if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
+        showAnimation();
+        assignNavbarActive(dataDictionaryElement, 1);
+        document.title = 'Confluence - Data Dictionary';
+        confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false, true);
+        removeActiveClass('nav-link', 'active');
+        document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
+        dataDictionaryTemplate();
+    }
     else window.location.hash = '#home';
 }
 

@@ -118,6 +118,7 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
     `
     document.getElementById('filterDataDictionary').innerHTML = template;
     addEventFilterDataDictionary(dictionary, headers);
+    downloadFiles(dictionary, headers, 'dictionary');
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary, 60);
     addEventPageSizeSelection(dictionary, headers);
 };
@@ -252,7 +253,6 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     template += `</div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
-    downloadFiles(dictionary, headers, 'dictionary');
     addEventSortColumn(dictionary, pageSize, headers);
 }
 
@@ -279,7 +279,8 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         data = flatArray;
     }
     const downloadDictionaryCSV = document.getElementById('downloadDictionaryCSV');
-    downloadDictionaryCSV.addEventListener('click', () => {
+    downloadDictionaryCSV.addEventListener('click', e => {
+        e.stopPropagation();
         const csvContent = "data:text/csv;charset=utf-8," + json2other(data, headers).replace(/(<b>)|(<\/b>)/g, '');
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -291,7 +292,8 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
     })
 
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
-    downloadDictionaryTSV.addEventListener('click', () => {
+    downloadDictionaryTSV.addEventListener('click', e => {
+        e.stopPropagation();
         let tsvContent = "data:text/tsv;charset=utf-8," + json2other(data, headers, true).replace(/(<b>)|(<\/b>)/g, '');
         const encodedUri = encodeURI(tsvContent);
         const link = document.createElement("a");
