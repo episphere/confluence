@@ -147,6 +147,15 @@ const addEventFilterDataDictionary = (dictionary, headers) => {
 }
 
 const filterDataBasedOnSelection = (dictionary, headers) => {
+    const highlightData = filterDataHandler(dictionary)
+    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
+    const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
+    paginationHandler(highlightData, pageSize);
+    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
+    addEventPageSizeSelection(highlightData);
+}
+
+const filterDataHandler = (dictionary) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
     
     let filteredData = dictionary;
@@ -158,19 +167,14 @@ const filterDataBasedOnSelection = (dictionary, headers) => {
     document.getElementById('listFilters').innerHTML = `
     ${variableTypeSelection.length > 0 ? `
         <span class="font-bold">Data Type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
-    `:`<span class="font-bold">Data Type:</span> All`}
+    `:`
+        <span class="font-bold">Data Type:</span> All`}
     `;
 
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
-        // previousValue = currentValue;
-        renderDataDictionary(filteredData, document.getElementById('pageSizeSelector').value, headers);
-        const pageSize = filteredData.length < 60 ? Math.floor(filteredData.length / 10) * 10 === 0 ? 10 : Math.floor(filteredData.length / 10) * 10 : 60;
-        paginationHandler(filteredData, pageSize, headers);
-        document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, pageSize);
-        addEventPageSizeSelection(filteredData, headers);
-        return;
+        return filteredData;
     }
     previousValue = currentValue;
     let searchedData = JSON.parse(JSON.stringify(filteredData));
@@ -186,12 +190,7 @@ const filterDataBasedOnSelection = (dictionary, headers) => {
         dt['Label'] = dt['Label'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         return dt;
     })
-
-    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
-    const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
-    paginationHandler(highlightData, pageSize);
-    document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
-    addEventPageSizeSelection(highlightData);
+    return highlightData;
 }
 
 const addEventSortColumn = (dictionary, pageSize, headers) => {

@@ -181,6 +181,7 @@ const getDescription = async () => {
     </div>
     `;
     addEventFilterDataCatalogue(descriptions, headers);
+    downloadFiles(descriptions, headers, 'study_description', true);
     renderStudyDescription(descriptions, defaultPageSize, headers);
     paginationHandler(descriptions, defaultPageSize, headers);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, defaultPageSize);
@@ -245,7 +246,6 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
         template += 'Data not found!'
     }
     document.getElementById('descriptionBody').innerHTML = template;
-    downloadFiles(descriptions, headers, 'study_description', true);
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(descriptions, pageSize, headers);
 }

@@ -80,7 +80,7 @@ export const dataGovernanceLazyLoad = (element) => {
         const folderName = element.dataset.folderName;
         const type = element.dataset.type;
         if(type && JSON.parse(localStorage.parms).login){
-            const bool = checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login);
+            const bool = await checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login, id, type);
             if(bool === true){
                 const button = document.createElement('button');
                 button.dataset.toggle = 'modal';
