@@ -147,7 +147,7 @@ export const renderDataSummary = (obj, caseControl) => {
                 <span class="font-size-32">${numberWithCommas(obj.totalConsortia)}</span>
             </div>
             <div class="col">
-                <span class="font-size-22">Study</span></br>
+                <span class="font-size-22">Studies</span></br>
                 <span class="font-size-32">${numberWithCommas(obj.totalStudies)}</span>
             </div>
         </div>
@@ -165,11 +165,11 @@ export const renderDataSummary = (obj, caseControl) => {
         `: `
         <div class="row mt-3">
                 <div class="col">
-                    <span class="font-size-22">BRCA1</span></br>
+                    <span class="font-size-22">BRCA1 Mutation Carriers</span></br>
                     <span class="font-size-32">${numberWithCommas(obj.totalBRCA1)}</span>
                 </div>
                 <div class="col">
-                    <span class="font-size-22">BRCA2</span></br>
+                    <span class="font-size-22">BRCA2 Mutation Carriers</span></br>
                     <span class="font-size-32">${numberWithCommas(obj.totalBRCA2)}</span>
                 </div>
             </div>

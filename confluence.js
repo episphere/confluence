@@ -122,7 +122,7 @@ export const confluence = async () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
             assignNavbarActive(dataRequestElement, 1)
-            document.title = 'Confluence - Data Request';
+            document.title = 'Confluence - Data Access';
             confluenceDiv.innerHTML = dataRequestTemplate();
             hideAnimation();
         });
@@ -224,11 +224,11 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = confluenceContactPage();
     }
-    else if (hash === '#data_request') {
+    else if (hash === '#data_access') {
         const element = document.getElementById('dataRequest');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Data Request';
+        document.title = 'Confluence - Data Access';
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
@@ -270,7 +270,7 @@ const manageHash = async () => {
         const element = document.getElementById('dataAnalysis');
         element.click();
     }
-    else if (hash === '#data_request') {
+    else if (hash === '#data_access') {
         const element = document.getElementById('dataRequest');
         element.click();
     }

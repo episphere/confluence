@@ -38,7 +38,7 @@ export const navBarMenutemplate = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_analysis" title="Data Analysis" id="dataAnalysis">
                     Analyze
                 </a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_request" title="Data Request" id="dataRequest">
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">
                     Request
                 </a>
             </div>
