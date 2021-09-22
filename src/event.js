@@ -439,37 +439,58 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     let table = `
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Added by</th>
-                <th>Added at</th>
+                <th>Name <button class="transparent-btn sort-column" data-column-name="name" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
+                <th>Email <button class="transparent-btn sort-column" data-column-name="email" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
+                <th>Role <button class="transparent-btn sort-column" data-column-name="role" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
+                <th>Added by <button class="transparent-btn sort-column" data-column-name="addedBy" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
+                <th>Added at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tBodyCollaboratorList"></tbody>
     `;
+    document.getElementById('collaboratorsList').innerHTML = table;
+    renderCollaboratorListTBody(allEntries, userPermission);
+    addEventSortTable(allEntries, userPermission);
+}
+
+const renderCollaboratorListTBody = (allEntries, userPermission) => {
+    let tbody = '';
     allEntries.forEach(entry => {
-        const { name, email, role, status, addedBy, addedAt, id, folderName} = entry;
+        const { name, email, role, addedBy, addedAt, id, folderName} = entry;
         const userName = JSON.parse(localStorage.parms).name
-        // ${userPermission && (userPermission === 'editor' || userPermission === 'owner' || userPermission === 'co-owner') && (role === 'editor' || role === 'viewer' || role === 'uploader') && email !== JSON.parse(localStorage.parms).login ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}
-        table += `<tr>
+        tbody += `<tr>
                     <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
                     <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
                     <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
                 ` : `${role}`}</td>
-                    <td>${status}</td>
                     <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
                     <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
                     <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
                 </tr>`
     });
-    table += `</tbody>`
-    document.getElementById('collaboratorsList').innerHTML = table;
+    document.getElementById('tBodyCollaboratorList').innerHTML = tbody;
     addEventRemoveCollaborator();
     addEventUpdateCollaborator();
+}
+
+const addEventSortTable = (allEntries, userPermission) => {
+    const elements = Array.from(document.getElementsByClassName('sort-column'));
+    elements.forEach(element => {
+        element.addEventListener('click', () => {
+            const columnName = element.dataset.columnName;
+            const orderBy = element.dataset.orderBy;
+            if(orderBy === 'desc') {
+                element.dataset.orderBy = 'asc';
+                renderCollaboratorListTBody(allEntries.sort((a,b) => (a[columnName] < b[columnName]) ? 1 : ((b[columnName] < a[columnName]) ? -1 : 0)), userPermission)
+            }
+            else{
+                element.dataset.orderBy = 'desc';
+                renderCollaboratorListTBody(allEntries.sort((a,b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0)), userPermission)
+            }
+        })
+    })
 }
 
 const addEventSearchCollaborators = (allEntries, userPermission) => {
