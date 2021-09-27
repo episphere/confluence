@@ -101,7 +101,7 @@ const getDescription = async () => {
     const allConsortium = Object.values(newJsons).map(dt => dt['Consortium']);
     
     const countries = allCountries.filter((d,i) => allCountries.indexOf(d) === i).sort();
-    const uniqueConsortium = allConsortium.filter((d,i) => allConsortium.indexOf(d.trim()) === i).sort();
+    const uniqueConsortium = allConsortium.filter((d,i) => d && allConsortium.indexOf(d.trim()) === i).sort();
     const uniqueStudyDesign = allStudyDesigns.filter((d,i) => allStudyDesigns.indexOf(d) === i).sort();
     
     let filterTemplate = `
