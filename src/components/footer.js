@@ -14,12 +14,6 @@ export const footerTemplate = () => {
                         <div class="footer-body"><a class="footer-links" href="mailto:confluenceproject@nih.gov">Contact Us</a></div>
                     </div>
                     <div class="col-md-4 zero-padding">
-                        <div class="footer-heading">MORE INFORMATION</div>
-                        <div class="footer-body">DOC Home</div>
-                        <div class="footer-body">Site Map</div>
-                        <div class="footer-body">Support</div>
-                    </div>
-                    <div class="col-md-4 zero-padding">
                         <div class="footer-heading">POLICIES</div>
                         <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/accessibility" target="__blank">Accessibility</a></div>
                         <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/disclaimer" target="__blank">Disclaimer</a></div>

@@ -56,6 +56,7 @@ export const getFolderInfo = async (id) => {
         else{
             hideAnimation();
             console.error(r);
+            return false;
         }
     }
     catch(err) {

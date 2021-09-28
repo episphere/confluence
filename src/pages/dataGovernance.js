@@ -1,30 +1,32 @@
 import { addEventShowAllCollaborator, addEventAddNewCollaborator, addEventFileStats } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel, getFolderInfo } from "../shared.js";
 
 export const template = async () => {
-    const response = await getFolderItems(0);
-    const array = response.entries.filter(obj => obj.type === 'folder' && obj.id === '137304373658');
+    // const response = await getFolderItems(0);
+    // const array = response.entries.filter(obj => obj.type === 'folder' && obj.id === '137304373658');
     // const array = filterConsortiums(response.entries);
-    if(array.length <= 0) return;
+    const array = await getFolderInfo('137304373658');
+    // if(array.length <= 0) return;
+    if(!array) return;
     
     let template = `<div class="card" style="border: 0px;"><div class="card-header"></div>`;
     
     template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items p-0 m-0">';
 
-    for(let obj of array){
-        const ID = obj.id;
-        const consortiaName = obj.name;
-        let type = obj.type;
+    // for(let obj of array){
+        const ID = array.id;
+        const consortiaName = array.name;
+        let type = array.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
             <button class="${liClass}" data-toggle="collapse" href="#toggle${ID}">
-                <i title="${title}" data-type="${type}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
+                <i title="${title}" data-type="${type}" data-id="${ID}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
             </button> ${consortiaName}
         </li>
         `
-    }
+    // }
     template += `</ul></div></div>`
     return template;
 }
