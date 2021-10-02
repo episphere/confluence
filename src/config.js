@@ -5,8 +5,8 @@ export const config = {
         stateIni: Math.random().toString().slice(2)
     },
     iniObs: {
-        client_id: 'rq2ab1uuvrzp86oa0yehgjibqf7arxy5',
-        server_id: 'NItekKKQEqQBgRsU0qnEBVY3zP0nvieh',
+        client_id: 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf',
+        server_id: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y',
         stateIni: Math.random().toString().slice(2)
     },
     iniAppProd: {
