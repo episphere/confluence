@@ -842,3 +842,9 @@ export const handleRangeRequests = async () => {
     console.timeEnd('Parsing')
     console.log(dataArray)
 }
+
+export const applicationURLs = {
+    'dev': 'https://episphere.github.io/confluence',
+    'stage': 'https://confluence-stage.cancer.gov',
+    'prod': 'https://confluence.cancer.gov'
+}

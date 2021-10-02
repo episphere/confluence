@@ -1,5 +1,5 @@
 import { config } from '../config.js'
-import { refreshToken } from '../shared.js';
+import { applicationURLs, refreshToken } from '../shared.js';
 
 export const checkAccessTokenValidity = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
@@ -25,7 +25,7 @@ export const checkAccessTokenValidity = async () => {
 }
 
 export const loginObs = () => {
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppStage.client_id}&redirect_uri=https://confluence-stage.cancer.gov&state=${config.iniAppStage.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppStage.client_id}&redirect_uri=${applicationURLs.stage}&state=${config.iniAppStage.stateIni}`
 }
 
 export const loginAppDev = () => {
@@ -33,7 +33,7 @@ export const loginAppDev = () => {
 }
 
 export const loginAppProd = () => {
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppDev.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=${applicationURLs.dev}&state=${config.iniAppDev.stateIni}`
 }
 
 export const logOut = () => {
