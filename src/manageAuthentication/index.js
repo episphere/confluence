@@ -33,7 +33,7 @@ export const loginAppDev = () => {
 }
 
 export const loginAppProd = () => {
-    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppProd.stateIni}`
+    document.location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppDev.stateIni}`
 }
 
 export const logOut = () => {

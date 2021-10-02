@@ -33,7 +33,7 @@ export const loginAppDev = () => {
 }
 
 export const loginAppProd = () => {
-    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppProd.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppProd.stateIni}`
+    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=https://episphere.github.io/confluence&state=${config.iniAppDev.stateIni}`
 }
 
 export const logOut = async () => {
@@ -43,7 +43,7 @@ export const logOut = async () => {
     if(location.origin.indexOf('localhost') !== -1){
         clt = config.iniAppLocal;
     }else if(location.origin.indexOf('episphere') !== -1){
-        clt = config.iniAppProd
+        clt = config.iniAppDev
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
         clt = config.iniAppStage
     }

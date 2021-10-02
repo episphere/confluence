@@ -161,7 +161,7 @@ export const storeAccessToken = async () => {
         if(location.origin.indexOf('localhost') !== -1){
             clt = config.iniAppLocal;
         }else if(location.origin.indexOf('episphere') !== -1){
-            clt = config.iniAppProd
+            clt = config.iniAppDev
         }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
             clt = config.iniAppStage
         }
@@ -201,7 +201,7 @@ export const refreshToken = async () => {
     if(location.origin.indexOf('localhost') !== -1){
         clt = config.iniAppLocal;
     }else if(location.origin.indexOf('episphere') !== -1){
-        clt = config.iniAppProd
+        clt = config.iniAppDev
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
         clt = config.iniAppStage
     }
