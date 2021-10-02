@@ -25,7 +25,7 @@ export const checkAccessTokenValidity = async () => {
 }
 
 export const loginObs = () => {
-    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniStage.client_id}&redirect_uri=https://confluence-stage.cancer.gov&state=${config.iniStage.stateIni}`
+    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppStage.client_id}&redirect_uri=https://confluence-stage.cancer.gov&state=${config.iniAppStage.stateIni}`
 }
 
 export const loginAppDev = () => {
@@ -45,7 +45,7 @@ export const logOut = async () => {
     }else if(location.origin.indexOf('episphere') !== -1){
         clt = config.iniAppProd
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-        clt = config.iniStage
+        clt = config.iniAppStage
     }
 
     const response = await fetch(`https://api.box.com/oauth2/revoke`, {

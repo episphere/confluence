@@ -4,7 +4,7 @@ export const config = {
         server_id: '2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT',
         stateIni: Math.random().toString().slice(2)
     },
-    iniStage: {
+    iniAppStage: {
         client_id: 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf',
         server_id: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y',
         stateIni: Math.random().toString().slice(2)
