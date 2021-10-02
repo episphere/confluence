@@ -163,7 +163,7 @@ export const storeAccessToken = async () => {
         }else if(location.origin.indexOf('episphere') !== -1){
             clt = config.iniAppProd
         }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-            clt = config.iniObs
+            clt = config.iniStage
         }
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
@@ -203,7 +203,7 @@ export const refreshToken = async () => {
     }else if(location.origin.indexOf('episphere') !== -1){
         clt = config.iniAppProd
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-        clt = config.iniObs
+        clt = config.iniStage
     }
 
     const response = await fetch(`https://api.box.com/oauth2/token/`, {
