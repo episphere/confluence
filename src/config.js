@@ -1,5 +1,5 @@
 export const config = {
-    iniAppDev: {
+    iniAppLocal: {
         client_id: '52zad6jrv5v52mn1hfy1vsjtr9jn5o1w',
         server_id: '2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT',
         stateIni: Math.random().toString().slice(2)

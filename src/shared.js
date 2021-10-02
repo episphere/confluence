@@ -159,7 +159,7 @@ export const storeAccessToken = async () => {
         //exchange code for authorization token
         let clt={}
         if(location.origin.indexOf('localhost') !== -1){
-            clt = config.iniAppDev;
+            clt = config.iniAppLocal;
         }else if(location.origin.indexOf('episphere') !== -1){
             clt = config.iniAppProd
         }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
@@ -199,7 +199,7 @@ export const refreshToken = async () => {
     const parms = JSON.parse(localStorage.parms);
     let clt={}
     if(location.origin.indexOf('localhost') !== -1){
-        clt = config.iniAppDev;
+        clt = config.iniAppLocal;
     }else if(location.origin.indexOf('episphere') !== -1){
         clt = config.iniAppProd
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){

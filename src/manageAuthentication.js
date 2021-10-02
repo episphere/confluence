@@ -29,7 +29,7 @@ export const loginObs = () => {
 }
 
 export const loginAppDev = () => {
-    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppDev.client_id}&redirect_uri=${location.origin+location.pathname}?state=${config.iniAppDev.stateIni}`
+    location.href=`https://account.box.com/api/oauth2/authorize?response_type=code&client_id=${config.iniAppLocal.client_id}&redirect_uri=${location.origin+location.pathname}?state=${config.iniAppLocal.stateIni}`
 }
 
 export const loginAppProd = () => {
@@ -41,7 +41,7 @@ export const logOut = async () => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     let clt={}
     if(location.origin.indexOf('localhost') !== -1){
-        clt = config.iniAppDev;
+        clt = config.iniAppLocal;
     }else if(location.origin.indexOf('episphere') !== -1){
         clt = config.iniAppProd
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
