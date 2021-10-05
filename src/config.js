@@ -14,6 +14,11 @@ export const config = {
         server_id: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y',
         stateIni: Math.random().toString().slice(2)
     },
+    iniAppProd: {
+        client_id: 'dbi2dzxqknj4542pzfq3ovzjt954zfhp',
+        server_id: 'H4yhcDkwBPQSyeAFTuKfv92gzSqXpWYO',
+        stateIni: Math.random().toString().slice(2)
+    },
     EpiBoxFolderId: 6454654365,
     invalidVariables: ['bcac_id', 'bcac_db_version', 'onc_id', 'dataset_created_by', 'date_bcac_db_version_created', 'date_dataset_created', 'icogs_id']
 }
