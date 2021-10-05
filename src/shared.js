@@ -56,6 +56,7 @@ export const getFolderInfo = async (id) => {
         else{
             hideAnimation();
             console.error(r);
+            return false;
         }
     }
     catch(err) {
@@ -158,11 +159,11 @@ export const storeAccessToken = async () => {
         //exchange code for authorization token
         let clt={}
         if(location.origin.indexOf('localhost') !== -1){
-            clt = config.iniAppDev;
+            clt = config.iniAppLocal;
         }else if(location.origin.indexOf('episphere') !== -1){
-            clt = config.iniAppProd
+            clt = config.iniAppDev
         }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-            clt = config.iniObs
+            clt = config.iniAppStage
         }
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
@@ -180,6 +181,7 @@ export const storeAccessToken = async () => {
             confluence();
             document.getElementById('loginBoxAppDev').hidden = true;
             document.getElementById('loginBoxAppStage').hidden = true;
+            document.getElementById('loginBoxAppEpisphere').hidden = true;
             document.getElementById('loginBoxAppProd').hidden = true;
         }
     }else{
@@ -198,11 +200,11 @@ export const refreshToken = async () => {
     const parms = JSON.parse(localStorage.parms);
     let clt={}
     if(location.origin.indexOf('localhost') !== -1){
-        clt = config.iniAppDev;
+        clt = config.iniAppLocal;
     }else if(location.origin.indexOf('episphere') !== -1){
-        clt = config.iniAppProd
+        clt = config.iniAppDev
     }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-        clt = config.iniObs
+        clt = config.iniAppStage
     }
 
     const response = await fetch(`https://api.box.com/oauth2/token/`, {
@@ -840,4 +842,10 @@ export const handleRangeRequests = async () => {
     })
     console.timeEnd('Parsing')
     console.log(dataArray)
+}
+
+export const applicationURLs = {
+    'dev': 'https://episphere.github.io/confluence',
+    'stage': 'https://confluence-stage.cancer.gov',
+    'prod': 'https://confluence.cancer.gov'
 }

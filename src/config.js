@@ -1,17 +1,22 @@
 export const config = {
-    iniAppDev: {
+    iniAppLocal: {
         client_id: '52zad6jrv5v52mn1hfy1vsjtr9jn5o1w',
         server_id: '2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT',
         stateIni: Math.random().toString().slice(2)
     },
-    iniObs: {
-        client_id: 'rq2ab1uuvrzp86oa0yehgjibqf7arxy5',
-        server_id: 'NItekKKQEqQBgRsU0qnEBVY3zP0nvieh',
+    iniAppDev: {
+        client_id: '1n44fu5yu1l547f2n2fgcw7vhps7kvuw',
+        server_id: '2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd',
+        stateIni: Math.random().toString().slice(2)
+    },
+    iniAppStage: {
+        client_id: 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf',
+        server_id: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y',
         stateIni: Math.random().toString().slice(2)
     },
     iniAppProd: {
-        client_id: '1n44fu5yu1l547f2n2fgcw7vhps7kvuw',
-        server_id: '2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd',
+        client_id: 'dbi2dzxqknj4542pzfq3ovzjt954zfhp',
+        server_id: 'H4yhcDkwBPQSyeAFTuKfv92gzSqXpWYO',
         stateIni: Math.random().toString().slice(2)
     },
     EpiBoxFolderId: 6454654365,

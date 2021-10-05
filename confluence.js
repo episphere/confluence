@@ -3,8 +3,8 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppProd, logOut } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests } from './src/shared.js';
+import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -30,15 +30,18 @@ export const confluence = async () => {
     const navBarOptions = document.getElementById('navBarOptions');
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppStage').addEventListener('click', loginObs);
+    document.getElementById('loginBoxAppEpisphere').addEventListener('click', loginAppEpisphere);
     document.getElementById('loginBoxAppProd').addEventListener('click', loginAppProd);
 
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
+        const loginBoxAppEpisphere = document.getElementById('loginBoxAppEpisphere');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         const loginBoxAppStage = document.getElementById('loginBoxAppStage');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
-        if (location.origin.match('confluence-stage.cancer.gov')) loginBoxAppStage.hidden = false;
-        if (location.origin.match('episphere')) loginBoxAppProd.hidden = false;
+        if (location.origin.match(applicationURLs.stage)) loginBoxAppStage.hidden = false;
+        if (location.origin.match(applicationURLs.prod)) loginBoxAppProd.hidden = false;
+        if (location.origin.match('episphere')) loginBoxAppEpisphere.hidden = false;
         storeAccessToken();
         manageRouter();
     }
@@ -378,6 +381,7 @@ window.onstorage = () => {
         confluence();
         document.getElementById('loginBoxAppDev').hidden = true;
         document.getElementById('loginBoxAppStage').hidden = true;
+        document.getElementById('loginBoxAppEpisphere').hidden = true;
         document.getElementById('loginBoxAppProd').hidden = true;
     }
 };
