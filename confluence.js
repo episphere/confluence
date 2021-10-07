@@ -4,7 +4,7 @@ import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js'
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -149,6 +149,8 @@ export const confluence = async () => {
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
         const projectArray = filterProjects(folders.entries);
+        const getMyPermissionLevel =  checkDataSubmissionPermissionLevel(await getCollaboration(137304373658, 'folders'), JSON.parse(localStorage.parms).login);
+        
         let showProjects = false;
         for (let obj of projectArray) {
             if (showProjects === false) {
@@ -158,9 +160,11 @@ export const confluence = async () => {
         }
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-                    Data Governance
-                </a>
+                ${getMyPermissionLevel ? `
+                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+                        Data Governance
+                    </a>
+                `: ``}
             `;
             document.getElementById('myProjectsNav').innerHTML = `
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
@@ -171,9 +175,11 @@ export const confluence = async () => {
             addEventMyProjects();
         } else if (array.length > 0) {
             document.getElementById('governanceNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-                    Data Governance
-                </a>
+                ${getMyPermissionLevel ? `
+                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+                        Data Governance
+                    </a>
+                `: ``}
             `;
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {

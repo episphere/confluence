@@ -399,7 +399,7 @@ export const getFileAccessStats = async (id) => {
             }
         });
         if(response.status === 401){
-            if((await refreshToken()) === true) return await getCollaboration(id, type);
+            if((await refreshToken()) === true) return await getFileAccessStats(id, type);
         }
         if(response.status === 200){
             return response.json();
@@ -409,7 +409,7 @@ export const getFileAccessStats = async (id) => {
         }
     }
     catch(err) {
-        if((await refreshToken()) === true) return await getCollaboration(id, type);
+        if((await refreshToken()) === true) return await getFileAccessStats(id, type);
     }
 }
 

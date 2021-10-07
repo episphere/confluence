@@ -678,6 +678,7 @@ const addEventHideNotification = () => {
 
 export const addEventDataGovernanceNavBar = (bool) => {
     const dataGovernanceElement = document.getElementById('dataGovernance');
+    if(!dataGovernanceElement) return;
     dataGovernanceElement.addEventListener('click', async () => {
         // if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
