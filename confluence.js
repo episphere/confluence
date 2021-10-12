@@ -150,7 +150,7 @@ export const confluence = async () => {
         const array = filterConsortiums(folders.entries);
         const projectArray = filterProjects(folders.entries);
         const getMyPermissionLevel =  checkDataSubmissionPermissionLevel(await getCollaboration(137304373658, 'folders'), JSON.parse(localStorage.parms).login);
-        
+        console.log('137304373658 '+getMyPermissionLevel);
         let showProjects = false;
         for (let obj of projectArray) {
             if (showProjects === false) {
