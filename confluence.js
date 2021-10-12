@@ -154,12 +154,12 @@ export const confluence = async () => {
         if(getCollaborators) getMyPermissionLevel =  checkDataSubmissionPermissionLevel(getCollaborators, JSON.parse(localStorage.parms).login);
         console.log('137304373658 '+getMyPermissionLevel);
         let showProjects = false;
-        for (let obj of projectArray) {
-            if (showProjects === false) {
-                const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
-                if (bool === true) showProjects = true;
-            }
-        }
+        // for (let obj of projectArray) {
+        //     if (showProjects === false) {
+        //         const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
+        //         if (bool === true) showProjects = true;
+        //     }
+        // }
         if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
             document.getElementById('governanceNav').innerHTML = `
                 ${getMyPermissionLevel ? `
@@ -175,13 +175,11 @@ export const confluence = async () => {
             `;
             addEventDataGovernanceNavBar(true);
             addEventMyProjects();
-        } else if (array.length > 0) {
+        } else if (array.length > 0 && getMyPermissionLevel) {
             document.getElementById('governanceNav').innerHTML = `
-                ${getMyPermissionLevel ? `
-                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-                        Data Governance
-                    </a>
-                `: ``}
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+                    Data Governance
+                </a>
             `;
             addEventDataGovernanceNavBar(true);
         } else if (projectArray.length > 0 && showProjects === true) {
@@ -191,6 +189,14 @@ export const confluence = async () => {
                 </a>
             `;
             addEventMyProjects();
+        }
+        else if (getMyPermissionLevel) {
+            document.getElementById('governanceNav').innerHTML = `
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+                    Data Governance
+                </a>
+            `;
+            addEventDataGovernanceNavBar(true);
         }
         manageHash();
     }
