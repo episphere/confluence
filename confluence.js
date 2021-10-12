@@ -149,7 +149,9 @@ export const confluence = async () => {
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
         const projectArray = filterProjects(folders.entries);
-        const getMyPermissionLevel =  checkDataSubmissionPermissionLevel(await getCollaboration(137304373658, 'folders'), JSON.parse(localStorage.parms).login);
+        const getCollaborators = await getCollaboration(137304373658, 'folders');
+        let getMyPermissionLevel = false;
+        if(getCollaborators) getMyPermissionLevel =  checkDataSubmissionPermissionLevel(getCollaborators, JSON.parse(localStorage.parms).login);
         console.log('137304373658 '+getMyPermissionLevel);
         let showProjects = false;
         for (let obj of projectArray) {
