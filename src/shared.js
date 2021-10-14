@@ -158,13 +158,11 @@ export const storeAccessToken = async () => {
     if(parms.code){
         //exchange code for authorization token
         let clt={}
-        if(location.origin.indexOf('localhost') !== -1){
-            clt = config.iniAppLocal;
-        }else if(location.origin.indexOf('episphere') !== -1){
-            clt = config.iniAppDev
-        }else if(location.origin.indexOf('confluence-stage.cancer.gov') !== -1){
-            clt = config.iniAppStage
-        }
+        if(location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
+        else if(location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
+        else if(location.origin.indexOf(applicationURLs.stage) !== -1) clt = config.iniAppStage
+        else if(location.origin.indexOf(applicationURLs.prod) !== -1) clt = config.iniAppProd;
+
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
         
