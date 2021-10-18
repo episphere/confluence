@@ -11,7 +11,9 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, publicAcces
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 `: `
                     <button class="sub-menu-btn"><a class="nav-link active black-font font-size-14" href="#data_exploration/summary"><strong>Summary Statistics</strong></a></button>
-                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></button>
+                    ${location.origin.match(applicationURLs.prod) ? ``:`
+                        <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></button>
+                    `}
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 `} 
                 </div>
