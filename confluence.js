@@ -95,18 +95,20 @@ export const confluence = async () => {
             })
             getFileContent();
         });
-        dataSummarySubsetElement.addEventListener('click', () => {
-            if (dataSummarySubsetElement.classList.contains('navbar-active')) return;
-            const confluenceDiv = document.getElementById('confluenceDiv');
-            showAnimation();
-            assignNavbarActive(dataSummarySubsetElement, 1);
-            document.title = 'Confluence - Subset Statistics';
-            confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true);
-            addEventUpdateSummaryStatsData();
-            removeActiveClass('nav-link', 'active');
-            document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
-            dataSummaryMissingTemplate();
-        })
+        if(dataSummarySubsetElement) {
+            dataSummarySubsetElement.addEventListener('click', () => {
+                if (dataSummarySubsetElement.classList.contains('navbar-active')) return;
+                const confluenceDiv = document.getElementById('confluenceDiv');
+                showAnimation();
+                assignNavbarActive(dataSummarySubsetElement, 1);
+                document.title = 'Confluence - Subset Statistics';
+                confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true);
+                addEventUpdateSummaryStatsData();
+                removeActiveClass('nav-link', 'active');
+                document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
+                dataSummaryMissingTemplate();
+            })
+        }
         if(dataDictionaryElement){
             dataDictionaryElement.addEventListener('click', () => {
                 if (dataDictionaryElement.classList.contains('navbar-active')) return;
