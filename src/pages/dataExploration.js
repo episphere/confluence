@@ -1,4 +1,4 @@
-import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId, reSizePlots } from '../shared.js';
+import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpdateData, getFileInfo, missingnessStatsFileId, reSizePlots, applicationURLs } from '../shared.js';
 import { addEventConsortiumSelect, getSelectedStudies } from '../visualization.js';
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from '../event.js';
 
