@@ -273,7 +273,7 @@ const manageHash = async () => {
         if(!element) return;
         element.click();
     }
-    else if(hash === '#data_exploration/subset') {
+    else if(hash === '#data_exploration/subset' && !location.origin.match(applicationURLs.prod)) {
         const element = document.getElementById('dataSummarySubset');
         if(!element) return;
         element.click()
