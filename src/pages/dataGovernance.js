@@ -1,6 +1,6 @@
 import { addEventShowAllCollaborator, addEventAddNewCollaborator, addEventFileStats } from "../event.js";
 import { boxRoles } from "../config.js";
-import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel, getFolderInfo } from "../shared.js";
+import { getFolderItems, filterConsortiums, filterStudiesDataTypes, filterProjects, getCollaboration, checkMyPermissionLevel, getFolderInfo, getFile, tsv2Json } from "../shared.js";
 
 export const template = async () => {
     // const response = await getFolderItems(0);

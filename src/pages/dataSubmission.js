@@ -1,9 +1,14 @@
-import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration } from "../shared.js";
+import { getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 
 export const dataSubmissionTemplate = async () => {
     const response = await getFolderItems(0);
-    const array = filterConsortiums(response.entries);
+    const studiesList = await getFile('850171303009')
+    let studyIDs = [];
+    if(studiesList) studyIDs = tsv2Json(studiesList).data.map(dt => dt['Folder ID']);;
+    const studies = response.entries.filter(obj => studyIDs.includes(obj.id));
+    const consortias = filterConsortiums(response.entries);
+    const array = [...studies, ...consortias];
     let bool = false;
     for(let consortia of array){
         if(bool) continue;
@@ -48,7 +53,7 @@ export const dataSubmissionTemplate = async () => {
 
     template += await uploadInStudy('uploadInStudy');
     
-    template += '<div class="data-submission div-border white-bg"><ul class="ul-list-style first-list-item collapsible-items">';
+    template += '<div class="data-submission div-border white-bg"><ul class="ul-list-style first-list-item collapsible-items mb-0">';
 
     for(let obj of array){
         const consortiaName = obj.name;

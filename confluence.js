@@ -154,7 +154,6 @@ export const confluence = async () => {
         const getCollaborators = await getCollaboration(137304373658, 'folders');
         let getMyPermissionLevel = false;
         if(getCollaborators) getMyPermissionLevel =  checkDataSubmissionPermissionLevel(getCollaborators, JSON.parse(localStorage.parms).login);
-        console.log('137304373658 '+getMyPermissionLevel);
         let showProjects = false;
         // for (let obj of projectArray) {
         //     if (showProjects === false) {
@@ -293,10 +292,6 @@ const manageHash = async () => {
         const element = document.getElementById('dataRequest');
         element.click();
     }
-    // else if (hash === '#tutorials') {
-    //     const element = document.getElementById('platformTutorial');
-    //     element.click();
-    // }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
         element.click();
