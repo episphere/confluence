@@ -5,7 +5,7 @@ export const dataSubmissionTemplate = async () => {
     const response = await getFolderItems(0);
     const studiesList = await getFile('850171303009')
     let studyIDs = [];
-    if(studiesList) studyIDs = tsv2Json(studiesList).data.map(dt => dt['Folder ID']);;
+    if(studiesList) studyIDs = tsv2Json(studiesList).data.map(dt => dt['Folder ID'].trim());
     const studies = response.entries.filter(obj => studyIDs.includes(obj.id));
     const consortias = filterConsortiums(response.entries);
     const array = [...studies, ...consortias];
