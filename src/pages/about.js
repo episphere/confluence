@@ -25,32 +25,27 @@ export const renderOverView = async () => {
         </div>
         <div class="home-page-stats font-size-18">
             <div class="main-summary-row">
-                <div class="col align-left">
-                    </br>
-                    <span>
-                        Confluence includes breast cancer case-control studies, case series or clinical trials of female or male breast cancer (invasive or in situ) with the following:
-                    </span>
-                    </br>
-                    <ul>
-                        <li>Genome-wide genotyping data</li>
-                        <li>Risk factor, pathology, treatment, toxicities and survival data</li>
-                        <li>Ethics approval and consent for germline genetic</li>
-                    </ul>
-                    </br>
-                    <span>
-                        The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 
-                        cases and 200,000 controls and double it by generating new genotypes from at least 150,000 
-                        additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 
-                        300,000 controls of different ancestries.
-                    </span>
-                    </br></br>
-                    <span>
-                        Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies.
-                    </span>
-                    </br></br>
-                    <span>
-                        Genotyping and harmonization of data is expected to be completed in 2022.
-                    </span>
+                <div class="col align-left pt-2">
+                    <div class="mb-3">
+                        The Confluence project is developing a large research resource to uncover breast cancer genetics through genome-wide association studies (GWAS) in diverse populations.
+                    </div>
+                    <div class="mb-3">
+                        Broad scientific aims include:
+                    </div>
+                    <div class="mb-3">
+                        <ul>
+                            <li>To discover susceptibility loci and advance knowledge of etiology of breast cancer overall and by subtypes.</li>
+                            <li>To develop polygenic risk scores and integrate them with known risk factors for personalized risk assessment for breast cancer overall and by subtypes.</li>
+                            <li>To discover loci for breast cancer prognosis, long-term survival, response to treatment, and second breast cancer.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 cases and 200,000 controls and double it by generating new genotypes from at least 150,000 additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 300,000 controls of different ancestries. Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies. Genotyping and harmonization of data is expected to be completed in 2022.
+                    </div>
+                    <div>
+                        The table below shows the current number of cases and controls from different participating consortia/studies. Numbers are updated regularly.
+                    </div>
                 </div>
             </div>
             <div class="align-left" id="confluenceDataSummary"></div>
