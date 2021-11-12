@@ -8,12 +8,9 @@ export const template = () => {
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
-                    <div class="row m-0">
+                    <div class="mb-3">
                         The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. Data is expected to be available for request in late 2022. Data access will be facilitated through this platform, in accordance to the data use agreements signed between participating studies (originator) and Data Coordinating Centers from Consortia participating in Confluence.
-                    </div></br>
-                    <div class="row m-0 align-center">
-                        <img src="./static/images/data_request.PNG" alt="Overview of data sharing and access in Confluence" style="margin:auto">
-                    </div></br>
+                    </div>
                     <div class="row m-0">
                         The following data access procedures will be facilitated through this platform:
                     </div>
