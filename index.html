@@ -44,6 +44,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com/">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" defer>
     <link href="./static/css/helvetica.css" rel="stylesheet" defer>
+    <link href="https://cdn01.boxcdn.net/platform/preview/2.81.0/en-US/preview.css" rel="stylesheet" defer>
 </head>
 
 <body>
@@ -130,6 +131,17 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="confluencePreviewerModal" data-keyboard="false" data-backdrop="static"
+                tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content h-100">
+                        <div class="modal-header" id="confluencePreviewerModalHeader"></div>
+                        <div class="modal-body" id="confluencePreviewerModalBody"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="modalShareFolder" data-keyboard="false" data-backdrop="static" tabindex="-1"
                 role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -176,6 +188,7 @@
     <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" defer></script>
     <script crossorigin="anonymous" src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
     <script crossorigin="anonymous" src="https://episphere.github.io/qaqc/lorena.js" defer></script>
+    <script crossorigin="anonymous" src="https://cdn01.boxcdn.net/platform/preview/2.81.0/en-US/preview.js" defer></script>
     <script type="module" src="./confluence.js"></script>
     <!-- <script type="module" src="./dist/bundle.js"></script> -->
     <!-- <script crossorigin="anonymous" src="http://localhost:8001/lorena.js" defer></script> -->

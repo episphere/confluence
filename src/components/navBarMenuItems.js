@@ -15,6 +15,7 @@ export const navBarMenutemplate = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join" id="resourcesConfluence">Join a Participating Consortium</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#events" id="events">Events</a>
             </div>
         </div>
         <div class="grid-elements dropdown">
