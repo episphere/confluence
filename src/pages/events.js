@@ -89,7 +89,7 @@ export const eventsBody = async () => {
                         <div class="col-md-5 mt-1">${event['title'] ? `${event['title']}`: ``}</div>
                         <div class="col-md-2">${event['time'] ? `${event['time']}`: ``}</div>
                         <div class="col-md-3">${event['presenter'] ? `${event['presenter']}`: ``}</div>
-                        <div class="col-md-2">${event['fileName'] && event['fileId'] ? `${event['fileName']}</br><button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button>`: ``}</div>
+                        <div class="col-md-2">${event['fileName'] && event['fileId'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>${event['fileName']}`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
