@@ -375,6 +375,7 @@ const manageHash = async () => {
         if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
         document.title = 'Confluence - Events';
+        showAnimation();
         confluenceDiv.innerHTML = confluenceEventsPage();
         await eventsBody()
         hideAnimation();
