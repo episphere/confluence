@@ -77,10 +77,10 @@ export const eventsBody = async () => {
                             <div id="study${meetings['id']}" class="collapse" aria-labelledby="heading${meetings['id']}">
                             `
                             template +=`<div class="card-body pl-3 pr-3" style="padding-left: 10px;background-color:#f6f6f6;">
-                                <div class="row">
+                                <div class="row mb-3">
                                     <div class="col-md-5 font-bold">Title</div>
                                     <div class="col-md-2 font-bold">Time</div>
-                                    <div class="col-md-3 font-bold">presenter</div>
+                                    <div class="col-md-3 font-bold">Presenter</div>
                                     <div class="col-md-2 font-bold">Presentation</div>
                                 </div>`
             meetings.events.forEach(event => {
@@ -89,7 +89,7 @@ export const eventsBody = async () => {
                         <div class="col-md-5 mt-1">${event['title'] ? `${event['title']}`: ``}</div>
                         <div class="col-md-2">${event['time'] ? `${event['time']}`: ``}</div>
                         <div class="col-md-3">${event['presenter'] ? `${event['presenter']}`: ``}</div>
-                        <div class="col-md-2">${event['fileName'] && event['fileId'] ? `${event['fileName']}<button class="btn btn-sm custom-btn preview-file m-1" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button>`: ``}</div>
+                        <div class="col-md-2">${event['fileName'] && event['fileId'] ? `${event['fileName']}</br><button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button>`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
