@@ -78,18 +78,16 @@ export const eventsBody = async () => {
                             `
                             template +=`<div class="card-body pl-3 pr-3" style="padding-left: 10px;background-color:#f6f6f6;">
                                 <div class="row mb-3">
-                                    <div class="col-md-5 font-bold">Title</div>
-                                    <div class="col-md-2 font-bold">Time</div>
+                                    <div class="col-md-7 font-bold">Title</div>
                                     <div class="col-md-3 font-bold">Presenter</div>
                                     <div class="col-md-2 font-bold">Presentation</div>
                                 </div>`
             meetings.events.forEach(event => {
                 template += `
                     <div class="row">
-                        <div class="col-md-5 mt-1">${event['title'] ? `${event['title']}`: ``}</div>
-                        <div class="col-md-2">${event['time'] ? `${event['time']}`: ``}</div>
-                        <div class="col-md-3">${event['presenter'] ? `${event['presenter']}`: ``}</div>
-                        <div class="col-md-2">${event['fileName'] && event['fileId'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>${event['fileName']}`: ``}</div>
+                        <div class="col-md-7 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
+                        <div class="col-md-3 border-bottom">${event['presenter'] ? `${event['presenter']}`: ``}</div>
+                        <div class="col-md-2">${event['fileId'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
