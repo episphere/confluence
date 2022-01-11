@@ -37,8 +37,8 @@ export const confluenceResources = () => {
                         </div>
 
                         <div class="consortia-desc">
-                            <a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer GWAS Consortium</a> (MALES-BC)</br>
-                            The MALES-BC is a GWAS of male breast cancer cases and similar number of controls.
+                            <a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium (MERGE)</a></br>
+                            The MERGE is a GWAS of male breast cancer cases and similar number of controls.
                         </div>
 
                         <div class="consortia-desc">
