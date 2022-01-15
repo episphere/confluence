@@ -32,7 +32,7 @@ const allFilters = (jsonData, headers, cimba) => {
     let template =`
         <div style="width: 100%;">
             <div class="form-group">
-                <label class="filter-label font-size-13" for="genderSelection">Gender</label>
+                <label class="filter-label font-size-13" for="genderSelection">Sex</label>
                 <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
                     <option selected value='all'>All</option>
                     <option value='female'>Female</option>
