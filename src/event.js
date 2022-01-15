@@ -1349,7 +1349,7 @@ const filterData = (jsonData, headers) => {
     }
     const selectedStudies = array.map(s => s.split('@#$')[1]);
     document.getElementById('listFilters').innerHTML = `
-        <span class="font-bold">Gender: </span>${genderFilter}<span class="vertical-line"></span>
+        <span class="font-bold">Sex: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
