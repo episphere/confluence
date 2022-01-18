@@ -285,7 +285,7 @@ const manageHash = async () => {
         if(!element) return;
         element.click()
     }
-    else if (hash === '#data_analysis') {
+    else if (hash === '#data_analysis' && !location.origin.match(applicationURLs.prod)) {
         const element = document.getElementById('dataAnalysis');
         element.click();
     }
