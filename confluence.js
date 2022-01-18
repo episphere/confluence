@@ -140,14 +140,16 @@ export const confluence = async () => {
         //     confluenceDiv.innerHTML = dataRequestTemplate();
         //     hideAnimation();
         // });
-        dataAnalysisElement.addEventListener('click', () => {
-            if (dataAnalysisElement.classList.contains('navbar-active')) return;
-            showAnimation();
-            assignNavbarActive(dataAnalysisElement, 1);
-            document.title = 'Confluence - Data Analysis';
-            confluenceDiv.innerHTML = dataAnalysisTemplate();
-            hideAnimation();
-        });
+        if(dataAnalysisElement) {
+            dataAnalysisElement.addEventListener('click', () => {
+                if (dataAnalysisElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(dataAnalysisElement, 1);
+                document.title = 'Confluence - Data Analysis';
+                confluenceDiv.innerHTML = dataAnalysisTemplate();
+                hideAnimation();
+            });
+        }
 
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
