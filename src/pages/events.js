@@ -78,7 +78,7 @@ export const eventsBody = async () => {
                             `
                             template +=`<div class="card-body pl-3 pr-3" style="padding-left: 10px;background-color:#f6f6f6;">
                                 <div class="row mb-3">
-                                    <div class="col-md-7 font-bold">Title</div>
+                                    <div class="col-md-7 font-bold"></div>
                                     <div class="col-md-3 font-bold">Presenter</div>
                                     <div class="col-md-2 font-bold">Presentation</div>
                                 </div>`
