@@ -37,12 +37,13 @@ export const eventsBody = async () => {
         if(obj.event) eventObj.title = obj.event;
         if(obj.presenter) eventObj.presenter = obj.presenter;
         if(obj.eventTime) eventObj.time = obj.eventTime;
-        if(obj.fileId) eventObj.fileId = Math.floor(obj.fileId);
+        if(obj.fileIdVideos) eventObj.fileId1 = obj.fileIdVideos;
+        if(obj.fileIdSlides) eventObj.fileId2 = obj.fileIdSlides;
+        if(obj.fileIdChats) eventObj.fileId3 = obj.fileIdChats;
         if(obj.fileName) eventObj.fileName = obj.fileName;
         requiredFormat[previousId].events.push(eventObj)
     })
     requiredFormat = Object.values(requiredFormat);
-    console.log(requiredFormat)
     // const array = folderItems.entries;
     let template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
@@ -78,41 +79,26 @@ export const eventsBody = async () => {
                             `
                             template +=`<div class="card-body pl-3 pr-3" style="padding-left: 10px;background-color:#f6f6f6;">
                                 <div class="row mb-3">
-                                    <div class="col-md-7 font-bold"></div>
-                                    <div class="col-md-3 font-bold">Presenter</div>
-                                    <div class="col-md-2 font-bold">Presentation</div>
+                                    <div class="col-md-4 font-bold"></div>
+                                    <div class="col-md-2 font-bold">Presenter</div>
+                                    <div class="col-md-2 font-bold">Recorded Presentation</div>
+                                    <div class="col-md-2 font-bold">Presentation Slides</div>
+                                    <div class="col-md-2 font-bold">Meeting Chat</div>
                                 </div>`
             meetings.events.forEach(event => {
                 template += `
                     <div class="row">
-                        <div class="col-md-7 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
-                        <div class="col-md-3 border-bottom">${event['presenter'] ? `${event['presenter']}`: ``}</div>
-                        <div class="col-md-2">${event['fileId'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-4 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
+                        <div class="col-md-2 border-bottom">${event['presenter'] ? `${event['presenter']}`: ``}</div>
+                        <div class="col-md-2">${event['fileId1'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId1']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-2">${event['fileId2'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId2']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-2">${event['fileId3'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId3']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
             
         });
         template += `</div>`;
-    // template += '<ul class="ul-list-style first-list-item collapsible-items mb-0">';
-
-    // for(let obj of array){
-    //     const fileName = obj.name;
-    //     const type = obj.type;
-    //     const fileType = fileName.substr(fileName.lastIndexOf('.')+1, fileName.length);
-    //     const fileTypeMapping = {
-    //         'pptx': 'powerpoint',
-    //         '.docx': 'word',
-    //         'pdf': 'pdf'
-    //     }
-    //     template += `<li class="collapsible-items">
-    //                     <i class="far fa-file${fileTypeMapping[fileType] ? `-${fileTypeMapping[fileType]}` : ''}"></i> 
-    //                     ${fileName}
-    //                     <button class="btn btn-sm custom-btn preview-file m-1" data-file-id="${obj.id}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button>
-    //                 </li>`
-    // }
-
-    // template += '</ul>';
     
     document.getElementById('eventsBody').innerHTML = template;
     addEventPreviewFile();
