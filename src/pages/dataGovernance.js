@@ -6,7 +6,11 @@ export const template = async () => {
     // const response = await getFolderItems(0);
     // const array = response.entries.filter(obj => obj.type === 'folder' && obj.id === '137304373658');
     // const array = filterConsortiums(response.entries);
+    let AllFolders = [];
     const array = await getFolderInfo('137304373658');
+    const events = await getFolderInfo('155546882525');
+    if(array) AllFolders.push(array);
+    if(events) AllFolders.push(events);
     // if(array.length <= 0) return;
     if(!array) return;
     
@@ -14,10 +18,10 @@ export const template = async () => {
     
     template += '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items p-0 m-0">';
 
-    // for(let obj of array){
-        const ID = array.id;
-        const consortiaName = array.name;
-        let type = array.type;
+    for(let obj of AllFolders){
+        const ID = obj.id;
+        const consortiaName = obj.name;
+        let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
         let title = type === 'folder' ? 'Expand / Collapse' : '';
         template += `<li class="collapsible-items">
@@ -26,7 +30,7 @@ export const template = async () => {
             </button> ${consortiaName}
         </li>
         `
-    // }
+    }
     template += `</ul></div></div>`
     return template;
 }

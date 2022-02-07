@@ -26,5 +26,6 @@ export const config = {
 export const boxRoles = {
     'Editor': 'Upload, download, preview, share, edit, and delete',
     'Viewer': 'Download, preview and share',
-    'Uploader': 'Upload only'
+    'Uploader': 'Upload only',
+    'Previewer': 'Preview only'
 }
