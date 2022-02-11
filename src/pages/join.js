@@ -42,7 +42,7 @@ export const confluenceResources = () => {
                         </div>
 
                         <div class="consortia-desc">
-                            You can also participate through a direct collaboration with the NCI Division of Cancer Epidemiology and Genetics.
+                            Studies not part of a breast cancer consortia are participating through a direct collaboration with NCI Division of Cancer Epidemiology and Genetics
                         </div>
                         <div class="consortia-desc">
                             For more information:</br>
