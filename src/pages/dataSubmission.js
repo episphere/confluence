@@ -152,9 +152,4 @@ export const dataSubmission = (element) => {
             }
         }
     });
-    
-    // let consortiaFolder = document.getElementsByClassName('consortia-folder');
-    // Array.from(consortiaFolder).forEach(element => {
-    //     element.dispatchEvent(new Event('click'));
-    // });
 };

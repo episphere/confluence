@@ -79,7 +79,7 @@ const allFilters = (jsonData, headers, cimba) => {
                 const total = obj[consortium][study].total;
                 innerTemplate += `<li class="filter-list-item">
                                 <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
-                                <label for="label${study}" class="study-name" title="${study}">${study.length > 10 ? `${study.substr(0,10)}...`:study}</label>
+                                <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0,8)}...`:study}</label>
                                 <div class="ml-auto">
                                     <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
                                         ${numberWithCommas(total)}
