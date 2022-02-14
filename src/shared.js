@@ -844,3 +844,11 @@ export const applicationURLs = {
     'stage': 'https://confluence-stage.cancer.gov',
     'prod': 'https://confluence.cancer.gov'
 }
+
+export const filePreviewer = (fileId, divId) => {
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    const preview = new Box.Preview();
+    preview.show(fileId, access_token, {
+        container: divId
+    });
+}

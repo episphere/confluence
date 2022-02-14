@@ -1047,14 +1047,14 @@ label {
     font-size:2.5vw;
     color: #ffffff;
     font-weight: bold;
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: 'Helvetica Neue';
     margin: 0px !important;
 }
 
 .banner-overlay-h3 {
     font-size:1.5vw;
     color: #ffffff;
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: 'Helvetica Neue';
 }
 
 .rounded-circle {
@@ -1087,7 +1087,7 @@ label {
 }
 
 .font-family-helvetica {
-    font-family: 'Helvetica Neue', sans-serif !important;
+    font-family: 'Helvetica Neue' !important;
 }
 
 .inverse-triangle {
@@ -1146,7 +1146,7 @@ label {
 }
 
 .max-height-study-list {
-    max-height: 250px !important;
+    max-height: 100px !important;
 }
 
 .font-white {
@@ -1228,7 +1228,7 @@ span.icon {
 
 .footer-content {
     text-align: center;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat';
 }
 
 .footer-col {
@@ -1243,14 +1243,14 @@ span.icon {
 
 .division-of-cancer-e {
     color: #FFFFFF;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat';
     font-size: 25px;
     font-weight: bold;
   }
 
 .at-the-national-canc {
     color: #FFFFFF;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat';
     font-size: 16px;
     font-weight: bold;
 }
@@ -1744,4 +1744,8 @@ form {
 
 .ws-nowrap {
     white-space: nowrap;
+}
+
+.bp-container {
+    min-height: 400px;
 }
