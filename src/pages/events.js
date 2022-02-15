@@ -1,4 +1,5 @@
 import { csv2Json, filePreviewer, getFile, getFolderItems } from "../shared.js";
+import { addEventToggleCollapsePanelBtn } from "./description.js";
 
 export const confluenceEventsPage = () => {
     return `
@@ -105,6 +106,7 @@ export const eventsBody = async () => {
     
     document.getElementById('eventsBody').innerHTML = template;
     addEventPreviewFile();
+    addEventToggleCollapsePanelBtn();
 }
 
 const addEventPreviewFile = () => {
