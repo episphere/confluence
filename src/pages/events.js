@@ -51,7 +51,7 @@ export const eventsBody = async () => {
                 <div class="row">
                     <div class="col-md-4 font-bold">Meeting title</div>
                     <div class="col-md-5 font-bold">Meeting date</div>
-                    <div class="col-md-3 font-bold">Meeting time</div>
+                    <div class="col-md-3 font-bold">Meeting Purpose</div>
                 </div>
             </div>
             <div class="ml-auto"></div>
