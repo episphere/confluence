@@ -83,9 +83,9 @@ export const eventsBody = async () => {
                                     <div class="col-md-5 font-bold"></div>
                                     <div class="col-md-2 font-bold">Presenter</div>
                                     <div class="col-md-2 font-bold">Affiliation</div>
-                                    <div class="col-md-1 font-bold p-0">Recording</div>
-                                    <div class="col-md-1 font-bold p-0">Slides</div>
-                                    <div class="col-md-1 font-bold p-0">Chat</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Recording</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Slides</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Chat</div>
                                 </div>`
             meetings.events.forEach(event => {
                 template += `
@@ -93,9 +93,9 @@ export const eventsBody = async () => {
                         <div class="col-md-5 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
                         <div class="col-md-2 border-bottom">${event['presenter'] ? `${event['presenter']}`: ``}</div>
                         <div class="col-md-2 border-bottom">${event['affiliation'] ? `${event['affiliation']}`: ``}</div>
-                        <div class="col-md-1 p-0">${event['fileId1'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId1']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
-                        <div class="col-md-1 p-0">${event['fileId2'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId2']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
-                        <div class="col-md-1 p-0">${event['fileId3'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId3']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId1'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId1']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId2'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId2']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId3'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId3']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
