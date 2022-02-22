@@ -26,6 +26,13 @@ export const confluenceResources = () => {
                             LAGENO-BC is a collaborative effort including a multinational team of investigators sharing knowledge and materials to facilitate breast cancer genetics research relevant to the diverse populations of Latin America and its diaspora.
                         </div>
 
+                        <div class="consortia-desc">
+                            <a href="mailto:wei.zheng@vanderbilt.edu">Asia Breast Cancer Consortium</a> (ABCC) </br>
+                            The ABCC is a GWAS of Asian breast cancer cases and similar number of controls.
+                        </div>
+
+
+
 
                         <div class="consortia-desc">
                             <a href="http://cimba.ccge.medschl.cam.ac.uk/" target="__blank">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
