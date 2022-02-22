@@ -213,13 +213,13 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                         <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
                         <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
                         <div class="col-md-1">
-                            <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Consortium'].replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
+                            <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Consortium'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '')}">
                                 <i class="fas fa-caret-down fa-2x"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div id="study${desc['Consortium'].replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
+                <div id="study${desc['Consortium'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
                     <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
                         ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
                         ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
