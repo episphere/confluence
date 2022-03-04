@@ -12,7 +12,7 @@ export const confluenceResources = () => {
                         </br>
                         <div>The following breast cancer consortia are participating in Confluence:</div>
                         <div class="consortia-desc">
-                            <a href="#join" data-href=""http://bcac.ccge.medschl.cam.ac.uk/" class="external-url" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
+                            <a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
                             The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                         </div>
 
@@ -66,7 +66,7 @@ const handleExternalLinks = () => {
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>`;
-            body.innerHTML = `<div style="margin-bottom: 2rem;">You are about to access an external resource, would you like to continue?</div>
+            body.innerHTML = `<div style="margin-bottom: 2rem;">You are now leaving the Confluence Data Platform website to access the ${link.dataset.href}</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">
                     Cancel
