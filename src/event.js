@@ -464,7 +464,7 @@ const renderCollaboratorListTBody = (allEntries, userPermission) => {
                     <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
                     <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
-                ` : `${role} ${status === 'pending' ? `(status)` : ''} `}</td>
+                ` : `${role} ${status === 'pending' ? `(${status})` : ''} `}</td>
                     <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
                     <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
                     <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
