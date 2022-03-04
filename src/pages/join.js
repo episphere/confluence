@@ -66,7 +66,7 @@ const handleExternalLinks = () => {
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>`;
-            body.innerHTML = `<div style="margin-bottom: 2rem;">You are now leaving the Confluence Data Platform website to access the ${link.dataset.href}</div>
+            body.innerHTML = `<div style="margin-bottom: 2rem;">You are now leaving the Confluence Data Platform website to access ${link.dataset.href}</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">
                     Cancel
