@@ -80,7 +80,7 @@ const addEventPageBtns = (pageSize, data, headers) => {
 
 const renderDataDictionaryFilters = (dictionary, headers) => {
     const allVariableType = Object.values(dictionary).map(dt => dt['Data Type']);
-    const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i).sort();
+    const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i);
 
     let template = '';
     template += `
