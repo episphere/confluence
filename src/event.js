@@ -420,7 +420,7 @@ export const addEventShowAllCollaborator = () => {
             table = 'Collaborators not found!'
         }
         collaboratorModalBody.innerHTML = `
-            <div class="modal-body allow-overflow">${table}</div>
+            <div class="modal-body allow-overflow max-height-collaboration-list">${table}</div>
             <div class="modal-footer">
                 <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
