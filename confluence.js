@@ -8,7 +8,7 @@ import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, ina
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
-import { aboutConfluence, renderOverView } from './src/pages/about.js';
+import { aboutConfluence, renderOverView, renderDataDescription } from './src/pages/about.js';
 import { confluenceResources } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
@@ -228,6 +228,7 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         aboutConfluence('overview');
         renderOverView();
+        renderDataDescription();
     }
     else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
@@ -334,6 +335,7 @@ const manageHash = async () => {
         const fileInfo = await getFileInfo(761599566277);
         aboutConfluence('overview', fileInfo ? true : false);
         renderOverView();
+        renderDataDescription();
         hideAnimation();
     }
     else if(hash === '#about/description'){
