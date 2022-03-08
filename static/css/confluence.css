@@ -61,6 +61,21 @@ body {
 
 .active {
     border-bottom: 2px solid #A41652;
+    background-color: #555;
+}
+
+.activeCollapse, .collapsible:hover {
+    border-bottom: 2px solid #A41652;
+    background-color: #555;
+    content: "";
+}
+
+.activeCollapse:after {
+    content: "";
+}
+
+.activeCollapse:after {
+    content: "";
 }
 
 .active-tab {
@@ -522,6 +537,14 @@ label {
     white-space: nowrap;
 }
 
+.table tr:nth-child(even) {
+    background-color: #d4d4d4;
+}
+
+.table caption {
+    font-size: 25px;
+}
+
 #pagination-container {
     padding: 1rem;
 }
@@ -674,6 +697,14 @@ label {
     max-height: 0;
     overflow: hidden;
     margin: 0;
+}
+
+.contentdropdown {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #fff;
 }
 
 .menu-item {
@@ -1355,6 +1386,26 @@ span.icon {
     overflow: auto;
 }
 
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: center;
+    outline: none;
+    font-size: 20px;    
+}
+
+.collapsible:after {
+    content: '\002b';
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;  
+}
+
 .modal-close-btn {
     /* position: absolute; */
     right: 0.75rem;
@@ -1464,6 +1515,7 @@ form {
 
 .table td, .table th {
     padding: 0.5rem !important;
+    border: 1px solid #DDDDDD;
 }
 
 .lazy-loading-spinner {
@@ -1748,4 +1800,21 @@ form {
 
 .bp-container {
     min-height: 400px;
+}
+
+.article{
+    font-size: 12px;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    text-align: justify;
+}
+
+.centered-element{
+    text-align: center;
+}
+
+.table-default {
+    border-collapse: collapse;
+    margin: 15px 0;
+    border: 1px solid #ddd;
 }
