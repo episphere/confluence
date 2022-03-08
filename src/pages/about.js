@@ -352,7 +352,7 @@ export const renderDataDescription = async () => {
                         
                     
                 <figure class="image-full centered-set"><div class="centered-element">
-                            <img src="../static/image/Confluence-Project-Figure1.png" width="751" height="269" alt="&quot;&quot;" loading="lazy"></div>
+                            <img src="../static/images/Confluence-Project-Figure1.png" width="751" height="269" alt="&quot;&quot;" loading="lazy"></div>
                             <figcaption><div class="caption-container no-resize">
                                         <p>Figure 1: Study participation through consortia or direct collaboration with DCEG/NCI</p>
                                                 </div>
