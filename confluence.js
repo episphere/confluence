@@ -36,10 +36,14 @@ export const confluence = async () => {
 
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
+        console.log('Got loginBoxAppDev');
         const loginBoxAppEpisphere = document.getElementById('loginBoxAppEpisphere');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         const loginBoxAppStage = document.getElementById('loginBoxAppStage');
-        if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
+        if (location.origin.match('localhost')) {
+            console.log('loginbox not hidden');
+            loginBoxAppDev.hidden = false;
+        }
         if (location.origin.match(applicationURLs.stage)) loginBoxAppStage.hidden = false;
         if (location.origin.match(applicationURLs.prod)) loginBoxAppProd.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppEpisphere.hidden = false;
