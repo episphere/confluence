@@ -36,7 +36,7 @@ export const confluence = async () => {
 
     if (localStorage.parms === undefined) {
         const loginBoxAppDev = document.getElementById('loginBoxAppDev');
-        console.log('Got loginBoxAppDev');
+        console.log('Got loginBoxAppDev ');
         const loginBoxAppEpisphere = document.getElementById('loginBoxAppEpisphere');
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         const loginBoxAppStage = document.getElementById('loginBoxAppStage');
