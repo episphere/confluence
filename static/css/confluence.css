@@ -1818,3 +1818,8 @@ form {
     margin: 15px 0;
     border: 1px solid #ddd;
 }
+
+.tab-content .active {
+    background-color: #F0F0F7 !important;
+
+}
