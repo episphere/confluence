@@ -1,9 +1,8 @@
-import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, publicDataFileId, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
-import { createProjectModal } from './components/modal.js';
 import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 
 let top = 0;
@@ -103,13 +102,13 @@ export const addEventUploadStudyForm = () => {
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
             document.getElementById('submitBtn').classList.add('btn-disbaled');
-            document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
+            if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
             
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
-                
-                performQAQC(textFromFileLoaded, fileName);
+                if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) performQAQC(textFromFileLoaded, fileName);
+                else separateData('', textFromFileLoaded, fileName);
             };
             fileReader.readAsText(file, "UTF-8");
         }
@@ -122,11 +121,12 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     const study = document.getElementById('selectStudyUIS');
     const newStudyName = document.getElementById('newStudyName');
     let studyId;
+    const submitBtn = location.origin.match('localhost') || location.origin.match(applicationURLs.dev) ? document.getElementById('continueSubmission') : document.getElementById('submitBtn');
     if(study){
         studyId = study.value;
     }
     else if (newStudyName) {
-        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating new study...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating new study...`;
         const entries = (await getFolderItems(consortiaId)).entries;
         const studyFolders = entries.filter(dt => dt.type === 'folder' && dt.name.trim().toLowerCase() === 'confluence data from studies');
         const response = await createFolder(`${studyFolders.length === 0 ? consortiaId : studyFolders[0].id}`, newStudyName.value);
@@ -135,14 +135,14 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         studyId = data.id;
     }
     const dataEntries = (await getFolderItems(studyId)).entries;
-    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking folders...`;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking folders...`;
     let logFolderID = '', cDataFolderID = '', pDataFolderID = '', rfDataFolderID = '', stDataFolderID = '';
     logFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Submission_Logs');
     cDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Core Data');
     pDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Pathology Data');
     rfDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Risk Factor Data');
     stDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Survival and Treatment Data');
-    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Separating data...`;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Separating data...`;
     let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
     const headings = rows[0];
     rows.splice(0, 1);
@@ -195,37 +195,38 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         if(Object.keys(stObj).length > 0) stData.push(stObj);
     });
     // Upload Data
-    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading data...`;
     const response1 = await uploadFile(coreData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Core_Data.json`, cDataFolderID);
     
     if(response1.status === 409) {
         const conflictFileId = response1.json.context_info.conflicts.id;
-        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(coreData, conflictFileId, 'application/json');
     }
     const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
     if(response2.status === 409) {
         const conflictFileId = response2.json.context_info.conflicts.id;
-        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(pathologyData, conflictFileId, 'application/json');
     }
     const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
     if(response3.status === 409) {
         const conflictFileId = response3.json.context_info.conflicts.id;
-        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(rfData, conflictFileId, 'application/json');
     }
     const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
     if(response4.status === 409) {
         const conflictFileId = response4.json.context_info.conflicts.id;
-        document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(stData, conflictFileId, 'application/json');
     }
-
-    // Upload Submission logs
-    document.getElementById('continueSubmission').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
-    const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
-    await uploadFile(elHtml, qaqcFileName, logFolderID, true)
+    if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) {
+        // Upload Submission logs
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
+        const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;
+        await uploadFile(elHtml, qaqcFileName, logFolderID, true)
+    }
     
     location.reload();
 }
