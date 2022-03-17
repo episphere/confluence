@@ -420,7 +420,7 @@ export const addEventShowAllCollaborator = () => {
             table = 'Collaborators not found!'
         }
         collaboratorModalBody.innerHTML = `
-            <div class="modal-body allow-overflow">${table}</div>
+            <div class="modal-body allow-overflow max-height-collaboration-list">${table}</div>
             <div class="modal-footer">
                 <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
@@ -457,14 +457,14 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
 const renderCollaboratorListTBody = (allEntries, userPermission) => {
     let tbody = '';
     allEntries.forEach(entry => {
-        const { name, email, role, addedBy, addedAt, id, folderName} = entry;
+        const { name, email, role, addedBy, addedAt, id, folderName, status} = entry;
         const userName = JSON.parse(localStorage.parms).name
         tbody += `<tr>
                     <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
                     <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
-                    <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select>
-                ` : `${role}`}</td>
+                    <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select> ${status === 'pending' ? `(${status})` : ''}
+                    ` : `${role} ${status === 'pending' ? `(${status})` : ''} `}</td>
                     <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
                     <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
                     <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
