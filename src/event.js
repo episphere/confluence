@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -90,7 +90,7 @@ export const addEventUploadStudyForm = () => {
         const file = document.getElementById('uploadDataUIS').files[0]; 
         const fileName = file.name;
         const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
-        if(fileType !== 'txt') {
+        if(fileType !== 'txt' && fileType !== 'csv' && fileType !== 'json') {
             alert('File type not supported!');
             return;
         }
@@ -102,12 +102,12 @@ export const addEventUploadStudyForm = () => {
         const r = confirm(`Upload ${fileName} in ${consortiaText} >> ${studyName}?`);
         if(r){
             document.getElementById('submitBtn').classList.add('btn-disbaled');
-            if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
+            if(location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev)) document.getElementById('submitBtn').innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Performing QAQC...`;
             
             let fileReader = new FileReader();
             fileReader.onload = function(fileLoadedEvent){
                 const textFromFileLoaded = fileLoadedEvent.target.result;
-                if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) performQAQC(textFromFileLoaded, fileName);
+                if(location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev)) performQAQC(textFromFileLoaded, fileName);
                 else separateData('', textFromFileLoaded, fileName);
             };
             fileReader.readAsText(file, "UTF-8");
@@ -121,7 +121,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     const study = document.getElementById('selectStudyUIS');
     const newStudyName = document.getElementById('newStudyName');
     let studyId;
-    const submitBtn = location.origin.match('localhost') || location.origin.match(applicationURLs.dev) ? document.getElementById('continueSubmission') : document.getElementById('submitBtn');
+    const submitBtn = location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev) ? document.getElementById('continueSubmission') : document.getElementById('submitBtn');
     if(study){
         studyId = study.value;
     }
@@ -143,16 +143,11 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     rfDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Risk Factor Data');
     stDataFolderID = await existsOrCreateNewFolder(dataEntries, studyId, 'Survival and Treatment Data');
     submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Separating data...`;
-    let rows = textFromFileLoaded.split(/\n/g).map(tx=>tx.split(/\t/g));
-    const headings = rows[0];
-    rows.splice(0, 1);
-    let obj = rows.map(el => {
-        let obj = {};
-        for (let i = 0; i < el.length; i++) {
-        obj[headings[i].trim()] = el[i];
-        }
-        return obj;
-    });
+    const fileType = fileName.slice(fileName.lastIndexOf('.')+1, fileName.length);
+    let obj = {};
+    if(fileType === 'txt') obj = tsv2Json(textFromFileLoaded).data;
+    else if(fileType === 'csv') obj = csv2Json(textFromFileLoaded).data;
+    else if(fileType === 'json') obj = JSON.parse(textFromFileLoaded);
     
     const masterFile = variables.masterFile;
     const core = masterFile.core.map(att => att.toLowerCase());
@@ -221,7 +216,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(stData, conflictFileId, 'application/json');
     }
-    if(location.origin.match('localhost') || location.origin.match(applicationURLs.dev)) {
+    if(location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev)) {
         // Upload Submission logs
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
         const elHtml = document.getElementById('qaqcSubmissionReport').innerHTML;

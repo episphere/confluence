@@ -37,7 +37,7 @@ export const uploadInStudy = async (id) => {
                         <div id="uploadErrorReport"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" title="Submit" class="btn btn-light" id="submitBtn">${location.origin.match('localhost') || location.origin.match(applicationURLs.dev) ? 'run QAQC' : 'Submit'}</button>
+                        <button type="submit" title="Submit" class="btn btn-light" id="submitBtn">${location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev) ? 'run QAQC' : 'Submit'}</button>
                         <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
                     </div>
                 </form>
