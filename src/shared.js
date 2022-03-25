@@ -842,7 +842,8 @@ export const handleRangeRequests = async () => {
 export const applicationURLs = {
     'dev': 'https://episphere.github.io/confluence',
     'stage': 'https://confluence-stage.cancer.gov',
-    'prod': 'https://confluence.cancer.gov'
+    'prod': 'https://confluence.cancer.gov',
+    'local': 'http://localhost'
 }
 
 export const filePreviewer = (fileId, divId) => {

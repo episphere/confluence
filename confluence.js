@@ -371,7 +371,7 @@ const manageHash = async () => {
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
     }
-    else if(hash === '#events') {
+    else if(hash === '#events/meetings') {
         const element = document.getElementById('events');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
