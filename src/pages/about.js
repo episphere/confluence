@@ -59,12 +59,7 @@ export const renderOverView = async () => {
         </div>
     `;
     document.getElementById('overview').innerHTML = template;
-    // getPublicFile('27jmuhandgz9qnc3tz81cx4v3rb87rrc', publicDataFileId).then(response => {
-    //     const data = response.data;
-    //     if(!data) return;
-    //     countPublicStatistics(data, true);
-    // });
-    const response = await fetch('./publicDataSet.json');
+    const response = await fetch('https://raw.githubusercontent.com/episphere/confluence/master/publicDataSet.json');
     countPublicStatistics(await response.json(), true);
 }
 
