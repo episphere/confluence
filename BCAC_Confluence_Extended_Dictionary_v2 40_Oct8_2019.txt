@@ -37,7 +37,7 @@ Ethnicity	EthnicitySubClass	Ethnic origin (refined)	"1=Northern European, 2=Sout
 (3) if EthnicityClass=3, then EthnicitySubClass=7, 8, 9 or 888
 (4) if EthnicityClass=4, then EthnicitySubClass=10, 11, 12 or 888
 (5) if EthnicityClass=5, then EthnicitySubClass=13, 14, 15 or 888
-(6) if EthnicityClass=6, then EthnicitySubClass=16, ethnOt­777
+(6) if EthnicityClass=6, then EthnicitySubClass=16, ethnOt�777
 (7) if EthnicityClass=888, then EthnicitySubClass=888 and ethnOt=888; "	Yes	Core
 Ethnicity	ethnOt	Details of specific ethnicity	"Specify ethnicity; 777=NA, 888=DK"	qualitative - text	No coding. Please provide details of ethnicity as free text if this is known	Yes	Core
 Ethnicity	raceM	Race/ethnicity of mother 	"1=European, 2=Hispanic American, 3=African, 4=Asian Subcontinent, 5=South-East Asian, 6=Other (including 'mixed race'), 888=DK"	qualitative - categorical		Yes	Core
@@ -52,9 +52,9 @@ Menstrual cycle	AgeMenarche	Age at menarche	"years, 888=DK"	quantitative - conti
 Menstrual cycle	mensAgeLast	Age at menopause	"years, 777=NA (still menstruating), 888=DK"	quantitative - continuous	Do not provide reference age if still menstruating. 	Yes	Risk Factors
 Menstrual cycle	mensRsn	Reason menstruation stopped	"1=Natural, 2=Oophorectomy and hysterect, 3=Oophorectomy or hysterect, 4=Oophorect, 5=Hysterect, 6=Stop OC use, 7=Chemother, 8=Other, 777=NA (still menstruating), 888=DK"	qualitative - categorical		Yes	Risk Factors
 Menstrual cycle	MenoStat	Menopausal status at reference date	"1=pre/peri, 2=post (postmenopausal: last menstruation more than 12 months before reference date), 888=DK "	qualitative - categorical		Yes	Risk Factors
-Children	parous	Nulliparous v parous	"0=nulliparous, 1=1+ full term pregnancies, 888=DK"	qualitative - categorical	Full-term is defined as ³ 24 weeks gestation	Yes	Risk Factors
-Children	Parity	Number of full-term pregnancies	"integer, 888=DK"	quantitative - continuous	Still born and life born or only life born if only this is available (Full-term is defined as ³ 24 weeks gestation)	Yes	Risk Factors
-Children	AgeFFTP	Age at end of first full-term pregnancy	"years, 777=NA, 888=DK"	quantitative - continuous	Full-term is defined as ³ 24 weeks gestation	Yes	Risk Factors
+Children	parous	Nulliparous v parous	"0=nulliparous, 1=1+ full term pregnancies, 888=DK"	qualitative - categorical	Full-term is defined as � 24 weeks gestation	Yes	Risk Factors
+Children	Parity	Number of full-term pregnancies	"integer, 888=DK"	quantitative - continuous	Still born and life born or only life born if only this is available (Full-term is defined as � 24 weeks gestation)	Yes	Risk Factors
+Children	AgeFFTP	Age at end of first full-term pregnancy	"years, 777=NA, 888=DK"	quantitative - continuous	Full-term is defined as � 24 weeks gestation	Yes	Risk Factors
 Children	lastChildAge	Age at end of last full-term pregnancy (or current age if pregnant)	"years, 777=NA, 888=DK"	quantitative - continuous		Yes	Risk Factors
 Breastfeeding	breastfed	Ever breastfed 	"0=No, 1=Yes, 888=DK"	qualitative - categorical		Yes	Risk Factors
 Breastfeeding	breastMos	Lifetime duration of breastfeeding 	"months, 888=DK"	quantitative - continuous		Yes	Risk Factors
@@ -136,9 +136,9 @@ Tumour characteristics	NodesIndex	Number of positive nodes for index tumour	"Int
 Tumour characteristics	Size1	Tumour size (maximum diameter)	"Maximum diameter in mm, 888=DK"	quantitative - continuous	NOT centimetres; if invasive tumor measure invasive component only; use clinical or pre-pathological (before neoadjuvant chemo) Size1 for cases treated with neoadjuvant chemotherapy.	Yes	Pathology
 Tumour characteristics	Size2	Tumour size (maximum diameter)	"Maximum diameter in mm, 777=NA, 888=DK"	quantitative - continuous	NOT centimetres ; if invasive tumor measure invasive component only	Yes	Pathology
 Tumour characteristics	SizeIndex	Tumour size (maximum diameter) for index tumour	"Maximum diameter in mm, 888=DK"	quantitative - continuous	This variable is derived from [Size1] or [Size2] using variable [Index]	Yes	Pathology
-Tumour characteristics	Size1_Cat	Categorization of size	"1= ²2cm, 2= >2cm and ²5cm, 3= >5cm, 888=DK"	qualitative - categorical		Yes	Pathology
-Tumour characteristics	Size2_Cat	Categorization of size	"1= ²2cm, 2= >2cm and ²5cm, 3= >5cm, 777=NA, 888=DK"	qualitative - categorical		Yes	Pathology
-Tumour characteristics	SizeIndex_Cat	Categorization of size for index tumour	"1= ²2cm, 2= >2cm and ²5cm, 3= >5cm, 888=DK"	qualitative - categorical	This variable is derived from [Size1_cat] or [Size2_cat] using variable [Index]	Yes	Pathology
+Tumour characteristics	Size1_Cat	Categorization of size	"1= �2cm, 2= >2cm and �5cm, 3= >5cm, 888=DK"	qualitative - categorical		Yes	Pathology
+Tumour characteristics	Size2_Cat	Categorization of size	"1= �2cm, 2= >2cm and �5cm, 3= >5cm, 777=NA, 888=DK"	qualitative - categorical		Yes	Pathology
+Tumour characteristics	SizeIndex_Cat	Categorization of size for index tumour	"1= �2cm, 2= >2cm and �5cm, 3= >5cm, 888=DK"	qualitative - categorical	This variable is derived from [Size1_cat] or [Size2_cat] using variable [Index]	Yes	Pathology
 Tumour characteristics	SizeIndex_Cat_derived	(see comments)		qualitative - text	"Where [SizeIndex_Cat] is unknown, this variable is derived using [SizeGroupIndex] where [SizeGroupIndex] = 1, 2 or 3"	Yes	Pathology
 Tumour characteristics	SizeGroup1	Tumour size categories	"see sheet TNM codes (0, 1, 2, 3, 4, 8); 888=DK"	qualitative - categorical	use pT if not available use cT; use clinical or pre-pathological (before neoadjuvant chemo) SizeGroup1 for cases treated with neoadjuvant chemotherapy. 	Yes	Pathology
 Tumour characteristics	SizeGroup2	Tumour size categories	"see sheet TNM codes (0, 1, 2, 3, 4, 8); 777=NA, 888=DK"	qualitative - categorical	use pT if not available use cT	Yes	Pathology
