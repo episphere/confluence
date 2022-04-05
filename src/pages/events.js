@@ -1,4 +1,5 @@
 import { csv2Json, filePreviewer, getFile, getFolderItems } from "../shared.js";
+import { addEventToggleCollapsePanelBtn } from "./description.js";
 
 export const confluenceEventsPage = () => {
     return `
@@ -40,6 +41,7 @@ export const eventsBody = async () => {
         if(obj.fileIdVideos) eventObj.fileId1 = obj.fileIdVideos;
         if(obj.fileIdSlides) eventObj.fileId2 = obj.fileIdSlides;
         if(obj.fileIdChats) eventObj.fileId3 = obj.fileIdChats;
+        if(obj.affiliation) eventObj.affiliation = obj.affiliation;
         if(obj.fileName) eventObj.fileName = obj.fileName;
         requiredFormat[previousId].events.push(eventObj)
     })
@@ -50,8 +52,8 @@ export const eventsBody = async () => {
             <div class="col-md-11">
                 <div class="row">
                     <div class="col-md-4 font-bold">Meeting title</div>
-                    <div class="col-md-5 font-bold">Meeting date</div>
-                    <div class="col-md-3 font-bold">Meeting time</div>
+                    <div class="col-md-2 font-bold">Meeting date</div>
+                    <div class="col-md-6 font-bold">Meeting Purpose</div>
                 </div>
             </div>
             <div class="ml-auto"></div>
@@ -66,8 +68,8 @@ export const eventsBody = async () => {
                                     <div class="col-md-11">
                                         <div class="row">
                                             <div class="col-md-4">${meetings['meetingTitle'] ? meetings['meetingTitle'] : ''}</div>
-                                            <div class="col-md-5">${meetings['meetingDate'] ? meetings['meetingDate'] : ''}</div>
-                                            <div class="col-md-3">${meetings['meetingTime'] ? meetings['meetingTime'] : ''}</div>
+                                            <div class="col-md-2">${meetings['meetingDate'] ? meetings['meetingDate'] : ''}</div>
+                                            <div class="col-md-6">${meetings['meetingTime'] ? meetings['meetingTime'] : ''}</div>
                                         </div>
                                     </div>
                                     <div class="ml-auto">
@@ -79,20 +81,22 @@ export const eventsBody = async () => {
                             `
                             template +=`<div class="card-body pl-3 pr-3" style="padding-left: 10px;background-color:#f6f6f6;">
                                 <div class="row mb-3">
-                                    <div class="col-md-4 font-bold"></div>
+                                    <div class="col-md-5 font-bold">Scientific Presentations</div>
                                     <div class="col-md-2 font-bold">Presenter</div>
-                                    <div class="col-md-2 font-bold">Recorded Presentation</div>
-                                    <div class="col-md-2 font-bold">Presentation Slides</div>
-                                    <div class="col-md-2 font-bold">Meeting Chat</div>
+                                    <div class="col-md-2 font-bold">Affiliation</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Recording</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Slides</div>
+                                    <div class="col-md-1 font-bold p-0 align-center">Chat</div>
                                 </div>`
             meetings.events.forEach(event => {
                 template += `
                     <div class="row">
-                        <div class="col-md-4 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
+                        <div class="col-md-5 mt-1 border-bottom">${event['title'] ? `${event['title']}`: ``}</div>
                         <div class="col-md-2 border-bottom">${event['presenter'] ? `${event['presenter']}`: ``}</div>
-                        <div class="col-md-2">${event['fileId1'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId1']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
-                        <div class="col-md-2">${event['fileId2'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId2']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
-                        <div class="col-md-2">${event['fileId3'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId3']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-2 border-bottom">${event['affiliation'] ? `${event['affiliation']}`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId1'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId1']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId2'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId2']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
+                        <div class="col-md-1 p-0 align-center">${event['fileId3'] ? `<button class="btn btn-sm custom-btn preview-file" data-file-id="${event['fileId3']}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt"></i> Preview</button></br>`: ``}</div>
                     </div>`
             })
             template += `</div></div></div>`
@@ -102,6 +106,7 @@ export const eventsBody = async () => {
     
     document.getElementById('eventsBody').innerHTML = template;
     addEventPreviewFile();
+    addEventToggleCollapsePanelBtn();
 }
 
 const addEventPreviewFile = () => {

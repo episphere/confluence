@@ -1149,6 +1149,10 @@ label {
     max-height: 100px !important;
 }
 
+.max-height-collaboration-list {
+    max-height: 400px !important;
+}
+
 .font-white {
     color: #ffffff !important;
 }
