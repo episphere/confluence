@@ -22,7 +22,7 @@ export const confluenceResources = () => {
                         </div>
 
                         <div class="consortia-desc">
-                            <a href="https://www.lageno-bc.org/about">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
+                            <a href= "#join" class="external-url" data-href="https://www.lageno-bc.org/about" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
                             LAGENO-BC is a collaborative effort including a multinational team of investigators sharing knowledge and materials to facilitate breast cancer genetics research relevant to the diverse populations of Latin America and its diaspora.
                         </div>
 
