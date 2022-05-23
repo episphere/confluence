@@ -27,7 +27,7 @@ export const confluenceContactPage = () => {
                                         <tr>
                                             <td>Montserrat Garcia-Closas</td>
                                             <td>Division of Cancer Epidemiology and Genetics, USA</td>
-                                            <td>Co-Chair (DCEG)</td>
+                                            <td>Chair</td>
                                         </tr>
                                         <tr>
                                             <td>Doug Easton</td>
