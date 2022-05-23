@@ -79,6 +79,13 @@ export const confluenceContactPage = () => {
                                             <td>Division of Cancer Control and Prevention Sciences, NCI, USA</td>
                                             <td>DCCPS/NCI extramural</td>
                                         </tr>
+
+                                        <tr>
+                                        <td>Gretchen Gierach</td>
+                                        <td>Division of Cancer Epidemiology and Genetics, USA</td>
+                                        <td>Clinical Trials</td>
+                                        </tr>
+                                        
                                         <tr>
                                             <td>Chris Haiman</td>
                                             <td>University of South California, USA</td>
@@ -125,11 +132,7 @@ export const confluenceContactPage = () => {
                                             <td>ABCC and AABCGS</td>
                                         </tr>
 
-                                        <tr>
-                                            <td>Gretchen Gierach</td>
-                                            <td>Division of Cancer Epidemiology and Genetics, USA</td>
-                                            <td>Clinical Trials</td>
-                                        </tr>
+
                                     </tbody>
                                 </table>
                             </div>
