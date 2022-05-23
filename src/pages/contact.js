@@ -124,6 +124,12 @@ export const confluenceContactPage = () => {
                                             <td>Vanderbilt University, USA</td>
                                             <td>ABCC and AABCGS</td>
                                         </tr>
+
+                                        <tr>
+                                            <td>Gretchen Gierach</td>
+                                            <td>Division of Cancer Epidemiology and Genetics, USA</td>
+                                            <td>Clinical Trials</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
