@@ -3,6 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
+import { formtemplate as dataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
@@ -63,6 +64,7 @@ export const confluence = async () => {
         const dataRequestElement = document.getElementById('dataRequest');
         // const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
+        const dataFormElement = document.getElementById('dataForm');
 
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -147,6 +149,16 @@ export const confluence = async () => {
                 assignNavbarActive(dataAnalysisElement, 1);
                 document.title = 'Confluence - Data Analysis';
                 confluenceDiv.innerHTML = dataAnalysisTemplate();
+                hideAnimation();
+            });
+        }
+        if(dataFormElement) {
+            dataFormElement.addEventListener('click', () => {
+                if (dataFormElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(dataFormElement, 1);
+                document.title = 'Confluence - Data Form';
+                confluenceDiv.innerHTML = dataFormTemplate();
                 hideAnimation();
             });
         }
@@ -253,6 +265,14 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
+    else if (hash === '#data_form') {
+        const element = document.getElementById('dataForm');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Data Form';
+        assignNavbarActive(element, 1);
+        confluenceDiv.innerHTML = dataFormTemplate();
+    }
     else if (hash === '#data_exploration/dictionary') {
         const dataDictionaryElement = document.getElementById('dataDictionary');
         if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
@@ -293,6 +313,10 @@ const manageHash = async () => {
     }
     else if (hash === '#data_access') {
         const element = document.getElementById('dataRequest');
+        element.click();
+    }
+    else if (hash === '#data_form') {
+        const element = document.getElementById('dataForm');
         element.click();
     }
     else if (hash === '#data_submission') {
