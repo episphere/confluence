@@ -65,6 +65,9 @@ export const navBarMenutemplate = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">
                     Access
                 </a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm">
+                Form
+            </a>
             </div>
         </div>
         <div class="grid-elements">
