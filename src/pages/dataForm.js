@@ -205,7 +205,7 @@ export const formtemplate = () => {
                             </div>
 
                             <br>
-                            <p><u>2. PHENOTYPE DATA REQUESTED (see data dictionary)</u></p>
+                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary">see data dictionary</a>)</u></p>
 
                             <div class="input-group">
                                 <p>All data requests will be provided access to the Confluence core variables. <br>
@@ -438,6 +438,7 @@ export const formtemplate = () => {
                             </button>
                           </form>
                         </section>
+
                         <div id='popUpModal' class="modal" tabindex="-1" role="dialog">
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
