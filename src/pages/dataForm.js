@@ -6,14 +6,15 @@
 // };
 
 export const formtemplate = () => {
-    // function yesnoCheck() {
-    //     if (document.getElementById('amendmentyes').checked) {
-    //         document.getElementById('ifamendmentyes').style.visibility = 'visible';
-    //     }
-    //     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
-    // };
-
-    let template = ` 
+  // function yesnoCheck() {
+  //     if (document.getElementById('amendmentyes').checked) {
+  //         document.getElementById('ifamendmentyes').style.visibility = 'visible';
+  //     }
+  //     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
+  // };
+  const date = new Date();
+  const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+  let template = ` 
                 <div class="general-bg padding-bottom-1rem">
                         <div class="container body-min-height">
 
@@ -30,7 +31,7 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                               <label for="date"><b>Date</b></label>
-                              <input id="date" name="date" type="date" required/>
+                              <input id="date" name="date" type="date" value='${today}' required/>
                             </div>
 
                             <div class="input-group">
@@ -219,7 +220,7 @@ export const formtemplate = () => {
 
                               <div class="row">
                                 <div class="col-12">
-                                  <ul class="form">
+                                  <ul class="form" id='riskfactlist'>
 
                                       <li class="form">
                                         <div class="inline-field">
@@ -312,7 +313,7 @@ export const formtemplate = () => {
 
                                 <div class="row">
                                   <div class="col-12">
-                                    <ul class="form">
+                                    <ul class="form" id='pathlist'>
 
                                       <li class="form">
                                         <div class="inline-field">
@@ -350,7 +351,7 @@ export const formtemplate = () => {
 
                               <div class="row">
                                 <div class="col-12">
-                                  <ul class="form">
+                                  <ul class="form" id='surtrelist'>
 
                                     <li class="form">
                                       <div class="inline-field">
@@ -465,5 +466,51 @@ export const formtemplate = () => {
                     </div>
                   </div>`;
 
-return template;
+  return template;
+}
+
+export const formFunctions = () => {
+  document.getElementById('riskfactvarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('riskfactlist').getElementsByTagName('input');
+
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+  document.getElementById('pathvarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('pathlist').getElementsByTagName('input');
+
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+  document.getElementById('surtrevarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
+    
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+
 }
