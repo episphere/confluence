@@ -3,7 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { formtemplate as dataFormTemplate } from './src/pages/dataForm.js';
+import { formtemplate as dataFormTemplate, formFunctions } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
@@ -159,6 +159,7 @@ export const confluence = async () => {
                 assignNavbarActive(dataFormElement, 1);
                 document.title = 'Confluence - Data Form';
                 confluenceDiv.innerHTML = dataFormTemplate();
+                formFunctions();
                 hideAnimation();
             });
         }
@@ -271,7 +272,8 @@ const manageRouter = async () => {
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Data Form';
         assignNavbarActive(element, 1);
-        confluenceDiv.innerHTML = dataFormTemplate();
+        confluenceDiv.innerHTML = dataFormTemplate();  
+        formFunctions(); 
     }
     else if (hash === '#data_exploration/dictionary') {
         const dataDictionaryElement = document.getElementById('dataDictionary');

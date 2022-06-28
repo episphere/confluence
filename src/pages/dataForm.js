@@ -6,14 +6,15 @@
 // };
 
 export const formtemplate = () => {
-    // function yesnoCheck() {
-    //     if (document.getElementById('amendmentyes').checked) {
-    //         document.getElementById('ifamendmentyes').style.visibility = 'visible';
-    //     }
-    //     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
-    // };
-
-    let template = ` 
+  // function yesnoCheck() {
+  //     if (document.getElementById('amendmentyes').checked) {
+  //         document.getElementById('ifamendmentyes').style.visibility = 'visible';
+  //     }
+  //     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
+  // };
+  const date = new Date();
+  const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+  let template = ` 
                 <div class="general-bg padding-bottom-1rem">
                         <div class="container body-min-height">
 
@@ -30,7 +31,7 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                               <label for="date"><b>Date</b></label>
-                              <input id="date" name="date" type="date" required/>
+                              <input id="date" name="date" type="date" value='${today}' required/>
                             </div>
 
                             <div class="input-group">
@@ -67,9 +68,15 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                                 <label for="consortia"><b>Member of Consortia?</b></label>
+                                
+                                <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
+                                <label class="inline" for="mem-aabcg"> AABCG</label>
 
                                 <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
                                 <label class="inline" for="mem-bcac"> BCAC</label>
+
+                                <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
+                                <label class="inline" for="mem-cimba"> CIMBA</label>
 
                                 <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
                                 <label class="inline" for="mem-lageno"> LAGENO</label>
@@ -108,6 +115,59 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
+                                <label for="consortia"><b>Consortia data being requested</b> <i>(please check all boxes that apply)</i></label>
+                            </div>
+
+                                <div class="row">
+                                  <div class="col-12">
+                                    <ul class="form">
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-aabcg" name="consortia-aabcg" type="checkbox" value="consortia-aabcg"/>
+                                            <label class="container-ul" for="consortia-aabcg"> AABCG</label>
+                                          </div>
+                                        </li>
+
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-BCAC" name="consortia-BCAC" type="checkbox" value="consortia-BCAC"/>
+                                            <label class="container-ul" for="consortia-BCAC"> BCAC</label>
+                                          </div>
+                                        </li>
+
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-cimba" name="consortia-cimba" type="checkbox" value="consortia-cimba"/>
+                                            <label class="container-ul" for="consortia-cimba"> CIMBA</label>
+                                          </div>
+                                        </li>                                        
+
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-c-nci" name="consortia-c-nci" type="checkbox" value="consortia-c-nci"/>
+                                            <label class="container-ul" for="consortia-c-nci"> C-NCI</label>
+                                          </div>
+                                        </li>
+
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-lageno" name="consortia-lageno" type="checkbox" value="consortia-lageno"/>
+                                            <label class="container-ul" for="consortia-lageno"> LAGENO</label>
+                                          </div>
+                                        </li>
+                                        
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="consortia-merge" name="consortia-merge" type="checkbox" value="consortia-merge"/>
+                                            <label class="container-ul" for="consortia-merge"> MERGE</label>
+                                          </div>
+                                        </li>
+                                        
+                                      </ul>
+                                    </div>
+                                  </div>
+
+                            <div class="input-group">
                               <label for="condesc"><b>Concept Description</b> <i> Please provide a concise description of Background/Aims</i></label>
                               <textarea id="condesc" name="condesc" rows="6" cols="65" required></textarea>
                             </div>
@@ -132,63 +192,6 @@ export const formtemplate = () => {
 
                             <br>
                             <p><u>1. GENETIC DATA REQUESTED</u></p>
-
-                            <div class="input-group">
-                                <label for="consortia"><b>Consortia data being requested</b> <i>(please check all boxes that apply)</i></label>
-                            </div>
-
-                                <div class="row">
-                                  <div class="col-12">
-                                    <ul class="form">
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-BCAC" name="consortia-BCAC" type="checkbox" value="consortia-BCAC"/>
-                                            <label class="container-ul" for="consortia-BCAC"> BCAC</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-lageno" name="consortia-lageno" type="checkbox" value="consortia-lageno"/>
-                                            <label class="container-ul" for="consortia-lageno"> LAGENO</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-aabcg" name="consortia-aabcg" type="checkbox" value="consortia-aabcg"/>
-                                            <label class="container-ul" for="consortia-aabcg"> AABCG</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-c-nci" name="consortia-c-nci" type="checkbox" value="consortia-c-nci"/>
-                                            <label class="container-ul" for="consortia-c-nci"> C-NCI</label>
-                                          </div>
-                                        </li>
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-merge" name="consortia-merge" type="checkbox" value="consortia-merge"/>
-                                            <label class="container-ul" for="consortia-merge"> MERGE</label>
-                                          </div>
-                                        </li>
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-cimba" name="consortia-cimba" type="checkbox" value="consortia-cimba"/>
-                                            <label class="container-ul" for="consortia-cimba"> CIMBA</label>
-                                          </div>
-                                        </li>
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-nki" name="consortia-nki" type="checkbox" value="consortia-nki"/>
-                                            <label class="container-ul" for="consortia-nki"> NKI-Clinical Trials</label>
-                                          </div>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                  </div>
 
                             <div class="input-group">
                                 <label for="genotyping"><b>Genotyping</b></label>
@@ -219,7 +222,7 @@ export const formtemplate = () => {
 
                               <div class="row">
                                 <div class="col-12">
-                                  <ul class="form">
+                                  <ul class="form" id='riskfactlist'>
 
                                       <li class="form">
                                         <div class="inline-field">
@@ -312,7 +315,7 @@ export const formtemplate = () => {
 
                                 <div class="row">
                                   <div class="col-12">
-                                    <ul class="form">
+                                    <ul class="form" id='pathlist'>
 
                                       <li class="form">
                                         <div class="inline-field">
@@ -350,7 +353,7 @@ export const formtemplate = () => {
 
                               <div class="row">
                                 <div class="col-12">
-                                  <ul class="form">
+                                  <ul class="form" id='surtrelist'>
 
                                     <li class="form">
                                       <div class="inline-field">
@@ -465,5 +468,51 @@ export const formtemplate = () => {
                     </div>
                   </div>`;
 
-return template;
+  return template;
+}
+
+export const formFunctions = () => {
+  document.getElementById('riskfactvarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('riskfactlist').getElementsByTagName('input');
+
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+  document.getElementById('pathvarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('pathlist').getElementsByTagName('input');
+
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+  document.getElementById('surtrevarv').addEventListener('click', (e) => {
+    const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
+    
+    if (e.target.checked) {
+      for (const element of inputList) {
+        element.checked = true;
+      }
+    }
+    else{
+      for (const element of inputList) {
+        element.checked = false;
+      }
+    }
+  });
+
 }
