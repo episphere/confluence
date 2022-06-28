@@ -9,17 +9,18 @@ export const template = () => {
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
                     <div class="mb-3">
-                        The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. Data is expected to be available for request in 2023. Data access will be in accordance to data use agreements signed between participating studies and the Data Coordinating Centers from Consortia participating in Confluence.
+                        The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. When data is available, this page will be updated to facilitate the data request process.
                     </div>
                     <div class="row m-0">
-                        The following data access procedures will be facilitated through this platform:
+                        The anticipated data request process is described below:
                     </div>
                     <div class="row m-0">
                         <ul>
-                            <li>Researcher submits a study concept describing the project, including variables of interest, via the Confluence Data Platform. This request will be sent via the platform to the relevant consortia data access coordinating committees (DACCs) that govern the requested data.</li>
-                            <li>After approval by the relevant consortia DACCs, individual studies contributing data will be notified and given a time period to determine if their study will participate in the approved project.</li>
-                            <li>After this period has elapsed, the researcher’s institution will sign a data transfer agreement (DTA) for the study concept with each of the relevant consortium data coordinating center(s) governing the data.</li>
-                            <li>Upon DTA signatures, the data coordinating center(s) will be able to provide access of the approved data to researchers through the Confluence Data Platform.</li>
+                            <li> Step 1: Researcher explores summary data to evaluate feasibility of proposed studies. </li>
+                            <li> Step 2: Researcher submits a study concept describing their project via the Confluence Data Platform. It is sent to the relevant consortia data access coordinating committees (DACCs) that govern the requested data. </li>
+                            <li> Step 3: Researcher receives approval from relevant data governors. Relevant consortia DACCs first review and either approve or reject the study concept. If approved, the individual studies contributing the requested data will be notified and determine if their study will participate in the approved project. </li>
+                            <li> Step 4: Researcher signs a data transfer agreement (DTA) for the study concept with each of the relevant consortium data coordinating centers (DCCs) governing the requested data (see Particiapting Consortia for list of DCCs). </li>
+                            <li> Step 5: Researcher receives access to the request data from the DCCs, following execution of DTAs. </li>
                         </ul>
                     </div>
                 </div>
