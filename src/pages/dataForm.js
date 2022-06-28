@@ -69,26 +69,28 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="consortia"><b>Member of Consortia?</b></label>
                                 
-                                <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
-                                <label class="inline" for="mem-aabcg"> AABCG</label>
+                                <div class='row'>
+                                  <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
+                                  <label class="inline" for="mem-aabcg"> AABCG</label>
 
-                                <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
-                                <label class="inline" for="mem-bcac"> BCAC</label>
+                                  <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
+                                  <label class="inline" for="mem-bcac"> BCAC</label>
 
-                                <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
-                                <label class="inline" for="mem-cimba"> CIMBA</label>
+                                  <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
+                                  <label class="inline" for="mem-cimba"> CIMBA</label>
 
-                                <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
-                                <label class="inline" for="mem-lageno"> LAGENO</label>
+                                  <input id="mem-nci-dceg" name="mem-nci-dceg" type="checkbox" value="mem-nci-dceg"/>
+                                  <label class="inline" for="mem-nci-dceg"> C-NCI</label>
 
-                                <input id="mem-merge" name="mem-merge" type="checkbox" value="mem-merge"/>
-                                <label class="inline" for="mem-merge"> MERGE</label>
+                                  <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
+                                  <label class="inline" for="mem-lageno"> LAGENO</label>
 
-                                <input id="mem-nci-dceg" name="mem-nci-dceg" type="checkbox" value="mem-nci-dceg"/>
-                                <label class="inline" for="mem-nci-dceg"> NCI-DCEG</label>
+                                  <input id="mem-merge" name="mem-merge" type="checkbox" value="mem-merge"/>
+                                  <label class="inline" for="mem-merge"> MERGE</label>
 
-                                <input id="mem-none" name="mem-none" type="checkbox" value="mem-none"/>
-                                <label class="inline" for="mem-none"> None</label>
+                                  <input id="mem-none" name="mem-none" type="checkbox" value="mem-none"/>
+                                  <label class="inline" for="mem-none"> None</label>
+                                </div>
                             </div>
                             
                             <div class="input-group">
@@ -217,7 +219,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor Variables</b></label>
                                 <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
-                                <label class="container-ul" for="riskfactvarv"> (All risk variables) </label>
+                                <label class="container-ul" for="riskfactvarv"> Check All </label>
                             </div>
 
                               <div class="row">
@@ -310,7 +312,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="pathvar"><b>Pathology Variables</b></label>
                                 <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/>
-                                <label class="container-ul" for="pathvarv"> (All Pathology variables) </label>
+                                <label class="container-ul" for="pathvarv"> Check All </label>
                             </div>
 
                                 <div class="row">
@@ -348,7 +350,7 @@ export const formtemplate = () => {
                           <div class="input-group">
                             <label for="surtrevar"><b>Survival and Treatment Variables</b></label>
                             <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
-                            <label class="container-ul" for="surtrevarv"> (All Survival and Treatment variables) </label>
+                            <label class="container-ul" for="surtrevarv"> Check All </label>
                           </div>
 
                               <div class="row">
@@ -406,12 +408,6 @@ export const formtemplate = () => {
                                   </ul>
                                 </div>
                               </div>
-
-                            <div class="input-group">
-                              <label for="mamden"><b>Mammographic Density Variables</b></label>
-                                <input id="mamdenv" name="mamdenv" type="checkbox" value="mamdenv"/>
-                                <label class="container-ul" for="mamdenv"> (All Mammographic Density variables) </label>
-                            </div>
 
                             <br>
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
