@@ -332,7 +332,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
 
     document.getElementById('listFilters').innerHTML = `
         ${consortiumSelected.length > 0 ? `
-            <span class="font-bold">Consortium: </span>${consortiumSelected[0]} ${consortiumSelected.length > 1 ? `and <span class="other-variable-count">${consortiumSelected.length-1} other</span>`: ``}
+            <span class="font-bold">Consortium: </span>${consortiumSelected[0] === 'NCI' ? 'C-NCI':consortiumSelected[0]} ${consortiumSelected.length > 1 ? `and <span class="other-variable-count">${consortiumSelected.length-1} other</span>`: ``}
         `: `
             <span class="font-bold">Consortium:</span> All
         `}

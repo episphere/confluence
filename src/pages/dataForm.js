@@ -462,7 +462,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="budget"><b>Budgetary considerations, if applicaple</b></label>
+                              <label for="budget"><b>Budgetary considerations, if applicable</b></label>
                               <textarea id="budget" name="budget" rows="2" cols="65"></textarea>
                             </div>
 
