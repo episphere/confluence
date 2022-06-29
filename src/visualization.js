@@ -66,14 +66,14 @@ const allFilters = (jsonData, headers, cimba) => {
                                 <i class="fas fa-caret-down"></i>
                             </button>
                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                            <label for="label${consortium}" class="consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
                             <div class="ml-auto">
                                 <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
                                     ${numberWithCommas(obj[consortium].consortiumTotal)}
                                 </div>
                             </div>
                         </li>
-                        <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
+                    <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
