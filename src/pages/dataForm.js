@@ -43,12 +43,12 @@ export const formtemplate = () => {
                                 <label for="amendment"> <b>Is this an amendment?</b> </label>
                                     
                                     <input id="amendmentyes" name="amendment" type="radio" value="Yes" required/>
-                                        <label class="inline" for="amendmentyes">Yes</label>
+                                        <label class="ul-container" for="amendmentyes"> Yes </label>
                                     <input id="amendmentno" name="amendment" type="radio" value="No" required/>
-                                        <label class="inline" for="amendmentno">No</label>
+                                        <label class="ul-container" for="amendmentno"> No </label>
 
-                                <label for="ifamendmentyes"> If yes, provide Concept Number of original form </label>
-                                    <input type="text" id="conNum" name="conNum"/>
+                                <label for="ifamendmentyes"> <i> If yes, provide Concept Number of original form </i></label>
+                                    <input type="text" id="conNum" name="conNum" />
                             </div>
 
                             <div class="input-group">
@@ -142,10 +142,10 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <div class="input-group">
+                            
                                 
-                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b>Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
-                              </div>
+                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
+                              
                             </div>
 
                             <div class="input-group">
@@ -209,18 +209,22 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="consortia"><b>Primary Endpoint</b> <i> (please check box)</i> </label>
 
-                                <div class="input-group">
+                                <div class="inline-field">
                                 <input id="consortia-bcr" name="consortia-bcr" type="checkbox" value="consortia-bcr"/>
-                                <label class="inline" for="consortia-bcr"> Breast Cancer Risk</label>
+                                <label class="container-ul" for="consortia-bcr"> Breast Cancer Risk</label>
 
                                 <input id="sbc" name="sbc" type="checkbox" value="sbc"/>
-                                <label class="inline" for="sbc"> Subtype of Breast Cancer</label>
+                                <label class="container-ul" for="sbc"> Subtype of Breast Cancer</label>
 
                                 <input id="sur" name="sur" type="checkbox" value="sur"/>
-                                <label class="inline" for="sur"> Survival</label>
+                                <label class="container-ul" for="sur"> Survival</label>
 
                                 <input id="other" name="other" type="checkbox" value="other"/>
-                                <label class="inline" for="other"> Other</label>
+                                <label class="container-ul" for="other"> Other</label>
+
+                                <label for="otherinput"></label>
+                                <input id="otherinput" name="otherinput" type="text" style="display:none" placeholder="Other primary endpoint" />
+                                
                                 </div>
                             </div>
 
@@ -229,12 +233,12 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                                 <label for="genotyping"><b>Genotyping</b></label>
-                                <div class="input-group">
+                                <div class="inline-field">
                                 <input id="genotyped" name="genotyped" type="checkbox" value="genotyped"/>
-                                <label class="inline" for="genotyped"> Individual-level genotyped data</label>
+                                <label class="container-ul" for="genotyped"> Individual-level genotyped data</label>
 
                                 <input id="imputed" name="imputed" type="checkbox" value="imputed"/>
-                                <label class="inline" for="imputed"> Individual-level imputed data</label>
+                                <label class="container-ul" for="imputed"> Individual-level imputed data</label>
 
                                 <p> <br>If specific variants are being requested attach separate file(s) (.csv) with a list of either: (i) All SNPs (e.g. with their iCOGs/Onco SNP_name, see BCAC website) or (ii) ALL gene region(s) (with chromosome number and start and end positions [build 37]).</p>
                                 <input id="fileVar" name="fileVar" type="file">
@@ -336,7 +340,7 @@ export const formtemplate = () => {
                                       <li>
                                         <div class="inline-field">
                                           <input id="c13" name="c13" type="checkbox" value="c13"/>
-                                          <label class="container-ul" for="c11"> Detection</label>
+                                          <label class="container-ul" for="c13"> Detection</label>
                                         </div>
                                       </li>
                                   </ul>
@@ -548,6 +552,16 @@ export const formFunctions = () => {
       for (const element of inputList) {
         element.checked = false;
       }
+    }
+  });
+
+  document.getElementById('other').addEventListener('click', (e) => {
+    var inputBox = document.getElementById("otherinput");
+
+    if (e.target.checked) {
+      inputBox.style.display = "block";
+    } else {
+      inputBox.style.display = "none";
     }
   });
 
