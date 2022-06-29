@@ -257,7 +257,7 @@ export const formtemplate = () => {
                                 
                                 <label> 
                                   <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
-                                  Check All 
+                                  Check all 
                                 </label>
                             </div>
 
@@ -353,7 +353,7 @@ export const formtemplate = () => {
                                
                                 <label>
                                   <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/> 
-                                  Check All 
+                                  Check all 
                                 </label>
                             </div>
 
@@ -393,7 +393,7 @@ export const formtemplate = () => {
                             <label for="surtrevar"><b>Survival and Treatment Variables</b></label>
                             <label> 
                             <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
-                            Check All 
+                            Check all 
                             </label>
                           </div>
 
@@ -452,6 +452,13 @@ export const formtemplate = () => {
                                   </ul>
                                 </div>
                               </div>
+
+                            <div class="input-group">
+                              <label for="mammvar"><b>Mammographic Density Variable</b></label>
+                              <label> 
+                              <input id="mammvarv" name="mammvarv" type="checkbox" value="mammvarv"/> Select
+                              </label>
+                            </div>
 
                             <br>
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
