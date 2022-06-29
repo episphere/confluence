@@ -1,6 +1,6 @@
 export const variables = {
     BCAC: {
-        Carrier_status: {
+        Carrier_Status: {
             'label': 'Carrier status'
         },
         studyDesign: {
@@ -24,6 +24,9 @@ export const variables = {
             3: 'case unknown invasiveness',
             9: 'excluded sample',
             'label': 'Case-control status'
+        },
+        Status_Carrier: {
+            'label': 'Carrier status'
         },
         matchId: {
             777: 'Not Applicable',
@@ -110,7 +113,7 @@ export const variables = {
             5: 'South-East Asian',
             6: 'Other',
             888: "Don't Know",
-            'label': 'Self-reported Race/ethnicity'
+            'label': 'Self-reported race/ethnicity'
         },
         ethnicitySubClass: {
             1: 'Northern European',

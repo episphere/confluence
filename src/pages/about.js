@@ -103,7 +103,7 @@ const countPublicStatistics = (d, caseControl) => {
         summary += `<div class="row font-size-16" style="margin:2px 2px;">
             ${key !== 'CIMBA' ? `
                 <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
-                    <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name.length > 8 ? `${data[key].name.substr(0,8)}...`:data[key].name}</label>
+                    <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name === `NCI-DCEG` ? `C-NCI`:data[key].name.length > 8 ? `${data[key].name.substr(0,8)}...`:data[key].name}</label>
             `:``}
             </div>`
     }         
