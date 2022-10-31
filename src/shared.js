@@ -692,8 +692,16 @@ export const csvJSON = (csv) => {
     for(let i=1; i < lines.length; i++){
         const obj = {};
         const currentline = lines[i].split(/[,\t]/g);
+        //currentline.replace("Asian", "Asian Subcontinent");
+        // for(let j=0; j<currentline.length; j++){
+        //     let value = currentline[j];
+        //     if(value === 'Asian') value = 'Asian Subcontinent';
+        //     obj[value] = currentline[j];
+        //     console.log(obj);
+        // }
         for(let j = 0; j<headers.length; j++){
             let value = headers[j];
+            //console.log(value);
             if(value === 'age10.19') value = '10-19';
             if(value === 'age20.29') value = '20-29';
             if(value === 'age30.39') value = '30-39';
@@ -704,15 +712,27 @@ export const csvJSON = (csv) => {
             if(value === 'age80.89') value = '80-89';
             if(value === 'age90.99') value = '90-99';
             if(value === 'age100.109') value = '100-109';
+            //if(value === 'Asian') value = 'Asian Subcontinent';
             obj[value] = currentline[j];
+            //console.log(obj);
         }
         if(obj.study !== undefined) {
+            //console.log(obj);
             result.push(obj);
         }
     }
     for(let obj of result){
         obj.total = parseInt(obj['statusTotal']);
     }
+    for(var k=0; k<result.length; k++){
+        if(result[k].ethnicityClass === 'Asian') {
+            result[k].ethnicityClass = 'Asian Subcontinent';
+        }
+        if(result[k].ethnicityClass === 'South East Asian') {
+            result[k].ethnicityClass = 'South-East Asian';
+        }
+    }
+
     return {jsonData:result, headers};
 }
 
