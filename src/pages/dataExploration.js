@@ -52,7 +52,7 @@ export const dataSummary = (pageHeader, showPages, showUpdateButton, publicAcces
             </div>
         </div>
     `;
-}
+};
 
 export const dataSummaryStatisticsTemplate = () => {
     let template = '';
@@ -83,7 +83,7 @@ export const dataSummaryStatisticsTemplate = () => {
     `;
     document.getElementById('dataSummaryStatistics').innerHTML = template;
     addEventFilterBarToggle();
-}
+};
 
 export const dataSummaryMissingTemplate = async () => {
     const response = await getFile(missingnessStatsFileId);

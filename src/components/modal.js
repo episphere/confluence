@@ -1,4 +1,4 @@
-import { getFolderItems, filterConsortiums, getCollaboration, checkDataSubmissionPermissionLevel } from "../shared.js"
+import { getFolderItems, filterConsortiums, getCollaboration, checkDataSubmissionPermissionLevel, applicationURLs } from "../shared.js"
 
 export const uploadInStudy = async (id) => {
     return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
@@ -37,7 +37,7 @@ export const uploadInStudy = async (id) => {
                         <div id="uploadErrorReport"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" title="Submit" class="btn btn-light" id="submitBtn">run QAQC</button>
+                        <button type="submit" title="Submit" class="btn btn-light" id="submitBtn">${location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev) ? 'run QAQC' : 'Submit'}</button>
                         <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
                     </div>
                 </form>
