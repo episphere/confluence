@@ -66,14 +66,14 @@ const allFilters = (jsonData, headers, cimba) => {
                                 <i class="fas fa-caret-down"></i>
                             </button>
                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium}</label>
+                            <label for="label${consortium}" class="consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
                             <div class="ml-auto">
                                 <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
                                     ${numberWithCommas(obj[consortium].consortiumTotal)}
                                 </div>
                             </div>
                         </li>
-                        <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
+                    <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
@@ -166,12 +166,12 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-    renderStatusBarChart(finalData, onlyCIMBA ? 'Status_Carrier': 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', onlyCIMBA ? ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'] : ['case', 'control'], 'chartRow1');
+    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
     renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
-    if(onlyCIMBA) renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case', 'control'], 'chartRow2');
-    else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2')
+    if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
+        else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
 }
 
 export const updateCounts = (data) => {

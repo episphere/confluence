@@ -43,12 +43,12 @@ export const formtemplate = () => {
                                 <label for="amendment"> <b>Is this an amendment?</b> </label>
                                     
                                     <input id="amendmentyes" name="amendment" type="radio" value="Yes" required/>
-                                        <label class="inline" for="amendmentyes">Yes</label>
+                                        <label class="ul-container" for="amendmentyes"> Yes </label>
                                     <input id="amendmentno" name="amendment" type="radio" value="No" required/>
-                                        <label class="inline" for="amendmentno">No</label>
+                                        <label class="ul-container" for="amendmentno"> No </label>
 
-                                <label for="ifamendmentyes"> If yes, provide Concept Number of original form </label>
-                                    <input type="text" id="conNum" name="conNum"/>
+                                <label for="ifamendmentyes"> <i> If yes, provide Concept Number of original form </i></label>
+                                    <input type="text" id="conNum" name="conNum" />
                             </div>
 
                             <div class="input-group">
@@ -68,27 +68,62 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                                 <label for="consortia"><b>Member of Consortia?</b></label>
-                                
-                                <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
-                                <label class="inline" for="mem-aabcg"> AABCG</label>
+                            </div>
+                            
+                            <div class="row">
+                                  <div class="col-12">
+                                    <ul class="form">
+                                        <li class="form">
+                                          <div class="inline-field">
+                                          <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
+                                          <label class="container-ul" for="mem-aabcg"> AABCG</label>
+                                          </div>
+                                        </li>
 
-                                <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
-                                <label class="inline" for="mem-bcac"> BCAC</label>
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
+                                            <label class="container-ul" for="mem-bcac"> BCAC</label>
+                                          </div>
+                                        </li>
 
-                                <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
-                                <label class="inline" for="mem-cimba"> CIMBA</label>
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
+                                            <label class="container-ul" for="mem-cimba"> CIMBA</label>
+                                          </div>
+                                        </li>                                        
 
-                                <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
-                                <label class="inline" for="mem-lageno"> LAGENO</label>
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="mem-nci-dceg" name="mem-nci-dceg" type="checkbox" value="mem-nci-dceg"/>
+                                            <label class="container-ul" for="mem-nci-dceg"> C-NCI</label>
+                                          </div>
+                                        </li>
 
-                                <input id="mem-merge" name="mem-merge" type="checkbox" value="mem-merge"/>
-                                <label class="inline" for="mem-merge"> MERGE</label>
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
+                                            <label class="container-ul" for="mem-lageno"> LAGENO</label>
+                                          </div>
+                                        </li>
+                                        
+                                        <li class="form">
+                                          <div class="inline-field">
+                                            <input id="mem-merge" name="mem-merge" type="checkbox" value="mem-merge"> 
+                                            <label class="container-ul" for="mem-merge"> MERGE</label>
+                                          </div>
+                                        </li>
 
-                                <input id="mem-nci-dceg" name="mem-nci-dceg" type="checkbox" value="mem-nci-dceg"/>
-                                <label class="inline" for="mem-nci-dceg"> NCI-DCEG</label>
-
-                                <input id="mem-none" name="mem-none" type="checkbox" value="mem-none"/>
-                                <label class="inline" for="mem-none"> None</label>
+                                        <li class="form">
+                                          <div class="inline-field">
+                                          <input id="mem-none" name="mem-none" type="checkbox" value="mem-none"/>
+                                          <label class="container-ul" for="mem-none"> None</label>
+                                          </div>
+                                        </li>
+                                        
+                                      </ul>
+                                    </div>
                             </div>
                             
                             <div class="input-group">
@@ -107,11 +142,10 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="confirmation"><b>Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
-                              <div class="input-group">
-                                <input id="confirm-agree" name="confirm-agree" type="checkbox" value="Yes" required/>
-                                <label class="inline" for="confirm-agree"> Yes</label>
-                              </div>
+                            
+                                
+                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
+                              
                             </div>
 
                             <div class="input-group">
@@ -175,18 +209,22 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="consortia"><b>Primary Endpoint</b> <i> (please check box)</i> </label>
 
-                                <div class="input-group">
+                                <div class="inline-field">
                                 <input id="consortia-bcr" name="consortia-bcr" type="checkbox" value="consortia-bcr"/>
-                                <label class="inline" for="consortia-bcr"> Breast Cancer Risk</label>
+                                <label class="container-ul" for="consortia-bcr"> Breast Cancer Risk</label>
 
                                 <input id="sbc" name="sbc" type="checkbox" value="sbc"/>
-                                <label class="inline" for="sbc"> Subtype of Breast Cancer</label>
+                                <label class="container-ul" for="sbc"> Subtype of Breast Cancer</label>
 
                                 <input id="sur" name="sur" type="checkbox" value="sur"/>
-                                <label class="inline" for="sur"> Survival</label>
+                                <label class="container-ul" for="sur"> Survival</label>
 
                                 <input id="other" name="other" type="checkbox" value="other"/>
-                                <label class="inline" for="other"> Other</label>
+                                <label class="container-ul" for="other"> Other</label>
+
+                                <label for="otherinput"></label>
+                                <input id="otherinput" name="otherinput" type="text" style="display:none" placeholder="Other primary endpoint" />
+                                
                                 </div>
                             </div>
 
@@ -195,12 +233,12 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                                 <label for="genotyping"><b>Genotyping</b></label>
-                                <div class="input-group">
+                                <div class="inline-field">
                                 <input id="genotyped" name="genotyped" type="checkbox" value="genotyped"/>
-                                <label class="inline" for="genotyped"> Individual-level genotyped data</label>
+                                <label class="container-ul" for="genotyped"> Individual-level genotyped data</label>
 
                                 <input id="imputed" name="imputed" type="checkbox" value="imputed"/>
-                                <label class="inline" for="imputed"> Individual-level imputed data</label>
+                                <label class="container-ul" for="imputed"> Individual-level imputed data</label>
 
                                 <p> <br>If specific variants are being requested attach separate file(s) (.csv) with a list of either: (i) All SNPs (e.g. with their iCOGs/Onco SNP_name, see BCAC website) or (ii) ALL gene region(s) (with chromosome number and start and end positions [build 37]).</p>
                                 <input id="fileVar" name="fileVar" type="file">
@@ -216,8 +254,11 @@ export const formtemplate = () => {
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor Variables</b></label>
-                                <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
-                                <label class="container-ul" for="riskfactvarv"> (All risk variables) </label>
+                                
+                                <label> 
+                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
+                                  Check all 
+                                </label>
                             </div>
 
                               <div class="row">
@@ -299,7 +340,7 @@ export const formtemplate = () => {
                                       <li>
                                         <div class="inline-field">
                                           <input id="c13" name="c13" type="checkbox" value="c13"/>
-                                          <label class="container-ul" for="c11"> Detection</label>
+                                          <label class="container-ul" for="c13"> Detection</label>
                                         </div>
                                       </li>
                                   </ul>
@@ -309,8 +350,11 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                                 <label for="pathvar"><b>Pathology Variables</b></label>
-                                <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/>
-                                <label class="container-ul" for="pathvarv"> (All risk variables) </label>
+                               
+                                <label>
+                                  <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/> 
+                                  Check all 
+                                </label>
                             </div>
 
                                 <div class="row">
@@ -347,8 +391,10 @@ export const formtemplate = () => {
 
                           <div class="input-group">
                             <label for="surtrevar"><b>Survival and Treatment Variables</b></label>
+                            <label> 
                             <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
-                            <label class="container-ul" for="surtrevarv"> (All risk variables) </label>
+                            Check all 
+                            </label>
                           </div>
 
                               <div class="row">
@@ -408,9 +454,10 @@ export const formtemplate = () => {
                               </div>
 
                             <div class="input-group">
-                              <label for="mamden"><b>Mammographic Density Variables</b></label>
-                                <input id="mamdenv" name="mamdenv" type="checkbox" value="mamdenv"/>
-                                <label class="container-ul" for="mamdenv"> (All risk variables) </label>
+                              <label for="mammvar"><b>Mammographic Density Variable</b></label>
+                              <label> 
+                              <input id="mammvarv" name="mammvarv" type="checkbox" value="mammvarv"/> Select
+                              </label>
                             </div>
 
                             <br>
@@ -422,7 +469,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="budget"><b>Budgetary considerations, if applicaple</b></label>
+                              <label for="budget"><b>Budgetary considerations, if applicable</b></label>
                               <textarea id="budget" name="budget" rows="2" cols="65"></textarea>
                             </div>
 
@@ -514,5 +561,4 @@ export const formFunctions = () => {
       }
     }
   });
-
 }

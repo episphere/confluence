@@ -122,7 +122,7 @@ const getDescription = async () => {
                         filterTemplate += `
                             <li class="filter-list-item">
                                 <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="select-consortium" style="margin-left: 1px !important;">
-                                <label for="label${consortium}" class="country-name" title="${consortium}">${shortenText(consortium, 15)}</label>
+                                <label for="label${consortium}" class="country-name" title="${consortium}">${consortium === 'NCI' ? 'C-NCI':shortenText(consortium, 15)}</label>
                             </li>
                         `
                     })
@@ -207,7 +207,7 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
             <div class="card mt-1 mb-1 align-left">
                 <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
                     <div class="row">
-                        <div class="col-md-2">${desc['Consortium'] ? desc['Consortium'] : ''}</div>
+                        <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
                         <div class="col-md-3">${desc['Study'] ? desc['Study'] : ''}</div>
                         <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
                         <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
@@ -332,7 +332,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
 
     document.getElementById('listFilters').innerHTML = `
         ${consortiumSelected.length > 0 ? `
-            <span class="font-bold">Consortium: </span>${consortiumSelected[0]} ${consortiumSelected.length > 1 ? `and <span class="other-variable-count">${consortiumSelected.length-1} other</span>`: ``}
+            <span class="font-bold">Consortium: </span>${consortiumSelected[0] === 'NCI' ? 'C-NCI':consortiumSelected[0]} ${consortiumSelected.length > 1 ? `and <span class="other-variable-count">${consortiumSelected.length-1} other</span>`: ``}
         `: `
             <span class="font-bold">Consortium:</span> All
         `}

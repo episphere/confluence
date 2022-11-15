@@ -1006,6 +1006,10 @@ export const addEventVariableDefinitions = () => {
                 variableName = 'Study design'; 
                 definition = "Study type classified as ‘population based’ or ‘non-population based’";
             }
+            // if(variable === 'Status_Carrier') {
+            //     variableName = 'Carrier Status'; 
+            //     definition = "Study type classified as ‘population based’ or ‘non-population based’";
+            // }
             if(variable === 'status') {
                 variableName = 'Case-control status'; 
                 definition = "Number of subjects with a reported diagnosis of invasive breast cancer or in situ breast cancer and number of subjects without a breast cancer diagnosis";
