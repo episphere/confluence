@@ -561,15 +561,4 @@ export const formFunctions = () => {
       }
     }
   });
-
-  document.getElementById('other').addEventListener('click', (e) => {
-    var inputBox = document.getElementById("otherinput");
-
-    if (e.target.checked) {
-      inputBox.style.display = "block";
-    } else {
-      inputBox.style.display = "none";
-    }
-  });
-
 }

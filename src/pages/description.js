@@ -370,6 +370,9 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
         if(dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Study'].toLowerCase().includes(currentValue)) found = true;
         if(dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
+        dt['pis'].forEach(element => {
+            if(element['PI'] && element['PI'].toLowerCase().includes(currentValue)) found = true;
+        });
         if(found) return dt;
     })
     searchedData = searchedData.map(dt => {
@@ -377,6 +380,9 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
         dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         dt['Study'] = dt['Study'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        dt['pis'].forEach(element => {
+            element['PI'] = element['PI'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        });
         return dt;
     })
 

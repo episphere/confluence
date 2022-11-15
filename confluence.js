@@ -242,6 +242,16 @@ const manageRouter = async () => {
         aboutConfluence('overview');
         renderOverView();
     }
+    else if(hash === '#about/description'){
+        const element = document.getElementById('aboutConfluence');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Study Description';
+        assignNavbarActive(element, 2);
+        aboutConfluence('description', fileInfo ? true : false);
+        renderDescription(fileInfo['content_modified_at'])
+        renderOverView();
+    }
     else if(hash === '#join'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
