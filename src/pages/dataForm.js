@@ -26,7 +26,12 @@ export const formtemplate = () => {
 
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
-                            <p>Please fill out the form below in order to get approval for access to data.</p>
+                            <p>Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
+                            of the consortia participating in Confluence to ensure that proposal are consistent with Confluence goals
+                             and individual cohorts’ consents. A description of the data access request process and individual consortia 
+                             DACC guidelines can be viewed here (TO DO, insert link to Document of Understanding Across Consortia). Access to data for 
+                             approved concepts will only be given to investigators listed below, each of whose Institutions will need to sign DTAs with the data 
+                             coordinating centers that are governing the requested data.</p>
                             <form>
 
                             <div class="input-group">
