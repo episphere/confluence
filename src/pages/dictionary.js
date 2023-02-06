@@ -147,11 +147,11 @@ const addEventFilterDataDictionary = (dictionary, headers) => {
 
 const filterDataBasedOnSelection = (dictionary, headers) => {
     const highlightData = filterDataHandler(dictionary)
-    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
     const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
     paginationHandler(highlightData, pageSize);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
     addEventPageSizeSelection(highlightData);
+    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
 }
 
 const filterDataHandler = (dictionary) => {
