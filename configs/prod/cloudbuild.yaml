@@ -1,3 +1,3 @@
 steps:
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', '-r', '*', 'gs://confluence_data_platform_prod']
+  args: ['cp', '-r', '*', 'gs://nih-nci-dceg-epidataplatform-confluence']
