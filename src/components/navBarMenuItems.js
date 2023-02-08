@@ -73,9 +73,8 @@ export const navBarMenutemplate = () => {
                 Data Access
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm">
-                    Form
-                </a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Form </a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#upload_data_form" title="Data Form Upload" id="uploaddataForm"> Form Upload </a>
             </div>
         </div>
         <div class="grid-elements">

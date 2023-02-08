@@ -1,17 +1,6 @@
-// export function yesnoCheck() {
-//     if (document.getElementById('amendmentyes').checked) {
-//         document.getElementById('ifamendmentyes').style.visibility = 'visible';
-//     }
-//     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
-// };
+
 
 export const formtemplate = () => {
-  // function yesnoCheck() {
-  //     if (document.getElementById('amendmentyes').checked) {
-  //         document.getElementById('ifamendmentyes').style.visibility = 'visible';
-  //     }
-  //     else document.getElementById('ifamendmentyes').style.visibility = 'hidden';
-  // };
   const date = new Date();
   const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
   let template = ` 
@@ -72,63 +61,42 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                                <label for="consortia"><b>Member of Consortia?</b></label>
+                                <label for="mem-con"><b>Member of Consortia?</b></label>
                             </div>
                             
-                            <div class="row">
-                                  <div class="col-12">
-                                    <ul class="form">
-                                        <li class="form">
-                                          <div class="inline-field">
-                                          <input id="mem-aabcg" name="mem-aabcg" type="checkbox" value="mem-aabcg"/>
-                                          <label class="container-ul" for="mem-aabcg"> AABCG</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="mem-bcac" name="mem-bcac" type="checkbox" value="mem-bcac"/>
-                                            <label class="container-ul" for="mem-bcac"> BCAC</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="mem-cimba" name="mem-cimba" type="checkbox" value="mem-cimba"/>
-                                            <label class="container-ul" for="mem-cimba"> CIMBA</label>
-                                          </div>
-                                        </li>                                        
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="mem-nci-dceg" name="mem-nci-dceg" type="checkbox" value="mem-nci-dceg"/>
-                                            <label class="container-ul" for="mem-nci-dceg"> C-NCI</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="mem-lageno" name="mem-lageno" type="checkbox" value="mem-lageno"/>
-                                            <label class="container-ul" for="mem-lageno"> LAGENO</label>
-                                          </div>
-                                        </li>
-                                        
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="mem-merge" name="mem-merge" type="checkbox" value="mem-merge"> 
-                                            <label class="container-ul" for="mem-merge"> MERGE</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                          <input id="mem-none" name="mem-none" type="checkbox" value="mem-none"/>
-                                          <label class="container-ul" for="mem-none"> None</label>
-                                          </div>
-                                        </li>
-                                        
-                                      </ul>
-                                    </div>
+                            <div class="input-group">
+                              <div class="col-12">
+                                <ul class="form" id='mem-conlist'>
+                                  <div class="inline-field">
+                                    <input id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
+                                    <label class="container-ul" for="mem-aabcg"> AABCG</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="mem-bcac" name="mem-con" type="checkbox" value="BCAC"/>
+                                    <label class="container-ul" for="mem-bcac"> BCAC</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="mem-cimba" name="mem-con" type="checkbox" value="CIMBA"/>
+                                    <label class="container-ul" for="mem-cimba"> CIMBA</label>
+                                  </div>                                    
+                                  <div class="inline-field">
+                                    <input id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI"/>
+                                    <label class="container-ul" for="mem-nci-dceg"> C-NCI</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO"/>
+                                    <label class="container-ul" for="mem-lageno"> LAGENO</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="mem-merge" name="mem-con" type="checkbox" value="MERGE"> 
+                                    <label class="container-ul" for="mem-merge"> MERGE</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="mem-none" name="mem-con" type="checkbox" value="None"/>
+                                    <label class="container-ul" for="mem-none"> None</label>
+                                  </div>
+                                </ul>
+                              </div>
                             </div>
                             
                             <div class="input-group">
@@ -147,64 +115,43 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                            
-                                
                                 <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
-                              
                             </div>
 
                             <div class="input-group">
-                                <label for="consortia"><b>Consortia data being requested</b> <i>(please check all boxes that apply)</i></label>
+                                <label for="data-con"><b>Consortia data being requested</b> <i>(please check all boxes that apply)</i></label>
                             </div>
 
-                                <div class="row">
-                                  <div class="col-12">
-                                    <ul class="form">
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-aabcg" name="consortia-aabcg" type="checkbox" value="consortia-aabcg"/>
-                                            <label class="container-ul" for="consortia-aabcg"> AABCG</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-BCAC" name="consortia-BCAC" type="checkbox" value="consortia-BCAC"/>
-                                            <label class="container-ul" for="consortia-BCAC"> BCAC</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-cimba" name="consortia-cimba" type="checkbox" value="consortia-cimba"/>
-                                            <label class="container-ul" for="consortia-cimba"> CIMBA</label>
-                                          </div>
-                                        </li>                                        
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-c-nci" name="consortia-c-nci" type="checkbox" value="consortia-c-nci"/>
-                                            <label class="container-ul" for="consortia-c-nci"> C-NCI</label>
-                                          </div>
-                                        </li>
-
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-lageno" name="consortia-lageno" type="checkbox" value="consortia-lageno"/>
-                                            <label class="container-ul" for="consortia-lageno"> LAGENO</label>
-                                          </div>
-                                        </li>
-                                        
-                                        <li class="form">
-                                          <div class="inline-field">
-                                            <input id="consortia-merge" name="consortia-merge" type="checkbox" value="consortia-merge"/>
-                                            <label class="container-ul" for="consortia-merge"> MERGE</label>
-                                          </div>
-                                        </li>
-                                        
-                                      </ul>
-                                    </div>
+                            <div class="input-group">
+                              <div class="col-12">
+                                <ul class="form">
+                                  <div class="inline-field">
+                                    <input id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG"/>
+                                    <label class="container-ul" for="consortia-aabcg"> AABCG</label>
                                   </div>
+                                  <div class="inline-field">
+                                    <input id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC"/>
+                                    <label class="container-ul" for="consortia-BCAC"> BCAC</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA"/>
+                                    <label class="container-ul" for="consortia-cimba"> CIMBA</label>
+                                  </div>                                  
+                                  <div class="inline-field">
+                                    <input id="consortia-c-nci" name="data-con" type="checkbox" value="C-NCI"/>
+                                    <label class="container-ul" for="consortia-c-nci"> C-NCI</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="consortia-lageno" name="data-con" type="checkbox" value="LAGENO"/>
+                                    <label class="container-ul" for="consortia-lageno"> LAGENO</label>
+                                  </div>
+                                  <div class="inline-field">
+                                    <input id="consortia-merge" name="data-con" type="checkbox" value="MERGE"/>
+                                    <label class="container-ul" for="consortia-merge"> MERGE</label>
+                                  </div>
+                                </ul>
+                              </div>
+                            </div>
 
                             <div class="input-group">
                               <label for="condesc"><b>Concept Description</b> <i> Please provide a concise description of Background/Aims</i></label>
@@ -212,42 +159,45 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                                <label for="consortia"><b>Primary Endpoint</b> <i> (please check box)</i> </label>
+                              <label for="prim-end"><b>Primary Endpoint</b> <i> (please check box)</i> </label>
+                            </div>
 
-                                <div class="inline-field">
-                                <input id="consortia-bcr" name="consortia-bcr" type="checkbox" value="consortia-bcr"/>
+                            <div class="input-group">
+                              <div class="inline-field">
+                                <input id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk"/>
                                 <label class="container-ul" for="consortia-bcr"> Breast Cancer Risk</label>
 
-                                <input id="sbc" name="sbc" type="checkbox" value="sbc"/>
+                                <input id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
                                 <label class="container-ul" for="sbc"> Subtype of Breast Cancer</label>
 
-                                <input id="sur" name="sur" type="checkbox" value="sur"/>
+                                <input id="sur" name="prim-end" type="checkbox" value="Survival"/>
                                 <label class="container-ul" for="sur"> Survival</label>
 
-                                <input id="other" name="other" type="checkbox" value="other"/>
+                                <input id="other" name="prim-end" type="checkbox" value="Other"/>
                                 <label class="container-ul" for="other"> Other</label>
 
                                 <label for="otherinput"></label>
-                                <input id="otherinput" name="otherinput" type="text" style="display:none" placeholder="Other primary endpoint" />
-                                
-                                </div>
+                                <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
+                              </div>
                             </div>
 
                             <br>
                             <p><u>1. GENETIC DATA REQUESTED</u></p>
 
                             <div class="input-group">
-                                <label for="genotyping"><b>Genotyping</b></label>
-                                <div class="inline-field">
-                                <input id="genotyped" name="genotyped" type="checkbox" value="genotyped"/>
+                              <label for="genotyping"><b>Genotyping</b></label>
+                            </div>
+                            <div class="input-group">
+                              <div class="inline-field">
+                                <input id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data"/>
                                 <label class="container-ul" for="genotyped"> Individual-level genotyped data</label>
 
-                                <input id="imputed" name="imputed" type="checkbox" value="imputed"/>
+                                <input id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
                                 <label class="container-ul" for="imputed"> Individual-level imputed data</label>
 
                                 <p> <br>If specific variants are being requested attach separate file(s) (.csv) with a list of either: (i) All SNPs (e.g. with their iCOGs/Onco SNP_name, see BCAC website) or (ii) ALL gene region(s) (with chromosome number and start and end positions [build 37]).</p>
                                 <input id="fileVar" name="fileVar" type="file">
-                                </div>
+                              </div>
                             </div>
 
                             <br>
@@ -266,130 +216,92 @@ export const formtemplate = () => {
                                 </label>
                             </div>
 
-                              <div class="row">
+                              <div class="input-group">
                                 <div class="col-12">
                                   <ul class="form" id='riskfactlist'>
-
-                                      <li class="form">
-                                        <div class="inline-field">
-                                          <input id="c1" name="c1" type="checkbox" value="c1"/>
-                                          <label class="container-ul" for="c1"> Education </label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c2" name="c2" type="checkbox" value="c2"/>
-                                          <label class="container-ul" for="c2"> Menstrual Cycle</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c3" name="c3" type="checkbox" value="c3"/>
-                                          <label class="container-ul" for="c3"> Children</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c4" name="c4" type="checkbox" value="c4"/>
-                                          <label class="container-ul" for="c4"> Breastfeeding</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c5" name="c5" type="checkbox" value="c5"/>
-                                          <label class="container-ul" for="c5"> BMI</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c6" name="c6" type="checkbox" value="c6"/>
-                                          <label class="container-ul" for="c6"> OC</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c7" name="c7" type="checkbox" value="c7"/>
-                                          <label class="container-ul" for="c7"> HRT</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c8" name="c8" type="checkbox" value="c8"/>
-                                          <label class="container-ul" for="c8"> Alcohol</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c9" name="c9" type="checkbox" value="c9"/>
-                                          <label class="container-ul" for="c9"> Smoking</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c10" name="c10" type="checkbox" value="c10"/>
-                                          <label class="container-ul" for="c10"> Family history</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c11" name="c11" type="checkbox" value="c11"/>
-                                          <label class="container-ul" for="c11"> Biopsies</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c12" name="c12" type="checkbox" value="c12"/>
-                                          <label class="container-ul" for="c12"> Benign breast disease</label>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="inline-field">
-                                          <input id="c13" name="c13" type="checkbox" value="c13"/>
-                                          <label class="container-ul" for="c13"> Detection</label>
-                                        </div>
-                                      </li>
+                                    <div class="inline-field">
+                                      <input id="c1" name="riskfactvar" type="checkbox" value="Education"/>
+                                      <label class="container-ul" for="c1"> Education </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c2" name="riskfactvar" type="checkbox" value="Menstrual Cycle"/>
+                                      <label class="container-ul" for="c2"> Menstrual Cycle</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c3" name="riskfactvar" type="checkbox" value="Children"/>
+                                      <label class="container-ul" for="c3"> Children</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c4" name="riskfactvar" type="checkbox" value="Breastfeeding"/>
+                                      <label class="container-ul" for="c4"> Breastfeeding</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c5" name="riskfactvar" type="checkbox" value="BMI"/>
+                                      <label class="container-ul" for="c5"> BMI</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c6" name="riskfactvar" type="checkbox" value="OC"/>
+                                      <label class="container-ul" for="c6"> OC</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c7" name="riskfactvar" type="checkbox" value="HRT"/>
+                                      <label class="container-ul" for="c7"> HRT</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c8" name="riskfactvar" type="checkbox" value="Alcohol"/>
+                                      <label class="container-ul" for="c8"> Alcohol</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c9" name="riskfactvar" type="checkbox" value="Smoking"/>
+                                      <label class="container-ul" for="c9"> Smoking</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c10" name="criskfactvar10" type="checkbox" value="Family history"/>
+                                      <label class="container-ul" for="c10"> Family history</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c11" name="riskfactvar" type="checkbox" value="Biopsies"/>
+                                      <label class="container-ul" for="c11"> Biopsies</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c12" name="riskfactvar" type="checkbox" value="Benign breast disease"/>
+                                      <label class="container-ul" for="c12"> Benign breast disease</label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="c13" name="riskfactvar" type="checkbox" value="Detection"/>
+                                      <label class="container-ul" for="c13"> Detection</label>
+                                    </div>
                                   </ul>
                                 </div>
                               </div>
-                            
 
                             <div class="input-group">
                                 <label for="pathvar"><b>Pathology Variables</b></label>
-                               
                                 <label>
                                   <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/> 
                                   Check all 
                                 </label>
                             </div>
 
-                                <div class="row">
+                                <div class="input-group">
                                   <div class="col-12">
                                     <ul class="form" id='pathlist'>
-
-                                      <li class="form">
                                         <div class="inline-field">
-                                          <input id="p1" name="p1" type="checkbox" value="p1"/>
-                                          <label class="container-ul" for="p1"> Tumor Characteristics </label>
+                                          <input id="p1" name="pathvar" type="checkbox" value="Tumor Characteristics"/>
+                                          <label class="container-ul" for="p1"> Tumor Characteristics</label>
                                         </div>
-                                      </li>
-                                      <li>
                                         <div class="inline-field">
-                                          <input id="p2" name="p2" type="checkbox" value="p2"/>
+                                          <input id="p2" name="pathvar" type="checkbox" value="ER"/>
                                           <label class="container-ul" for="p2"> ER</label>
                                         </div>
-                                      </li>
-                                      <li>
                                         <div class="inline-field">
-                                          <input id="p3" name="p3" type="checkbox" value="p3"/>
+                                          <input id="p3" name="pathvar" type="checkbox" value="PR"/>
                                           <label class="container-ul" for="p3"> PR</label>
                                         </div>
-                                      </li>
-                                      <li>
                                         <div class="inline-field">
-                                          <input id="p4" name="p4" type="checkbox" value="p4"/>
+                                          <input id="p4" name="pathvar" type="checkbox" value="HER2"/>
                                           <label class="container-ul" for="p4"> HER2</label>
                                         </div>
-                                      </li>
                                     </ul>
                                   </div>
                                 </div>
@@ -397,63 +309,46 @@ export const formtemplate = () => {
                           <div class="input-group">
                             <label for="surtrevar"><b>Survival and Treatment Variables</b></label>
                             <label> 
-                            <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
-                            Check all 
+                              <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
+                              Check all 
                             </label>
                           </div>
 
-                              <div class="row">
+                              <div class="input-group">
                                 <div class="col-12">
                                   <ul class="form" id='surtrelist'>
-
-                                    <li class="form">
-                                      <div class="inline-field">
-                                        <input id="s1" name="s1" type="checkbox" value="s1"/>
-                                        <label class="container-ul" for="s1"> Survival </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s2" name="s2" type="checkbox" value="s2"/>
-                                        <label class="container-ul" for="s2"> Relapse </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s3" name="s3" type="checkbox" value="s3"/>
-                                        <label class="container-ul" for="s3"> Adjuvant Chemotherapy </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s4" name="s4" type="checkbox" value="s4"/>
-                                        <label class="container-ul" for="s4"> Adjuvant anti-hormone </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s5" name="s5" type="checkbox" value="s5"/>
-                                        <label class="container-ul" for="s5"> Adjuvant trastuzumab </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s6" name="s6" type="checkbox" value="s6"/>
-                                        <label class="container-ul" for="s6"> Surgery </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s7" name="s7" type="checkbox" value="s7"/>
-                                        <label class="container-ul" for="s7"> Radiation therapy </label>
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="inline-field">
-                                        <input id="s8" name="s8" type="checkbox" value="s8"/>
-                                        <label class="container-ul" for="s8"> Neoadjuvant chemotherapy </label>
-                                      </div>
-                                    </li>
+                                    <div class="inline-field">
+                                      <input id="s1" name="surtrevar" type="checkbox" value="Survival"/>
+                                      <label class="container-ul" for="s1"> Survival </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s2" name="surtrevar" type="checkbox" value="Relapse"/>
+                                      <label class="container-ul" for="s2"> Relapse </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s3" name="surtrevar" type="checkbox" value="Adjuvant chemotherapy"/>
+                                      <label class="container-ul" for="s3"> Adjuvant Chemotherapy </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s4" name="surtrevar" type="checkbox" value="Adjuvant anti-hormone"/>
+                                      <label class="container-ul" for="s4"> Adjuvant anti-hormone </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s5" name="surtrevar" type="checkbox" value="Adjuvant trastuzumab"/>
+                                      <label class="container-ul" for="s5"> Adjuvant trastuzumab </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s6" name="surtrevar" type="checkbox" value="Surgery"/>
+                                      <label class="container-ul" for="s6"> Surgery </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s7" name="surtrevar" type="checkbox" value="Radiation therapy"/>
+                                      <label class="container-ul" for="s7"> Radiation therapy </label>
+                                    </div>
+                                    <div class="inline-field">
+                                      <input id="s8" name="surtrevar" type="checkbox" value="Neoadjuvant chemotherapy"/>
+                                      <label class="container-ul" for="s8"> Neoadjuvant chemotherapy</label>
+                                    </div>
                                   </ul>
                                 </div>
                               </div>
@@ -461,7 +356,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                               <label for="mammvar"><b>Mammographic Density Variable</b></label>
                               <label> 
-                              <input id="mammvarv" name="mammvarv" type="checkbox" value="mammvarv"/> Select
+                              <input id="mammvarv" name="mammvarv" type="checkbox" value="Yes"/> Select
                               </label>
                             </div>
 
@@ -488,8 +383,11 @@ export const formtemplate = () => {
                               <textarea id="anyoth" name="anyoth" rows="4" cols="65" required></textarea>
                             </div>
                             
-                            <button type="submit" id="submitFormButton" class="buttonsubmit" onclick="if validate(){this.classList.toggle('buttonsubmit--loading')}"> 
+                            <!---<button type="submit" id="submitFormButton" class="buttonsubmit"> 
                               <span class="buttonsubmit__text"> Send Form </span>
+                            </button>--->
+                            <button type="button" id="downloadWord" class="buttonsubmit"> 
+                              <span class="buttonsubmit__text"> Download Word </span>
                             </button>
                           </form>
                         </section>
@@ -512,13 +410,14 @@ export const formtemplate = () => {
                           </div>
                         </div>
                       </div>
-                        <div class="results">
+                        <!---<div class="results">
                         <h2>Form Data</h2>
                         <pre></pre>
-                        </div>
+                        </div>--->
                       </div>
                     </div>
-                  </div>`;
+                  </div>
+                  `;
 
   return template;
 }
@@ -566,4 +465,967 @@ export const formFunctions = () => {
       }
     }
   });
+}
+
+export const dataForm = async () => {
+  //let files = await getFolderItems(uploadFormFolder);
+  const d = new Date();
+  let filename =
+    JSON.parse(localStorage.parms).login.split("@")[0] +
+    "_" +
+    d.getDate() +
+    "_" +
+    (d.getMonth() + 1) +
+    "_" +
+    d.getFullYear() +
+    ".docx";
+
+  // Find unique name
+  // let entries = files.entries;
+  // let i = 1;
+  // while (entries.includes(filename)) {
+  //   let indexOfExtension = filename.indexOf(".");
+  //   filename =
+  //     filename.substring(0, indexOfExtension) +
+  //     `(${i})` +
+  //     filename.substring(indexOfExtension);
+  //   i++;
+  // }
+  // const filesinfoldernames = [];
+  // const filesinfolderids = [];
+  // for (let i = 0; i < files.entries.length; i++) {
+  //   filesinfoldernames.push(files.entries[i].name);
+  //   filesinfolderids.push(files.entries[i].id);
+  // }
+
+  async function handleFormDownload(eventtest) {
+    const btn = document.activeElement;
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = true;
+    eventtest.preventDefault();
+    const form = document.querySelector(".contact-form form");
+    const data = new FormData(form);
+    const jsondata = Object.fromEntries(data.entries());
+    jsondata.memcon = data.getAll("mem-con");
+    jsondata.datacon = data.getAll("data-con");
+    jsondata.primend = data.getAll("prim-end");
+    jsondata.genotyping = data.getAll("genotyping");
+    jsondata.riskfactvar = data.getAll("riskfactvar");
+    jsondata.pathvar = data.getAll("pathvar");
+    jsondata.surtrevar = data.getAll("surtrevar");
+
+    let parentEl = eventtest.target.parentElement;
+    let blob;
+    if (parentEl.id === "downloadWord") {
+      const doc = new docx.Document({
+        styles: {
+          default: {
+            heading1: {
+              run: {
+                size: 22,
+                bold: true,
+                color: "#000000",
+                font: "Verdana",
+              },
+            },
+            heading2: {
+              run: {
+                size: 18,
+                bold: true,
+                color: "#000000",
+                font: "Verdana",
+              },
+            },
+          },
+        },
+        sections: [
+          {
+            properties: {},
+            headers: {
+              default: new docx.Header({
+                children: [
+                  new docx.Paragraph({
+                    text: "Confluence Project Analysis Proposal",
+                    heading: docx.HeadingLevel.HEADING_1,
+                    alignment: docx.AlignmentType.CENTER,
+                  }),
+                ],
+              }),
+            },
+            children: [
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Date: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.date,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Project Title: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.projname,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Is this an amendment: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.amendment,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Amendment: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.conNum,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Contact Investigator(s): ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.investigators,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Institution(s): ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.institution,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Contact Email: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.email,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Member of Consortia? ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.memcon, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Confluence Study Acronym(s) for the Contact Investigator: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.acro,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "OTHER Investigators and their institutions: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.otherinvest,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "ALL Investigators (and Institutions) who require access: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.allinvest,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Consortia data being requested: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.datacon, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Concept Description: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.condesc,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Primary Endpoint: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.primend, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Other Primary Endpoint: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.otherinput,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Genotyping: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.genotyping, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Risk Factor Variables: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.riskfactvar, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Pathology Variables: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.pathvar, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Survival and Treatment Variables: ",
+                  }),
+                  new docx.TextRun({
+                    text: JSON.stringify(jsondata.surtrevar, null, 1)
+                      .replace("[", "")
+                      .replace("]", "")
+                      .replace(/"/g, ''),
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Mammographic Density Variable: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.mammvarv,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Description of Analysis Plan: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.analdesc,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Budgetary consideratsion, if applicable: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.budget,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Time Plan: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.time,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Any other considerations you would like the DACC to be aware of: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.anyoth,
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+            ],
+          },
+        ],
+      });
+
+      blob = await docx.Packer.toBlob(doc);
+    }
+
+    if (parentEl.id === "downloadJSON") {
+      blob = new Blob([JSON.stringify(jsondata)], {
+        type: "application/json",
+      });
+    }
+    const downloadLink = await URL.createObjectURL(blob);
+    let filename = jsondata.projname;
+
+    let a = document.createElement("a");
+
+    a.href = downloadLink;
+    a.download = filename;
+
+    a.click();
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = false;
+    location.href = "#upload_data_form";
+  }
+  async function handleFormSubmit(eventtest) {
+    const btn = document.activeElement;
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = true;
+    eventtest.preventDefault();
+    const data = new FormData(eventtest.target);
+
+    const formJSON = Object.fromEntries(data.entries());
+    formJSON.basevar = data.getAll("basevar");
+    formJSON.ibcvar = data.getAll("ibcvar");
+    formJSON.reqcoh = data.getAll("reqcoh");
+    const results = document.querySelector(".results pre");
+    results.innerText = JSON.stringify(formJSON, null, 2);
+    // fs.wrtieFile('test.json', formJSON);
+    await generateWord(formJSON);
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = false;
+  }
+
+  async function generateWord(jsondata) {
+    const doc = new docx.Document({
+      styles: {
+        default: {
+          heading1: {
+            run: {
+              size: 22,
+              bold: true,
+              color: "#000000",
+              font: "Verdana",
+            },
+          },
+          heading2: {
+            run: {
+              size: 18,
+              bold: true,
+              color: "#000000",
+              font: "Verdana",
+            },
+          },
+        },
+      },
+      sections: [
+        {
+          properties: {},
+          headers: {
+            default: new docx.Header({
+              children: [
+                new docx.Paragraph({
+                  text: "Breast Cancer Risk Prediction Project Analysis Proposal",
+                  heading: docx.HeadingLevel.HEADING_1,
+                  alignment: docx.AlignmentType.CENTER,
+                }),
+              ],
+            }),
+          },
+          children: [
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Date: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.date,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Project Title: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.projname,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Is this an amendment: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.amendment,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Amendment: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.conNum,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Contact Investigator(s): ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.investigators,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Institution(s): ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.institution,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Contact Email: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.email,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Are you a member of BCRPP ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.member,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "BCRPP Study Acronym(s) for the Contact Investigator: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.acro,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "All Investigators (and Institutions) who require access: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.investigators,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Background: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.background,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Aims: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.aims,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Analysis Plan: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.analyplan,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Core Variables: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.basevar, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "MMD Variables: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.mmdvarv,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "BRCA Variables: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.ibcvar, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Requested Cohorts: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.reqcoh, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Timeline: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.timeline,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Authorship: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.authorship,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+          ],
+        },
+      ],
+    });
+
+    filename = jsondata.projname.substring(0, 10) + "_" + filename;
+    let files = await getFolderItems(uploadFormFolder);
+    const filesinfoldernames = [];
+    const filesinfolderids = [];
+    for (let i = 0; i < files.entries.length; i++) {
+      filesinfoldernames.push(files.entries[i].name);
+      filesinfolderids.push(files.entries[i].id);
+    }
+
+    await docx.Packer.toBlob(doc).then(async (blob) => {
+      if (filesinfoldernames.includes(filename)) {
+        const [name, extension] = filename.split(".");
+        let i = 1;
+        while (filesinfoldernames.includes(filename)) {
+          if (filename.includes(")")) {
+            const [name, version] = filename.split("(");
+            filename = name + `(${i})` + version.substring(2);
+          } else {
+            filename = name + `(${i}).` + extension;
+          }
+          i++;
+        }
+        let response = await uploadWordFile(blob, filename, uploadFormFolder);
+        await assigntasktochair();
+        let fileid = response.entries[0].id;
+        //Modal code here
+        document.getElementById("modalBody").innerHTML = `
+          <p>File was successfully uploaded.</p>
+          <p>Document ID: ${fileid}</p>`;
+        $("#popUpModal").modal("show");
+      } else {
+        // Adding keywords
+        let response = await uploadWordFile(blob, filename, uploadFormFolder);
+        if (response.status === 201) {
+          await assigntasktochair();
+          let fileid = response.entries[0].id;
+          //Modal code here
+          document.getElementById("modalBody").innerHTML = `
+        <p>File was successfully uploaded.</p>
+        <p>Document ID: ${fileid}</p>`;
+          $("#popUpModal").modal("show");
+        } else {
+        }
+      }
+    });
+  }
+
+  const form = await document.querySelector(".contact-form");
+  form.addEventListener("submit", handleFormSubmit);
+
+  // const downloadJSON = document.getElementById("downloadJSON");
+  // downloadJSON.addEventListener("click", handleFormDownload);
+
+  const downloadWord = document.getElementById("downloadWord");
+  downloadWord.addEventListener("click", handleFormDownload);
+}
+
+export const uploaddataFormTemplate = () => {
+  let template = ` 
+                <div class="general-bg padding-bottom-1rem">
+                  <div class="container body-min-height">
+                    <div class="main-summary-row">
+                        <div class="align-left">
+                            <h1 class="page-header">Analysis Concept Form Upload</h1>
+                        </div>
+                    </div>
+                  <iframe src="https://nih.app.box.com/f/535799b248cb4b68a027d177902cb580" height="1000" width="1000"></iframe>
+                </div>
+              </div>`
+  return template;
 }
