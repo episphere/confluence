@@ -67,6 +67,7 @@ export const confluence = async () => {
         const dataAnalysisElement = document.getElementById('dataAnalysis');
         const dataFormElement = document.getElementById('dataForm');
         const uploaddataFormElement = document.getElementById('uploaddataForm');
+        const chairMenuElement = document.getElementById('chairMenu');
 
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
