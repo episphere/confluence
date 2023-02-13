@@ -1,14 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
-
 import { getFolderItems } from "../shared.js";
-
-
-
-
 export function renderFilePreviewDropdown(files, tab) {
-
     let template = "";
-
     if (!Array.isArray(files)) {
 
       return template;
@@ -40,47 +33,26 @@ export function renderFilePreviewDropdown(files, tab) {
                       <div class='text-muted small'>Hold Ctrl to select multiple concept forms </div>
 
                   </label>
-
                   <br>
-
                   <select id='${tab}selectedDoc' multiple size='3'>
-
               `;
-
       } else {
-
         template += `<div class='card-body p-0'>
-
                   <div class='card-title'>
-
                   <label for='${tab}selectedDoc'>
-
                       <b>Select Concept Form:</b>
-
                   </label>
-
                   <br>
-
                   <select id='${tab}selectedDoc'>`;
-
       }
-
- 
-
       for (const file of files) {
-
         template += `
-
                   <option value='${file.id}'>
 
                   ${file.name}</option>`;
 
       }
-
- 
-
       template += `
-
                   </select>
 
                   </div>
@@ -90,98 +62,46 @@ export function renderFilePreviewDropdown(files, tab) {
               </div>`;
 
     } else {
-
       template += `
-
       <br>
-
                 No files to show.    
-
       </div>
-
-     
-
       `;
-
     }
-
-
-
-
- 
-
     return template;
-
 }
-
-
-
-
 export function switchFiles(tab) {
-
     document
-
       .getElementById(`${tab}selectedDoc`)
-
       .addEventListener("change", (e) => {
-
         const file_id = e.target.value;
-
         showPreview(file_id);
-
       });
-
   }
-
-
-
-
-
 export const generateChairMenuFiles = async () => {
 
     let template = '';
 
     template += "<div class='tab-content' id='selectedTab'>";
 
-
-
-
     const responseChair = await getFolderItems(194173772220);
 
     console.log({responseChair});
 
     let filearrayChair = responseChair.entries;
-
-
-
-
     const filescompleted = [];
-
-
-
-
     for (let obj of filearrayChair) {
 
         filescompleted.push(obj);
 
     }
-
-
-
-
     template += `<div class='tab-pane fade show active'
 
                   id='toBeCompleted' role='tabpanel'
 
                   aria-labeledby='toBeCompletedTab'> `;
 
-
-
-
     template += renderFilePreviewDropdown(filescompleted, "toBeCompleted");
-
-   
-
     if (filescompleted.length !== 0) {
 
         template += `
@@ -243,37 +163,17 @@ export const generateChairMenuFiles = async () => {
             `;
 
       }
-
-
-
-
-     
-
-
-
-
     template += "</div>";
 
     template += "</div>";
 
     document.getElementById("chairFileView").innerHTML = template;
-
-
-
-
     showPreview(filearrayChair[0].id);
-
-   
-
     switchFiles("toBeCompleted");
 
     return template;
 
 }
-
-
-
-
 export const chairMenuTemplate = () => {
 
     let template = `
@@ -286,7 +186,7 @@ export const chairMenuTemplate = () => {
 
                                 <div class="align-left">
 
-                                    <h1 class="page-header">Chair Menu</h1>
+                                    <h1 class="page-header">DACC Chair – Submit concept recommendation</h1>
 
                                 </div>
 
