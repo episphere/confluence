@@ -27,8 +27,6 @@ export function showPreview(file_id, div_id = "boxFilePreview") {
   
   }
   
-  
-  
   export function updatePreview(id) {
   
     const access_token = JSON.parse(localStorage.parms).access_token;

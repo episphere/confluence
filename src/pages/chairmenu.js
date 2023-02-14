@@ -112,8 +112,6 @@ export const generateChairMenuFiles = async () => {
 
             </div>
 
-   
-
             <div id='finalChairDecision' class="card-body approvedeny" style="background-color:#f6f6f6;">
 
               <form>
@@ -159,39 +157,26 @@ export const generateChairMenuFiles = async () => {
               </form>
 
             </div>
-
             `;
-
       }
     template += "</div>";
-
     template += "</div>";
-
     document.getElementById("chairFileView").innerHTML = template;
     showPreview(filearrayChair[0].id);
     switchFiles("toBeCompleted");
-
     return template;
-
 }
 export const chairMenuTemplate = () => {
 
     let template = `
-
                     <div class="general-bg padding-bottom-1rem">
 
                         <div class="container body-min-height">
-
                             <div class="main-summary-row">
-
                                 <div class="align-left">
-
                                     <h1 class="page-header">DACC Chair – Submit concept recommendation</h1>
-
                                 </div>
-
                             </div>
-
                             <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
 
                                 <!-- <ul class='nav nav-tabs mb-3' role='tablist'>
@@ -199,19 +184,12 @@ export const chairMenuTemplate = () => {
                                      <li class='nav-item' role='presentation'>
 
                                          <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> Review Completed </a>
-
                                      </li>
-
                                  </ul> -->
-
                                 <div id="chairFileView" class="align-left"></div>  
-
                             </div>
-
                         </div>
-
                     </div>
-
                 `;
 
     return template;

@@ -258,7 +258,6 @@ export const confluence = async () => {
         manageHash();
     }
 };
-
 const manageRouter = async () => {
     document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms !== undefined) return;
