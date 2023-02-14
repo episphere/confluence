@@ -402,7 +402,7 @@ const manageHash = async () => {
         hideAnimation();
     }
     else if(hash === '#about/description'){
-        const element = document.getElementById('aboutConfluence');
+        const element = document.getElementById('aboutConfluenceDes');
         if(!element) return;
         // if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
