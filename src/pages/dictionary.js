@@ -2,7 +2,6 @@ import { addEventFilterBarToggle } from "../event.js";
 import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
-
 export const dataDictionaryTemplate = async () => {
     const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
     const tsvData = tsv2Json(data);
@@ -40,19 +39,16 @@ export const dataDictionaryTemplate = async () => {
     addEventFilterBarToggle();
     hideAnimation();
 }
-
 const paginationHandler = (data, pageSize, headers) => {
     const dataLength = data.length;
     const pages = Math.ceil(dataLength/pageSize);
     const array = [];
-
     for(let i = 0; i< pages; i++){
         array.push(i+1);
     }
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
     addEventPageBtns(pageSize, data, headers);
 }
-
 const addEventPageBtns = (pageSize, data, headers) => {
     const elements = document.getElementsByClassName('page-link');
     Array.from(elements).forEach(element => {
@@ -77,7 +73,6 @@ const addEventPageBtns = (pageSize, data, headers) => {
         })
     });
 }
-
 const renderDataDictionaryFilters = (dictionary, headers) => {
     const allVariableType = Object.values(dictionary).filter(dt => dt['Data Type']).map(dt => dt['Data Type']);
     const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i);
@@ -121,7 +116,6 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary, 60);
     addEventPageSizeSelection(dictionary, headers);
 };
-
 const addEventPageSizeSelection = (data, headers) => {
     const select = document.getElementById('pageSizeSelector');
     select.addEventListener('change', () => {
@@ -130,7 +124,6 @@ const addEventPageSizeSelection = (data, headers) => {
         paginationHandler(data, value, headers)
     })
 }
-
 const addEventFilterDataDictionary = (dictionary, headers) => {
     const variableTypeSelection = document.getElementsByClassName('select-variable-type');
     Array.from(variableTypeSelection).forEach(ele => {
@@ -138,13 +131,11 @@ const addEventFilterDataDictionary = (dictionary, headers) => {
             filterDataBasedOnSelection(dictionary, headers)
         });
     });
-
     const input = document.getElementById('searchDataDictionary');
     input.addEventListener('input', () => {
         filterDataBasedOnSelection(dictionary, headers);
     })
 }
-
 const filterDataBasedOnSelection = (dictionary, headers) => {
     const highlightData = filterDataHandler(dictionary)
     const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
@@ -153,10 +144,8 @@ const filterDataBasedOnSelection = (dictionary, headers) => {
     addEventPageSizeSelection(highlightData);
     renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
 }
-
 const filterDataHandler = (dictionary) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
-    
     let filteredData = dictionary;
     if(variableTypeSelection.length > 0) {
         filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Data Type']) !== -1);
@@ -169,7 +158,6 @@ const filterDataHandler = (dictionary) => {
     `:`
         <span class="font-bold">Data Type:</span> All`}
     `;
-
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
@@ -191,7 +179,6 @@ const filterDataHandler = (dictionary) => {
     })
     return highlightData;
 }
-
 const addEventSortColumn = (dictionary, pageSize, headers) => {
     const btns = document.getElementsByClassName('sort-column');
     Array.from(btns).forEach(btn => {
@@ -202,7 +189,6 @@ const addEventSortColumn = (dictionary, pageSize, headers) => {
         })
     })
 }
-
 const renderDataDictionary = (dictionary, pageSize, headers) => {
     let template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
@@ -253,7 +239,6 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(dictionary, pageSize, headers);
 }
-
 export const downloadFiles = (data, headers, fileName, studyDescription) => {
     if(studyDescription) {
         let flatArray = [];
@@ -288,7 +273,6 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         link.click(); 
         document.body.removeChild(link);
     })
-
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
     downloadDictionaryTSV.addEventListener('click', e => {
         e.stopPropagation();
@@ -301,4 +285,4 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         link.click(); 
         document.body.removeChild(link);
     })
-}
+} 

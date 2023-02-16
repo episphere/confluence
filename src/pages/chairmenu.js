@@ -7,7 +7,6 @@ export function renderFilePreviewDropdown(files, tab) {
       return template;
 
     }
-
     if (files.length != 0) {
 
       if (
