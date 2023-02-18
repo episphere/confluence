@@ -6,7 +6,9 @@ export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 691143057533;
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
-// /export const chairfolder1 = 
+export const chairfolder1 = 195155906608
+export const emailforChair = [];
+//"sbehpour@deloitte.com"
 export const getFolderItems = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
@@ -388,60 +390,31 @@ export const getFileAccessStats = async (id) => {
             return null;
         }
     }
-
     catch(err) {
-
         if((await refreshToken()) === true) return await getFileAccessStats(id, type);
-
     }
-
 }
-
-
-
-
 export const getCurrentUser = async () => {
-
     try {
-
         const access_token = JSON.parse(localStorage.parms).access_token;
-
         const response = await fetch(`https://api.box.com/2.0/users/me`, {
-
             headers: {
-
                 Authorization: "Bearer "+access_token
-
             }
-
         });
-
         if(response.status === 401){
-
             if((await refreshToken()) === true) return await getCurrentUser();
-
         }
-
         if(response.status === 200){
-
             return response.json();
-
         }
-
         else{
-
             return null;
-
         }
-
     }
-
     catch(err) {
-
         if((await refreshToken()) === true) return await getCurrentUser();
-
     }
-
 }
 
 
@@ -920,3 +893,143 @@ export const filePreviewer = (fileId, divId) => {
     });
 
 }
+
+export async function showComments(id) {
+    const commentSection = document.getElementById("fileComments");
+    const response = await listComments(id);
+  
+    let comments = JSON.parse(response).entries;
+    if (comments.length === 0) {
+      const dropdownSection = document.getElementById(`fileComments`);
+      dropdownSection.innerHTML = ` <div class='comments'>
+          Comments
+          <div class='text-left'>
+              No comments to show.
+          </div>
+          </div>`;
+  
+      return;
+    }
+    let template = `
+      <div class='comments'>
+      Comments
+      <div class='container-fluid'>`;
+    const user = JSON.parse(localStorage.parms).login;
+  
+    if (emailforChair.includes(user)) {
+      for (const comment of comments) {
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        template += `
+          <div>
+              <div class='row'>
+                  <div class='col-8 p-0'>
+                      <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+                  </div>
+              `;
+        if (document.getElementById("finalChairDecision") !== null) {
+          if (
+            document.getElementById("finalChairDecision").style.display ===
+            "block"
+          ) {
+            template += `
+                  <div class='col-4'>
+                      <input type='checkbox' name='comments' id='${comment.id}' class='mb-0'>
+                  </div>   
+                  `;
+          }
+        }
+        template += `    
+              </div>
+              <div class='row'>
+                      <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+              </div>
+  
+              <div class='row'>
+                  <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+              </div>
+              <hr class='my-1'>
+          </div>
+          `;
+      }
+    } else {
+      for (const comment of comments) {
+        const comment_user = comment.created_by;
+  
+        if (
+          comment_user.login === user ||
+          emailforChair.includes(comment_user.login)
+        ) {
+          const comment_date = new Date(comment.created_at);
+          const date = comment_date.toLocaleDateString();
+          const time = comment_date.toLocaleTimeString();
+          template += `
+          <div>
+              <div class='row'>
+                  <div class='col-8 p-0'>
+                      <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+                  </div>
+              `;
+          if (document.getElementById("finalChairDecision") !== null) {
+            if (
+              document.getElementById("finalChairDecision").style.display ===
+              "block"
+            ) {
+              template += `
+                  <div class='col-4'>
+                      <input type='checkbox' name='comments' id='${comment.id}' class='mb-0'>
+                  </div>   
+                  `;
+            }
+          }
+          template += `    
+              </div>
+              <div class='row'>
+                      <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+              </div>
+  
+              <div class='row'>
+                  <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+              </div>
+              <hr class='my-1'>
+          </div>
+          `;
+        }
+      }
+    }
+    template += "</div>";
+    if (comments.length >= 0 && document.getElementById("finalChairDecision")) {
+      if (
+        document.getElementById("finalChairDecision").style.display === "block"
+      ) {
+        template += `
+          <input type='button' class='btn-secondary' value='Copy'  id='copyBtn' onclick="
+          const comments = Array.from(document.getElementsByName('comments'));
+    
+       let copiedComments = [];
+       for(const comment of comments){
+        
+  
+           if (comment.checked){
+               let commentText = document.getElementById('comment' + comment.id).innerText;
+               if(commentText.includes('Rating:')){
+                  copiedComments.push(commentText.split(':')[2]);
+               }
+              else {
+                  copiedComments.push(commentText);
+              }
+           }
+       }
+      
+       navigator.clipboard.writeText(copiedComments.join('\\n'));
+          "/>
+          <div class='text-muted small'>Select comments to copy to clipboard. Paste comments in text box below.</div>
+          `;
+      }
+    }
+    commentSection.innerHTML = template;
+  
+    return;
+  }
+  

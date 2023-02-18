@@ -1,4 +1,5 @@
-import { applicationURLs } from './../shared.js';
+import { applicationURLs, emailforChair } from './../shared.js';
+
 
 export const navBarMenutemplate = () => {
     return `

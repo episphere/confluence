@@ -1,5 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { getFolderItems } from "../shared.js";
+import {chairfolder1} from"./../shared.js";
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
     if (!Array.isArray(files)) {
@@ -83,7 +84,7 @@ export const generateChairMenuFiles = async () => {
 
     template += "<div class='tab-content' id='selectedTab'>";
 
-    const responseChair = await getFolderItems(194173772220);
+    const responseChair = await getFolderItems(195155906608);
 
     console.log({responseChair});
 
