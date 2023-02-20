@@ -2,6 +2,9 @@ import { applicationURLs, emailforChair } from './../shared.js';
 
 
 export const navBarMenutemplate = () => {
+    let authChair = emailforChair
+    .map(({email})=>email)
+    .indexOf(JSON.parse(localStorage.parms).login)!==-1;
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
@@ -76,7 +79,11 @@ export const navBarMenutemplate = () => {
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Form </a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#upload_data_form" title="Data Form Upload" id="uploaddataForm"> Form Upload </a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#chair_menu" title="Chair Menu" id="chairMenu"> Chair Menu </a>
+                ${
+                    authChair ? (
+                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" herf="#chair-menu" title="Chair Menu" id="chairMenu"> Chair Menu </a>`
+                    ) :''
+                }
             </div>
         </div>
         <div class="grid-elements">

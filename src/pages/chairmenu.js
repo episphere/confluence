@@ -1,6 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { getFolderItems } from "../shared.js";
-import {chairfolder1} from"./../shared.js";
+import { emailforChair, getFolderItems, getCurrentUser } from "../shared.js";
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
     if (!Array.isArray(files)) {
@@ -78,14 +77,18 @@ export function switchFiles(tab) {
         showPreview(file_id);
       });
   }
+const getCurrentUserAuth = ()=>{
+    const userEmail = JSON.parse(localStorage.parms).login;
+    let authChair =emailforChair
+      .find(({email})=> email===userEmail);
+    return authChair ? authChair:null;
+  }
 export const generateChairMenuFiles = async () => {
-
+  const userChairItem= getCurrentUserAuth();
+  if (!userChairItem) return null;
     let template = '';
-
     template += "<div class='tab-content' id='selectedTab'>";
-
-    const responseChair = await getFolderItems(195155906608);
-
+    const responseChair = await getFolderItems(userChairItem.boxId);
     console.log({responseChair});
 
     let filearrayChair = responseChair.entries;
