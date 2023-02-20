@@ -10,7 +10,6 @@ export const chairfolder1 = 195155906608
 export const emailforChair = [{email:"sbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
 {email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, {email:"Behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO'}, {email:"ssbehpour@deloitte.com", boxId:195151351417, consortium:'SIMBA'}, {email:"ssbehpour@deloitte.com", boxId:195156038705, consortium:'C-NCI'}, {email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
 ];
-
 export const getFolderItems = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
