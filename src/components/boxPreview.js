@@ -1,4 +1,3 @@
-//test
 export function showPreview(file_id, div_id = "boxFilePreview") {
     const access_token = JSON.parse(localStorage.parms).access_token;
     try {

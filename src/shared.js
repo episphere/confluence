@@ -6,10 +6,22 @@ export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 691143057533;
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
-export const chairfolder1 = 195155906608
-export const emailforChair = [{email:"sbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
-{email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, {email:"Behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO'}, {email:"ssbehpour@deloitte.com", boxId:195151351417, consortium:'SIMBA'}, {email:"ssbehpour@deloitte.com", boxId:195156038705, consortium:'C-NCI'}, {email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
+export const emailforChair = [
+    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
+    {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, 
+    {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO'}, 
+    {id: 'user_4', email:"ahearntu@nih.gov", boxId:195151351417, consortium:'CIMBA'}, 
+    {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI'}, 
+    {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
 ];
+export const messagesForChair = {
+    user_1: 'DACC Chair1 - Submit concept recommendation',
+    user_2: 'DACC Chair2 - Submit concept recommendation',
+    user_3: 'DACC Chair3 - Submit concept recommendation',
+    user_4: 'DACC Chair4 - Submit concept recommendation',
+    user_5: 'DACC Chair5 - Submit concept recommendation',
+    user_6: 'DACC Chair6 - Submit concept recommendation'
+}
 export const getFolderItems = async (id) => {
     try{
         const access_token = JSON.parse(localStorage.parms).access_token;
@@ -69,7 +81,6 @@ export const getFolderInfo = async (id) => {
         if((await refreshToken()) === true) return await getFolderInfo(id);
     }
 }
-
 export const getPublicFile = async (sharedName, id) => {
     let r = await fetch(`https://us-central1-nih-nci-dceg-episphere-dev.cloudfunctions.net/confluencePublicData?fileId=${id}&sharedName=${sharedName}`,{
         method:'GET'
