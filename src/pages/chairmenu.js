@@ -1,6 +1,20 @@
 import { showPreview } from "../components/boxPreview.js";
-
-import { getFolderItems, emailforChair, getCurrentUser, messagesForChair } from "../shared.js";
+import {
+  getFolderItems,
+  emailforChair,
+  messagesForChair,
+  getTaskList,
+  updateTaskAssignment,
+  createComment,
+  getFileInfo,
+  moveFile,
+  createFolder,
+  addNewCollaborator,
+  copyFile,
+  acceptedFolder,
+  deniedFolder,
+  submitterFolder
+} from "../shared.js";
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
     if (!Array.isArray(files)) {
@@ -118,9 +132,9 @@ export function switchFiles(tab) {
     document.getElementById(
       "toBeCompletedselectedDoc"
     ).children[0].selected = true;
+    commentApproveReject();
     return template;
 }
-
 export const chairMenuTemplate = () => {
   const userInfo = JSON.parse(localStorage.getItem('parms'))
   console.log('user info: ', userInfo, localStorage.getItem('parms'))
@@ -150,3 +164,91 @@ export const chairMenuTemplate = () => {
                 `;
     return template;
 }
+export const commentApproveReject = () => {
+  let approveComment = async (e) => {
+    console.log('comment approve: ', e)
+    e.preventDefault();
+    const btn = document.activeElement;
+    btn.disabled = true;
+    // let taskId = btn.name;
+    let fileId = document.querySelector(
+      ".tab-content .active #toBeCompletedselectedDoc"
+    ).value; //document.getElementById('selectedDoc').value;
+    // Send multiple files
+    const filesToSend = [];
+    const elements = document.querySelectorAll(
+      ".tab-content .active #toBeCompletedselectedDoc option"
+    );
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].selected) {
+        filesToSend.push(elements[i].value);
+      }
+    }
+    for (const fileId of filesToSend) {
+      let tasklist = await getTaskList(fileId);
+      let entries = tasklist.entries;
+      if (entries.length !== 0) {
+        for (let item of entries) {
+          if (item.is_completed == false && item.action == "review") {
+            for (let taskassignment of item.task_assignment_collection
+              .entries) {
+              if (
+                taskassignment.assigned_to.login ==
+                JSON.parse(localStorage.parms).login
+              ) {
+                var taskId = taskassignment.id;
+              }
+            }
+          }
+        }
+      }
+      let decision = e.submitter.value;
+      let grade = e.target[0].value;
+      let comment = e.target[1].value;
+      let message = "Rating: " + grade + "\nComment: " + comment;
+      if (decision !== "daccReview") {
+        await updateTaskAssignment(taskId, decision, message);
+      }
+      await createComment(fileId, message);
+      let fileInfo = await getFileInfo(fileId);
+      let uploaderName = fileInfo.created_by.login;
+      if (decision == "approved") {
+        await moveFile(fileId, acceptedFolder);
+      } else if (decision == "rejected") {
+        await moveFile(fileId, deniedFolder);
+      }
+      if (decision != "daccReview") {
+        let folderItems = await getFolderItems(submitterFolder);
+        let folderEntries = folderItems.entries;
+        let folderID = "none";
+        for (let obj of folderEntries) {
+          if (obj.name == uploaderName) {
+            folderID = obj.id;
+          }
+        }
+        let cpFileId = "";
+        if (folderID == "none") {
+          const newFolder = await createFolder(submitterFolder, uploaderName);
+          await addNewCollaborator(
+            newFolder.id,
+            "folder",
+            uploaderName,
+            "viewer"
+          );
+          const cpFile = await copyFile(fileId, newFolder.id);
+          cpFileId = cpFile.id;
+        } else {
+          const cpFile = await copyFile(fileId, folderID);
+          cpFileId = cpFile.id;
+        }
+        await createComment(cpFileId, "This file was " + decision);
+        await createComment(cpFileId, message);
+      }
+    }
+    document.location.reload(true);
+  };
+  const form = document.querySelector(".approvedeny");
+  if (form) {
+    form.addEventListener("submit", approveComment);
+  }
+};

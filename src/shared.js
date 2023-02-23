@@ -6,6 +6,9 @@ export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 691143057533;
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
+export const acceptedFolder = 196011761030;
+export const deniedFolder = 196012663822;
+export const submitterFolder = 196013436057;
 export const emailforChair = [
     {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
     {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, 
@@ -115,6 +118,88 @@ export const getFile = async (id) => {
     }
     catch(err) {
         if((await refreshToken()) === true) return await getFile(id);
+    }
+};
+
+export const createComment = async (id, msg = "") => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/comments`, {
+        method: "POST",
+        headers: {
+            Authorization: "Bearer " + access_token,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            message: msg,
+            item: {
+            type: "file",
+            id: id,
+            },
+        }),
+        });
+        if (response.status === 401) {
+        if ((await refreshToken()) === true) return await createComment(id, msg);
+        } else {
+        return response;
+        }
+    } catch (err) {
+        if ((await refreshToken()) === true) return await createComment(id, msg);
+    }
+};
+
+export const updateTaskAssignment = async (id, res_state, msg = "") => {
+    try {
+      let body = msg.length
+        ? JSON.stringify({
+            resolution_state: res_state,
+            message: msg,
+          })
+        : JSON.stringify({
+            resolution_state: res_state,
+          });
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      const response = await fetch(
+        `https://api.box.com/2.0/task_assignments/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: "Bearer " + access_token,
+          },
+          body,
+        }
+      );
+      if (response.status === 401) {
+        if ((await refreshToken()) === true)
+          return await updateTaskAssignment(id, res_state, msg);
+      } else {
+        return response;
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await updateTaskAssignment(id, res_state, msg);
+    }
+};
+
+export const getTaskList = async (id) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      const response = await fetch(`https://api.box.com/2.0/files/${id}/tasks`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+      });
+      if (response.status === 401) {
+        if ((await refreshToken()) === true) return await getTaskList(id);
+      }
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        return null;
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true) return await getTaskList(id);
     }
 };
 export const getFileInfo = async (id) => {
@@ -269,6 +354,38 @@ export const createFolder = async (folderId, folderName) => {
         if((await refreshToken()) === true) return await createFolder(folderId, foldername);
     }
 };
+export const moveFile = async (fileId, parentId) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      let obj = {
+        parent: {
+          id: parentId,
+        },
+      };
+      let response = await fetch(`https://api.box.com/2.0/files/${fileId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        body: JSON.stringify(obj),
+      });
+      if (response.status === 401) {
+        if ((await refreshToken()) === true)
+          return await moveFile(fileId, parentId);
+      } else if (response.status === 201) {
+        return response;
+      } else {
+        return {
+          status: response.status,
+          statusText: response.statusText,
+        };
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await moveFile(fileId, parentId);
+    }
+  };
+
 export const copyFile = async (fileId, parentId) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
