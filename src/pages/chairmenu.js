@@ -109,7 +109,7 @@ export function switchFiles(tab) {
                 <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
                 <option value = "3"> 3 - Approved, but data release will be delayed </option>
                 <option value = "4"> 4 - Not approved </option>
-                <option value = "6"> 6 - Decision pending clarification of several issues</option>
+                <option value = "5"> 5 - Decision pending clarification of several issues</option>
                 <option value = "777"> 777 - Duplicate Proposal</option>
                 </select>
               <br>
@@ -152,11 +152,15 @@ export const chairMenuTemplate = () => {
                                 </div>
                             </div>
                             <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                                <!-- <ul class='nav nav-tabs mb-3' role='tablist'>
+                                <ul class='nav nav-tabs mb-3' role='tablist'>
                                      <li class='nav-item' role='presentation'>
-                                         <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> Review Completed </a>
+                                         <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> Submit concept recommendation</a>
                                      </li>
-                                 </ul> -->
+                                     </li>
+                                    <li class='nav-item' role='presentation'>
+                                      <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> DACC Decision </a>
+                                    </li>
+                                </ul> 
                                 <div id="chairFileView" class="align-left"></div>  
                             </div>
                         </div>

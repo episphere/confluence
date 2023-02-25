@@ -18,12 +18,12 @@ export const emailforChair = [
     {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
 ];
 export const messagesForChair = {
-    user_1: 'AABCG DACC Chair - Submit concept recommendation',
-    user_2: 'MERGE DACC Chair - Submit concept recommendation',
-    user_3: 'LAGENO DACC Chair - Submit concept recommendation',
-    user_4: 'CIMBA DACC Chair - Submit concept recommendation',
-    user_5: 'C-NCI DACC Chair - Submit concept recommendation',
-    user_6: 'BCAC DACC Chair - Submit concept recommendation'
+    user_1: 'AABCG DACC Chair',
+    user_2: 'MERGE DACC Chair',
+    user_3: 'LAGENO DACC Chair',
+    user_4: 'CIMBA DACC Chair',
+    user_5: 'C-NCI DACC Chair',
+    user_6: 'BCAC DACC Chair'
 }
 export const getFolderItems = async (id) => {
     try{
