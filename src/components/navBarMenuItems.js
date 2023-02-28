@@ -1,8 +1,8 @@
-import { applicationURLs, emailforChair } from './../shared.js';
+import { applicationURLs,chairsInfo } from './../shared.js';
 
 
 export const navBarMenutemplate = () => {
-    let authChair = emailforChair
+    let authChair = chairsInfo
     .map(({email})=>email)
     .indexOf(JSON.parse(localStorage.parms).login)!==-1;
     return `

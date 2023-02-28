@@ -1,7 +1,8 @@
 import { showPreview } from "../components/boxPreview.js";
 import {
   getFolderItems,
-  emailforChair,
+  emailtoChair,
+  chairsInfo,
   messagesForChair,
   getTaskList,
   updateTaskAssignment,
@@ -20,6 +21,10 @@ export function renderFilePreviewDropdown(files, tab) {
     if (!Array.isArray(files)) {
       return template;
     }
+    template += `<a href="mailto:${emailtoChair.join(
+      "; "
+    )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
+
     if (files.length != 0) {
       if (
         tab !== "daccReview" &&
@@ -29,12 +34,13 @@ export function renderFilePreviewDropdown(files, tab) {
       ) {
         template += `<div class='card-body p-0'>
                   <div class='card-title'>
-                  <label for='${tab}selectedDoc'>
+                 <label for='${tab}selectedDoc'>
                       <b>Select Concept Form:</b>
-                      <div class='text-muted small'>Hold Ctrl to select multiple concept forms </div>
+                      <!---<div class='text-muted small'>Hold Ctrl to select multiple concept forms 
+                            </div>-->
                   </label>
                   <br>
-                  <select id='${tab}selectedDoc' multiple size='3'>
+                  <select id='${tab}selectedDoc' size='3'>
               `;
       } else {
         template += `<div class='card-body p-0'>
@@ -74,7 +80,7 @@ export function switchFiles(tab) {
   }
   const getCurrentUserAuth = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
-    let authChair = emailforChair
+    let authChair = chairsInfo
       .find(({ email }) => email === userEmail);
     return authChair ? authChair : null;
   }
@@ -140,7 +146,7 @@ export const chairMenuTemplate = () => {
   console.log('user info: ', userInfo, localStorage.getItem('parms'))
   if (!userInfo) return;
   const userEmail = userInfo.login;
-  const userForChair = emailforChair.find(item => item.email === userEmail)
+  const userForChair = chairsInfo.find(item => item.email === userEmail)
   if (userForChair === -1) return;
   const message = messagesForChair[userForChair.id]
     let template = `
@@ -256,3 +262,4 @@ export const commentApproveReject = () => {
     form.addEventListener("submit", approveComment);
   }
 };
+

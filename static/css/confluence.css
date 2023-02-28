@@ -1808,7 +1808,12 @@ form {
     margin-top: 0.5rem;
     font-size: 87.5%;
   }
-  
+  #email {
+    font-size: 87.5%;
+    float: right;
+    padding-right: 10px;
+    display: inline;
+  }
   .results pre {
     margin-top: 1rem;
     padding: 0.5rem 1rem;

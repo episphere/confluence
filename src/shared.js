@@ -9,7 +9,7 @@ export const missingnessStatsFileId = 653087731560;
 export const acceptedFolder = 196011761030;
 export const deniedFolder = 196012663822;
 export const submitterFolder = 196013436057;
-export const emailforChair = [
+export const chairsInfo = [
     {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
     {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, 
     {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO'}, 
@@ -17,6 +17,8 @@ export const emailforChair = [
     {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI'}, 
     {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
 ];
+export const emailtoChair=['sbehpour@deloitte.com']
+
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
     user_2: 'MERGE DACC Chair',
@@ -1045,7 +1047,7 @@ export async function showComments(id) {
       <div class='container-fluid'>`;
     const user = JSON.parse(localStorage.parms).login;
   
-    if (emailforChair.includes(user)) {
+    if (chairsInfo.includes(user)) {
       for (const comment of comments) {
         const comment_date = new Date(comment.created_at);
         const date = comment_date.toLocaleDateString();
@@ -1088,7 +1090,7 @@ export async function showComments(id) {
   
         if (
           comment_user.login === user ||
-          emailforChair.includes(comment_user.login)
+          chairsInfo.includes(comment_user.login)
         ) {
           const comment_date = new Date(comment.created_at);
           const date = comment_date.toLocaleDateString();
