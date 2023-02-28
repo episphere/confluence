@@ -3,6 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
+import { chairMenuTemplate, generateChairMenuFiles } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
@@ -66,6 +67,7 @@ export const confluence = async () => {
         const dataAnalysisElement = document.getElementById('dataAnalysis');
         const dataFormElement = document.getElementById('dataForm');
         const uploaddataFormElement = document.getElementById('uploaddataForm');
+        const chairMenuElement = document.getElementById('chairMenu');
 
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -177,7 +179,31 @@ export const confluence = async () => {
                 hideAnimation();
             });
         }
+        if(chairMenuElement) {
 
+            chairMenuElement.addEventListener('click', () => {
+ 
+                 if (chairMenuElement.classList.contains('navbar-active')) return;
+ 
+                 showAnimation();
+ 
+                 assignNavbarActive(chairMenuElement, 1);
+ 
+                 document.title = 'Confluence - Chair Menu';
+ 
+                 confluenceDiv.innerHTML = chairMenuTemplate();
+ 
+                 generateChairMenuFiles();
+ 
+                 //uploaddataForm();
+ 
+                 //formFunctions();
+ 
+                 hideAnimation();
+ 
+             });
+ 
+         }
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
         const projectArray = filterProjects(folders.entries);
@@ -232,7 +258,6 @@ export const confluence = async () => {
         manageHash();
     }
 };
-
 const manageRouter = async () => {
     document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if(localStorage.parms !== undefined) return;
@@ -310,6 +335,23 @@ const manageRouter = async () => {
         //uploaddataForm();  
         //formFunctions(); 
     }
+    else if (hash === '#chair_menu') {
+
+        const element = document.getElementById('chairMenu');
+
+        if (!element) return;
+
+        if (element.classList.contains('navbar-active')) return;
+
+        document.title = 'Chair Menu';
+
+        assignNavbarActive(element, 1);
+
+        confluenceDiv.innderHTML = chairMenuTemplate();
+
+        generateChairMenuFiles();
+
+    }
     else if (hash === '#data_exploration/dictionary') {
         const dataDictionaryElement = document.getElementById('dataDictionary');
         if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
@@ -359,6 +401,13 @@ const manageHash = async () => {
     else if (hash === '#upload_data_form') {
         const element = document.getElementById('uploaddataForm');
         element.click();
+    }
+    else if (hash === '#chair_menu') {
+
+        const element = document.getElementById('chairMenu');
+
+        element.click();
+
     }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');

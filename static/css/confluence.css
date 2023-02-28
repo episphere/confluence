@@ -1808,7 +1808,12 @@ form {
     margin-top: 0.5rem;
     font-size: 87.5%;
   }
-  
+  #email {
+    font-size: 87.5%;
+    float: right;
+    padding-right: 10px;
+    display: inline;
+  }
   .results pre {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -1826,7 +1831,15 @@ form {
     border-bottom: 1px solid var(--color-gray-light);
     overflow: hidden;
   }
-  
+  .preview-container {
+
+    border: 2px solid #eee;
+
+    height: 1000px;
+
+    width: 99%;
+
+  }
   .input-group {
     margin-top: 0.25rem;
     padding: .5rem 1rem;
