@@ -34,13 +34,13 @@ export function renderFilePreviewDropdown(files, tab) {
       ) {
         template += `<div class='card-body p-0'>
                   <div class='card-title'>
-                 <label for='${tab}selectedDoc'>
+                  <label for='${tab}selectedDoc'>
                       <b>Select Concept Form:</b>
                       <!---<div class='text-muted small'>Hold Ctrl to select multiple concept forms 
                             </div>-->
                   </label>
                   <br>
-                  <select id='${tab}selectedDoc' size='3'>
+                  <select id='${tab}selectedDoc' size='1'>
               `;
       } else {
         template += `<div class='card-body p-0'>
@@ -85,11 +85,11 @@ export function switchFiles(tab) {
     return authChair ? authChair : null;
   }
   export const generateChairMenuFiles = async () => {
-      const userChairItem = getCurrentUserAuth();
-      if (!userChairItem) return null;
-      let template = '';
-      template += "<div class='tab-content' id='selectedTab'>";
-      const responseChair = await getFolderItems(userChairItem.boxId);
+    const userChairItem = getCurrentUserAuth();
+    if (!userChairItem) return null;
+    let template = '';
+    template += "<div class='tab-content' id='selectedTab'>";
+    const responseChair = await getFolderItems(userChairItem.boxId);
     console.log({responseChair});
     let filearrayChair = responseChair.entries;
     const filescompleted = [];
