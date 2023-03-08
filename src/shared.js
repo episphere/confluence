@@ -10,14 +10,14 @@ export const acceptedFolder = 196011761030;
 export const deniedFolder = 196012663822;
 export const submitterFolder = 196013436057;
 export const chairsInfo = [
-    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG'}, 
-    {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE'}, 
-    {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO'}, 
-    {id: 'user_4', email:"ahearntu@nih.gov", boxId:195151351417, consortium:'CIMBA'}, 
-    {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI'}, 
-    {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC'}
+    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG', dacc:['']}, 
+    {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE', dacc:['']}, 
+    {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO',dacc:['']}, 
+    {id: 'user_4', email:"ahearntu@nih.gov", boxId:195151351417, consortium:'CIMBA', dacc:['']}, 
+    {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI', dacc:['']}, 
+    {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
 ];
-export const emailtoChair=['sbehpour@deloitte.com']
+export const sendEmail = ['sbehpour@deloitte.com'];
 
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',

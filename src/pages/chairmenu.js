@@ -1,7 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
+import { switchTabs } from "../event.js";
 import {
   getFolderItems,
-  emailtoChair,
   chairsInfo,
   messagesForChair,
   getTaskList,
@@ -14,16 +14,22 @@ import {
   copyFile,
   acceptedFolder,
   deniedFolder,
-  submitterFolder
+  submitterFolder, 
+  sendEmail
 } from "../shared.js";
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
     if (!Array.isArray(files)) {
       return template;
     }
-    template += `<a href="mailto:${emailtoChair.join(
+    // template += `<a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join(
+    //   "; "
+    // )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
+    template += `<a href="mailto:${sendEmail.join(
+
       "; "
-    )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
+
+    )}" id='email' class='btn btn-dark'>Send Email to Chiar</a>`
 
     if (files.length != 0) {
       if (
@@ -40,7 +46,7 @@ export function renderFilePreviewDropdown(files, tab) {
                             </div>-->
                   </label>
                   <br>
-                  <select id='${tab}selectedDoc' size='3'>
+                  <select id='${tab}selectedDoc' size='1'>
               `;
       } else {
         template += `<div class='card-body p-0'>
@@ -59,7 +65,6 @@ export function renderFilePreviewDropdown(files, tab) {
       template += `
                   </select>
                   </div>
-                  </div>  
               </div>`;
     } else {
       template += `
@@ -71,6 +76,7 @@ export function renderFilePreviewDropdown(files, tab) {
     return template;
 }
 export function switchFiles(tab) {
+   console.log('switchFile:', tab,document.getElementById(`${tab}selectedDoc`) )
     document
       .getElementById(`${tab}selectedDoc`)
       .addEventListener("change", (e) => {
@@ -84,22 +90,22 @@ export function switchFiles(tab) {
       .find(({ email }) => email === userEmail);
     return authChair ? authChair : null;
   }
-  export const generateChairMenuFiles = async () => {
+    export const generateChairMenuFiles = async () => {
       const userChairItem = getCurrentUserAuth();
       if (!userChairItem) return null;
       let template = '';
-      template += "<div class='tab-content' id='selectedTab'>";
+      //template += "<div class='tab-content' id='selectedTab'>";
       const responseChair = await getFolderItems(userChairItem.boxId);
-    console.log({responseChair});
-    let filearrayChair = responseChair.entries;
-    const filescompleted = [];
-    for (let obj of filearrayChair) {
+      let filearrayChair = responseChair.entries;
+      const filescompleted = [];
+      for (let obj of filearrayChair) {
         filescompleted.push(obj);
     }
     template += `<div class='tab-pane fade show active'
-                  id='toBeCompleted' role='tabpanel'
-                  aria-labeledby='toBeCompletedTab'> `;
-    template += renderFilePreviewDropdown(filescompleted, "toBeCompleted");
+                  id='recommendation' role='tabpanel'
+                  aria-labeledby='recommendationTab'>`;
+    console.log({template})
+    template += renderFilePreviewDropdown(filescompleted, "recommendation");
     if (filescompleted.length !== 0) {
         template += `
             <div class='row'>
@@ -131,14 +137,29 @@ export function switchFiles(tab) {
             `;
       }
     template += "</div>";
-    template += "</div>";
-    document.getElementById("chairFileView").innerHTML = template;
+    //template += "</div>";
+    //document.getElementById("chairFileView").innerHTML = template;
+    template += `<div class='tab-pane fade'
+    id='daccDecision' role='tabpanel'
+    aria-labeledby='daccDecision'>daccDecisionTab tab  content </div>`;
+
+    document.getElementById("selectedTab").innerHTML = template;
     showPreview(filearrayChair[0].id);
-    switchFiles("toBeCompleted");
+    switchFiles("recommendation");
     document.getElementById(
-      "toBeCompletedselectedDoc"
+      "recommendationselectedDoc"
     ).children[0].selected = true;
     commentApproveReject();
+    //Switch Tabs
+    switchTabs(
+      "recommendation",
+      ["daccDecision"]
+    );
+    
+    switchTabs(
+      "daccDecision",
+      ["recommendation"]
+    );
     return template;
 }
 export const chairMenuTemplate = () => {
@@ -160,14 +181,14 @@ export const chairMenuTemplate = () => {
                             <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
                                 <ul class='nav nav-tabs mb-3' role='tablist'>
                                      <li class='nav-item' role='presentation'>
-                                         <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> Submit concept recommendation</a>
+                                         <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> Submit concept recommendation</a>
                                      </li>
                                      </li>
                                     <li class='nav-item' role='presentation'>
-                                      <a class='nav-link' id='daccCompletedTab' href='#chair_menu' data-mdb-toggle="tab" role='tab' aria-controls='chair_menu' aria-selected='true'> DACC Decision </a>
+                                      <a class='nav-link' id='daccDecisionTab' href='#daccDecision' data-mdb-toggle="tab" role='tab' aria-controls='daccDecision' aria-selected='true'> DACC Decision </a>
                                     </li>
                                 </ul> 
-                                <div id="chairFileView" class="align-left"></div>  
+                                <div class="tab-content" id="selectedTab"></div>  
                             </div>
                         </div>
                     </div>
@@ -182,12 +203,12 @@ export const commentApproveReject = () => {
     btn.disabled = true;
     // let taskId = btn.name;
     let fileId = document.querySelector(
-      ".tab-content .active #toBeCompletedselectedDoc"
+      ".tab-content .active #recommendationselectedDoc"
     ).value; //document.getElementById('selectedDoc').value;
     // Send multiple files
     const filesToSend = [];
     const elements = document.querySelectorAll(
-      ".tab-content .active #toBeCompletedselectedDoc option"
+      ".tab-content .active #recommendationselectedDoc option"
     );
     for (let i = 0; i < elements.length; i++) {
       if (elements[i].selected) {
@@ -263,3 +284,104 @@ export const commentApproveReject = () => {
   }
 };
 
+// export function viewFinalDecisionFilesColumns() {
+//   return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
+//     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submitted By <button class="transparent-btn sort-column" data-column-name="Submitted By"><i class="fas fa-sort"></i></button></div>
+//     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decision<button class="transparent-btn sort-column" data-column-name="Decision"><i class="fas fa-sort"></i></button></div>
+//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decided On<button class="transparent-btn sort-column" data-column-name="Decision Date"><i class="fas fa-sort"></i></button></div>
+//   </div>`;
+// }
+// export async function viewFinalDecisionFilesTemplate(files) {
+//   let template = "";
+//   let filesInfo = [];
+//   for (const file of files) {
+//     const fileInfo = await getFileInfo(file.id);
+//     filesInfo.push(fileInfo);
+//   }
+//   if (filesInfo.length > 0) {
+//     template += `
+//     <div id='decidedFiles'>
+//     <div class='row'>
+//       <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
+//           <div class="div-border white-bg align-left p-2">
+//               <div class="main-summary-row">
+//                   <div class="col-xl-12 pl-1 pr-0">
+//                       <span class="font-size-17 font-bold">Filter</span>
+//                       <div id="filterData" class="align-left"></div>
+//                   </div>
+//               </div>
+//           </div>
+//       </div>
+//       </div>
+//       <!--div class='table-responsive'>
+//       <table class='table'-->
+      
+//       <div class='col-xl-12 pr-0'>`;
+
+//     template += viewFinalDecisionFilesColumns();
+
+//     template += '<div id="files"> </div>';
+
+//     template += '<!--tbody id="files"-->';
+//   } else {
+//     template += `
+//               No files to show.            
+//     </div>
+//     </div>`;
+//   }
+
+//   document.getElementById("decided").innerHTML = template;
+
+//   if (filesInfo.length !== 0) {
+//     await viewFinalDecisionFiles(filesInfo);
+//     for (const file of filesInfo) {
+//       document
+//         .getElementById(`study${file.id}`)
+//         .addEventListener("click", showCommentsDropDown(file.id));
+//     }
+
+//     let btns = Array.from(document.querySelectorAll(".preview-file"));
+//     btns.forEach((btn) => {
+//       btn.addEventListener("click", (e) => {
+//         btn.dataset.target = "#bcrppPreviewerModal";
+//         const header = document.getElementById("bcrppPreviewerModalHeader");
+//         const body = document.getElementById("bcrppPreviewerModalBody");
+//         header.innerHTML = `<h5 class="modal-title">File preview</h5>
+//                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+//                                         <span aria-hidden="true">&times;</span>
+//                                     </button>`;
+//         const fileId = btn.dataset.fileId;
+//         $("#bcrppPreviewerModal").modal("show");
+//         showPreview(fileId, "bcrppPreviewerModalBody");
+//       });
+//     });
+//     //Filtering and Sorting
+//     const table = document.getElementById("decidedFiles");
+//     const headers = table.querySelector(`.div-sticky`);
+//     Array.from(headers.children).forEach((header, index) => {
+//       header.addEventListener("click", (e) => {
+//         const sortDirection = header.classList.contains("header-sort-asc");
+//         sortTableByColumn(table, index, !sortDirection);
+//       });
+//     });
+
+//     filterSection(filesInfo);
+//     Array.from(document.getElementsByClassName("filter-var")).forEach((el) => {
+//       el.addEventListener("click", () => {
+//         const headerCell =
+//           document.getElementsByClassName("header-sortable")[0];
+//         const tableElement =
+//           headerCell.parentElement.parentElement.parentElement;
+//         filterCheckBox(tableElement, filesInfo);
+//       });
+//     });
+//     const input = document.getElementById("searchDataDictionary");
+//     input.addEventListener("input", () => {
+//       const headerCell = document.getElementsByClassName("header-sortable")[0];
+//       const tableElement = headerCell.parentElement.parentElement.parentElement;
+//       filterCheckBox(tableElement, filesInfo);
+//     });
+//   }
+// }

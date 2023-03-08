@@ -2073,3 +2073,9 @@ ul.form {
     -ms-user-select: none;
     user-select: none;
 }
+#email {
+    font-size: 87.5%;
+    float: right;
+    padding-right: 10px;
+    display: inline;
+}

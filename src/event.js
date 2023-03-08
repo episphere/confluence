@@ -6,7 +6,6 @@ import { myProjectsTemplate } from './pages/myProjects.js';
 import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 
 let top = 0;
-
 export const addEventStudyRadioBtn = () => {
     const createStudyRadio = document.getElementsByName('createStudyRadio');
     Array.from(createStudyRadio).forEach(element => {
@@ -1392,3 +1391,224 @@ export const addEventConsortiaFilter = (d) => {
         })
     })
 }
+export function switchTabs(show, hide, files) {
+
+    try {
+
+      if (!Array.isArray(hide)) {
+
+        return;
+
+      }
+
+    //   else if (!Array.isArray(files)) {
+
+    //     return;
+
+    //   } else if (show === "decided") {
+
+    //     document.getElementById(show + "Tab").addEventListener("click", (e) => {
+
+    //       e.preventDefault();
+
+    //       const boxPreview = document.getElementById("filePreview");
+
+    //       boxPreview.classList.remove("d-block");
+
+    //       boxPreview.classList.add("d-none");
+
+ 
+
+    //       for (const tab of hide) {
+
+    //         document.getElementById(tab + "Tab").classList.remove("active");
+
+    //         document.getElementById(tab).classList.remove("show", "active");
+
+    //       }
+
+    //       document.getElementById(show + "Tab").classList.add("active");
+
+    //       document.getElementById(show).classList.add("show", "active");
+
+ 
+
+    //       localStorage.setItem("currentTab", show + "Tab");
+
+    //       return;
+
+    //     });
+
+    //   }
+
+      else {
+
+        // const boxPreview = document.getElementById("filePreview");
+
+        console.log('switch: ', document.getElementById(show + "Tab"))
+
+        document.getElementById(show + "Tab").addEventListener("click", (e) => {
+
+          e.preventDefault();
+
+        //   if (boxPreview !== null) {
+
+        //     if (files.length != 0) {
+
+        //       if (!boxPreview.classList.contains("d-block")) {
+
+        //         boxPreview.classList.add("d-block");
+
+        //       }
+
+        //       switchFiles(show);
+
+        //       document.getElementById(show + "selectedDoc").value = files[0].id;
+
+        //       showPreview(files[0].id);
+
+        //       if (show !== "toBeCompleted") {
+
+        //         document.getElementById("boxFilePreview").classList.add("col-8");
+
+        //         showComments(files[0].id);
+
+        //       } else {
+
+        //         document
+
+        //           .getElementById("boxFilePreview")
+
+        //           .classList.remove("col-8");
+
+        //       }
+
+        //       if (show === "toBeCompleted") {
+
+        //         document.getElementById("sendtodaccButton").style.display =
+
+        //           "block";
+
+        //         document.getElementById("finalChairDecision").style.display =
+
+        //           "none";
+
+        //         document.getElementById("daccOverride").style.display = "none";
+
+        //         document.getElementById("fileComments").style.display = "none";
+
+        //         // document.getElementById('fileComments').innerHTML = listComments(files[0].id);
+
+        //       }
+
+        //       if (show === "inProgress") {
+
+        //         document.getElementById("sendtodaccButton").style.display =
+
+        //           "none";
+
+        //         document.getElementById("fileComments").style.display = "block";
+
+        //         document.getElementById("finalChairDecision").style.display =
+
+        //           "none";
+
+        //         document.getElementById("daccOverride").style.display = "block";
+
+        //         document.getElementById("fileComments").style.display = "block";
+
+        //       }
+
+        //       if (show === "daccCompleted") {
+
+        //         document.getElementById("sendtodaccButton").style.display =
+
+        //           "none";
+
+        //         document.getElementById("daccOverride").style.display = "none";
+
+        //         document.getElementById("fileComments").style.display = "block";
+
+        //         document.getElementById("finalChairDecision").style.display =
+
+        //           "block";
+
+        //         document.getElementById("fileComments").style.display = "block";
+
+        //       }
+
+        //       if (show === "dacctoBeCompleted") {
+
+        //         document.getElementById("daccComment").style.display = "block";
+
+        //       }
+
+        //       if (show === "completed") {
+
+        //         document.getElementById("daccComment").style.display = "none";
+
+        //       }
+
+        //       if (show === "daccReview") {
+
+        //         document.getElementById("boxFilePreview").classList.add("col-8");
+
+        //         document.getElementById("daccComment").style.display = "block";
+
+        //         showComments(files[0].id);
+
+        //       }
+
+        //     } else {
+
+        //       boxPreview.classList.remove("d-block");
+
+        //       boxPreview.classList.add("d-none");
+
+        //       if (show === "completed") {
+
+        //         if (document.getElementById("daccComment")) {
+
+        //           document.getElementById("daccComment").style.display = "none";
+
+        //         }
+
+        //       }
+
+        //     }
+
+        //   }
+
+        for (const tab of hide) {
+
+              console.log('switch: 1', document.getElementById(tab + "Tab"))
+
+            document.getElementById(tab + "Tab").classList.remove("active");
+
+            document.getElementById(tab).classList.remove("show", "active");
+
+          }
+
+          console.log({show})
+
+          document.getElementById(show + "Tab").classList.add("active");
+
+          document.getElementById(show).classList.add("show", "active");
+
+ 
+
+          localStorage.setItem("currentTab", show + "Tab");
+
+          return;
+
+        });
+
+      }
+
+    } catch (err) {
+
+      return;
+
+    }
+
+  }
