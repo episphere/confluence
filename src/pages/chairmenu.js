@@ -14,22 +14,22 @@ import {
   copyFile,
   acceptedFolder,
   deniedFolder,
-  submitterFolder, 
-  sendEmail
+  submitterFolder,getChairApprovalDate, 
+  showCommentsDropDown 
 } from "../shared.js";
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
     if (!Array.isArray(files)) {
       return template;
     }
-    // template += `<a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join(
-    //   "; "
-    // )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
-    template += `<a href="mailto:${sendEmail.join(
-
+    template += `<a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join(
       "; "
+    )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
+    // template += `<a href="mailto:${sendEmail.join(
 
-    )}" id='email' class='btn btn-dark'>Send Email to Chiar</a>`
+    //   "; "
+
+    // )}" id='email' class='btn btn-dark'>Send Email to Chiar</a>`
 
     if (files.length != 0) {
       if (
@@ -40,7 +40,7 @@ export function renderFilePreviewDropdown(files, tab) {
       ) {
         template += `<div class='card-body p-0'>
                   <div class='card-title'>
-                 <label for='${tab}selectedDoc'>
+                  <label for='${tab}selectedDoc'>
                       <b>Select Concept Form:</b>
                       <!---<div class='text-muted small'>Hold Ctrl to select multiple concept forms 
                             </div>-->
@@ -90,65 +90,177 @@ export function switchFiles(tab) {
       .find(({ email }) => email === userEmail);
     return authChair ? authChair : null;
   }
-    export const generateChairMenuFiles = async () => {
-      const userChairItem = getCurrentUserAuth();
-      if (!userChairItem) return null;
-      let template = '';
-      //template += "<div class='tab-content' id='selectedTab'>";
-      const responseChair = await getFolderItems(userChairItem.boxId);
-      let filearrayChair = responseChair.entries;
-      const filescompleted = [];
-      for (let obj of filearrayChair) {
-        filescompleted.push(obj);
+  export const generateChairMenuFiles = async () => {
+
+    const userChairItem = getCurrentUserAuth();
+
+    if (!userChairItem) return null;
+
+    let template = '';
+
+    //template += "<div class='tab-content' id='selectedTab'>";
+
+    const responseChair = await getFolderItems(userChairItem.boxId);
+
+    let filearrayChair = responseChair.entries;
+
+    console.log('filearrayChair: ', filearrayChair)
+
+    const responseAccepted = await getFolderItems(acceptedFolder);
+
+    let filearrayAccepted = responseAccepted.entries;
+
+ 
+
+    const responseDenied = await getFolderItems(deniedFolder);
+
+    let filearrayDenied = responseDenied.entries;
+
+
+
+
+    const filescompleted = [];
+
+    const filesdecided = [];
+
+   
+
+    for (let obj of filearrayChair) {
+
+      filescompleted.push(obj);
+
     }
+
+
+
+
+    for (let obj of filearrayAccepted) {
+
+      filesdecided.push(obj);
+
+    }
+
+ 
+
+    for (let obj of filearrayDenied) {
+
+      filesdecided.push(obj);
+
+    }
+
+
+
+
     template += `<div class='tab-pane fade show active'
+
                   id='recommendation' role='tabpanel'
+
                   aria-labeledby='recommendationTab'>`;
-    console.log({template})
+
     template += renderFilePreviewDropdown(filescompleted, "recommendation");
+
+    template += `<div id='filePreview'>`;
+
     if (filescompleted.length !== 0) {
+
         template += `
+
             <div class='row'>
+
               <div id='boxFilePreview' class="col-12 preview-container"></div>
+
             </div>
+
             <div id='finalChairDecision' class="card-body approvedeny" style="background-color:#f6f6f6;">
+
               <form>
+
                 <label for="message">Enter Message for submitter or the DACC</label>
+
                 <div class='text-muted small'>Submitter will only see the below comment after approve or deny. </div>
+
                 <label for="grade">Select recommendation: </label>
+
               <select name="grade" id="grade2"></option>
+
                 <option value = "1"> 1 - Approved as submitted</option>
+
                 <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
+
                 <option value = "3"> 3 - Approved, but data release will be delayed </option>
+
                 <option value = "4"> 4 - Not approved </option>
+
                 <option value = "5"> 5 - Decision pending clarification of several issues</option>
+
                 <option value = "777"> 777 - Duplicate Proposal</option>
+
                 </select>
+
               <br>
+
                 <div class="input-group">
+
                     <textarea id="message" name="message" rows="6" cols="65"></textarea>
+
                 </div>
+
                 <button type="submit" class="buttonsubmit" value="approved" onclick="this.classList.toggle('buttonsubmit--loading')">
+
                   <span class="buttonsubmit__text"> Approve </span></button>
+
                 <button type="submit" class="buttonsubmit" value="rejected" onclick="this.classList.toggle('buttonsubmit--loading')">
+
                   <span class="buttonsubmit__text"> Deny </span></button>
+
               </form>
+
             </div>
+
             `;
+
       }
-    template += "</div>";
+
+    template += `
+
+        </div>
+
+      </div>
+
+    `;
+
     //template += "</div>";
+
     //document.getElementById("chairFileView").innerHTML = template;
+
     template += `<div class='tab-pane fade'
+
     id='daccDecision' role='tabpanel'
+
     aria-labeledby='daccDecision'>daccDecisionTab tab  content </div>`;
 
+
+
+
     document.getElementById("selectedTab").innerHTML = template;
-    showPreview(filearrayChair[0].id);
-    switchFiles("recommendation");
-    document.getElementById(
-      "recommendationselectedDoc"
-    ).children[0].selected = true;
+
+    viewFinalDecisionFilesTemplate(filesdecided);
+
+    console.log('show preview: ', filearrayChair)
+
+    if (!!filearrayChair.length) {
+
+      showPreview(filearrayChair[0].id);
+
+      switchFiles("recommendation");
+
+      document.getElementById(
+        "recommendationselectedDoc"
+      ).children[0].selected = true;
+    } else {
+      document.getElementById("filePreview").classList.remove("d-block");
+      document.getElementById("filePreview").classList.add("d-none");
+    }
     commentApproveReject();
     //Switch Tabs
     switchTabs(
@@ -283,105 +395,325 @@ export const commentApproveReject = () => {
     form.addEventListener("submit", approveComment);
   }
 };
+export function viewFinalDecisionFilesColumns() {
 
-// export function viewFinalDecisionFilesColumns() {
-//   return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
-//     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submitted By <button class="transparent-btn sort-column" data-column-name="Submitted By"><i class="fas fa-sort"></i></button></div>
-//     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decision<button class="transparent-btn sort-column" data-column-name="Decision"><i class="fas fa-sort"></i></button></div>
-//     <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decided On<button class="transparent-btn sort-column" data-column-name="Decision Date"><i class="fas fa-sort"></i></button></div>
-//   </div>`;
-// }
-// export async function viewFinalDecisionFilesTemplate(files) {
-//   let template = "";
-//   let filesInfo = [];
-//   for (const file of files) {
-//     const fileInfo = await getFileInfo(file.id);
-//     filesInfo.push(fileInfo);
-//   }
-//   if (filesInfo.length > 0) {
-//     template += `
-//     <div id='decidedFiles'>
-//     <div class='row'>
-//       <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
-//           <div class="div-border white-bg align-left p-2">
-//               <div class="main-summary-row">
-//                   <div class="col-xl-12 pl-1 pr-0">
-//                       <span class="font-size-17 font-bold">Filter</span>
-//                       <div id="filterData" class="align-left"></div>
-//                   </div>
-//               </div>
-//           </div>
-//       </div>
-//       </div>
-//       <!--div class='table-responsive'>
-//       <table class='table'-->
-      
-//       <div class='col-xl-12 pr-0'>`;
+  return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
 
-//     template += viewFinalDecisionFilesColumns();
+    <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
 
-//     template += '<div id="files"> </div>';
+    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submitted By <button class="transparent-btn sort-column" data-column-name="Submitted By"><i class="fas fa-sort"></i></button></div>
 
-//     template += '<!--tbody id="files"-->';
-//   } else {
-//     template += `
-//               No files to show.            
-//     </div>
-//     </div>`;
-//   }
+    <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
 
-//   document.getElementById("decided").innerHTML = template;
+    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decision<button class="transparent-btn sort-column" data-column-name="Decision"><i class="fas fa-sort"></i></button></div>
 
-//   if (filesInfo.length !== 0) {
-//     await viewFinalDecisionFiles(filesInfo);
-//     for (const file of filesInfo) {
-//       document
-//         .getElementById(`study${file.id}`)
-//         .addEventListener("click", showCommentsDropDown(file.id));
-//     }
+    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decided On<button class="transparent-btn sort-column" data-column-name="Decision Date"><i class="fas fa-sort"></i></button></div>
 
-//     let btns = Array.from(document.querySelectorAll(".preview-file"));
-//     btns.forEach((btn) => {
-//       btn.addEventListener("click", (e) => {
-//         btn.dataset.target = "#bcrppPreviewerModal";
-//         const header = document.getElementById("bcrppPreviewerModalHeader");
-//         const body = document.getElementById("bcrppPreviewerModalBody");
-//         header.innerHTML = `<h5 class="modal-title">File preview</h5>
-//                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-//                                         <span aria-hidden="true">&times;</span>
-//                                     </button>`;
-//         const fileId = btn.dataset.fileId;
-//         $("#bcrppPreviewerModal").modal("show");
-//         showPreview(fileId, "bcrppPreviewerModalBody");
-//       });
-//     });
-//     //Filtering and Sorting
-//     const table = document.getElementById("decidedFiles");
-//     const headers = table.querySelector(`.div-sticky`);
-//     Array.from(headers.children).forEach((header, index) => {
-//       header.addEventListener("click", (e) => {
-//         const sortDirection = header.classList.contains("header-sort-asc");
-//         sortTableByColumn(table, index, !sortDirection);
-//       });
-//     });
+  </div>`;
 
-//     filterSection(filesInfo);
-//     Array.from(document.getElementsByClassName("filter-var")).forEach((el) => {
-//       el.addEventListener("click", () => {
-//         const headerCell =
-//           document.getElementsByClassName("header-sortable")[0];
-//         const tableElement =
-//           headerCell.parentElement.parentElement.parentElement;
-//         filterCheckBox(tableElement, filesInfo);
-//       });
-//     });
-//     const input = document.getElementById("searchDataDictionary");
-//     input.addEventListener("input", () => {
-//       const headerCell = document.getElementsByClassName("header-sortable")[0];
-//       const tableElement = headerCell.parentElement.parentElement.parentElement;
-//       filterCheckBox(tableElement, filesInfo);
-//     });
-//   }
-// }
+}
+
+export async function viewFinalDecisionFilesTemplate(files) {
+
+  let template = "";
+
+  let filesInfo = [];
+
+  for (const file of files) {
+
+    const fileInfo = await getFileInfo(file.id);
+
+    console.log({fileInfo})
+
+    filesInfo.push(fileInfo);
+
+  }
+
+  if (filesInfo.length > 0) {
+
+    template += `
+
+    <div id='decidedFiles'>
+
+    <div class='row'>
+
+      <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
+
+          <div class="div-border white-bg align-left p-2">
+
+              <div class="main-summary-row">
+
+                  <div class="col-xl-12 pl-1 pr-0">
+
+                      <span class="font-size-17 font-bold">Filter</span>
+
+                      <div id="filterData" class="align-left"></div>
+
+                  </div>
+
+              </div>
+
+          </div>
+
+      </div>
+
+      </div>
+
+      <!--div class='table-responsive'>
+
+      <table class='table'-->
+
+     
+
+      <div class='col-xl-12 pr-0'>`;
+
+
+
+
+    template += viewFinalDecisionFilesColumns();
+
+
+
+
+    template += '<div id="files"> </div>';
+
+
+
+
+    template += '<!--tbody id="files"-->';
+
+  } else {
+
+    template += `
+
+              No files to show.            
+
+    </div>
+
+    </div>`;
+
+  }
+
+
+
+
+  document.getElementById("daccDecision").innerHTML = template;
+
+
+
+
+  if (filesInfo.length !== 0) {
+
+    await viewFinalDecisionFiles(filesInfo);
+
+    for (const file of filesInfo) {
+
+      document
+
+        .getElementById(`study${file.id}`)
+
+        .addEventListener("click", showCommentsDropDown(file.id));
+
+    }
+
+
+
+
+    let btns = Array.from(document.querySelectorAll(".preview-file"));
+
+    btns.forEach((btn) => {
+
+      btn.addEventListener("click", (e) => {
+
+        btn.dataset.target = "#bcrppPreviewerModal";
+
+        const header = document.getElementById("bcrppPreviewerModalHeader");
+
+        const body = document.getElementById("bcrppPreviewerModalBody");
+
+        header.innerHTML = `<h5 class="modal-title">File preview</h5>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+                                        <span aria-hidden="true">&times;</span>
+
+                                    </button>`;
+
+        const fileId = btn.dataset.fileId;
+
+        $("#bcrppPreviewerModal").modal("show");
+
+        showPreview(fileId, "bcrppPreviewerModalBody");
+
+      });
+
+    });
+
+    //Filtering and Sorting
+
+    const table = document.getElementById("decidedFiles");
+
+    const headers = table.querySelector(`.div-sticky`);
+
+    Array.from(headers.children).forEach((header, index) => {
+
+      header.addEventListener("click", (e) => {
+
+        const sortDirection = header.classList.contains("header-sort-asc");
+
+        sortTableByColumn(table, index, !sortDirection);
+
+      });
+
+    });
+
+
+
+
+    // filterSection(filesInfo);
+
+    Array.from(document.getElementsByClassName("filter-var")).forEach((el) => {
+
+      el.addEventListener("click", () => {
+
+        const headerCell =
+
+          document.getElementsByClassName("header-sortable")[0];
+
+        const tableElement =
+
+          headerCell.parentElement.parentElement.parentElement;
+
+        filterCheckBox(tableElement, filesInfo);
+
+      });
+
+    });
+
+    // const input = document.getElementById("searchDataDictionary");
+
+    // input.addEventListener("input", () => {
+
+    //   const headerCell = document.getElementsByClassName("header-sortable")[0];
+
+    //   const tableElement = headerCell.parentElement.parentElement.parentElement;
+
+    //   filterCheckBox(tableElement, filesInfo);
+
+    // });
+
+  }
+
+}
+
+
+
+
+export async function viewFinalDecisionFiles(files) {
+
+  let template = "";
+
+
+
+
+  for (const fileInfo of files) {
+
+    const fileId = fileInfo.id;
+
+    let filename = fileInfo.name.split("_").slice(0, -4).join(" ");
+
+    const shortfilename =
+
+      filename.length > 21 ? filename.substring(0, 20) + "..." : filename;
+
+
+
+
+    let completion_date = await getChairApprovalDate(fileId);
+
+    template += `
+
+<div class="card mt-1 mb-1 align-left" >
+
+    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
+
+        <div class="row">
+
+            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
+
+            <div class="col-lg-2 text-left">${fileInfo.created_by.name}</div>
+
+            <div class="col-lg-2 text-center">${new Date(fileInfo.created_at)
+
+              .toDateString()
+
+              .substring(4)}</div>
+
+            <div class="col-lg-2 pl-6 text-right">${
+
+              fileInfo.parent.name === "approved"
+
+                ? '<h6 class="badge badge-pill badge-success">Approved</h6>'
+
+                : fileInfo.parent.name === "denied"
+
+                ? '<h6 class="badge badge-pill badge-danger">Denied</h6>'
+
+                : '<h6 class="badge badge-pill badge-warning">Under Review</h6>'
+
+            }</div>
+
+            <div class="col-lg-2 pl-6 text-right">${completion_date}</div>
+
+            <div class="col-lg-1 text-right">
+
+                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
+
+                    <i class="fas fa-caret-down fa-2x"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
+
+                    <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+
+                    <div class="row mb-1 m-0">
+
+                    <div class="col-12 font-bold">
+
+                    Concept: ${filename}
+
+                    </div>
+
+                    </div>
+
+                    <div class="row mb-1 m-0">
+
+                      <div id='file${fileId}Comments' class='col-12'></div>
+
+                    </div>
+
+        </div>
+
+    </div>
+
+    </div>
+
+    </div>`;
+
+  }
+
+
+
+
+  template += `</div></div></div></div>`;
+
+  if (document.getElementById("files") != null)
+
+    document.getElementById("files").innerHTML = template;
+
+}
