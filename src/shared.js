@@ -11,7 +11,7 @@ export const deniedFolder = 196012663822;
 export const submitterFolder = 196013436057;
 export const chairsInfo = [
     {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG', dacc:['']}, 
-    {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:195153060784, consortium:'MERGE', dacc:['']}, 
+    {id: 'user_2', email:"kopchickbp@nih.gov", boxId:195153060784, consortium:'MERGE', dacc:['']}, 
     {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO',dacc:['']}, 
     {id: 'user_4', email:"ahearntu@nih.gov", boxId:195151351417, consortium:'CIMBA', dacc:['']}, 
     {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI', dacc:['']}, 
