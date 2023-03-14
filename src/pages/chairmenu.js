@@ -35,7 +35,8 @@ import {
 
   getChairApprovalDate,
 
-  showCommentsDropDown
+  showCommentsDropDown,
+  showCommentsDCEG
 
 } from "../shared.js";
 
@@ -362,7 +363,7 @@ export function switchFiles(tab) {
 
       document.getElementById("filePreview").classList.remove("d-block");
 
-      document.getElementById("filePreview").classList.add("d-none");
+      document.getElementById("filePreview").classList.add("d-None");
 
     }
 
@@ -576,7 +577,7 @@ export const commentApproveReject = () => {
 
         let folderEntries = folderItems.entries;
 
-        let folderID = "none";
+        let folderID = "None";
 
         for (let obj of folderEntries) {
 
@@ -590,7 +591,7 @@ export const commentApproveReject = () => {
 
         let cpFileId = "";
 
-        if (folderID == "none") {
+        if (folderID == "None") {
 
           const newFolder = await createFolder(submitterFolder, uploaderName);
 
@@ -645,17 +646,26 @@ export const commentApproveReject = () => {
 
 export function viewFinalDecisionFilesColumns() {
 
-  return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
+  return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
 
     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
 
-    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submitted By <button class="transparent-btn sort-column" data-column-name="Submitted By"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
 
-    <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
 
-    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decision<button class="transparent-btn sort-column" data-column-name="Decision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
 
-    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Decided On<button class="transparent-btn sort-column" data-column-name="Decision Date"><i class="fas fa-sort"></i></button></div>
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="CNCIDecision"><i class="fas fa-sort"></i></button></div>
+
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+
+    <div class="col-md-1 text-left font-bold ws-nowrap header-sortable"></div>
+
 
   </div>`;
 
@@ -693,7 +703,12 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
                   <div class="col-xl-12 pl-1 pr-0">
 
-                      <span class="font-size-17 font-bold">Filter</span>
+                      <span class="font-size-10"> <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted 
+                                                  <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
+                                                  <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
+                                                  <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
+                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision pending clarification 
+                                                  <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
 
                       <div id="filterData" class="align-left"></div>
 
@@ -760,7 +775,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
         .getElementById(`study${file.id}`)
 
-        .addEventListener("click", showCommentsDropDown(file.id));
+        .addEventListener("click", showCommentsDCEG(file.id));
 
     }
 
@@ -868,6 +883,8 @@ export async function viewFinalDecisionFiles(files) {
 
     const fileId = fileInfo.id;
 
+    //console.log(fileInfo);
+
     let filename = fileInfo.name.split("_").slice(0, -4).join(" ");
 
     const shortfilename =
@@ -887,17 +904,23 @@ export async function viewFinalDecisionFiles(files) {
 
         <div class="row">
 
-            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
+            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>${fileInfo.name}</div>
 
-            <div class="col-lg-2 text-left">${fileInfo.created_by.name}</div>
+            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
 
-            <div class="col-lg-2 text-center">${new Date(fileInfo.created_at)
-
-              .toDateString()
-
-              .substring(4)}</div>
-
-            <div class="col-lg-2 pl-6 text-right">${
+            <div class="col-md-1 text-center" id="AABCG${fileId}">N/A</div>
+            
+            <div class="col-md-1 text-center" id="BCAC${fileId}">N/A</div>
+            
+            <div class="col-md-1 text-center" id="CNCI${fileId}">N/A</div>
+            
+            <div class="col-md-1 text-center" id="CIMBA${fileId}">N/A</div>
+            
+            <div class="col-md-1 text-center" id="LAGENO${fileId}">N/A</div>
+            
+            <div class="col-md-1 text-center" id="MERGE${fileId}">N/A</div>
+            
+            <!---<div class="col-lg-2 pl-6 text-right">${
 
               fileInfo.parent.name === "approved"
 
@@ -911,7 +934,7 @@ export async function viewFinalDecisionFiles(files) {
 
             }</div>
 
-            <div class="col-lg-2 pl-6 text-right">${completion_date}</div>
+            <div class="col-lg-2 pl-6 text-right">${completion_date}</div>--->
 
             <div class="col-lg-1 text-right">
 
@@ -929,15 +952,15 @@ export async function viewFinalDecisionFiles(files) {
 
                     <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
 
-                    <div class="row mb-1 m-0">
+                      <div class="row mb-1 m-0">
 
-                    <div class="col-12 font-bold">
+                        <div class="col-12 font-bold">
 
-                    Concept: ${filename}
+                          Concept: ${filename}
 
-                    </div>
+                        </div>
 
-                    </div>
+                      </div>
 
                     <div class="row mb-1 m-0">
 
