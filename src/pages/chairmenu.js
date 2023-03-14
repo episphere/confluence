@@ -32,10 +32,15 @@ import {
 
   submitterFolder,
 
+  //sendEmail,
 
   getChairApprovalDate,
 
-  showCommentsDropDown
+  showCommentsDropDown,
+
+  archivedFolder,
+
+  deleteTask
 
 } from "../shared.js";
 
@@ -269,7 +274,7 @@ export function switchFiles(tab) {
 
             </div>
 
-            <div id='finalChairDecision' class="card-body approvedeny" style="background-color:#f6f6f6;">
+            <div id='finalChairDecision' class="card-body submit-comment" style="background-color:#f6f6f6;">
 
               <form>
 
@@ -303,13 +308,9 @@ export function switchFiles(tab) {
 
                 </div>
 
-                <button type="submit" class="buttonsubmit" value="approved" onclick="this.classList.toggle('buttonsubmit--loading')">
+                <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
 
-                  <span class="buttonsubmit__text"> Approve </span></button>
-
-                <button type="submit" class="buttonsubmit" value="rejected" onclick="this.classList.toggle('buttonsubmit--loading')">
-
-                  <span class="buttonsubmit__text"> Deny </span></button>
+                  <span class="buttonsubmit__text"> Submit </span></button>
 
               </form>
 
@@ -372,7 +373,7 @@ export function switchFiles(tab) {
 
    
 
-    commentApproveReject();
+    commentSubmit();
 
     //Switch Tabs
 
@@ -434,7 +435,7 @@ export const chairMenuTemplate = () => {
 
                                 <ul class='nav nav-tabs mb-3' role='tablist'>
 
-                                     <li class='nav-item' role='presentation'>
+                                     <li class='nav-item active' role='presentation'>
 
                                          <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> Submit concept recommendation</a>
 
@@ -464,11 +465,9 @@ export const chairMenuTemplate = () => {
 
 }
 
-export const commentApproveReject = () => {
+export const commentSubmit = () => {
 
-  let approveComment = async (e) => {
-
-    console.log('comment approve: ', e)
+  let submitComment = async (e) => {
 
     e.preventDefault();
 
@@ -548,11 +547,11 @@ export const commentApproveReject = () => {
 
       let message = "Rating: " + grade + "\nComment: " + comment;
 
-      if (decision !== "daccReview") {
+      // if (decision !== "daccReview") {
 
-        await updateTaskAssignment(taskId, decision, message);
+        // await updateTaskAssignment(taskId, decision, message);
 
-      }
+      // }
 
       await createComment(fileId, message);
 
@@ -560,17 +559,13 @@ export const commentApproveReject = () => {
 
       let uploaderName = fileInfo.created_by.login;
 
-      if (decision == "approved") {
+      // if (decision == "submitted") {
 
-        await moveFile(fileId, acceptedFolder);
+        await copyFile(fileId, archivedFolder);
 
-      } else if (decision == "rejected") {
+      // }
 
-        await moveFile(fileId, deniedFolder);
-
-      }
-
-      if (decision != "daccReview") {
+      // if (decision != "daccReview") {
 
         let folderItems = await getFolderItems(submitterFolder);
 
@@ -622,7 +617,28 @@ export const commentApproveReject = () => {
 
         await createComment(cpFileId, message);
 
-      }
+
+
+
+        const taskEntries = tasklist.entries;
+
+        if (taskEntries.length !== 0) {
+
+          for (let entry of taskEntries) {
+
+            console.log({taskEntries, entry});
+
+            if (entry.action === "complete" && entry.is_completed == false) {
+
+              await deleteTask(entry.id);
+
+            }
+
+          }
+
+        }
+
+      // }
 
     }
 
@@ -630,11 +646,11 @@ export const commentApproveReject = () => {
 
   };
 
-  const form = document.querySelector(".approvedeny");
+  const form = document.querySelector(".submit-comment");
 
   if (form) {
 
-    form.addEventListener("submit", approveComment);
+    form.addEventListener("submit", submitComment);
 
   }
 
