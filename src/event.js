@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -225,17 +225,17 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     location.reload();
 }
 
-const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
-    const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
-    let ID = '';
-    if(folderExists.length === 0) {
-        ID = (await (await createFolder(studyId, folderName)).json()).id;
-    }
-    else {
-        ID = folderExists[0].id;
-    }
-    return ID;
-}
+// const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
+//     const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
+//     let ID = '';
+//     if(folderExists.length === 0) {
+//         ID = (await (await createFolder(studyId, folderName)).json()).id;
+//     }
+//     else {
+//         ID = folderExists[0].id;
+//     }
+//     return ID;
+// }
 
 const performQAQC = async (textFromFileLoaded, fileName) => {
     document.getElementById('uploadErrorReport').innerHTML = `
