@@ -1336,29 +1336,76 @@ export async function showComments(id) {
           `;
 
       }
-
     } else {
+       for (const comment of comments) {
+         const comment_user = comment.created_by;
+         if (
+           comment_user.login === user ||
+           chairsInfo.find(element => element.email === comment_user.login)
+         ) {
+           const comment_date = new Date(comment.created_at);
+           const date = comment_date.toLocaleDateString();
+           const time = comment_date.toLocaleTimeString();
+           template += `
+           <div>
+               <div class='row'>
+                   <div class='col-8 p-0'>
+                       <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+                   </div>
+               `;
+  
+           template += `    
+               </div>
+               <div class='row'>
+                       <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+               </div>
+  
+               <div class='row'>
+                   <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+               </div>
+               <hr class='my-1'>
+           </div>
+           `;
+         }
+       }
+     }
+     template += '</div>'
+  
+    commentSection.innerHTML = template;
+  
+    return;
+  }
 
+export async function showCommentsDCEG(id) {
+    const commentSection = document.getElementById(`file${id}Comments`);
+    const response = await listComments(id);
+    //console.log(response);
+    let comments = JSON.parse(response).entries;
+    if (comments.length === 0) {
+      const dropdownSection = document.getElementById(`file${id}Comments`);
+      dropdownSection.innerHTML = `
+                
+                      No Comments to show.
+          `;
+  
+      return;
+    }
+    let template = ` 
+      <div class='container-fluid'>`;
+    const user = JSON.parse(localStorage.parms).login;
+    if (chairsInfo.find(element => element.email === user)) {
       for (const comment of comments) {
-
-        const comment_user = comment.created_by;
-
-        if (
-
-          comment_user.login === user ||
-
-          chairsInfo.find(element => element.email === comment_user.login)
-
-        ) {
-
-          const comment_date = new Date(comment.created_at);
-
-          const date = comment_date.toLocaleDateString();
-
-          const time = comment_date.toLocaleTimeString();
-
-          template += `
-
+        //console.log(chairsInfo.map(function (el) {return el.consortium}));
+        //console.log(chairsInfo.find(element => chairsInfo.map(function (el) {return el.consortium}).includes(element.consortium)).consortium);
+        const cons = chairsInfo.find(element => chairsInfo.map(function (el) {return el.consortium}).includes(element.consortium)).consortium;
+        const score = comment.message[8];
+        //console.log(score);
+        const inputScore = document.getElementById(`${cons}${id}`);
+        inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;            
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        template += `
           <div>
 
               <div class='row'>
@@ -1370,8 +1417,6 @@ export async function showComments(id) {
                   </div>
 
               `;
-
- 
 
           template += `    
 
@@ -1414,9 +1459,6 @@ export async function showComments(id) {
     return;
 
   }
-
-
-
 
 export const listComments = async (id) => {
 

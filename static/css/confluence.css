@@ -434,9 +434,9 @@ label {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.first-list-item {
-    /* margin-top: 1rem; */
-}
+/* .first-list-item {
+    margin-top: 1rem;
+} */
 
 .main-summary-row {
     flex-wrap: wrap;
@@ -2078,4 +2078,35 @@ ul.form {
     float: right;
     padding-right: 10px;
     display: inline;
+}
+
+.badge-1 {
+    background-color: green;
+    font-weight: bold;
+    color: white;
+}
+.badge-2 {
+    background-color: #fff400;
+    font-weight: bold;
+    color: black;
+}
+.badge-3 {
+    background-color: #a3ff00;
+    font-weight: bold;
+    color: black
+}
+.badge-4 {
+    background-color: #ff0000;
+    font-weight: bold;
+    color: white;
+}
+.badge-5 {
+    background-color: #ffa700;
+    font-weight: bold;
+    color: black
+}
+.badge-777 {
+    background-color: #7700ff;
+    font-weight: bold;
+    color: white;
 }

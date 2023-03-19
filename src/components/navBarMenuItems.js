@@ -2,9 +2,8 @@ import { applicationURLs,chairsInfo } from './../shared.js';
 
 
 export const navBarMenutemplate = () => {
-    let authChair = chairsInfo
-    .map(({email})=>email)
-    .indexOf(JSON.parse(localStorage.parms).login)!==-1;
+    let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
+    console.log(authChair);
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
