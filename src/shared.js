@@ -7,15 +7,16 @@ export const summaryStatsFileId = 691143057533;
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
 export const acceptedFolder = 196011761030;
-export const deniedFolder = 196012663822;
+export const deniedFolder = 198940989727;
 export const submitterFolder = 196013436057;
+export const archivedFolder = 198962088100;
 export const chairsInfo = [
-    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:195155906608, consortium:'AABCG', dacc:['']}, 
-    {id: 'user_2', email:"kopchickbp@nih.gov", boxId:195153060784, consortium:'MERGE', dacc:['']}, 
-    {id: 'user_3', email:"behpours2@nih.gov", boxId:195156183284, consortium:'LAGENO',dacc:['']}, 
-    {id: 'user_4', email:"ahearntu@nih.gov", boxId:195151351417, consortium:'CIMBA', dacc:['']}, 
-    {id: 'user_5', email:"garciacm@nih.gov", boxId:195156038705, consortium:'C-NCI', dacc:['']}, 
-    {id: 'user_6', email:"sbehpour@deloitte.com", boxId:195155330962, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
+    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['']}, 
+    {id: 'user_2', email:"ben.kopchick@nih.gov", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['']}, 
+    {id: 'user_3', email:"behpours2@nih.gov", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['']}, 
+    {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['']}, 
+    {id: 'user_5', email:"garciacm@nih.gov", boxId:198956756286, boxIdNew: 199271469612,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['']}, 
+    {id: 'user_6', email:"sbehpour@deloitte.com", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -180,7 +181,57 @@ export const updateTaskAssignment = async (id, res_state, msg = "") => {
         return await updateTaskAssignment(id, res_state, msg);
     }
 };
+export const deleteTask = async (taskId) => {
 
+    try {
+
+      const access_token = JSON.parse(localStorage.parms).access_token;
+
+      const response = await fetch(`https://api.box.com/2.0/tasks/${taskId}`, {
+
+        method: "DELETE",
+
+        headers: {
+
+          Authorization: "Bearer " + access_token,
+
+          "Content-Type": "application/json",
+
+          "Allow-Access-Control-Methods": "DELETE",
+
+        },
+
+      });
+
+      if (response.status === 403) {
+
+        if ((await refreshToken()) === true) return await getTaskList(taskId);
+
+      }
+
+      if (response.status === 404) {
+
+        return;
+
+      }
+
+      if (response.status === 204) {
+
+        return;
+
+      } else {
+
+        return null;
+
+      }
+
+    } catch (err) {
+
+      if ((await refreshToken()) === true) return await deleteTask(taskId);
+
+    }
+
+  };
 export const getTaskList = async (id) => {
     try {
       const access_token = JSON.parse(localStorage.parms).access_token;
@@ -324,36 +375,36 @@ const searchParms = () => {
     }
     return parms
 };
-export const createFolder = async (folderId, folderName) => {
-    try {
-        const access_token = JSON.parse(localStorage.parms).access_token;
-        let obj = {
-            "name": folderName,
-            "parent": {
-                "id": folderId
-            }
-        };
-        let response = await fetch("https://api.box.com/2.0/folders", {
-            method: "POST",
-            headers:{
-                Authorization:"Bearer "+access_token
-            },
-            body: JSON.stringify(obj)
-        });
-        if(response.status === 401){
-            if((await refreshToken()) === true) return await createFolder(folderId, foldername);
-        }
-        else if(response.status === 201){
-            return response;
-        }
-        else{
-            return {status: response.status, statusText: response.statusText};
-        };
-    }
-    catch(err) {
-        if((await refreshToken()) === true) return await createFolder(folderId, foldername);
-    }
-};
+// export const createFolder = async (folderId, folderName) => {
+//     try {
+//         const access_token = JSON.parse(localStorage.parms).access_token;
+//         let obj = {
+//             "name": folderName,
+//             "parent": {
+//                 "id": folderId
+//             }
+//         };
+//         let response = await fetch("https://api.box.com/2.0/folders", {
+//             method: "POST",
+//             headers:{
+//                 Authorization:"Bearer "+access_token
+//             },
+//             body: JSON.stringify(obj)
+//         });
+//         if(response.status === 401){
+//             if((await refreshToken()) === true) return await createFolder(folderId, foldername);
+//         }
+//         else if(response.status === 201){
+//             return response;
+//         }
+//         else{
+//             return {status: response.status, statusText: response.statusText};
+//         };
+//     }
+//     catch(err) {
+//         if((await refreshToken()) === true) return await createFolder(folderId, foldername);
+//     }
+// };
 export const moveFile = async (fileId, parentId) => {
     try {
       const access_token = JSON.parse(localStorage.parms).access_token;
@@ -1162,104 +1213,163 @@ export async function showComments(id) {
     return;
   }
   export const getChairApprovalDate = async (id) => {
+
     let fileTasks = await getTaskList(id);
+
     let completion_date = "";
-  
+
+ 
+
     fileTasks.entries.forEach((task) => {
+
       if (task.action === "review") {
+
         let task_assignments = task.task_assignment_collection.entries;
+
         task_assignments.forEach((task_assignment) => {
+
           if (task_assignment.completed_at !== undefined) {
+
             completion_date = new Date(task_assignment.completed_at)
+
               .toDateString()
+
               .substring(4);
+
           }
+
         });
+
       }
+
     });
-  
+
+ 
+
     if (completion_date !== "") return completion_date;
+
     else return "Not Completed";
+
   };
 
+
+
+
   export async function showCommentsDropDown(id) {
+
     const commentSection = document.getElementById(`file${id}Comments`);
+
     const response = await listComments(id);
+
     let comments = JSON.parse(response).entries;
+
     if (comments.length === 0) {
+
       const dropdownSection = document.getElementById(`file${id}Comments`);
+
       dropdownSection.innerHTML = `
-                
+
+               
+
                       No Comments to show.
+
           `;
-  
+
+ 
+
       return;
+
     }
-    let template = ` 
+
+    let template = `
+
       <div class='container-fluid'>`;
+
     const user = JSON.parse(localStorage.parms).login;
+
     if (chairsInfo.find(element => element.email === user.login)) {
+
       for (const comment of comments) {
+
         const comment_date = new Date(comment.created_at);
+
         const date = comment_date.toLocaleDateString();
+
         const time = comment_date.toLocaleTimeString();
+
         template += `
+
           <div>
+
               <div class='row'>
+
                   <div class='col-8 p-0'>
+
                       <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+
                   </div>
+
               `;
+
         template += `    
+
               </div>
+
               <div class='row'>
+
                       <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+
               </div>
-  
+
+ 
+
               <div class='row'>
+
                   <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+
               </div>
+
               <hr class='my-1'>
+
           </div>
+
           `;
+
       }
-    } else { 
-        return;
-    }
-    // } else {
-    //   for (const comment of comments) {
-    //     const comment_user = comment.created_by;
-    //     if (
-    //       comment_user.login === user ||
-    //       chairsInfo.find(element => element.email === comment_user.login)
-    //     ) {
-    //       const comment_date = new Date(comment.created_at);
-    //       const date = comment_date.toLocaleDateString();
-    //       const time = comment_date.toLocaleTimeString();
-    //       template += `
-    //       <div>
-    //           <div class='row'>
-    //               <div class='col-8 p-0'>
-    //                   <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
-    //               </div>
-    //           `;
+    } else {
+       for (const comment of comments) {
+         const comment_user = comment.created_by;
+         if (
+           comment_user.login === user ||
+           chairsInfo.find(element => element.email === comment_user.login)
+         ) {
+           const comment_date = new Date(comment.created_at);
+           const date = comment_date.toLocaleDateString();
+           const time = comment_date.toLocaleTimeString();
+           template += `
+           <div>
+               <div class='row'>
+                   <div class='col-8 p-0'>
+                       <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+                   </div>
+               `;
   
-    //       template += `    
-    //           </div>
-    //           <div class='row'>
-    //                   <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
-    //           </div>
+           template += `    
+               </div>
+               <div class='row'>
+                       <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+               </div>
   
-    //           <div class='row'>
-    //               <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
-    //           </div>
-    //           <hr class='my-1'>
-    //       </div>
-    //       `;
-    //     }
-    //   }
-    // }
-    // template += '</div>'
+               <div class='row'>
+                   <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+               </div>
+               <hr class='my-1'>
+           </div>
+           `;
+         }
+       }
+     }
+     template += '</div>'
   
     commentSection.innerHTML = template;
   
@@ -1297,88 +1407,109 @@ export async function showCommentsDCEG(id) {
         const time = comment_date.toLocaleTimeString();
         template += `
           <div>
+
               <div class='row'>
+
                   <div class='col-8 p-0'>
+
                       <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+
                   </div>
+
               `;
-        template += `    
+
+          template += `    
+
               </div>
+
               <div class='row'>
+
                       <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+
               </div>
-  
+
+ 
+
               <div class='row'>
+
                   <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+
               </div>
+
               <hr class='my-1'>
+
           </div>
+
           `;
-      }
-    } else {
-        return;
-    }
-    // } else {
-    //   for (const comment of comments) {
-    //     const comment_user = comment.created_by;
-    //     //console.log(comment_user.login);
-    //     if (
-    //       comment_user.login === user ||
-    //       chairsInfo.find(element => element.email === comment_user.login)
-    //     ) {
-    //         const comment_date = new Date(comment.created_at);
-    //         const date = comment_date.toLocaleDateString();
-    //         const time = comment_date.toLocaleTimeString();
-    //         template += `
-    //         <div>
-    //             <div class='row'>
-    //                 <div class='col-8 p-0'>
-    //                     <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
-    //                 </div>
-    //             </div>
-    //             <div class='row'>
-    //                 <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
-    //             </div>
-    //             <div class='row'>
-    //                 <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
-    //             </div>
-    //             <hr class='my-1'>
-    //         </div>
-    //         `;
-    //         }
-    //     }
-    // }
-    // template += '</div>'
-  
-    commentSection.innerHTML = template;
-  
-    return;
-  }
-  
-export const listComments = async (id) => {
-    try {
-      const access_token = JSON.parse(localStorage.parms).access_token;
-      const response = await fetch(
-        `https://api.box.com/2.0/files/${id}/comments`,
-        {
-          method: "GET",
-  
-          headers: {
-            Authorization: "Bearer " + access_token,
-  
-            "Content-Type": "application/json",
-          },
-  
-          redirect: "follow",
+
         }
-      );
-  
-      if (response.status === 401) {
-        if ((await refreshToken()) === true) return await listComments(id);
-      } else {
-        return response.text();
+
       }
-    } catch (err) {
-      if ((await refreshToken()) === true) return await listComments(id);
+
     }
-  }; 
+
+    // template += '</div>'
+
+ 
+
+    commentSection.innerHTML = template;
+
+ 
+
+    return;
+
+  }
+
+export const listComments = async (id) => {
+
+    try {
+
+      const access_token = JSON.parse(localStorage.parms).access_token;
+
+      const response = await fetch(
+
+        `https://api.box.com/2.0/files/${id}/comments`,
+
+        {
+
+          method: "GET",
+
+ 
+
+          headers: {
+
+            Authorization: "Bearer " + access_token,
+
+ 
+
+            "Content-Type": "application/json",
+
+          },
+
+ 
+
+          redirect: "follow",
+
+        }
+
+      );
+
+ 
+
+      if (response.status === 401) {
+
+        if ((await refreshToken()) === true) return await listComments(id);
+
+      } else {
+
+        return response.text();
+
+      }
+
+    } catch (err) {
+
+      if ((await refreshToken()) === true) return await listComments(id);
+
+    }
+
+  };

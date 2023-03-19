@@ -20,7 +20,7 @@ import {
 
   moveFile,
 
-  createFolder,
+ //createFolder,
 
   addNewCollaborator,
 
@@ -32,15 +32,23 @@ import {
 
   submitterFolder,
 
+  //sendEmail,
 
   getChairApprovalDate,
 
   showCommentsDropDown,
+
+  archivedFolder,
+
+  deleteTask,
+  
   showCommentsDCEG
 
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
+
+  console.log({files})
 
     let template = "";
 
@@ -54,32 +62,19 @@ export function renderFilePreviewDropdown(files, tab) {
 
       "; "
 
-    )}" id='email' class='btn btn-dark'>Send Email to Chair</a>`
+    )}" id='email' class='btn btn-dark'>Send Email to DACC</a>`
 
-    // template += `<a href="mailto:${sendEmail.join(
-
-
-
-
-    //   "; "
-
-
-
-
-    // )}" id='email' class='btn btn-dark'>Send Email to Chiar</a>`
-
-
-
+ 
 
     if (files.length != 0) {
 
       if (
 
-        tab !== "daccReview" &&
+        //tab !== "daccReview" &&
 
-        tab !== "dacctoBeCompleted" &&
+        //tab !== "dacctoBeCompleted" &&
 
-        tab !== "completed" &&
+        //tab !== "completed" &&
 
         tab !== "decided"
 
@@ -159,7 +154,7 @@ export function renderFilePreviewDropdown(files, tab) {
 
 }
 
-export function switchFiles(tab) {
+export function switchFiles(tab, div_id = '') {
 
    console.log('switchFile:', tab,document.getElementById(`${tab}selectedDoc`) )
 
@@ -171,7 +166,7 @@ export function switchFiles(tab) {
 
         const file_id = e.target.value;
 
-        showPreview(file_id);
+        showPreview(file_id, div_id);
 
       });
 
@@ -197,58 +192,68 @@ export function switchFiles(tab) {
 
     let template = '';
 
-    //template += "<div class='tab-content' id='selectedTab'>";
+    const responseChair = await getFolderItems(userChairItem.boxIdNew);
 
-    const responseChair = await getFolderItems(userChairItem.boxId);
+    const responseClara = await getFolderItems(userChairItem.boxIdClara);
 
     let filearrayChair = responseChair.entries;
 
-    console.log('filearrayChair: ', filearrayChair)
+    let filearrayClara = responseClara.entries;
 
-    const responseAccepted = await getFolderItems(acceptedFolder);
-
-    let filearrayAccepted = responseAccepted.entries;
-
- 
-
-    const responseDenied = await getFolderItems(acceptedFolder); /// PLEASE FIX, ONLY FOR RUNNING
-
-    let filearrayDenied = responseDenied.entries;
-
-
-
-
-    const filescompleted = [];
-
-    const filesdecided = [];
-
-   
+    const filesIncompleted = [];
 
     for (let obj of filearrayChair) {
 
-      filescompleted.push(obj);
+      let tasks = await getTaskList(obj.id);
+
+      if (tasks.entries.length != 0) {
+
+        for (let items of tasks.entries) {
+
+          for (let itemtasks of items.task_assignment_collection.entries) {
+
+            if (itemtasks.status === 'incomplete') {
+
+              filesIncompleted.push(itemtasks.item);
+
+            }
+
+          }
+
+        }
+
+      }
 
     }
 
 
 
 
-    for (let obj of filearrayAccepted) {
+    const filesClaraIncompleted = []
 
-      //filesdecided.push(obj);
+    for (let obj of filearrayClara) {
+
+      let tasks = await getTaskList(obj.id);
+
+      if (tasks.entries.length != 0) {
+
+        for (let items of tasks.entries) {
+
+          for (let itemtasks of items.task_assignment_collection.entries) {
+
+            if (itemtasks.status === 'incomplete') {
+
+              filesClaraIncompleted.push(itemtasks.item);
+
+            }
+
+          }
+
+        }
+
+      }
 
     }
-
- 
-
-    for (let obj of filearrayDenied) {
-
-      filesdecided.push(obj);
-
-    }
-
-
-
 
     template += `<div class='tab-pane fade show active'
 
@@ -256,11 +261,11 @@ export function switchFiles(tab) {
 
                   aria-labeledby='recommendationTab'>`;
 
-    template += renderFilePreviewDropdown(filescompleted, "recommendation");
+    template += renderFilePreviewDropdown(filesIncompleted, "recommendation");
 
     template += `<div id='filePreview'>`;
 
-    if (filescompleted.length !== 0) {
+    if (filesIncompleted.length !== 0) {
 
         template += `
 
@@ -270,7 +275,7 @@ export function switchFiles(tab) {
 
             </div>
 
-            <div id='finalChairDecision' class="card-body approvedeny" style="background-color:#f6f6f6;">
+            <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#f6f6f6;">
 
               <form>
 
@@ -304,13 +309,9 @@ export function switchFiles(tab) {
 
                 </div>
 
-                <button type="submit" class="buttonsubmit" value="approved" onclick="this.classList.toggle('buttonsubmit--loading')">
+                <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
 
-                  <span class="buttonsubmit__text"> Approve </span></button>
-
-                <button type="submit" class="buttonsubmit" value="rejected" onclick="this.classList.toggle('buttonsubmit--loading')">
-
-                  <span class="buttonsubmit__text"> Deny </span></button>
+                  <span class="buttonsubmit__text"> Submit </span></button>
 
               </form>
 
@@ -328,10 +329,6 @@ export function switchFiles(tab) {
 
     `;
 
-    //template += "</div>";
-
-    //document.getElementById("chairFileView").innerHTML = template;
-
     template += `<div class='tab-pane fade'
 
     id='daccDecision' role='tabpanel'
@@ -341,15 +338,92 @@ export function switchFiles(tab) {
 
 
 
+    // TODO: For Concept Needing Clarification Tab
+
+    template += `<div class='tab-pane fade' id='conceptNeedingClarification' role='tabpanel'
+
+    aria-labeledby='conceptNeedingClarification'>`;
+
+
+
+
+    template += renderFilePreviewDropdown(filesClaraIncompleted, "conceptNeedingClarification");
+
+    template += `<div id='filePreview'>`;
+
+    if (filesClaraIncompleted.length !== 0) {
+
+        template += `
+
+            <div class='row'>
+
+              <div id='boxFileClaraPreview' class="col-12 preview-container"></div>
+
+            </div>
+
+            <div id='finalClaraDecision' class="card-body submit-comment-conceptNeedingClarification" style="background-color:#f6f6f6;">
+
+              <form>
+
+                <label for="message">Enter Message for submitter or the DACC</label>
+
+                <div class='text-muted small'>Submitter will only see the below comment after approve or deny. </div>
+
+                <label for="grade">Select recommendation: </label>
+
+              <select name="grade" id="grade2"></option>
+
+                <option value = "1"> 1 - Approved as submitted</option>
+
+                <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
+
+                <option value = "3"> 3 - Approved, but data release will be delayed </option>
+
+                <option value = "4"> 4 - Not approved </option>
+
+                <option value = "5"> 5 - Decision pending clarification of several issues</option>
+
+                <option value = "777"> 777 - Duplicate Proposal</option>
+
+                </select>
+
+              <br>
+
+                <div class="input-group">
+
+                    <textarea id="message" name="message" rows="6" cols="65"></textarea>
+
+                </div>
+
+                <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
+
+                  <span class="buttonsubmit__text"> Submit </span></button>
+
+              </form>
+
+            </div>
+
+            `;
+
+      }
+
+
+
+
+    template += `
+
+        </div></div>
+
+    `;
+
+
+
+
     document.getElementById("selectedTab").innerHTML = template;
 
-    viewFinalDecisionFilesTemplate(filesdecided);
+    if (!!filesIncompleted.length) {
 
-    console.log('show preview: ', filearrayChair)
-
-    if (!!filearrayChair.length) {
-
-      showPreview(filearrayChair[0].id);
+      showPreview(filesIncompleted[0].id);
 
       switchFiles("recommendation");
 
@@ -359,6 +433,8 @@ export function switchFiles(tab) {
 
       ).children[0].selected = true;
 
+      commentSubmit('recommendation');
+
     } else {
 
       document.getElementById("filePreview").classList.remove("d-block");
@@ -367,13 +443,32 @@ export function switchFiles(tab) {
 
     }
 
-   
 
-   
 
-   
 
-    commentApproveReject();
+    if (!!filesClaraIncompleted.length) {
+
+      console.log({filesClaraIncompleted})
+
+      showPreview(filesClaraIncompleted[0].id, 'boxFileClaraPreview');
+
+      switchFiles("conceptNeedingClarification", 'boxFileClaraPreview');
+
+      document.getElementById(
+
+        "conceptNeedingClarification"
+
+      ).children[0].selected = true;
+
+      commentSubmit('conceptNeedingClarification');
+
+    } else {
+
+      document.getElementById("filePreview").classList.remove("d-block");
+
+      document.getElementById("filePreview").classList.add("d-none");
+
+    }
 
     //Switch Tabs
 
@@ -381,19 +476,42 @@ export function switchFiles(tab) {
 
       "recommendation",
 
-      ["daccDecision"]
+      ["daccDecision", 'conceptNeedingClarification']
 
     );
 
-   
+    switchTabs(
+
+      "conceptNeedingClarification",
+
+      ["recommendation", 'daccDecision']
+
+    );
 
     switchTabs(
 
       "daccDecision",
 
-      ["recommendation"]
+      ["recommendation", 'conceptNeedingClarification']
 
     );
+
+
+
+
+    if (localStorage.getItem("currentTab")) {
+
+      const currTab = localStorage.getItem("currentTab");
+
+      if (document.getElementById(currTab) != null) {
+
+        document.getElementById(currTab).click();
+
+      }
+
+    }
+
+   
 
     return template;
 
@@ -435,11 +553,15 @@ export const chairMenuTemplate = () => {
 
                                 <ul class='nav nav-tabs mb-3' role='tablist'>
 
-                                     <li class='nav-item' role='presentation'>
+                                     <li class='nav-item active' role='presentation'>
 
                                          <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> Submit concept recommendation</a>
 
                                      </li>
+
+                                     <li class='nav-item' role='presentation'>
+
+                                         <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>Concept Needing Clarification</a>
 
                                      </li>
 
@@ -465,11 +587,9 @@ export const chairMenuTemplate = () => {
 
 }
 
-export const commentApproveReject = () => {
+export const commentSubmit = (tab = 'recommendation') => {
 
-  let approveComment = async (e) => {
-
-    console.log('comment approve: ', e)
+  let submitComment = async (e) => {
 
     e.preventDefault();
 
@@ -477,13 +597,11 @@ export const commentApproveReject = () => {
 
     btn.disabled = true;
 
-    // let taskId = btn.name;
+    // let fileId = document.querySelector(
 
-    let fileId = document.querySelector(
+    //   ".tab-content .active #recommendationselectedDoc"
 
-      ".tab-content .active #recommendationselectedDoc"
-
-    ).value; //document.getElementById('selectedDoc').value;
+    // ).value; //document.getElementById('selectedDoc').value;
 
     // Send multiple files
 
@@ -491,9 +609,11 @@ export const commentApproveReject = () => {
 
     const elements = document.querySelectorAll(
 
-      ".tab-content .active #recommendationselectedDoc option"
+      `.tab-content .active #${tab}selectedDoc option`
 
     );
+
+    console.log({elements})
 
     for (let i = 0; i < elements.length; i++) {
 
@@ -509,39 +629,41 @@ export const commentApproveReject = () => {
 
       let tasklist = await getTaskList(fileId);
 
-      let entries = tasklist.entries;
+      // if (tasklist.entries.length !== 0) {
 
-      if (entries.length !== 0) {
+      //   for (let item of tasklist.entries) {
 
-        for (let item of entries) {
+      //     console.log({item})
 
-          if (item.is_completed == false && item.action == "review") {
+       
 
-            for (let taskassignment of item.task_assignment_collection
+      //     if (item.is_completed == false && item.action == "review") {
 
-              .entries) {
+      //       for (let taskassignment of item.task_assignment_collection
 
-              if (
+      //         .entries) {
 
-                taskassignment.assigned_to.login ==
+      //         if (
 
-                JSON.parse(localStorage.parms).login
+      //           taskassignment.assigned_to.login ==
 
-              ) {
+      //           JSON.parse(localStorage.parms).login
 
-                var taskId = taskassignment.id;
+      //         ) {
 
-              }
+      //           var taskId = taskassignment.id;
 
-            }
+      //         }
 
-          }
+      //       }
 
-        }
+      //     }
 
-      }
+      //   }
 
-      let decision = e.submitter.value;
+      // }
+
+      // let decision = e.submitter.value;
 
       let grade = e.target[0].value;
 
@@ -549,81 +671,116 @@ export const commentApproveReject = () => {
 
       let message = "Rating: " + grade + "\nComment: " + comment;
 
-      if (decision !== "daccReview") {
+      // if (decision !== "daccReview") {
 
-        await updateTaskAssignment(taskId, decision, message);
+        // await updateTaskAssignment(taskId, decision, message);
 
-      }
+
+
+
+      // }
+
+
+
+
+      // TODO: this is require
 
       await createComment(fileId, message);
 
-      let fileInfo = await getFileInfo(fileId);
 
-      let uploaderName = fileInfo.created_by.login;
 
-      if (decision == "approved") {
 
-        await moveFile(fileId, acceptedFolder);
+      // let fileInfo = await getFileInfo(fileId);
 
-      } else if (decision == "rejected") {
+      // let uploaderName = fileInfo.created_by.login;
 
-        await moveFile(fileId, deniedFolder);
+      // if (decision == "submitted") {
 
-      }
+      // await copyFile(fileId, archivedFolder);
 
-      if (decision != "daccReview") {
+      // }
 
-        let folderItems = await getFolderItems(submitterFolder);
+      // if (decision != "daccReview") {
 
-        let folderEntries = folderItems.entries;
+        // let folderItems = await getFolderItems(submitterFolder);
 
-        let folderID = "None";
+        // let folderEntries = folderItems.entries;
 
-        for (let obj of folderEntries) {
+        // let folderID = "none";
 
-          if (obj.name == uploaderName) {
+        // for (let obj of folderEntries) {
 
-            folderID = obj.id;
+        //   if (obj.name == uploaderName) {
+
+        //     folderID = obj.id;
+
+        //   }
+
+        // }
+
+        // let cpFileId = "";
+
+        // if (folderID == "none") {
+
+        //   const newFolder = await createFolder(submitterFolder, uploaderName);
+
+        //   await addNewCollaborator(
+
+        //     newFolder.id,
+
+        //     "folder",
+
+        //     uploaderName,
+
+        //     "viewer"
+
+        //   );
+
+        //   const cpFile = await copyFile(fileId, newFolder.id);
+
+        //   cpFileId = cpFile.id;
+
+        // } else {
+
+        //   const cpFile = await copyFile(fileId, folderID);
+
+        //   cpFileId = cpFile.id;
+
+        // }
+
+        // await createComment(cpFileId, "This file was " + decision);
+
+        // await createComment(cpFileId, message);
+
+        const taskEntries = tasklist.entries;
+
+        if (taskEntries.length !== 0) {
+
+          for (let entry of taskEntries) {
+
+            for (let item of entry.task_assignment_collection.entries) {
+
+              if (item.status === 'incomplete') {
+
+                // TODO: this is required
+
+                await updateTaskAssignment(item.id, 'completed', 'You have completed your task')
+
+              }
+
+            }
+
+            // if (entry.is_completed == false) {
+
+            //   await deleteTask(entry.id);
+
+            // }
 
           }
 
         }
 
-        let cpFileId = "";
-
-        if (folderID == "None") {
-
-          const newFolder = await createFolder(submitterFolder, uploaderName);
-
-          await addNewCollaborator(
-
-            newFolder.id,
-
-            "folder",
-
-            uploaderName,
-
-            "viewer"
-
-          );
-
-          const cpFile = await copyFile(fileId, newFolder.id);
-
-          cpFileId = cpFile.id;
-
-        } else {
-
-          const cpFile = await copyFile(fileId, folderID);
-
-          cpFileId = cpFile.id;
-
-        }
-
-        await createComment(cpFileId, "This file was " + decision);
-
-        await createComment(cpFileId, message);
-
-      }
+      // }
 
     }
 
@@ -631,18 +788,15 @@ export const commentApproveReject = () => {
 
   };
 
-  const form = document.querySelector(".approvedeny");
+  const form = document.querySelector(".submit-comment-" + tab);
 
   if (form) {
 
-    form.addEventListener("submit", approveComment);
+    form.addEventListener("submit", submitComment);
 
   }
 
 };
-
-
-
 
 export function viewFinalDecisionFilesColumns() {
 
@@ -726,22 +880,11 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
       <table class='table'-->
 
-     
-
       <div class='col-xl-12 pr-0'>`;
-
-
-
 
     template += viewFinalDecisionFilesColumns();
 
-
-
-
     template += '<div id="files"> </div>';
-
-
-
 
     template += '<!--tbody id="files"-->';
 
@@ -757,13 +900,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
   }
 
-
-
-
   document.getElementById("daccDecision").innerHTML = template;
-
-
-
 
   if (filesInfo.length !== 0) {
 
@@ -778,9 +915,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
         .addEventListener("click", showCommentsDCEG(file.id));
 
     }
-
-
-
 
     let btns = Array.from(document.querySelectorAll(".preview-file"));
 
@@ -830,9 +964,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
     });
 
-
-
-
     // filterSection(filesInfo);
 
     Array.from(document.getElementsByClassName("filter-var")).forEach((el) => {
@@ -855,17 +986,38 @@ export async function viewFinalDecisionFilesTemplate(files) {
 
     // const input = document.getElementById("searchDataDictionary");
 
+
+
+
     // input.addEventListener("input", () => {
+
+
+
 
     //   const headerCell = document.getElementsByClassName("header-sortable")[0];
 
+
+
+
     //   const tableElement = headerCell.parentElement.parentElement.parentElement;
+
+
+
 
     //   filterCheckBox(tableElement, filesInfo);
 
+
+
+
     // });
 
+
+
+
   }
+
+
+
 
 }
 
@@ -875,9 +1027,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
 export async function viewFinalDecisionFiles(files) {
 
   let template = "";
-
-
-
 
   for (const fileInfo of files) {
 
@@ -890,9 +1039,6 @@ export async function viewFinalDecisionFiles(files) {
     const shortfilename =
 
       filename.length > 21 ? filename.substring(0, 20) + "..." : filename;
-
-
-
 
     let completion_date = await getChairApprovalDate(fileId);
 
@@ -944,47 +1090,110 @@ export async function viewFinalDecisionFiles(files) {
 
                 </button>
 
+
+
+
             </div>
 
+
+
+
         </div>
+
+
+
 
         <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
 
+
+
+
                     <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
 
-                      <div class="row mb-1 m-0">
 
-                        <div class="col-12 font-bold">
 
-                          Concept: ${filename}
-
-                        </div>
-
-                      </div>
 
                     <div class="row mb-1 m-0">
 
-                      <div id='file${fileId}Comments' class='col-12'></div>
+
+
+
+                    <div class="col-12 font-bold">
+
+
+
+
+                    Concept: ${filename}
+
+
+
 
                     </div>
 
+
+
+
+                    </div>
+
+
+
+
+                    <div class="row mb-1 m-0">
+
+
+
+
+                      <div id='file${fileId}Comments' class='col-12'></div>
+
+
+
+
+                    </div>
+
+
+
+
         </div>
 
-    </div>
+
+
 
     </div>
+
+
+
+
+    </div>
+
+
+
 
     </div>`;
+
+
+
 
   }
 
 
 
 
+
+
+
   template += `</div></div></div></div>`;
+
+
+
 
   if (document.getElementById("files") != null)
 
+
+
+
     document.getElementById("files").innerHTML = template;
+
+
+
 
 }
