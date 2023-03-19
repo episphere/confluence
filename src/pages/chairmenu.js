@@ -211,7 +211,7 @@ export function switchFiles(tab) {
 
  
 
-    const responseDenied = await getFolderItems(deniedFolder);
+    const responseDenied = await getFolderItems(acceptedFolder); /// PLEASE FIX, ONLY FOR RUNNING
 
     let filearrayDenied = responseDenied.entries;
 
@@ -235,7 +235,7 @@ export function switchFiles(tab) {
 
     for (let obj of filearrayAccepted) {
 
-      filesdecided.push(obj);
+      //filesdecided.push(obj);
 
     }
 

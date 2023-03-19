@@ -434,9 +434,9 @@ label {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.first-list-item {
-    /* margin-top: 1rem; */
-}
+/* .first-list-item {
+    margin-top: 1rem;
+} */
 
 .main-summary-row {
     flex-wrap: wrap;
