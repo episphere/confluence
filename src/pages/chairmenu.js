@@ -261,6 +261,7 @@ export const generateChairMenuFiles = async () => {
     // `;
     //document.getElementById("selectedTab").innerHTML = template;
     document.getElementById("chairFileView").innerHTML = template;
+    viewFinalDecisionFilesTemplate(filearrayAllFiles);
     commentSubmit();
     if (!!filesIncompleted.length) {
       showPreview(filesIncompleted[0].id);
@@ -478,16 +479,16 @@ export async function viewFinalDecisionFilesTemplate(files) {
     let btns = Array.from(document.querySelectorAll(".preview-file"));
     btns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        btn.dataset.target = "#bcrppPreviewerModal";
-        const header = document.getElementById("bcrppPreviewerModalHeader");
-        const body = document.getElementById("bcrppPreviewerModalBody");
+        btn.dataset.target = "#confluencePreviewerModal";
+        const header = document.getElementById("confluencePreviewerModalHeader");
+        const body = document.getElementById("confluencePreviewerModalBody");
         header.innerHTML = `<h5 class="modal-title">File preview</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>`;
         const fileId = btn.dataset.fileId;
-        $("#bcrppPreviewerModal").modal("show");
-        showPreview(fileId, "bcrppPreviewerModalBody");
+        $("#confluencePreviewerModal").modal("show");
+        showPreview(fileId, "confluencePreviewerModalBody");
       });
     });
     //Filtering and Sorting
