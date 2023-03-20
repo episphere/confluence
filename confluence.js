@@ -180,29 +180,18 @@ export const confluence = async () => {
             });
         }
         if(chairMenuElement) {
-
             chairMenuElement.addEventListener('click', () => {
- 
                  if (chairMenuElement.classList.contains('navbar-active')) return;
- 
+                 const element = document.getElementById("chairMenu")
                  showAnimation();
- 
-                 assignNavbarActive(chairMenuElement, 1);
- 
+                 assignNavbarActive(element, 1);
                  document.title = 'Confluence - Chair Menu';
- 
                  confluenceDiv.innerHTML = chairMenuTemplate();
- 
                  generateChairMenuFiles();
- 
                  //uploaddataForm();
- 
                  //formFunctions();
- 
-                 hideAnimation();
- 
+                 //hideAnimation();
              });
- 
          }
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
