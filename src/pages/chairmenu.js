@@ -92,7 +92,9 @@ export const generateChairMenuFiles = async () => {
         for (let items of tasks.entries) {
           for (let itemtasks of items.task_assignment_collection.entries) {
             if (itemtasks.status === 'incomplete') {
-              filesIncompleted.push(itemtasks.item);
+              if (filesIncompleted.findIndex(element => element.id === itemtasks.item.id) === -1){
+                filesIncompleted.push(itemtasks.item);
+              }
             }
           }
         }
@@ -106,8 +108,9 @@ export const generateChairMenuFiles = async () => {
         for (let items of tasks.entries) {
           for (let itemtasks of items.task_assignment_collection.entries) {
             if (itemtasks.status === 'incomplete') {
-              filesClaraIncompleted.push(itemtasks.item);
-              console.log(itemtasks);
+              if (filesClaraIncompleted.findIndex(element => element.id === itemtasks.item.id) === -1){
+                filesClaraIncompleted.push(itemtasks.item);
+              }
             }
           }
         }

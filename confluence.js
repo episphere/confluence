@@ -275,7 +275,10 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Study Description';
-        assignNavbarActive(element, 2);
+        console.log(element);
+        assignNavbarActive(document.querySelector('[href="#about/description"]'));
+        const fileInfo = await getFileInfo(761599566277);
+        console.log(fileInfo);
         aboutConfluence('description', fileInfo ? true : false);
         renderDescription(fileInfo['content_modified_at'])
         renderOverView();
@@ -442,8 +445,9 @@ const manageHash = async () => {
     else if(hash === '#about/description'){
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
-        // if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, 1);
+        //if(element.classList.contains('navbar-active')) return;
+        //assignNavbarActive(element, 1);
+        assignNavbarActive(document.querySelector('[href="#about/description"]'),1);
         document.title = 'Confluence - Study Description';
         showAnimation();
         const fileInfo = await getFileInfo(761599566277);
