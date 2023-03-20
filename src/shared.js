@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
-export const emailsAllowedToUpdateData = ['patelbhp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov']
+export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 691143057533;
 // export const summaryStatsFileId = 795642281498;
