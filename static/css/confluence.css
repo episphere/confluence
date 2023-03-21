@@ -135,6 +135,12 @@ body {
     padding: 0px !important;
 }
 
+.uploadContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #pieChartLabel {
     /* margin-top: 1rem !important; */
     white-space: normal;
