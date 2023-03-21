@@ -65,7 +65,7 @@ export const formtemplate = () => {
                             </div>
                             
                             <div class="input-group">
-                              <div class="col-12">
+                              <div class="col-8">
                                 <ul class="form" id='mem-conlist'>
                                   <div class="inline-field">
                                     <input id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
@@ -123,7 +123,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <div class="col-12">
+                              <div class="col-8">
                                 <ul class="form">
                                   <div class="inline-field">
                                     <input id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG"/>
@@ -217,7 +217,7 @@ export const formtemplate = () => {
                             </div>
 
                               <div class="input-group">
-                                <div class="col-12">
+                                <div class="col-8">
                                   <ul class="form" id='riskfactlist'>
                                     <div class="inline-field">
                                       <input id="c1" name="riskfactvar" type="checkbox" value="Education"/>
@@ -284,7 +284,7 @@ export const formtemplate = () => {
                             </div>
 
                                 <div class="input-group">
-                                  <div class="col-12">
+                                  <div class="col-8">
                                     <ul class="form" id='pathlist'>
                                         <div class="inline-field">
                                           <input id="p1" name="pathvar" type="checkbox" value="Tumor Characteristics"/>
@@ -315,7 +315,7 @@ export const formtemplate = () => {
                           </div>
 
                               <div class="input-group">
-                                <div class="col-12">
+                                <div class="col-8">
                                   <ul class="form" id='surtrelist'>
                                     <div class="inline-field">
                                       <input id="s1" name="surtrevar" type="checkbox" value="Survival"/>
@@ -972,7 +972,8 @@ export const dataForm = async () => {
       });
     }
     const downloadLink = await URL.createObjectURL(blob);
-    let filename = jsondata.projname;
+    //let UID = Date.now()
+    let filename = jsondata.projname + '_' + Date.now() + '.docx';
 
     let a = document.createElement("a");
 
@@ -1420,12 +1421,27 @@ export const uploaddataFormTemplate = () => {
                 <div class="general-bg padding-bottom-1rem">
                   <div class="container body-min-height">
                     <div class="main-summary-row">
-                        <div class="align-left">
-                            <h1 class="page-header">Analysis Concept Form Upload</h1>
-                        </div>
+                      <div class="align-left">
+                        <h1 class="page-header">Analysis Concept Form Upload</h1>
+                      </div>
                     </div>
-                  <iframe src="https://nih.app.box.com/f/535799b248cb4b68a027d177902cb580" height="1000" width="1000"></iframe>
-                </div>
-              </div>`
+                    <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">  
+                      <h5> Do not change name of file from previous step, if file name is changed it may not be processed. </h5>
+                      <h5> Please upload form below. If window shows an error or takes long to load, please refresh the cache using Ctrl + F5. </h5>
+                      <h5> If you continue experiencing issues, you may also <a href="https://nih.app.box.com/f/818f3ca628ec4c12a2d5d2ed40029840" target="__blank">submit your file here</a>. </h5>
+                      <div class="uploadContainer">
+                        <iframe src="https://nih.app.box.com/f/818f3ca628ec4c12a2d5d2ed40029840" height="1000" width="1000"></iframe>
+                      </div>
+                    </div>
+                  </div>
+                </div>`
   return template;
 }
+{/* <div class="general-bg padding-bottom-1rem">
+<div class="container body-min-height">
+
+    <div class="main-summary-row">
+        <div class="align-left">
+            <h1 class="page-header">Analysis Concept Form</h1>
+        </div>
+    </div> */}

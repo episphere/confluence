@@ -1,10 +1,10 @@
-import { applicationURLs,chairsInfo } from './../shared.js';
+import { applicationURLs, chairsInfo, emailsAllowedToUpdateData } from './../shared.js';
 
 
 export const navBarMenutemplate = () => {
-    let authChair = chairsInfo
-    .map(({email})=>email)
-    .indexOf(JSON.parse(localStorage.parms).login)!==-1;
+    let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
+    let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
+    console.log(authAdmin);
     return `
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" href="#home" title="Confluence Home" id="homePage">
@@ -82,6 +82,11 @@ export const navBarMenutemplate = () => {
                 ${
                     authChair ? (
                         `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#chair_menu" title="Chair Menu" id="chairMenu"> Chair Menu </a>`
+                    ) :''
+                }
+                ${
+                    authAdmin ? (
+                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Auth Table" id="authTable"> Auth Table </a>`
                     ) :''
                 }
             </div>

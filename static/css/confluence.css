@@ -135,6 +135,12 @@ body {
     padding: 0px !important;
 }
 
+.uploadContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #pieChartLabel {
     /* margin-top: 1rem !important; */
     white-space: normal;
@@ -434,9 +440,9 @@ label {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.first-list-item {
-    /* margin-top: 1rem; */
-}
+/* .first-list-item {
+    margin-top: 1rem;
+} */
 
 .main-summary-row {
     flex-wrap: wrap;
@@ -1799,8 +1805,8 @@ form {
   /* Set up general layout rules for outer containers. */
   .contact-form,
   .results {
-    width: 90vw;
-    max-width: 750px;
+    width: 75vw;
+    max-width: 80vw;
     margin: 2vh auto;
   }
   
@@ -1858,6 +1864,10 @@ form {
     display: block;
     margin-right: 1rem;
     font-size: 90%;
+  }
+
+  .authTable input[type=checkbox]{
+    margin-right: .5rem;
   }
   
   .contact-form label.inline {
@@ -2072,4 +2082,41 @@ ul.form {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+#email {
+    font-size: 87.5%;
+    float: right;
+    padding-right: 10px;
+    display: inline;
+}
+
+.badge-1 {
+    background-color: green;
+    font-weight: bold;
+    color: white;
+}
+.badge-2 {
+    background-color: #fff200;
+    font-weight: bold;
+    color: black;
+}
+.badge-3 {
+    background-color: #ffa700;
+    font-weight: bold;
+    color: black
+}
+.badge-4 {
+    background-color: #ff0000;
+    font-weight: bold;
+    color: white;
+}
+.badge-5 {
+    background-color: #7700ff;
+    font-weight: bold;
+    color: white;
+}
+.badge-777 {
+    background-color: #757575;
+    font-weight: bold;
+    color: white;
 }
