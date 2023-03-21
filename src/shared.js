@@ -11,12 +11,12 @@ export const deniedFolder = 198940989727;
 export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
 export const chairsInfo = [
-    {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['']}, 
-    {id: 'user_2', email:"", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['']}, 
-    {id: 'user_3', email:"behpours2@nih.gov", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['']}, 
-    {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['']}, 
-    {id: 'user_5', email:"garciacm@nih.gov", boxId:198956756286, boxIdNew: 199271469612,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['']}, 
-    {id: 'user_6', email:"kopchickbp@nih.gov", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
+    {id: 'user_1', email:"kopchickbp@nih.gov1", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['']}, 
+    {id: 'user_2', email:"kopchickbp@nih.gov1", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['']}, 
+    {id: 'user_3', email:"kopchickbp@nih.gov1", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['']}, 
+    {id: 'user_4', email:"kopchickbp@nih.gov1", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['']}, 
+    {id: 'user_5', email:"kopchickbp@nih.gov", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['']}, 
+    {id: 'user_6', email:"kopchickbp@nih.gov1", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
