@@ -447,7 +447,7 @@ const manageHash = async () => {
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
         //assignNavbarActive(element, 1);
-        assignNavbarActive(document.querySelector('[href="#about/description"]'),1);
+        assignNavbarActive(document.querySelector('[href="#about/description"]'), 1);
         document.title = 'Confluence - Study Description';
         showAnimation();
         const fileInfo = await getFileInfo(761599566277);

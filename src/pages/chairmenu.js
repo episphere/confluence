@@ -41,7 +41,7 @@ export function renderFilePreviewDropdown(files, tab) {
       for (const file of files) {
         template += `
             <option value='${file.id}'>
-            ${file.name}</option>`;
+            ${file.name.slice(0,-19)}</option>`;
       }
       template += `
             </select>
@@ -80,10 +80,19 @@ export const generateChairMenuFiles = async () => {
     if (!userChairItem) return null;
     const responseChair = await getFolderItems(userChairItem.boxIdNew);
     const responseClara = await getFolderItems(userChairItem.boxIdClara);
-    const allFiles = await getFolderItems(198962088100);
+    const allFiles = await getFolderItems(submitterFolder);
     let filearrayChair = responseChair.entries;
     let filearrayClara = responseClara.entries;
     let filearrayAllFiles = allFiles.entries;
+
+    // let fileinfo = await getFileInfo(1169802034671);
+    // let filename = fileinfo.name;
+    // //let allFiles = await getFolderItems(submitterFolder);
+    // //let entries = allFiles.entries;
+    // console.log(filename);
+    // let test = allFiles.entries.find(element => element.name === filename);
+    // console.log(test.id);
+
 
     const filesIncompleted = [];
     for (let obj of filearrayChair) {
@@ -376,14 +385,22 @@ export const commentSubmit = async () => {
     }
     for (const fileId of filesToSend) {
       console.log(fileId);
+      let fileinfo = await getFileInfo(fileId);
+      let filename = fileinfo.name;
+      let allFiles = await getFolderItems(submitterFolder);
+      let entries = allFiles.entries;
+      console.log(filename);
+      console.log(entries);
+      let allFileMatch = entries.find(element => element.name === filename);
       let tasklist = await getTaskList(fileId);
       console.log(tasklist);
       let grade = e.target[0].value;
       let comment = e.target[1].value;
       let message = "Rating: " + grade + "\nComment: " + comment;
       console.log(message)
-      let test = await createComment(fileId, message);
-      console.log(test);
+      await createComment(fileId, message);
+      await createComment(allFileMatch.id, message);
+
         const taskEntries = tasklist.entries;
         if (taskEntries.length !== 0) {
           for (let entry of taskEntries) {
@@ -436,7 +453,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
   let filesInfo = [];
   for (const file of files) {
     const fileInfo = await getFileInfo(file.id);
-    console.log({fileInfo})
     filesInfo.push(fileInfo);
   }
   if (filesInfo.length > 0) {
@@ -527,15 +543,14 @@ export async function viewFinalDecisionFiles(files) {
   for (const fileInfo of files) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
-    let filename = fileInfo.name.split("_").slice(0, -4).join(" ");
-    const shortfilename =
-      filename.length > 21 ? filename.substring(0, 20) + "..." : filename;
+    let filename = fileInfo.name.slice(0,-19);
+    const shortfilename = filename.length > 21 ? filename.substring(0, 20) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
-<div class="card mt-1 mb-1 align-left" >
+  <div class="card mt-1 mb-1 align-left" >
     <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
         <div class="row">
-            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>${fileInfo.name}</div>
+            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
             <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
             <div class="col-md-1 text-center" id="AABCG${fileId}">N/A</div>
             <div class="col-md-1 text-center" id="BCAC${fileId}">N/A</div>
@@ -558,21 +573,22 @@ export async function viewFinalDecisionFiles(files) {
             </div>
         </div>
         <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
-                    <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                    <div class="row mb-1 m-0">
-                    <div class="col-12 font-bold">
-                    Concept: ${filename}
-                    </div>
-                    </div>
-                    <div class="row mb-1 m-0">
-                      <div id='file${fileId}Comments' class='col-12'></div>
-                    </div>
+          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+            <div class="row mb-1 m-0">
+              <div class="col-12 font-bold">
+                  Concept: ${filename}
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div id='file${fileId}Comments' class='col-12'></div>
+            </div>
         </div>
-    </div>
-    </div>
+        </div>
+      </div>
     </div>`;
   }
   template += `</div></div></div></div>`;
   if (document.getElementById("files") != null)
     document.getElementById("files").innerHTML = template;
 }
+

@@ -8,7 +8,7 @@ export const summaryStatsFileId = 691143057533;
 export const missingnessStatsFileId = 653087731560;
 export const acceptedFolder = 196011761030;
 export const deniedFolder = 198940989727;
-export const submitterFolder = 196013436057;
+export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
 export const chairsInfo = [
     {id: 'user_1', email:"ssbehpour@deloitte.com", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['']}, 
@@ -1396,11 +1396,10 @@ export async function showCommentsDCEG(id) {
     let template = ` 
       <div class='container-fluid'>`;
     const user = JSON.parse(localStorage.parms).login;
-    if (chairsInfo.find(element => element.email === user)) {
+    //if (chairsInfo.find(element => element.email === user)) {
       for (const comment of comments) {
-        //console.log(chairsInfo.map(function (el) {return el.consortium}));
-        //console.log(chairsInfo.find(element => chairsInfo.map(function (el) {return el.consortium}).includes(element.consortium)).consortium);
-        const cons = chairsInfo.find(element => chairsInfo.map(function (el) {return el.consortium}).includes(element.consortium)).consortium;
+        const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
+        console.log(cons);
         const score = comment.message[8];
         //console.log(score);
         const inputScore = document.getElementById(`${cons}${id}`);
@@ -1408,57 +1407,30 @@ export async function showCommentsDCEG(id) {
         const comment_date = new Date(comment.created_at);
         const date = comment_date.toLocaleDateString();
         const time = comment_date.toLocaleTimeString();
+
         template += `
           <div>
-
               <div class='row'>
-
                   <div class='col-8 p-0'>
-
                       <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
-
                   </div>
-
               `;
 
-          template += `    
-
+        template += `    
               </div>
-
               <div class='row'>
-
                       <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
-
               </div>
-
- 
-
               <div class='row'>
-
                   <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
-
               </div>
-
               <hr class='my-1'>
-
           </div>
-
           `;
-
         }
-
-      }
-
-    // template += '</div>'
-
- 
-
+    //}
     commentSection.innerHTML = template;
-
- 
-
     return;
-
   }
 
 export const listComments = async (id) => {

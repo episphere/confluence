@@ -1799,8 +1799,8 @@ form {
   /* Set up general layout rules for outer containers. */
   .contact-form,
   .results {
-    width: 90vw;
-    max-width: 750px;
+    width: 75vw;
+    max-width: 80vw;
     margin: 2vh auto;
   }
   
@@ -2086,12 +2086,12 @@ ul.form {
     color: white;
 }
 .badge-2 {
-    background-color: #fff400;
+    background-color: #fff200;
     font-weight: bold;
     color: black;
 }
 .badge-3 {
-    background-color: #a3ff00;
+    background-color: #ffa700;
     font-weight: bold;
     color: black
 }
@@ -2101,12 +2101,12 @@ ul.form {
     color: white;
 }
 .badge-5 {
-    background-color: #ffa700;
+    background-color: #7700ff;
     font-weight: bold;
-    color: black
+    color: white;
 }
 .badge-777 {
-    background-color: #7700ff;
+    background-color: #757575;
     font-weight: bold;
     color: white;
 }
