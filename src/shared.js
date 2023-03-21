@@ -16,7 +16,7 @@ export const chairsInfo = [
     {id: 'user_3', email:"behpours2@nih.gov", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['']}, 
     {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['']}, 
     {id: 'user_5', email:"garciacm@nih.gov", boxId:198956756286, boxIdNew: 199271469612,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['']}, 
-    {id: 'user_6', email:"kopchickbp@nih.gov", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
+    {id: 'user_6', email:'sbehpour@deloitte.com', boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -121,6 +121,56 @@ export const getFile = async (id) => {
         if((await refreshToken()) === true) return await getFile(id);
     }
 };
+
+export const getFileURL = async (id) => {
+
+    try{
+
+        const access_token = JSON.parse(localStorage.parms).access_token;
+
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+
+            method:'GET',
+
+            headers:{
+
+                Authorization:"Bearer "+access_token
+
+            }
+
+        });
+
+        if(r.status === 401) {
+
+            if((await refreshToken()) === true) return await getFileURL(id);
+
+        }
+
+        else if(r.status === 200) {
+
+            return r.url;
+
+        }
+
+        else{
+
+            hideAnimation();
+
+            console.error(r);
+
+        }
+
+    }
+
+    catch(err) {
+
+        if((await refreshToken()) === true) return await getFileURL(id);
+
+    }
+
+};
+
+
 
 export const createComment = async (id, msg = "") => {
     try {
