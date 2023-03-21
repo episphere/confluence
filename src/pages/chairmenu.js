@@ -21,7 +21,8 @@ import {
   archivedFolder,
   deleteTask,
   showCommentsDCEG,
-  hideAnimation
+  hideAnimation,
+  emailsAllowedToUpdateData
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -584,3 +585,132 @@ export async function viewFinalDecisionFiles(files) {
     document.getElementById("files").innerHTML = template;
 }
 
+export const authTableTemplate = () => {
+  //const userInfo = JSON.parse(localStorage.getItem('parms'))
+  //console.log('user info: ', userInfo, localStorage.getItem('parms'))
+  //if (!userInfo) return;
+  const userEmail = JSON.parse(localStorage.parms).login;
+  const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
+  if (!userForAuth) return;
+  let template = `
+  <div class="general-bg padding-bottom-1rem">
+          <div class="container body-min-height">
+              <div class="main-summary-row">
+                  <div class="align-left">
+                      <h1 class="page-header">Auth Table View</h1>
+                  </div>
+              </div>
+              <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                  <div class="tab-content" id="selectedTab">
+                    <div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab">
+                      <div id="authTableView" class="align-left"></div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+  </div>
+  `;
+
+  return template;
+}
+
+export const generateAuthTableFiles = async () => {
+  const allFiles = await getFolderItems(submitterFolder);
+  let filearrayAllFiles = allFiles.entries;
+
+  //document.getElementById("authTableView").innerHTML = template;
+  viewAuthFinalDecisionFilesTemplate(filearrayAllFiles);
+  commentSubmit();
+
+  hideAnimation();
+}
+
+export async function viewAuthFinalDecisionFilesTemplate(files) {
+  let template = "";
+  let filesInfo = [];
+  for (const file of files) {
+    const fileInfo = await getFileInfo(file.id);
+    filesInfo.push(fileInfo);
+  }
+  if (filesInfo.length > 0) {
+    template += `
+    <div id='decidedFiles'>
+    <div class='row'>
+      <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
+          <div class="div-border white-bg align-left p-2">
+              <div class="main-summary-row">
+                  <div class="col-xl-12 pl-1 pr-0">
+                      <span class="font-size-10"> <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted 
+                                                  <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
+                                                  <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
+                                                  <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
+                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision pending clarification 
+                                                  <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
+                      <div id="filterData" class="align-left"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      </div>
+      <!--div class='table-responsive'>
+      <table class='table'-->
+      <div class='col-xl-12 pr-0'>`;
+    template += viewFinalDecisionFilesColumns();
+    template += '<div id="files"> </div>';
+    template += '<!--tbody id="files"-->';
+  } else {
+    template += `
+              No files to show.            
+    </div>
+    </div>`;
+  }
+  document.getElementById("authTableView").innerHTML = template;
+  if (filesInfo.length !== 0) {
+    await viewFinalDecisionFiles(filesInfo);
+    for (const file of filesInfo) {
+      document
+        .getElementById(`study${file.id}`)
+        .addEventListener("click", showCommentsDCEG(file.id));
+    }
+    let btns = Array.from(document.querySelectorAll(".preview-file"));
+    btns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        btn.dataset.target = "#confluencePreviewerModal";
+        const header = document.getElementById("confluencePreviewerModalHeader");
+        const body = document.getElementById("confluencePreviewerModalBody");
+        header.innerHTML = `<h5 class="modal-title">File preview</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>`;
+        const fileId = btn.dataset.fileId;
+        $("#confluencePreviewerModal").modal("show");
+        showPreview(fileId, "confluencePreviewerModalBody");
+      });
+    });
+    //Filtering and Sorting
+    const table = document.getElementById("decidedFiles");
+    const headers = table.querySelector(`.div-sticky`);
+    Array.from(headers.children).forEach((header, index) => {
+      header.addEventListener("click", (e) => {
+        const sortDirection = header.classList.contains("header-sort-asc");
+        sortTableByColumn(table, index, !sortDirection);
+      });
+    });
+    // filterSection(filesInfo);
+    Array.from(document.getElementsByClassName("filter-var")).forEach((el) => {
+      el.addEventListener("click", () => {
+        const headerCell =
+          document.getElementsByClassName("header-sortable")[0];
+        const tableElement =
+          headerCell.parentElement.parentElement.parentElement;
+        filterCheckBox(tableElement, filesInfo);
+      });
+    });
+    // const input = document.getElementById("searchDataDictionary");
+    // input.addEventListener("input", () => {
+    //   const headerCell = document.getElementsByClassName("header-sortable")[0];
+    //   const tableElement = headerCell.parentElement.parentElement.parentElement;
+    //   filterCheckBox(tableElement, filesInfo);
+    // });
+  }
+}

@@ -3,7 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
-import { chairMenuTemplate, generateChairMenuFiles } from './src/pages/chairmenu.js';
+import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
@@ -68,6 +68,7 @@ export const confluence = async () => {
         const dataFormElement = document.getElementById('dataForm');
         const uploaddataFormElement = document.getElementById('uploaddataForm');
         const chairMenuElement = document.getElementById('chairMenu');
+        const authTableElement = document.getElementById('authTable');
 
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -192,6 +193,17 @@ export const confluence = async () => {
                  //formFunctions();
                  //hideAnimation();
              });
+        }
+        if(authTableElement) {
+        authTableElement.addEventListener('click', () => {
+                if (authTableElement.classList.contains('navbar-active')) return;
+                const element = document.getElementById("authTable")
+                showAnimation();
+                assignNavbarActive(element, 1);
+                document.title = 'Confluence - Auth Table';
+                confluenceDiv.innerHTML = authTableTemplate();
+                generateAuthTableFiles();
+            });
          }
         const folders = await getFolderItems(0);
         const array = filterConsortiums(folders.entries);
@@ -344,6 +356,23 @@ const manageRouter = async () => {
         generateChairMenuFiles();
 
     }
+    else if (hash === '#auth_table') {
+
+        const element = document.getElementById('authTable');
+
+        if (!element) return;
+
+        if (element.classList.contains('navbar-active')) return;
+
+        document.title = 'Auth Table';
+
+        assignNavbarActive(element, 1);
+
+        confluenceDiv.innderHTML = AuthTableTemplate();
+
+        generateAuthTableFiles();
+
+    }
     else if (hash === '#data_exploration/dictionary') {
         const dataDictionaryElement = document.getElementById('dataDictionary');
         if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
@@ -397,6 +426,13 @@ const manageHash = async () => {
     else if (hash === '#chair_menu') {
 
         const element = document.getElementById('chairMenu');
+
+        element.click();
+
+    }
+    else if (hash === '#auth_table') {
+
+        const element = document.getElementById('authTable');
 
         element.click();
 
