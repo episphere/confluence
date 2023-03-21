@@ -1865,6 +1865,10 @@ form {
     margin-right: 1rem;
     font-size: 90%;
   }
+
+  .authTable input[type=checkbox]{
+    margin-right: .5rem;
+  }
   
   .contact-form label.inline {
     display: block;

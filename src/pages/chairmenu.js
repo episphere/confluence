@@ -545,7 +545,7 @@ export async function viewFinalDecisionFiles(files) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
     let filename = fileInfo.name.slice(0,-19);
-    const shortfilename = filename.length > 21 ? filename.substring(0, 20) + "..." : filename;
+    const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
   <div class="card mt-1 mb-1 align-left" >
@@ -604,6 +604,12 @@ export const authTableTemplate = () => {
                   <div class="tab-content" id="selectedTab">
                     <div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab">
                       <div id="authTableView" class="align-left"></div>
+                        <button type="submit" class="buttonsubmit" value="approved" onclick="this.classList.toggle('buttonsubmit--loading')">
+                          <span class="buttonsubmit__text"> Approve </span></button>
+                        <button type="submit" class="buttonsubmit" value="rejected" onclick="this.classList.toggle('buttonsubmit--loading')">
+                          <span class="buttonsubmit__text"> Deny </span></button>
+                        <button type="submit" class="buttonsubmit" value="daccReview" onclick="this.classList.toggle('buttonsubmit--loading')">
+                          <span class="buttonsubmit__text"> Return to Chairs </span></button>
                     </div>
                   </div>
               </div>
@@ -666,7 +672,7 @@ export async function viewAuthFinalDecisionFilesTemplate(files) {
   }
   document.getElementById("authTableView").innerHTML = template;
   if (filesInfo.length !== 0) {
-    await viewFinalDecisionFiles(filesInfo);
+    await viewAuthFinalDecisionFiles(filesInfo);
     for (const file of filesInfo) {
       document
         .getElementById(`study${file.id}`)
@@ -713,4 +719,50 @@ export async function viewAuthFinalDecisionFilesTemplate(files) {
     //   filterCheckBox(tableElement, filesInfo);
     // });
   }
+}
+
+export async function viewAuthFinalDecisionFiles(files) {
+  let template = "";
+  for (const fileInfo of files) {
+    const fileId = fileInfo.id;
+    //console.log(fileInfo);
+    let filename = fileInfo.name.slice(0,-19);
+    const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
+    let completion_date = await getChairApprovalDate(fileId);
+    template += `
+  <div class="card mt-1 mb-1 align-left" >
+    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
+        <div class="row authTable">
+            <div class="col-lg-3 text-left"><input type="checkbox" id="${fileId}" name="${fileId}" value="${fileId}"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
+            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-center" id="AABCG${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="BCAC${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="C-NCI${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="CIMBA${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="LAGENO${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="MERGE${fileId}">N/A</div>
+            <div class="col-lg-1 text-right">
+                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
+                    <i class="fas fa-caret-down fa-2x"></i>
+                </button>
+            </div>
+        </div>
+        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
+          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+            <div class="row mb-1 m-0">
+              <div class="col-12 font-bold">
+                  Concept: ${filename}
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div id='file${fileId}Comments' class='col-12'></div>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  template += `</div></div></div></div>`;
+  if (document.getElementById("files") != null)
+    document.getElementById("files").innerHTML = template;
 }
