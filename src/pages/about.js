@@ -51,8 +51,8 @@ export const renderOverView = async () => {
             <div class="align-left" id="confluenceDataSummary"></div>
             <div class="main-summary-row align-left">
                 <div class="col">
-                    For more information:</br>
-                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>
+                    <!---For more information:</br>
+                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>--->
                     Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
                 </div>
             </div>
@@ -82,7 +82,7 @@ const countPublicStatistics = (d, caseControl) => {
                     <span class="font-size-17 font-bold">Filter</span></br>
                     ${data['CIMBA'] ? `
                         <div class="form-group pr-1">
-                            <label class="filter-label font-size-13" for="overviewConsortiumSelection">Consortium</label>
+                            <label class="filter-label font-size-17" for="overviewConsortiumSelection">Consortium</label>
                             <select class="form-control font-size-15" id="overviewConsortiumSelection">
                                 <option value='allOther'>Non-CIMBA</option>
                                 <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
