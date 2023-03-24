@@ -22,6 +22,7 @@ import {
   deleteTask,
   showCommentsDCEG,
   hideAnimation,
+  getFileURL,
   emailsAllowedToUpdateData
 } from "../shared.js";
 
@@ -32,6 +33,7 @@ export function renderFilePreviewDropdown(files, tab) {
     }
     if (files.length != 0) {
         template += `
+        <button style="margin-right: 10px; float: right" id='${tab}-download-all' class='btn btn-dark'>Download All</button>
         <div class='card-body p-0'>
           <div class='card-title'>
             <label for='${tab}selectedDoc'>
@@ -276,6 +278,8 @@ export const generateChairMenuFiles = async () => {
     document.getElementById("chairFileView").innerHTML = template;
     viewFinalDecisionFilesTemplate(filearrayAllFiles);
     commentSubmit();
+    downloadAll('recommendation', filesIncompleted)
+    downloadAll('conceptNeedingClarification', filesClaraIncompleted)
     if (!!filesIncompleted.length) {
       showPreview(filesIncompleted[0].id);
       switchFiles("recommendation");
@@ -429,6 +433,30 @@ export const commentSubmit = async () => {
     }
   })
 };
+
+export const downloadAll = (tab, files) => {
+  const downloadFile = async (e) => {
+    console.log(files);
+    files.forEach(async ({id}, index) => {
+      console.log(id);
+      let response = await getFileURL(id)
+      let a = document.createElement('a');
+      a.href = response;
+      a.download = files[index].name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    })
+  }
+
+  isElementLoaded(`#${tab}-download-all`).then(() => {
+    const downloadButton = document.querySelector(`#${tab}-download-all`);
+    console.log({downloadButton});
+    if (downloadButton) {
+      downloadButton.addEventListener("click", downloadFile);
+    }
+  })
+}
 
 const isElementLoaded = async selector => {
   while ( document.querySelector(selector) === null) {

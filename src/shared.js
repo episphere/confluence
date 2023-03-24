@@ -1540,3 +1540,28 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
         return await uploadWordFile(data, fileName, folderId, html);
     }
   };
+
+  export const getFileURL = async (id) => {
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        if(r.status === 401) {
+            if((await refreshToken()) === true) return await getFileURL(id);
+        }
+        else if(r.status === 200) {
+            return r.url;
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await getFileURL(id);
+    }
+};
