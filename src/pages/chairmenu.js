@@ -167,10 +167,10 @@ export const generateChairMenuFiles = async () => {
               <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
                   <ul class='nav nav-tabs mb-3' role='tablist'>
                         <li class='nav-item active' role='presentation'>
-                            <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> Submit concept recommendation</a>
+                            <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> New Concepts for Review</a>
                         </li>
                         <li class='nav-item' role='presentation'>
-                            <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>Concept Needing Clarification</a>
+                            <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>Concepts Requiring Clarifications</a>
                         </li>
                       <li class='nav-item' role='presentation'>
                         <a class='nav-link' id='daccDecisionTab' href='#daccDecision' data-mdb-toggle="tab" role='tab' aria-controls='daccDecision' aria-selected='true'> DACC Decision </a>
@@ -216,7 +216,7 @@ export const generateChairMenuFiles = async () => {
                 <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
                 <option value = "3"> 3 - Approved, but data release will be delayed </option>
                 <option value = "4"> 4 - Not approved </option>
-                <option value = "5"> 5 - Decision pending clarification of several issues</option>
+                <option value = "5"> 5 - Decision requires clarification</option>
                 <option value = "777"> 777 - Duplicate Proposal</option>
                 </select>
               <br>
@@ -401,13 +401,17 @@ export const commentSubmit = async () => {
       console.log(message)
       await createComment(fileId, message);
       await createComment(allFileMatch.id, message);
-
-        const taskEntries = tasklist.entries;
-        if (taskEntries.length !== 0) {
-          for (let entry of taskEntries) {
-            for (let item of entry.task_assignment_collection.entries) {
-              if (item.status === 'incomplete') {
-                await updateTaskAssignment(item.id, 'completed', 'You have completed your task')
+      if (grade === "5"){
+        let clariFolder = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).boxIdClara
+        await moveFile(fileId, clariFolder)
+      } else {
+          const taskEntries = tasklist.entries;
+          if (taskEntries.length !== 0) {
+            for (let entry of taskEntries) {
+              for (let item of entry.task_assignment_collection.entries) {
+                if (item.status === 'incomplete') {
+                  await updateTaskAssignment(item.id, 'completed', 'You have completed your task')
+                }
               }
             }
           }
@@ -468,7 +472,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
                                                   <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
                                                   <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
                                                   <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
-                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision pending clarification 
+                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                                   <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
                       <div id="filterData" class="align-left"></div>
                   </div>
@@ -553,12 +557,12 @@ export async function viewFinalDecisionFiles(files) {
         <div class="row">
             <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
             <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center" id="AABCG${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="BCAC${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="C-NCI${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="CIMBA${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="LAGENO${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="MERGE${fileId}">N/A</div>
+            <div class="col-lg-1 text-center" id="AABCG${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="BCAC${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="C-NCI${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="CIMBA${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="LAGENO${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="MERGE${fileId}">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
@@ -650,7 +654,7 @@ export async function viewAuthFinalDecisionFilesTemplate(files) {
                                                   <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
                                                   <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
                                                   <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
-                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision pending clarification 
+                                                  <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                                   <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
                       <div id="filterData" class="align-left"></div>
                   </div>

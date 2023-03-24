@@ -11,12 +11,12 @@ export const deniedFolder = 198940989727;
 export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
 export const chairsInfo = [
-    {id: 'user_1', email:"kopchickbp@nih.gov1", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['']}, 
-    {id: 'user_2', email:"kopchickbp@nih.gov1", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['']}, 
-    {id: 'user_3', email:"kopchickbp@nih.gov1", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['']}, 
-    {id: 'user_4', email:"kopchickbp@nih.gov1", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['']}, 
-    {id: 'user_5', email:"kopchickbp@nih.gov", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['']}, 
-    {id: 'user_6', email:"kopchickbp@nih.gov1", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com', 'ben.kopchick@nih.gov']}
+    {id: 'user_1', email:"gaudetmm@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_2', email:"kopchickbp@nih.gov", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_3', email:"troisir@nih.gov", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271314398, boxIdComplete:199272077669 ,consortium:'LAGENO',dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_4', email:"mukopadhyays2@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_5', email:"kraftp2@nih.gov", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_6', email:"garciacm@nih.gov", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -1396,17 +1396,25 @@ export async function showCommentsDCEG(id) {
     let template = ` 
       <div class='container-fluid'>`;
     const user = JSON.parse(localStorage.parms).login;
-    //if (chairsInfo.find(element => element.email === user)) {
+    const uniqueUsers = [...new Set(comments.map((item) => item.created_by.login))]
+    //for (const user of uniqueUsers){
+        //const userComments = comments.filter(element => element.created_by.login === user);
+        let newDate = new Date(0);
       for (const comment of comments) {
-        const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
-        console.log(cons);
-        const score = comment.message[8];
-        //console.log(score);
-        const inputScore = document.getElementById(`${cons}${id}`);
-        inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;            
         const comment_date = new Date(comment.created_at);
         const date = comment_date.toLocaleDateString();
         const time = comment_date.toLocaleTimeString();
+        //if (comment_date > newDate) {
+            newDate = comment_date;
+            console.log(newDate);
+            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login);
+            if (ifcons){
+                const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
+                const score = comment.message[8];
+                const inputScore = document.getElementById(`${cons}${id}`);
+                inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`; 
+            }
+        //}           
 
         template += `
           <div>
@@ -1485,4 +1493,50 @@ export const listComments = async (id) => {
 
     }
 
+  };
+
+export const uploadWordFile = async (data, fileName, folderId, html) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      //const user = await getCurrentUser();
+      //Check for bad data
+      const form = new FormData();
+      form.append("file", data);
+      form.append(
+        "attributes",
+        `{
+              "name": "${fileName}", "parent": {"id": "${folderId}"}}`
+      );
+  
+      let response = await fetch("https://upload.box.com/api/2.0/files/content", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        body: form,
+        contentType: false,
+      });
+      if (response.status === 400) {
+        if (response.code === "bad_request") {
+          return "Bad request";
+        }
+        if ((await refreshToken()) === true)
+          return await uploadWordFile(data, fileName, folderId, html);
+      } else if (response.status === 201) {
+        return response.json();
+      } else if (response.status === 400) {
+        return {
+          status: response.status,
+          json: await response.json(),
+        };
+      } else {
+        return {
+          status: response.status,
+          statusText: response.statusText,
+        };
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await uploadWordFile(data, fileName, folderId, html);
+    }
   };

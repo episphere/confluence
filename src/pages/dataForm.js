@@ -1,4 +1,4 @@
-
+import { submitterFolder, uploadWordFile } from "../shared.js"
 
 export const formtemplate = () => {
   const date = new Date();
@@ -383,11 +383,11 @@ export const formtemplate = () => {
                               <textarea id="anyoth" name="anyoth" rows="4" cols="65" required></textarea>
                             </div>
                             
-                            <!---<button type="submit" id="submitFormButton" class="buttonsubmit"> 
-                              <span class="buttonsubmit__text"> Send Form </span>
-                            </button>--->
-                            <button type="button" id="downloadWord" class="buttonsubmit"> 
-                              <span class="buttonsubmit__text"> Download Word </span>
+                            <button type="submit" id="submitFormButton" class="buttonsubmit"> 
+                              <span class="buttonsubmit__text"> Send Form & Download</span>
+                            </button>
+                            <!---<button type="button" id="downloadWord" class="buttonsubmit"> 
+                              <span class="buttonsubmit__text"> Download Word </span>--->
                             </button>
                           </form>
                         </section>
@@ -985,6 +985,7 @@ export const dataForm = async () => {
     btn.disabled = false;
     location.href = "#upload_data_form";
   }
+
   async function handleFormSubmit(eventtest) {
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
@@ -996,8 +997,8 @@ export const dataForm = async () => {
     formJSON.basevar = data.getAll("basevar");
     formJSON.ibcvar = data.getAll("ibcvar");
     formJSON.reqcoh = data.getAll("reqcoh");
-    const results = document.querySelector(".results pre");
-    results.innerText = JSON.stringify(formJSON, null, 2);
+    // const results = document.querySelector(".results pre");
+    // results.innerText = JSON.stringify(formJSON, null, 2);
     // fs.wrtieFile('test.json', formJSON);
     await generateWord(formJSON);
     btn.classList.toggle("buttonsubmit--loading");
@@ -1359,51 +1360,89 @@ export const dataForm = async () => {
       ],
     });
 
-    filename = jsondata.projname.substring(0, 10) + "_" + filename;
-    let files = await getFolderItems(uploadFormFolder);
-    const filesinfoldernames = [];
-    const filesinfolderids = [];
-    for (let i = 0; i < files.entries.length; i++) {
-      filesinfoldernames.push(files.entries[i].name);
-      filesinfolderids.push(files.entries[i].id);
-    }
-
-    await docx.Packer.toBlob(doc).then(async (blob) => {
-      if (filesinfoldernames.includes(filename)) {
-        const [name, extension] = filename.split(".");
-        let i = 1;
-        while (filesinfoldernames.includes(filename)) {
-          if (filename.includes(")")) {
-            const [name, version] = filename.split("(");
-            filename = name + `(${i})` + version.substring(2);
-          } else {
-            filename = name + `(${i}).` + extension;
-          }
-          i++;
-        }
-        let response = await uploadWordFile(blob, filename, uploadFormFolder);
-        await assigntasktochair();
-        let fileid = response.entries[0].id;
-        //Modal code here
+    //filename = jsondata.projname.substring(0, 10) + "_" + filename;
+    // let files = await getFolderItems(uploadFormFolder);
+    // const filesinfoldernames = [];
+    // const filesinfolderids = [];
+    // for (let i = 0; i < files.entries.length; i++) {
+    //   filesinfoldernames.push(files.entries[i].name);
+    //   filesinfolderids.push(files.entries[i].id);
+    // }
+    let filename = jsondata.projname + '_' + Date.now() + '.docx';
+    await docx.Packer.toBlob(doc).then(async (blob, btn) => {
+      let response = await uploadWordFile(blob, filename, submitterFolder);
+      console.log(response);
+      if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
-          <p>File was successfully uploaded.</p>
-          <p>Document ID: ${fileid}</p>`;
+            <p>Error detected, please upload again.</p>`;
         $("#popUpModal").modal("show");
+        btn.classList.toggle("buttonsubmit--loading");
+        btn.disabled = false;
+      } else if (response.status === 409){
+        document.getElementById("modalBody").innerHTML = `
+        <p>Conflict detected, please upload again.</p>`;
+        $("#popUpModal").modal("show");
+        btn.classList.toggle("buttonsubmit--loading");
+        btn.disabled = false;
       } else {
-        // Adding keywords
-        let response = await uploadWordFile(blob, filename, uploadFormFolder);
-        if (response.status === 201) {
-          await assigntasktochair();
-          let fileid = response.entries[0].id;
-          //Modal code here
-          document.getElementById("modalBody").innerHTML = `
-        <p>File was successfully uploaded.</p>
-        <p>Document ID: ${fileid}</p>`;
-          $("#popUpModal").modal("show");
-        } else {
+      let fileid = response.entries[0].id;
+      console.log(fileid);
+      const downloadLink = await URL.createObjectURL(blob);
+      let a = document.createElement("a");
+      a.href = downloadLink;
+      a.download = filename;
+      document.getElementById("modalBody").innerHTML = `
+           <p>File was successfully uploaded.</p>
+           <p>Document ID: ${fileid}</p>`;
+      $("#popUpModal").modal("show");
+      a.click();
+      let popup = document.getElementById('popUpModal');
+      let btns = popup.querySelectorAll('button');
+      for (let button of btns) {
+        button.addEventListener('click', function () {
+          location.reload();
+         })
         }
       }
-    });
+    })
+    //document.location.reload(true);
+
+    // await docx.Packer.toBlob(doc).then(async (blob) => {
+    //   if (filesinfoldernames.includes(filename)) {
+    //     const [name, extension] = filename.split(".");
+    //     let i = 1;
+    //     while (filesinfoldernames.includes(filename)) {
+    //       if (filename.includes(")")) {
+    //         const [name, version] = filename.split("(");
+    //         filename = name + `(${i})` + version.substring(2);
+    //       } else {
+    //         filename = name + `(${i}).` + extension;
+    //       }
+    //       i++;
+    //     }
+    //     let response = await uploadWordFile(blob, filename, uploadFormFolder);
+    //     await assigntasktochair();
+    //     let fileid = response.entries[0].id;
+    //     //Modal code here
+    //     document.getElementById("modalBody").innerHTML = `
+    //       <p>File was successfully uploaded.</p>
+    //       <p>Document ID: ${fileid}</p>`;
+    //     $("#popUpModal").modal("show");
+    //   } else {
+    //     // Adding keywords
+    //     let response = await uploadWordFile(blob, filename, uploadFormFolder);
+    //     if (response.status === 201) {
+    //       await assigntasktochair();
+    //       let fileid = response.entries[0].id;
+    //       //Modal code here
+    //       document.getElementById("modalBody").innerHTML = `
+    //     <p>File was successfully uploaded.</p>
+    //     <p>Document ID: ${fileid}</p>`;
+    //       $("#popUpModal").modal("show");
+    //     } else {
+    //     }
+    //   }
+    // });
   }
 
   const form = await document.querySelector(".contact-form");
@@ -1412,8 +1451,8 @@ export const dataForm = async () => {
   // const downloadJSON = document.getElementById("downloadJSON");
   // downloadJSON.addEventListener("click", handleFormDownload);
 
-  const downloadWord = document.getElementById("downloadWord");
-  downloadWord.addEventListener("click", handleFormDownload);
+  // const downloadWord = document.getElementById("downloadWord");
+  // downloadWord.addEventListener("click", handleFormDownload);
 }
 
 export const uploaddataFormTemplate = () => {
