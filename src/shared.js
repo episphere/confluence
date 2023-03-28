@@ -10,6 +10,7 @@ export const acceptedFolder = 196011761030;
 export const deniedFolder = 198940989727;
 export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
+export const returnToSubmitterFolder = 200908340220;
 export const chairsInfo = [
     {id: 'user_1', email:"gaudetmm@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['sbehpour@deloitte.com']}, 
     {id: 'user_2', email:"kopchickbp@nih.gov", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['sbehpour@deloitte.com']}, 

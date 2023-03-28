@@ -200,7 +200,7 @@ export const confluence = async () => {
                 const element = document.getElementById("authTable")
                 showAnimation();
                 assignNavbarActive(element, 1);
-                document.title = 'Confluence - Auth Table';
+                document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
             });
@@ -364,7 +364,7 @@ const manageRouter = async () => {
 
         if (element.classList.contains('navbar-active')) return;
 
-        document.title = 'Auth Table';
+        document.title = 'Admin Table';
 
         assignNavbarActive(element, 1);
 

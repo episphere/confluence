@@ -86,7 +86,7 @@ export const navBarMenutemplate = () => {
                 }
                 ${
                     authAdmin ? (
-                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Auth Table" id="authTable"> Auth Table </a>`
+                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable"> Admin Table </a>`
                     ) :''
                 }
             </div>
