@@ -870,65 +870,74 @@ export const returnToChairs = () => {
     if (returnChairsButton) {
       returnChairsButton.addEventListener("click", returnChairs);
     }
-  }
-
-  export const returnToSubmitter = () => {
-    const returnSubmitter = async (e) => {
-      e.preventDefault();
-      const btn = document.activeElement;
-      console.log("return to submitters selected");
-      var inputsChecked = document.querySelectorAll('.pl');
-      for (var checkbox of inputsChecked){
-        if (checkbox.checked){
-          console.log(checkbox.id);
-          let fileSelected = await getFileInfo(checkbox.id);
-          let fileName = fileSelected.name;
-          let userFound = fileSelected.created_by.login;
-          let submittedItems = await getFolderItems(returnToSubmitterFolder);
-          let folderID = "none";
-          // for (let item of submittedItems.entries){
-          //   if(item.name === userFound){
-          //     folderID = item.id
-          //   }
-          // }
-          // let cpFileId = "";
-          // if (folderID == "none") {
-          //   const newFolder = await createFolder(returnToSubmitterFolder, userFound);
-          //   await addNewCollaborator(
-          //     newFolder.id,
-          //     "folder",
-          //     userFound,
-          //     "viewer"
-          //   );
-          //   const cpFile = await copyFile(checkbox.id, newFolder.id);
-          //   cpFileId = cpFile.id;
-          // } else {
-          //   const cpFile = await copyFile(checkbox.id, folderID);
-          //   cpFileId = cpFile.id;
-          // }
-          for (let info of chairsInfo){
-            let fileFound = false;
-            console.log(info.boxIdNew);
-            let files = await getFolderItems(info.boxIdNew);
-            for (let file of files.entries) {
-                console.log(file);
-               if (file.name === fileName) {
-                  console.log(fileName);
-                  break;
-               }
-            }
-            //console.log(files.entries)
-            //console.log(info.boxIdClara);
-            //console.log(info.boxIdComplete);
+}
+//Returning submission to submitter
+export const returnToSubmitter = () => {
+  const returnSubmitter = async (e) => {
+    e.preventDefault();
+    const btn = document.activeElement;
+    var inputsChecked = document.querySelectorAll('.pl');
+    for (var checkbox of inputsChecked){
+      if (checkbox.checked){
+        console.log(checkbox.id);
+        let fileSelected = await getFileInfo(checkbox.id);
+        let fileName = fileSelected.name;
+        let userFound = fileSelected.created_by.login;
+        let submittedItems = await getFolderItems(returnToSubmitterFolder);
+        let folderID = "none";
+        for (let item of submittedItems.entries){
+          if(item.name === userFound){
+            folderID = item.id
           }
-          //Go through and move file in each box account
+        }
+        let cpFileId = "";
+        if (folderID == "none") {
+          const newFolder = await createFolder(returnToSubmitterFolder, userFound);
+          await addNewCollaborator(
+            newFolder.id,
+            "folder",
+            userFound,
+            "viewer"
+          );
+          const cpFile = await copyFile(checkbox.id, newFolder.id);
+          cpFileId = cpFile.id;
+        } else {
+          const cpFile = await copyFile(checkbox.id, folderID);
+          cpFileId = cpFile.id;
+        }
+        for (let info of chairsInfo){
+          let fileFound = false;
+          console.log(info.boxIdNew);
+          let files = await getFolderItems(info.boxIdNew);
+          for (let file of files.entries) {
+            console.log(file);
+            if (file.name === fileName) {
+              fileFound = true;
+              console.log(fileName);
+              await moveFile(file.id, info.boxIdComplete);
+              break;
+            }
+          }
+          if (!fileFound){
+            files = await getFolderItems(info.boxIdClara);
+            for (let file of files.entries) {
+              console.log(file);
+              if (file.name === fileName) {
+                fileFound = true;
+                console.log(fileName);
+                await moveFile(file.id, info.boxIdComplete);
+                break;
+              }
+            }
+          }
         }
       }
-      btn.classList.toggle("buttonsubmit--loading");
     }
-    
-    const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
-      if (returnSubmitterButton) {
-        returnSubmitterButton.addEventListener("click", returnSubmitter);
-      }
+    btn.classList.toggle("buttonsubmit--loading");
+  }
+  
+  const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
+    if (returnSubmitterButton) {
+      returnSubmitterButton.addEventListener("click", returnSubmitter);
     }
+}
