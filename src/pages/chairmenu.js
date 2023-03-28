@@ -26,7 +26,9 @@ import {
   hideAnimation,
   getFileURL,
   emailsAllowedToUpdateData,
-  returnToSubmitterFolder
+  returnToSubmitterFolder,
+  createFolder,
+  completedFolder
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -473,7 +475,8 @@ const isElementLoaded = async selector => {
 export function viewFinalDecisionFilesColumns() {
   return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
     <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
@@ -587,7 +590,8 @@ export async function viewFinalDecisionFiles(files) {
     <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
         <div class="row">
             <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-center">Ongoing</div>
             <div class="col-lg-1 text-center" id="AABCG${fileId}" data-value="AABCG">--</div>
             <div class="col-lg-1 text-center" id="BCAC${fileId}" data-value="BCAC">--</div>
             <div class="col-lg-1 text-center" id="C-NCI${fileId}" data-value="C-NCI">--</div>
@@ -654,25 +658,32 @@ export const authTableTemplate = () => {
 }
 
 export const generateAuthTableFiles = async () => {
-  const allFiles = await getFolderItems(submitterFolder);
-  let filearrayAllFiles = allFiles.entries;
+  const allFilessub = await getFolderItems(submitterFolder);
+  const allFilescom = await getFolderItems(completedFolder);
+  let filearrayAllFilesSub = allFilessub.entries;
+  let filearrayAllFilesCom = allFilescom.entries;
 
   //document.getElementById("authTableView").innerHTML = template;
-  viewAuthFinalDecisionFilesTemplate(filearrayAllFiles);
+  viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
   commentSubmit();
   returnToChairs();
   returnToSubmitter();
   hideAnimation();
 }
 
-export async function viewAuthFinalDecisionFilesTemplate(files) {
+export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
   let template = "";
-  let filesInfo = [];
-  for (const file of files) {
+  let filesInfoSub = [];
+  let filesInfoCom = [];
+  for (const file of filesSub) {
     const fileInfo = await getFileInfo(file.id);
-    filesInfo.push(fileInfo);
+    filesInfoSub.push(fileInfo);
   }
-  if (filesInfo.length > 0) {
+  for (const file of filesCom) {
+    const fileInfo = await getFileInfo(file.id);
+    filesInfoCom.push(fileInfo);
+  }
+  if (filesInfoSub.length > 0 || filesInfoCom.length > 0) {
     template += `
     <div id='decidedFiles'>
     <div class='row'>
@@ -705,9 +716,14 @@ export async function viewAuthFinalDecisionFilesTemplate(files) {
     </div>`;
   }
   document.getElementById("authTableView").innerHTML = template;
-  if (filesInfo.length !== 0) {
-    await viewAuthFinalDecisionFiles(filesInfo);
-    for (const file of filesInfo) {
+  if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0) {
+    await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom);
+    for (const file of filesInfoSub) {
+      document
+        .getElementById(`study${file.id}`)
+        .addEventListener("click", showCommentsDCEG(file.id));
+    }
+    for (const file of filesInfoCom) {
       document
         .getElementById(`study${file.id}`)
         .addEventListener("click", showCommentsDCEG(file.id));
@@ -755,9 +771,9 @@ export async function viewAuthFinalDecisionFilesTemplate(files) {
   }
 }
 
-export async function viewAuthFinalDecisionFiles(files) {
+export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
   let template = "";
-  for (const fileInfo of files) {
+  for (const fileInfo of filesInfoSub) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
     let filename = fileInfo.name.slice(0,-19);
@@ -768,7 +784,48 @@ export async function viewAuthFinalDecisionFiles(files) {
     <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
         <div class="row authTable">
             <div class="col-lg-3 text-left"><input type="checkbox" class = "pl" id="${fileId}" name="${fileId}" value="${fileInfo.name}"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-center">Ongoing</div>
+            <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
+            <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
+            <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
+            <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
+            <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
+            <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
+            <div class="col-lg-1 text-right">
+                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
+                    <i class="fas fa-caret-down fa-2x"></i>
+                </button>
+            </div>
+        </div>
+        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
+          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+            <div class="row mb-1 m-0">
+              <div class="col-12 font-bold">
+                  Concept: ${filename}
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div id='file${fileId}Comments' class='col-12'></div>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  for (const fileInfo of filesInfoCom) {
+    const fileId = fileInfo.id;
+    //console.log(fileInfo);
+    let filename = fileInfo.name.slice(0,-19);
+    const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
+    let completion_date = await getChairApprovalDate(fileId);
+    template += `
+  <div class="card mt-1 mb-1 align-left" >
+    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
+        <div class="row authTable">
+            <div class="col-lg-3 text-left"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
+            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-center">Returned</div>
             <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
             <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
             <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
@@ -846,21 +903,6 @@ export const returnToChairs = () => {
             }
           }
         }
-        // console.log(checkbox.id);
-        // console.log(checkbox.value);
-        // let test = document.getElementById("MERGE"+checkbox.id);
-        // console.log(test.innerHTML);
-        // for (let value of chairsInfo){
-        //   console.log(value.boxIdNew);
-        //   newBoxFiles = await getFolderItems(value.boxIdNew);
-        //   for (let item of newBoxFiles.entries){
-        //     if (item.name === checkbox.value){
-        //       console.log()
-        //     }
-        //   }
-        //   console.log(value.boxIdClara);
-        //   claraBoxFiles = await getFolderItems(value.boxIdClara);
-        // }
       }
     }
     btn.classList.toggle("buttonsubmit--loading");
@@ -931,6 +973,7 @@ export const returnToSubmitter = () => {
             }
           }
         }
+        await moveFile(checkbox.id, completedFolder);
       }
     }
     btn.classList.toggle("buttonsubmit--loading");

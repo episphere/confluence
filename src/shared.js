@@ -11,6 +11,7 @@ export const deniedFolder = 198940989727;
 export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
 export const returnToSubmitterFolder = 200908340220;
+export const completedFolder = 200926990513;
 export const chairsInfo = [
     {id: 'user_1', email:"gaudetmm@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['sbehpour@deloitte.com']}, 
     {id: 'user_2', email:"kopchickbp@nih.gov", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['sbehpour@deloitte.com']}, 
@@ -437,36 +438,40 @@ const searchParms = () => {
     }
     return parms
 };
-// export const createFolder = async (folderId, folderName) => {
-//     try {
-//         const access_token = JSON.parse(localStorage.parms).access_token;
-//         let obj = {
-//             "name": folderName,
-//             "parent": {
-//                 "id": folderId
-//             }
-//         };
-//         let response = await fetch("https://api.box.com/2.0/folders", {
-//             method: "POST",
-//             headers:{
-//                 Authorization:"Bearer "+access_token
-//             },
-//             body: JSON.stringify(obj)
-//         });
-//         if(response.status === 401){
-//             if((await refreshToken()) === true) return await createFolder(folderId, foldername);
-//         }
-//         else if(response.status === 201){
-//             return response;
-//         }
-//         else{
-//             return {status: response.status, statusText: response.statusText};
-//         };
-//     }
-//     catch(err) {
-//         if((await refreshToken()) === true) return await createFolder(folderId, foldername);
-//     }
-// };
+export const createFolder = async (folderId, folderName) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      let obj = {
+        name: folderName,
+        parent: {
+          id: folderId,
+        },
+      };
+      let response = await fetch("https://api.box.com/2.0/folders", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        body: JSON.stringify(obj),
+        redirect: "follow",
+      });
+      if (response.status === 401) {
+        if ((await refreshToken()) === true)
+          return await createFolder(folderId, foldername);
+      } else if (response.status === 201) {
+        return response.json();
+      } else {
+        return {
+          status: response.status,
+          statusText: response.statusText,
+        };
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await createFolder(folderId, foldername);
+    }
+  };
+
 export const moveFile = async (fileId, parentId) => {
     try {
       const access_token = JSON.parse(localStorage.parms).access_token;
