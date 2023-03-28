@@ -149,6 +149,67 @@ export const createComment = async (id, msg = "") => {
     }
 };
 
+export const createCompleteTask = async (fileId, message) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      const response = await fetch(`https://api.box.com/2.0/tasks`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + access_token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          item: {
+            id: fileId.toString(),
+            type: "file",
+          },
+          action: "complete",
+          message: message,
+        }),
+      });
+      if (response.status === 401) {
+        if ((await refreshToken()) === true)
+          return await createCompleteTask(fileId, message);
+      } else {
+        return await response.json();
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await createCompleteTask(fileId, message);
+    }
+  };
+
+export const assignTask = async (taskId, userId) => {
+    try {
+      const access_token = JSON.parse(localStorage.parms).access_token;
+      const response = await fetch(`https://api.box.com/2.0/task_assignments`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + access_token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          task: {
+            id: taskId.toString(),
+            type: "task",
+          },
+          assign_to: {
+            login: userId,
+          },
+        }),
+      });
+      if (response.status === 401) {
+        if ((await refreshToken()) === true)
+          return await assignTask(taskId, userId);
+      } else {
+        return response;
+      }
+    } catch (err) {
+      if ((await refreshToken()) === true)
+        return await assignTask(taskId, userId);
+    }
+  };
+
 export const updateTaskAssignment = async (id, res_state, msg = "") => {
     try {
       let body = msg.length
@@ -1442,57 +1503,25 @@ export async function showCommentsDCEG(id) {
   }
 
 export const listComments = async (id) => {
-
     try {
-
       const access_token = JSON.parse(localStorage.parms).access_token;
-
-      const response = await fetch(
-
-        `https://api.box.com/2.0/files/${id}/comments`,
-
-        {
-
+      const response = await fetch(`https://api.box.com/2.0/files/${id}/comments`, {
           method: "GET",
-
- 
-
           headers: {
-
             Authorization: "Bearer " + access_token,
-
- 
-
             "Content-Type": "application/json",
-
           },
-
- 
-
           redirect: "follow",
-
         }
-
       );
-
- 
-
       if (response.status === 401) {
-
         if ((await refreshToken()) === true) return await listComments(id);
-
       } else {
-
         return response.text();
-
       }
-
     } catch (err) {
-
       if ((await refreshToken()) === true) return await listComments(id);
-
     }
-
   };
 
 export const uploadWordFile = async (data, fileName, folderId, html) => {
@@ -1520,15 +1549,14 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
         if (response.code === "bad_request") {
           return "Bad request";
         }
-        if ((await refreshToken()) === true)
-          return await uploadWordFile(data, fileName, folderId, html);
+        if ((await refreshToken()) === true) return await uploadWordFile(data, fileName, folderId, html);
       } else if (response.status === 201) {
         return response.json();
       } else if (response.status === 400) {
-        return {
-          status: response.status,
-          json: await response.json(),
-        };
+            return {
+                status: response.status,
+                json: await response.json(),
+            };
       } else {
         return {
           status: response.status,
@@ -1536,8 +1564,7 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
         };
       }
     } catch (err) {
-      if ((await refreshToken()) === true)
-        return await uploadWordFile(data, fileName, folderId, html);
+      if ((await refreshToken()) === true) return await uploadWordFile(data, fileName, folderId, html);
     }
   };
 

@@ -5,6 +5,8 @@ import {
   chairsInfo,
   messagesForChair,
   getTaskList,
+  createCompleteTask,
+  assignTask,
   updateTaskAssignment,
   createComment,
   getFileInfo,
@@ -585,12 +587,12 @@ export async function viewFinalDecisionFiles(files) {
         <div class="row">
             <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
             <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center" id="AABCG${fileId}">--</div>
-            <div class="col-lg-1 text-center" id="BCAC${fileId}">--</div>
-            <div class="col-lg-1 text-center" id="C-NCI${fileId}">--</div>
-            <div class="col-lg-1 text-center" id="CIMBA${fileId}">--</div>
-            <div class="col-lg-1 text-center" id="LAGENO${fileId}">--</div>
-            <div class="col-lg-1 text-center" id="MERGE${fileId}">--</div>
+            <div class="col-lg-1 text-center" id="AABCG${fileId}" data-value="AABCG">--</div>
+            <div class="col-lg-1 text-center" id="BCAC${fileId}" data-value="BCAC">--</div>
+            <div class="col-lg-1 text-center" id="C-NCI${fileId}" data-value="C-NCI">--</div>
+            <div class="col-lg-1 text-center" id="CIMBA${fileId}" data-value="CIMBA">--</div>
+            <div class="col-lg-1 text-center" id="LAGENO${fileId}" data-value="LAGENO">--</div>
+            <div class="col-lg-1 text-center" id="MERGE${fileId}" data-value="MERGE">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
@@ -636,11 +638,9 @@ export const authTableTemplate = () => {
                   <div class="tab-content" id="selectedTab">
                     <div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab">
                       <div id="authTableView" class="align-left"></div>
-                        <button type="submit" class="buttonsubmit" value="approved" onclick="this.classList.toggle('buttonsubmit--loading')">
-                          <span class="buttonsubmit__text"> Approve </span></button>
-                        <button type="submit" class="buttonsubmit" value="rejected" onclick="this.classList.toggle('buttonsubmit--loading')">
-                          <span class="buttonsubmit__text"> Deny </span></button>
-                        <button type="submit" class="buttonsubmit" value="daccReview" onclick="this.classList.toggle('buttonsubmit--loading')">
+                        <button type="submit" class="buttonsubmit" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')">
+                          <span class="buttonsubmit__text"> Return to Submitter </span></button>
+                        <button type="submit" class="buttonsubmit" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')">
                           <span class="buttonsubmit__text"> Return to Chairs </span></button>
                     </div>
                   </div>
@@ -659,7 +659,7 @@ export const generateAuthTableFiles = async () => {
   //document.getElementById("authTableView").innerHTML = template;
   viewAuthFinalDecisionFilesTemplate(filearrayAllFiles);
   commentSubmit();
-
+  returnToChairs();
   hideAnimation();
 }
 
@@ -765,14 +765,14 @@ export async function viewAuthFinalDecisionFiles(files) {
   <div class="card mt-1 mb-1 align-left" >
     <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
         <div class="row authTable">
-            <div class="col-lg-3 text-left"><input type="checkbox" id="${fileId}" name="${fileId}" value="${fileId}"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
+            <div class="col-lg-3 text-left"><input type="checkbox" class = "pl" id="${fileId}" name="${fileId}" value="${fileInfo.name}"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
             <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center" id="AABCG${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="BCAC${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="C-NCI${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="CIMBA${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="LAGENO${fileId}">N/A</div>
-            <div class="col-lg-1 text-center" id="MERGE${fileId}">N/A</div>
+            <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
+            <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
+            <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
+            <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
+            <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
+            <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
@@ -798,3 +798,98 @@ export async function viewAuthFinalDecisionFiles(files) {
   if (document.getElementById("files") != null)
     document.getElementById("files").innerHTML = template;
 }
+
+export const returnToChairs = () => {
+  const returnChairs = async (e) => {
+    e.preventDefault();
+    const btn = document.activeElement;
+    console.log("return to chairs selected");
+    var inputsChecked = document.querySelectorAll('.pl');
+    for (var checkbox of inputsChecked){
+      if (checkbox.checked){
+        for (var checkedCons of checkbox.parentElement.parentElement.getElementsByClassName("consTable")){
+          if (checkedCons.innerHTML != '--') {
+            let cons = checkedCons.getAttribute('data-value');
+            const info = chairsInfo.find(object => {
+              return object.consortium === cons;
+            });
+            let newBoxFiles = await getFolderItems(info.boxIdNew);
+            console.log(newBoxFiles);
+            var itemFound = false;
+            for (let item of newBoxFiles.entries){
+              if(item.name === checkbox.value){
+                let createTask = await createCompleteTask(item.id, "Returning to complete your review");
+                console.log(createTask);
+                let assignedTask = await assignTask(createTask.id, info.email);
+                console.log(assignedTask);
+                console.log("Found " + item.name);
+                itemFound = true;
+              }
+            }
+            if (!itemFound){
+              let claraBoxFiles = await getFolderItems(info.boxIdClara);
+              console.log(claraBoxFiles);
+              for (let item of claraBoxFiles.entries){
+                if(item.name === checkbox.value){
+                  let createTask = await createCompleteTask(item.id, "Returning to complete your review");
+                  console.log(createTask);
+                  let assignedTask = await assignTask(createTask.id, info.email);
+                  console.log(assignedTask);
+                  console.log("Found " + item.name);
+                  itemFound = true;
+                }
+              }
+            } else {
+              console.log("item not found");
+            }
+          }
+        }
+        // console.log(checkbox.id);
+        // console.log(checkbox.value);
+        // let test = document.getElementById("MERGE"+checkbox.id);
+        // console.log(test.innerHTML);
+        // for (let value of chairsInfo){
+        //   console.log(value.boxIdNew);
+        //   newBoxFiles = await getFolderItems(value.boxIdNew);
+        //   for (let item of newBoxFiles.entries){
+        //     if (item.name === checkbox.value){
+        //       console.log()
+        //     }
+        //   }
+        //   console.log(value.boxIdClara);
+        //   claraBoxFiles = await getFolderItems(value.boxIdClara);
+        // }
+      }
+    }
+    btn.classList.toggle("buttonsubmit--loading");
+  }
+  
+  const returnChairsButton = document.querySelector(`#returnChairs`);
+    if (returnChairsButton) {
+      returnChairsButton.addEventListener("click", returnChairs);
+    }
+  }
+
+  export const returnToSubmitter = () => {
+    const returnSubmitter = async (e) => {
+      e.preventDefault();
+      const btn = document.activeElement;
+      console.log("return to submitters selected");
+      var inputsChecked = document.querySelectorAll('.pl');
+      for (var checkbox of inputsChecked){
+        if (checkbox.checked){
+          //Get submitter info from original file
+          //Check if folder exists for user
+          //Create folder if one does not exist and share with user
+          //Get folder id
+          //Copy original file with comments to folder
+        }
+      }
+      btn.classList.toggle("buttonsubmit--loading");
+    }
+    
+    const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
+      if (returnSubmitterButton) {
+        returnSubmitterButton.addEventListener("click", returnSubmitter);
+      }
+    }
