@@ -203,7 +203,7 @@ export const formtemplate = () => {
                             <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="__blank">see data dictionary</a>)</u></p>
 
                             <div class="input-group">
-                                <p>All data requests will be provided access to the Confluence core variables. <br>
+                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided. <br>
                                 <i>No dates (e.g. intDate, DateDiagnosis, etc.) can be sent.</i></p>
                             </div>
                             <div class="input-group">
