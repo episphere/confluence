@@ -16,11 +16,10 @@ export const formtemplate = () => {
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
                             <p>Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
-                            of the consortia participating in Confluence to ensure that proposal are consistent with Confluence goals
-                             and individual cohorts’ consents. A description of the data access request process and individual consortia 
-                             DACC guidelines can be viewed here (TO DO, insert link to Document of Understanding Across Consortia). Access to data for 
-                             approved concepts will only be given to investigators listed below, each of whose Institutions will need to sign DTAs with the data 
-                             coordinating centers that are governing the requested data.</p>
+                            of the consortia participating in Confluence. A description of the data access request process and individual 
+                            consortia DACC guidelines can be viewed <a href="#join/description" target="__blank">here</a>. 
+                            Access to data for approved concepts will only be given to investigators listed below, each of whose Institutions 
+                            will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.</p>
                             <form>
 
                             <div class="input-group">
@@ -201,7 +200,7 @@ export const formtemplate = () => {
                             </div>
 
                             <br>
-                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary">see data dictionary</a>)</u></p>
+                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="__blank">see data dictionary</a>)</u></p>
 
                             <div class="input-group">
                                 <p>All data requests will be provided access to the Confluence core variables. <br>
