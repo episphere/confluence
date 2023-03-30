@@ -1731,3 +1731,68 @@ export function switchTabs(show, hide, files) {
         showComments(file_id);
       });
   }
+
+export function sortTableByColumn(table, column, asc = true) {
+    const direction = asc ? 1 : -1;
+    const rows = Array.from(document.getElementsByClassName("filedata"));
+
+    //Get only visible rows
+    let filteredRows = rows;
+    filteredRows = filteredRows.filter(
+        (row) => row.parentElement.style.display !== "none"
+    );
+    //Sort each row
+    const sortedRows = filteredRows.sort((a, b) => {
+        let aContent = "";
+        let bContent = "";
+        if (column === 0) {
+        aContent = a.firstElementChild.firstElementChild.textContent
+            .trim()
+            .toLowerCase();
+        bContent = b.firstElementChild.firstElementChild.textContent
+            .trim()
+            .toLowerCase();
+        } else {
+        bContent = b
+            .querySelector(`div:nth-child(${column + 1})`)
+            .textContent.trim()
+            .toLowerCase();
+        aContent = a
+            .querySelector(`div:nth-child(${column + 1})`)
+            .textContent.trim()
+            .toLowerCase();
+        }
+        if (!isNaN(Date.parse(aContent)) && !isNaN(Date.parse(bContent))) {
+        return Date.parse(aContent) - Date.parse(bContent) > 0
+            ? 1 * direction
+            : -1 * direction;
+        }
+
+        return aContent > bContent ? 1 * direction : -1 * direction;
+    });
+    sortedRows.forEach((row) => {
+        row.parentElement.remove();
+    });
+
+    //Add Data Back
+    sortedRows.forEach((row) => {
+        const divEl = document.createElement("div");
+        divEl.classList.add("card", "mt-1", "mb-1", "align-left");
+        divEl.appendChild(row);
+        document.getElementById("files").appendChild(divEl);
+    });
+    //Remember how colmmn is sorted
+    Array.from(table.querySelectorAll(".header-sortable")).forEach((header) => {
+        header.classList.remove("header-sort-asc", "header-sort-desc");
+    });
+
+    if (direction === 1) {
+        table
+        .querySelector(`.div-sticky`)
+        .children[column].classList.toggle("header-sort-asc", direction);
+    } else {
+        table
+        .querySelector(`.div-sticky`)
+        .children[column].classList.toggle("header-sort-desc", -direction);
+    }
+}

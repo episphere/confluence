@@ -18,7 +18,8 @@ export const navBarMenutemplate = () => {
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluenceDes">Description of Studies</a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join" id="resourcesConfluence">Participating Consortium</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/description" id="resourcesConfluenceDes">Consortium DACC Chairs</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
             </div>
         </div>
@@ -66,22 +67,18 @@ export const navBarMenutemplate = () => {
                         </a>
                     `
                 }
-                
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">
-                    Access
-                </a>
             </div>
         </div>
         <div class="grid-elements dropdown">
             <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Data Access
+                Projects
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Form </a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#upload_data_form" title="Data Form Upload" id="uploaddataForm"> Form Upload </a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">Description of Data Access Process</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a>
                 ${
                     authChair ? (
-                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#chair_menu" title="Chair Menu" id="chairMenu"> Chair Menu </a>`
+                        `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#chair_menu" title="Chair Menu" id="chairMenu"> DACC Chair Menu </a>`
                     ) :''
                 }
                 ${
@@ -89,6 +86,7 @@ export const navBarMenutemplate = () => {
                         `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable"> Admin Table </a>`
                     ) :''
                 }
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Data Forms" id="acceptedForms"> Accepted Data Requests </a>
             </div>
         </div>
         <div class="grid-elements">
