@@ -16,7 +16,7 @@ export const formtemplate = () => {
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
                             <p>Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
-                            of the consortia participating in Confluence. A description of the data access request process and individual 
+                            of the consortia participating in Confluence. A description of the <a href="#data_access" target="__blank">data access request process</a> and individual 
                             consortia DACC guidelines can be viewed <a href="#join/description" target="__blank">here</a>. 
                             Access to data for approved concepts will only be given to investigators listed below, each of whose Institutions 
                             will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.</p>
