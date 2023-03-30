@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { switchTabs, switchFiles } from "../event.js";
+import { switchTabs, switchFiles, sortTableByColumn } from "../event.js";
 import {
   getFolderItems,
   chairsInfo,
@@ -637,7 +637,7 @@ export const authTableTemplate = () => {
               <div class="main-summary-row">
                   <div class="align-left">
                       <h1 class="page-header">Admin Table View</h1>
-                  </div>
+                  </div>  
               </div>
               <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
                   <div class="tab-content" id="selectedTab">
@@ -647,6 +647,7 @@ export const authTableTemplate = () => {
                           <span class="buttonsubmit__text"> Return to Submitter </span></button>
                         <button type="submit" class="buttonsubmit" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')">
                           <span class="buttonsubmit__text"> Return to Chairs </span></button>
+                        <a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a>
                     </div>
                   </div>
               </div>

@@ -66,7 +66,7 @@ export const confluence = async () => {
         // const platformTutorialElement = document.getElementById('platformTutorial');
         const dataAnalysisElement = document.getElementById('dataAnalysis');
         const dataFormElement = document.getElementById('dataForm');
-        const uploaddataFormElement = document.getElementById('uploaddataForm');
+        //const uploaddataFormElement = document.getElementById('uploaddataForm');
         const chairMenuElement = document.getElementById('chairMenu');
         const authTableElement = document.getElementById('authTable');
 
@@ -168,18 +168,18 @@ export const confluence = async () => {
                 hideAnimation();
             });
         }
-        if(uploaddataFormElement) {
-            uploaddataFormElement.addEventListener('click', () => {
-                if (uploaddataFormElement.classList.contains('navbar-active')) return;
-                showAnimation();
-                assignNavbarActive(uploaddataFormElement, 1);
-                document.title = 'Confluence - Data Form Upload';
-                confluenceDiv.innerHTML = uploaddataFormTemplate();
-                //uploaddataForm();
-                //formFunctions();
-                hideAnimation();
-            });
-        }
+        // if(uploaddataFormElement) {
+        //     uploaddataFormElement.addEventListener('click', () => {
+        //         if (uploaddataFormElement.classList.contains('navbar-active')) return;
+        //         showAnimation();
+        //         assignNavbarActive(uploaddataFormElement, 1);
+        //         document.title = 'Confluence - Data Form Upload';
+        //         confluenceDiv.innerHTML = uploaddataFormTemplate();
+        //         //uploaddataForm();
+        //         //formFunctions();
+        //         hideAnimation();
+        //     });
+        // }
         if(chairMenuElement) {
             chairMenuElement.addEventListener('click', () => {
                  if (chairMenuElement.classList.contains('navbar-active')) return;
@@ -329,16 +329,16 @@ const manageRouter = async () => {
         dataForm();  
         formFunctions(); 
     }
-    else if (hash === '#upload_data_form') {
-        const element = document.getElementById('uploaddataForm');
-        if(!element) return;
-        if(element.classList.contains('navbar-active')) return;
-        document.title = 'Confluence - Data Form Upload';
-        assignNavbarActive(element, 1);
-        confluenceDiv.innerHTML = uploaddataFormTemplate();
-        //uploaddataForm();  
-        //formFunctions(); 
-    }
+    // else if (hash === '#upload_data_form') {
+    //     const element = document.getElementById('uploaddataForm');
+    //     if(!element) return;
+    //     if(element.classList.contains('navbar-active')) return;
+    //     document.title = 'Confluence - Data Form Upload';
+    //     assignNavbarActive(element, 1);
+    //     confluenceDiv.innerHTML = uploaddataFormTemplate();
+    //     //uploaddataForm();  
+    //     //formFunctions(); 
+    // }
     else if (hash === '#chair_menu') {
 
         const element = document.getElementById('chairMenu');
