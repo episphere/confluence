@@ -2,7 +2,7 @@ import { navBarMenutemplate } from './src/components/navBarMenuItems.js';
 import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
-import { template as dataRequestTemplate } from './src/pages/dataRequest.js';
+import { template as dataRequestTemplate, templateAfterLogin as dataRequestTemplateAfterLogin} from './src/pages/dataRequest.js';
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
@@ -137,7 +137,7 @@ export const confluence = async () => {
             showAnimation();
             assignNavbarActive(dataRequestElement, 1)
             document.title = 'Confluence - Data Access';
-            confluenceDiv.innerHTML = dataRequestTemplate();
+            confluenceDiv.innerHTML = dataRequestTemplateAfterLogin();
             hideAnimation();
         });
         // platformTutorialElement.addEventListener('click', () => {
