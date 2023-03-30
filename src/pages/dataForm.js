@@ -194,7 +194,7 @@ export const formtemplate = () => {
                                 <input id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
                                 <label class="container-ul" for="imputed"> Individual-level imputed data</label>
 
-                                <p> <br>If specific variants are being requested attach separate file(s) (.csv) with a list of either: (i) All SNPs (e.g. with their iCOGs/Onco SNP_name, see BCAC website) or (ii) ALL gene region(s) (with chromosome number and start and end positions [build 37]).</p>
+                                <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
                                 <input id="fileVar" name="fileVar" type="file">
                               </div>
                             </div>
