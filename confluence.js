@@ -315,8 +315,9 @@ const manageRouter = async () => {
         //if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
         assignNavbarActive(element, 1);
-        participatingConfluence('overview', true);
+        participatingConfluence('overview', false);
         confluenceResources();
+        hideAnimation();
     }
     else if(hash === '#join/description'){
         const element = document.getElementById('resourcesConfluence');
@@ -324,8 +325,9 @@ const manageRouter = async () => {
         //if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources Description';
         assignNavbarActive(document.querySelector('[href="#join/description"]'));
-        participatingConfluence('overview', true);
+        participatingConfluence('description', false);
         confluenceResourcesDes();
+        hideAnimation();
     }
     else if(hash === '#contact'){
         const element = document.getElementById('contactConfluence');

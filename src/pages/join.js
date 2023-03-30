@@ -153,4 +153,5 @@ export const confluenceResourcesDes = () => {
     `;
     document.getElementById('overview').innerHTML = template;
     handleExternalLinks();
+    //hideAnimation();
 }
