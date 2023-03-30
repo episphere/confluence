@@ -18,7 +18,8 @@ export const navBarMenutemplate = () => {
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluenceDes">Description of Studies</a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join" id="resourcesConfluence">Participating Consortium</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a>
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/description" id="resourcesConfluenceDes">Consortium DACC Chairs</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
             </div>
         </div>
@@ -88,6 +89,7 @@ export const navBarMenutemplate = () => {
                         `<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable"> Admin Table </a>`
                     ) :''
                 }
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Data Forms" id="acceptedForms"> Accepted Data Requests </a>
             </div>
         </div>
         <div class="grid-elements">

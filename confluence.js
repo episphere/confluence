@@ -11,12 +11,13 @@ import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 import { aboutConfluence, renderOverView } from './src/pages/about.js';
-import { confluenceResources } from './src/pages/join.js';
+import { confluenceResources, confluenceResourcesDes, participatingConfluence } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 import { renderDescription } from './src/pages/description.js';
 import { dataDictionaryTemplate } from './src/pages/dictionary.js';
 import { confluenceEventsPage, eventsBody } from './src/pages/events.js';
+import { acceptedDocs, acceptedDocsView } from './src/pages/accepteddocs.js';
 
 
 export const confluence = async () => {
@@ -69,6 +70,7 @@ export const confluence = async () => {
         //const uploaddataFormElement = document.getElementById('uploaddataForm');
         const chairMenuElement = document.getElementById('chairMenu');
         const authTableElement = document.getElementById('authTable');
+        const acceptedFormsElement = document.getElementById('acceptedForms');
 
         dataSubmissionElement.addEventListener('click', async () => {
             if (dataSubmissionElement.classList.contains('navbar-active')) return;
@@ -195,7 +197,7 @@ export const confluence = async () => {
              });
         }
         if(authTableElement) {
-        authTableElement.addEventListener('click', () => {
+            authTableElement.addEventListener('click', () => {
                 if (authTableElement.classList.contains('navbar-active')) return;
                 const element = document.getElementById("authTable")
                 showAnimation();
@@ -203,6 +205,19 @@ export const confluence = async () => {
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
+            });
+         }
+        if(acceptedFormsElement) {
+            acceptedFormsElement.addEventListener('click', () => {
+                if (acceptedFormsElement.classList.contains('navbar-active')) return;
+                const element = document.getElementById("acceptedForms")
+                showAnimation();
+                assignNavbarActive(element, 1);
+                document.title = 'Confluence - Accepted Data Requests';
+                //confluenceDiv.innerHTML = authTableTemplate();
+                console.log("accepted forms");
+                confluenceDiv.innerHTML = acceptedDocs();
+                acceptedDocsView();
             });
          }
         const folders = await getFolderItems(0);
@@ -287,7 +302,6 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Study Description';
-        console.log(element);
         assignNavbarActive(document.querySelector('[href="#about/description"]'));
         const fileInfo = await getFileInfo(761599566277);
         console.log(fileInfo);
@@ -295,13 +309,23 @@ const manageRouter = async () => {
         renderDescription(fileInfo['content_modified_at'])
         renderOverView();
     }
-    else if(hash === '#join'){
+    else if(hash === '#join/overview'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
-        if(element.classList.contains('navbar-active')) return;
+        //if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
         assignNavbarActive(element, 1);
+        participatingConfluence('overview', true);
         confluenceResources();
+    }
+    else if(hash === '#join/description'){
+        const element = document.getElementById('resourcesConfluence');
+        if(!element) return;
+        //if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Resources Description';
+        assignNavbarActive(document.querySelector('[href="#join/description"]'));
+        participatingConfluence('overview', true);
+        confluenceResourcesDes();
     }
     else if(hash === '#contact'){
         const element = document.getElementById('contactConfluence');
@@ -340,38 +364,33 @@ const manageRouter = async () => {
     //     //formFunctions(); 
     // }
     else if (hash === '#chair_menu') {
-
         const element = document.getElementById('chairMenu');
-
         if (!element) return;
-
         if (element.classList.contains('navbar-active')) return;
-
         document.title = 'Chair Menu';
-
         assignNavbarActive(element, 1);
-
         confluenceDiv.innderHTML = chairMenuTemplate();
-
         generateChairMenuFiles();
-
     }
     else if (hash === '#auth_table') {
-
         const element = document.getElementById('authTable');
-
         if (!element) return;
-
         if (element.classList.contains('navbar-active')) return;
-
         document.title = 'Admin Table';
-
         assignNavbarActive(element, 1);
-
-        confluenceDiv.innderHTML = AuthTableTemplate();
-
+        confluenceDiv.innerHTML = AuthTableTemplate();
         generateAuthTableFiles();
-
+    }
+    else if (hash === '#accepted_forms') {
+        const element = document.getElementById('acceptedForms');
+        if (!element) return;
+        if (element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Accepted Data Requests';
+        assignNavbarActive(element, 1);
+        //confluenceDiv.innerHTML = AuthTableTemplate();
+        console.log("accepted forms");
+        confluenceDiv.innerHTML = acceptedDocs();
+        acceptedDocsView();
     }
     else if (hash === '#data_exploration/dictionary') {
         const dataDictionaryElement = document.getElementById('dataDictionary');
@@ -424,18 +443,16 @@ const manageHash = async () => {
         element.click();
     }
     else if (hash === '#chair_menu') {
-
         const element = document.getElementById('chairMenu');
-
         element.click();
-
     }
     else if (hash === '#auth_table') {
-
         const element = document.getElementById('authTable');
-
         element.click();
-
+    }
+    else if (hash === '#accepted_forms') {
+        const element = document.getElementById('acceptedForms');
+        element.click();
     }
     else if (hash === '#data_submission') {
         const element = document.getElementById('dataSubmission');
@@ -496,13 +513,24 @@ const manageHash = async () => {
         renderDescription(fileInfo['content_modified_at']);
         hideAnimation();
     }
-    else if(hash === '#join'){
+    else if(hash === '#join/overview'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
-        if(element.classList.contains('navbar-active')) return;
+        //if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 1);
         document.title = 'Confluence - Resources';
+        participatingConfluence('overview', true);
         confluenceResources();
+        hideAnimation();
+    }
+    else if(hash === '#join/description'){
+        const element = document.getElementById('resourcesConfluence');
+        if(!element) return;
+        //if(element.classList.contains('navbar-active')) return;
+        assignNavbarActive(document.querySelector('[href="#join/description"]'), 1);
+        document.title = 'Confluence - Resources Description';
+        participatingConfluence('description', true);
+        confluenceResourcesDes();
         hideAnimation();
     }
     else if(hash === '#contact'){

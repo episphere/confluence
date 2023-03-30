@@ -1,7 +1,20 @@
+export const participatingConfluence = (activeTab, showDescripton) => {
+    let template = `
+        <div class="general-bg body-min-height padding-bottom-1rem">
+            <div class="container">
+                ${showDescripton ? `<div class="main-summary-row white-bg div-border">
+                    <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></button>
+                    <button class="sub-menu-btn"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#join/description"> <strong>DACC Chairs</strong></a></button>
+                </div>`:``}
+                <div id="overview"></div>
+            </div>
+        </div>
+    `;
+    document.getElementById('confluenceDiv').innerHTML = template;
+}
+
 export const confluenceResources = () => {
     let template = `
-        <div class="general-bg padding-bottom-1rem">
-            <div class="container body-min-height">
                 <div class="main-summary-row">
                     <div class="align-left">
                         <h1 class="page-header">Participating Consortium</h1>
@@ -9,7 +22,6 @@ export const confluenceResources = () => {
                 </div>
                 <div class="main-summary-row white-bg div-border">
                     <div class="col font-size-18 align-left">
-                        </br>
                         <div>The following breast cancer consortia are participating in Confluence:</div>
                         <div class="consortia-desc">
                             <a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
@@ -49,10 +61,8 @@ export const confluenceResources = () => {
                         </div>
                     <div>
                 <div>
-            <div>
-        <div>
     `;
-    document.getElementById('confluenceDiv').innerHTML = template;
+    document.getElementById('overview').innerHTML = template;
     handleExternalLinks();
 }
 
@@ -75,4 +85,72 @@ const handleExternalLinks = () => {
             </div>`;
         })
     });
+}
+
+export const confluenceResourcesDes = () => {
+    let template = `
+                <div class="main-summary-row">
+                    <div class="align-left">
+                        <h1 class="page-header">Participating Consortium</h1>
+                    </div>
+                </div>
+                <div class="main-summary-row white-bg div-border">
+                    <div class="col font-size-18 align-left">
+                        The following DACCs provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
+                        participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="__blank">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
+                    <div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Consortium Name</th>
+                                    <th scope="col">DACC Chair</th>
+                                    <th scope="col">DACC Chair Email</th>
+                                    <th scope="col">DACC Guidelines</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>African-ancestry Breast Cancer Genetic Consortium</td>
+                                    <td>Wei Zheng</td>
+                                    <td>wei.zheng@vumc.org</td>
+                                    <td><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="__blank">AABCG DACC Guidelines</td>
+                                </tr>
+                                <tr>
+                                    <td>Breast Cancer Association Consortium</td>
+                                    <td>Roger Milne</td>
+                                    <td>roger.milne@cancervic.org.au</td>
+                                    <td>BCAC DACC Guidelines</td>
+                                </tr>
+                                <tr>
+                                    <td>Consortium of Investigators of Modifiers of BRCA1/2</td>
+                                    <td>Georgia Chenevix-Trench</td>
+                                    <td>georgia.trench@qimrberghofer.edu.au</td>
+                                    <td><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="__blank">CIMBA DACC Guidelines</td>
+                                </tr>
+                                    <tr>
+                                    <td>Latin America Genomics Breast Cancer Consortium</td>
+                                    <td>Laura Fejerman</td>
+                                    <td>lfejerman@ucdavis.edu</td>
+                                    <td><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="__blank">LAGENO DACC Guidelines</td>
+                                </tr>
+                                <tr>
+                                    <td>Male Breast Cancer Genetics Consortium</td>
+                                    <td>Nick Orr</td>
+                                    <td>nick.orr@qub.ac.uk</td>
+                                    <td><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="__blank">MERGE DACC Guidelines</td>
+                                </tr>
+                                <tr>
+                                    <td>Confluence National Cancer Institute Studies</td>
+                                    <td>Dezheng Huo</td>
+                                    <td>dhuo@bsd.uchicago.edu</td>
+                                    <td><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="__blank">C-NCI DACC Guidelines</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                <div>
+    `;
+    document.getElementById('overview').innerHTML = template;
+    handleExternalLinks();
 }

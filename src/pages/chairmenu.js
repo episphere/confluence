@@ -508,7 +508,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
                                                   <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
                                                   <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                                   <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
-                      <div id="filterData" class="align-left"></div>
                   </div>
               </div>
           </div>
@@ -698,14 +697,11 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
                                                   <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
                                                   <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                                   <h6 class="badge badge-pill badge-777">777</h6>: Duplicate </span>
-                      <div id="filterData" class="align-left"></div>
                   </div>
               </div>
           </div>
       </div>
       </div>
-      <!--div class='table-responsive'>
-      <table class='table'-->
       <div class='col-xl-12 pr-0'>`;
     template += viewFinalDecisionFilesColumns();
     template += '<div id="files"> </div>';
