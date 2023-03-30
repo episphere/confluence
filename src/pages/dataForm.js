@@ -203,8 +203,7 @@ export const formtemplate = () => {
                             <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="__blank">see data dictionary</a>)</u></p>
 
                             <div class="input-group">
-                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided. <br>
-                                <i>No dates (e.g. intDate, DateDiagnosis, etc.) can be sent.</i></p>
+                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided.</p>
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor Variables</b></label>
@@ -378,7 +377,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="anyoth"><b>Any other considerations you would like the DACC to be aware of</b></label>
+                              <label for="anyoth"><b>Any other considerations you would like the DACCs to be aware of</b></label>
                               <textarea id="anyoth" name="anyoth" rows="4" cols="65" required></textarea>
                             </div>
                             
