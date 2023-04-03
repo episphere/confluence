@@ -324,12 +324,14 @@ export const generateChairMenuFiles = async () => {
       ["recommendation", 'conceptNeedingClarification'],
       filesIncompleted
     );
-    if (localStorage.getItem("currentTab")) {
-      const currTab = localStorage.getItem("currentTab");
-      if (document.getElementById(currTab) != null) {
-        document.getElementById(currTab).click();
-      }
-    }
+
+    document.getElementById("recommendationTab").click();
+    // if (localStorage.getItem("currentTab")) {
+    //   const currTab = localStorage.getItem("currentTab");
+    //   if (document.getElementById(currTab) != null) {
+    //     document.getElementById(currTab).click();
+    //   }
+    // }
     //return template;
   hideAnimation();
 }
@@ -665,7 +667,7 @@ export const generateAuthTableFiles = async () => {
 
   //document.getElementById("authTableView").innerHTML = template;
   await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
-  commentSubmit();
+  //commentSubmit();
   returnToChairs();
   returnToSubmitter();
   hideAnimation();
