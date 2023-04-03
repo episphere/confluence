@@ -68,11 +68,11 @@ export const acceptedDocsView = async () => {
 
 export function viewAcceptedFilesColumns() {
     return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-      <div class="col-lg-5 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-left font-bold ws-nowrap header-sortable">Accepted Date <button class="transparent-btn sort-column" data-column-name="Accepted Date"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-center font-bold ws-nowrap header-sortable">Author <button class="transparent-btn sort-column" data-column-name="Author"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-1 text-right font-bold ws-nowrap header-sortable"></div>
+      <div class="col-lg-5 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+      <div class="col-lg-2 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+      <div class="col-lg-2 text-left font-bold ws-nowrap text-wrap header-sortable">Accepted Date <button class="transparent-btn sort-column" data-column-name="Accepted Date"><i class="fas fa-sort"></i></button></div>
+      <div class="col-lg-2 text-center font-bold ws-nowrap text-wrap header-sortable">Author <button class="transparent-btn sort-column" data-column-name="Author"><i class="fas fa-sort"></i></button></div>
+      <div class="col-lg-1 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
     </div>`;
   }
 

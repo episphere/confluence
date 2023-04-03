@@ -474,16 +474,16 @@ const isElementLoaded = async selector => {
 
 export function viewFinalDecisionFilesColumns() {
   return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-    <div class="col-lg-3 text-left font-bold ws-nowrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-left font-bold ws-nowrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-right font-bold ws-nowrap header-sortable"></div>
+    <div class="col-lg-3 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+    <div class="col-lg-1 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
   </div>`;
 }
 
