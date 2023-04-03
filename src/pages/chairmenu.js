@@ -1003,7 +1003,7 @@ export const returnToSubmitter = () => {
         await moveFile(checkbox.id, completedFolder);
         console.log(cpFileId);
         form.innerHTML = `Preparing email for submitter: ${userFound}`;
-        window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned&body=Your Confluence data access submission has been returned at: https://app.box.com/file/${cpFileId}`;
+        window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at: https://app.box.com/file/${cpFileId}`;
       }
     }
     btn.classList.toggle("buttonsubmit--loading");
