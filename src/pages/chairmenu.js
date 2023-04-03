@@ -11,13 +11,11 @@ import {
   createComment,
   getFileInfo,
   moveFile,
- //createFolder,
   addNewCollaborator,
   copyFile,
   acceptedFolder,
   deniedFolder,
   submitterFolder,
-  //sendEmail,
   getChairApprovalDate,
   showCommentsDropDown,
   archivedFolder,
@@ -947,7 +945,7 @@ export const returnToSubmitter = () => {
         let submittedItems = await getFolderItems(returnToSubmitterFolder);
         let folderID = "none";
         for (let item of submittedItems.entries){
-          if(item.name === userFound){
+          if(item.name ===  `The_Confluence_Project_Returned_Concepts-${userFound}`){
             form.innerHTML = `Folder already previously created: ${userFound}`;
             folderID = item.id
           }
@@ -955,7 +953,8 @@ export const returnToSubmitter = () => {
         let cpFileId = "";
         if (folderID == "none") {
           form.innerHTML = `Creating forlder for user: ${userFound}`
-          const newFolder = await createFolder(returnToSubmitterFolder, userFound);
+          const folderName = `The_Confluence_Project_Returned_Concepts-${userFound}`
+          const newFolder = await createFolder(returnToSubmitterFolder, folderName);
           await addNewCollaborator(newFolder.id, "folder", userFound, "viewer");
           form.innerHTML = `Submission being copied for return`;
           const cpFile = await copyFile(checkbox.id, newFolder.id);
