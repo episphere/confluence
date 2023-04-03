@@ -484,6 +484,7 @@ export function viewFinalDecisionFilesColumns() {
     <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+    <div hidden class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">TEST<button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
     <div class="col-lg-1 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
   </div>`;
 }
@@ -598,6 +599,7 @@ export async function viewFinalDecisionFiles(files) {
             <div class="col-lg-1 text-center" id="CIMBA${fileId}" data-value="CIMBA">--</div>
             <div class="col-lg-1 text-center" id="LAGENO${fileId}" data-value="LAGENO">--</div>
             <div class="col-lg-1 text-center" id="MERGE${fileId}" data-value="MERGE">--</div>
+            <div hidden class="col-lg-1 text-center" id="TEST${fileId}" data-value="TEST">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
@@ -790,6 +792,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
             <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
             <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
             <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
+            <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
@@ -830,6 +833,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
             <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
             <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
             <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
+            <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
             <div class="col-lg-1 text-right">
                 <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
                     <i class="fas fa-caret-down fa-2x"></i>
