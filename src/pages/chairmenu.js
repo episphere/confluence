@@ -28,7 +28,8 @@ import {
   emailsAllowedToUpdateData,
   returnToSubmitterFolder,
   createFolder,
-  completedFolder
+  completedFolder,
+  listComments
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -955,23 +956,24 @@ export const returnToSubmitter = () => {
         if (folderID == "none") {
           form.innerHTML = `Creating forlder for user: ${userFound}`
           const newFolder = await createFolder(returnToSubmitterFolder, userFound);
-          await addNewCollaborator(
-            newFolder.id,
-            "folder",
-            userFound,
-            "viewer"
-          );
+          await addNewCollaborator(newFolder.id, "folder", userFound, "viewer");
           form.innerHTML = `Submission being copied for return`;
           const cpFile = await copyFile(checkbox.id, newFolder.id);
-          console.log(cpFile);
           cpFileId = cpFile.id;
-          console.log(cpFileId);
+          let returnComments = await listComments(checkbox.id);
+          let commentsToCp = JSON.parse(returnComments).entries
+          form.innerHTML = `Copying comments`;
+          console.log(commentsToCp);
+          await copyComments(commentsToCp, cpFileId);
         } else {
           form.innerHTML = `Submission being copied for return`;
           const cpFile = await copyFile(checkbox.id, folderID);
-          console.log(cpFile);
           cpFileId = cpFile.id;
-          console.log(cpFileId);
+          let returnComments = await listComments(checkbox.id);
+          let commentsToCp = JSON.parse(returnComments).entries
+          form.innerHTML = `Copying comments`;
+          console.log(commentsToCp);
+          await copyComments(commentsToCp, cpFileId);
         }
         for (let info of chairsInfo){
           form.innerHTML = `Searching chair folders for same file: ${info.consortium}`;
@@ -1016,4 +1018,17 @@ export const returnToSubmitter = () => {
     if (returnSubmitterButton) {
       returnSubmitterButton.addEventListener("click", returnSubmitter);
     }
+}
+
+export const copyComments = async (comments, fileId) => {
+  for (let chairs of chairsInfo) {
+    let consortiumName = chairs.consortium;
+    let chairEmail = chairs.email;
+    let chairComments = comments.filter(dt => dt.created_by.login === chairEmail);
+    for (let comment of chairComments) {
+      let commentMessage = comment.message;
+      let submitMessage = `DACC Review Comments from ${consortiumName}: ` + commentMessage;
+      await createComment(fileId, submitMessage);
+    }
+  }
 }
