@@ -410,7 +410,7 @@ export const commentSubmit = async () => {
       console.log(message)
       await createComment(fileId, message);
       await createComment(allFileMatch.id, message);
-      if (grade === "5"){
+      if (grade === "5" || grade === "2"){
         let clariFolder = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).boxIdClara
         await moveFile(fileId, clariFolder)
       } else {
