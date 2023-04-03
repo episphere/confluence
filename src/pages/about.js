@@ -52,7 +52,7 @@ export const renderOverView = async () => {
             <div class="main-summary-row align-left">
                 <div class="col">
                     <!---For more information:</br>
-                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>--->
+                    Visit: <a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="_blank" rel="noopener noreferrer">https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project</a></br>--->
                     Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
                 </div>
             </div>

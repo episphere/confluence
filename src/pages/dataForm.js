@@ -16,8 +16,8 @@ export const formtemplate = () => {
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
                             <p>Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
-                            of the consortia participating in Confluence. A description of the <a href="#data_access" target="__blank">data access request process</a> and individual 
-                            consortia DACC guidelines can be viewed <a href="#join/description" target="__blank">here</a>. 
+                            of the consortia participating in Confluence. A description of the <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request process</a> and individual 
+                            consortia DACC guidelines can be viewed <a href="#join/description" target="_blank" rel="noopener noreferrer">here</a>. 
                             Access to data for approved concepts will only be given to investigators listed below, each of whose Institutions 
                             will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.</p>
                             <form>
@@ -200,7 +200,7 @@ export const formtemplate = () => {
                             </div>
 
                             <br>
-                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="__blank">see data dictionary</a>)</u></p>
+                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>)</u></p>
 
                             <div class="input-group">
                                 <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided.</p>
@@ -1574,7 +1574,7 @@ export const uploaddataFormTemplate = () => {
                     <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">  
                       <h5> Do not change name of file from previous step, if file name is changed it may not be processed. </h5>
                       <h5> Please upload form below. If window shows an error or takes long to load, please refresh the cache using Ctrl + F5. </h5>
-                      <h5> If you continue experiencing issues, you may also <a href="https://nih.app.box.com/f/818f3ca628ec4c12a2d5d2ed40029840" target="__blank">submit your file here</a>. </h5>
+                      <h5> If you continue experiencing issues, you may also <a href="https://nih.app.box.com/f/818f3ca628ec4c12a2d5d2ed40029840" target="_blank" rel="noopener noreferrer">submit your file here</a>. </h5>
                       <div class="uploadContainer">
                         <iframe src="https://nih.app.box.com/f/818f3ca628ec4c12a2d5d2ed40029840" height="1000" width="1000"></iframe>
                       </div>

@@ -15,9 +15,9 @@ export const footerTemplate = () => {
                     </div>
                     <div class="col-md-4 zero-padding">
                         <div class="footer-heading">POLICIES</div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/accessibility" target="__blank">Accessibility</a></div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/disclaimer" target="__blank">Disclaimer</a></div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/foia" target="__blank">FOIA</a></div>
+                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a></div>
+                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/disclaimer" target="_blank" rel="noopener noreferrer">Disclaimer</a></div>
+                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/foia" target="_blank" rel="noopener noreferrer">FOIA</a></div>
                     </div>
                 </div>
                 </br>

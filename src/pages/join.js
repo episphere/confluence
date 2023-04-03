@@ -29,7 +29,7 @@ export const confluenceResources = () => {
                         </div>
 
                         <div class="consortia-desc">
-                            <a data-href="https://projectreporter.nih.gov/project_info_description.cfm?aid=9040408&icde=30184576&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC" target="__blank">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
+                            <a data-href="https://projectreporter.nih.gov/project_info_description.cfm?aid=9040408&icde=30184576&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
                             The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                         </div>
 
@@ -81,7 +81,7 @@ const handleExternalLinks = () => {
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">
                     Cancel
                 </button>
-                <a href="${link.dataset.href}" target="_blank" class="btn btn-outline-primary">Continue</a>
+                <a href="${link.dataset.href}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary">Continue</a>
             </div>`;
         })
     });
@@ -97,7 +97,7 @@ export const confluenceResourcesDes = () => {
                 <div class="main-summary-row white-bg div-border">
                     <div class="col font-size-18 align-left">
                         The following DACCs provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
-                        participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="__blank">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
+                        participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="_blank" rel="noopener noreferrer">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
                     <div>
                     <div class="table-responsive">
                         <table class="table table-striped">
@@ -114,7 +114,7 @@ export const confluenceResourcesDes = () => {
                                     <td>African-ancestry Breast Cancer Genetic Consortium</td>
                                     <td>Wei Zheng</td>
                                     <td>wei.zheng@vumc.org</td>
-                                    <td><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="__blank">AABCG DACC Guidelines</td>
+                                    <td><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer">AABCG DACC Guidelines</td>
                                 </tr>
                                 <tr>
                                     <td>Breast Cancer Association Consortium</td>
@@ -126,25 +126,25 @@ export const confluenceResourcesDes = () => {
                                     <td>Consortium of Investigators of Modifiers of BRCA1/2</td>
                                     <td>Georgia Chenevix-Trench</td>
                                     <td>georgia.trench@qimrberghofer.edu.au</td>
-                                    <td><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="__blank">CIMBA DACC Guidelines</td>
+                                    <td><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer">CIMBA DACC Guidelines</td>
                                 </tr>
                                     <tr>
                                     <td>Latin America Genomics Breast Cancer Consortium</td>
                                     <td>Laura Fejerman</td>
                                     <td>lfejerman@ucdavis.edu</td>
-                                    <td><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="__blank">LAGENO DACC Guidelines</td>
+                                    <td><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer">LAGENO DACC Guidelines</td>
                                 </tr>
                                 <tr>
                                     <td>Male Breast Cancer Genetics Consortium</td>
                                     <td>Nick Orr</td>
                                     <td>nick.orr@qub.ac.uk</td>
-                                    <td><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="__blank">MERGE DACC Guidelines</td>
+                                    <td><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer">MERGE DACC Guidelines</td>
                                 </tr>
                                 <tr>
                                     <td>Confluence National Cancer Institute Studies</td>
                                     <td>Dezheng Huo</td>
                                     <td>dhuo@bsd.uchicago.edu</td>
-                                    <td><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="__blank">C-NCI DACC Guidelines</td>
+                                    <td><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer">C-NCI DACC Guidelines</td>
                                 </tr>
                             </tbody>
                         </table>

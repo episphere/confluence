@@ -90,7 +90,7 @@ export const navBarMenutemplate = () => {
             </div>
         </div>
         <div class="grid-elements">
-            <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
+            <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
                 Report issue
             </a>
         </div>

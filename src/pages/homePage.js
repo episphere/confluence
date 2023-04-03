@@ -46,7 +46,7 @@ export const infoDeck = () => {
         </div>
         <div class="ternary-bg">
             <div class="container align-left confluence-info font-family-helvetica">
-                <div><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">Confluence</a> is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the <a href="https://dceg.cancer.gov/" target="__blank">Division of Cancer Epidemiology and Genetics (DCEG)</a> of NCI.</div>
+                <div><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="_blank" rel="noopener noreferrer">Confluence</a> is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the <a href="https://dceg.cancer.gov/" target="_blank" rel="noopener noreferrer">Division of Cancer Epidemiology and Genetics (DCEG)</a> of NCI.</div>
             </div>
         </div>
     `
@@ -100,7 +100,7 @@ export const infoDeckAfterLoggedIn = async () => {
         </div>
         <div class="ternary-bg">
             <div class="container align-left confluence-info font-family-helvetica">
-                <div><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="__blank">Confluence</a> is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the <a href="https://dceg.cancer.gov/" target="__blank">Division of Cancer Epidemiology and Genetics (DCEG)</a> of NCI.</div>
+                <div><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="_blank" rel="noopener noreferrer">Confluence</a> is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the <a href="https://dceg.cancer.gov/" target="_blank" rel="noopener noreferrer">Division of Cancer Epidemiology and Genetics (DCEG)</a> of NCI.</div>
             </div>
         </div>
     `
