@@ -523,7 +523,7 @@ export const copyFile = async (fileId, parentId) => {
             if((await refreshToken()) === true) return await copyFile(fileId, parentId);
         }
         else if(response.status === 201){
-            return response;
+            return await response.json();
         }
         else{
             return {status: response.status, statusText: response.statusText};
@@ -1473,7 +1473,6 @@ export async function showCommentsDCEG(id) {
         const time = comment_date.toLocaleTimeString();
         //if (comment_date > newDate) {
             newDate = comment_date;
-            console.log(newDate);
             const ifcons = chairsInfo.find(element => element.email === comment.created_by.login);
             if (ifcons){
                 const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;

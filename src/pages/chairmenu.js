@@ -664,7 +664,7 @@ export const generateAuthTableFiles = async () => {
   let filearrayAllFilesCom = allFilescom.entries;
 
   //document.getElementById("authTableView").innerHTML = template;
-  viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
+  await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
   commentSubmit();
   returnToChairs();
   returnToSubmitter();
@@ -903,6 +903,7 @@ export const returnToChairs = () => {
       }
     }
     btn.classList.toggle("buttonsubmit--loading");
+    document.location.reload(true);
   }
   
   const returnChairsButton = document.querySelector(`#returnChairs`);
@@ -916,8 +917,26 @@ export const returnToSubmitter = () => {
     e.preventDefault();
     const btn = document.activeElement;
     var inputsChecked = document.querySelectorAll('.pl');
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    header.innerHTML = `<h5 class="modal-title">Returning to File to Sender</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+    let template = '<form id="returnToSubmitterInfo"></form>';
+    body.innerHTML = template;
+    $("#confluenceMainModal").modal("show");
+    let popup = document.getElementById('confluenceMainModal');
+    let btns = popup.querySelectorAll('button');
+    for (let button of btns) {
+      button.addEventListener('click', function () {
+        location.reload();
+      })
+    }
+    const form = document.getElementById("returnToSubmitterInfo");
     for (var checkbox of inputsChecked){
       if (checkbox.checked){
+        form.innerHTML = `Gathering data for Box file: ${checkbox.id}`;
         console.log(checkbox.id);
         let fileSelected = await getFileInfo(checkbox.id);
         let fileName = fileSelected.name;
@@ -926,11 +945,13 @@ export const returnToSubmitter = () => {
         let folderID = "none";
         for (let item of submittedItems.entries){
           if(item.name === userFound){
+            form.innerHTML = `Folder already previously created: ${userFound}`;
             folderID = item.id
           }
         }
         let cpFileId = "";
         if (folderID == "none") {
+          form.innerHTML = `Creating forlder for user: ${userFound}`
           const newFolder = await createFolder(returnToSubmitterFolder, userFound);
           await addNewCollaborator(
             newFolder.id,
@@ -938,13 +959,20 @@ export const returnToSubmitter = () => {
             userFound,
             "viewer"
           );
+          form.innerHTML = `Submission being copied for return`;
           const cpFile = await copyFile(checkbox.id, newFolder.id);
+          console.log(cpFile);
           cpFileId = cpFile.id;
+          console.log(cpFileId);
         } else {
+          form.innerHTML = `Submission being copied for return`;
           const cpFile = await copyFile(checkbox.id, folderID);
+          console.log(cpFile);
           cpFileId = cpFile.id;
+          console.log(cpFileId);
         }
         for (let info of chairsInfo){
+          form.innerHTML = `Searching chair folders for same file: ${info.consortium}`;
           let fileFound = false;
           console.log(info.boxIdNew);
           let files = await getFolderItems(info.boxIdNew);
@@ -953,6 +981,7 @@ export const returnToSubmitter = () => {
             if (file.name === fileName) {
               fileFound = true;
               console.log(fileName);
+              form.innerHTML = `Moving file to completed folder: ${info.consortium}`;
               await moveFile(file.id, info.boxIdComplete);
               break;
             }
@@ -962,6 +991,7 @@ export const returnToSubmitter = () => {
             for (let file of files.entries) {
               console.log(file);
               if (file.name === fileName) {
+                form.innerHTML = `Moving file to completed folder: ${info.consortium}`;
                 fileFound = true;
                 console.log(fileName);
                 await moveFile(file.id, info.boxIdComplete);
@@ -971,9 +1001,13 @@ export const returnToSubmitter = () => {
           }
         }
         await moveFile(checkbox.id, completedFolder);
+        console.log(cpFileId);
+        form.innerHTML = `Preparing email for submitter: ${userFound}`;
+        window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned&body=Your Confluence data access submission has been returned at: https://app.box.com/file/${cpFileId}`;
       }
     }
     btn.classList.toggle("buttonsubmit--loading");
+    //document.location.reload(true);
   }
   
   const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
