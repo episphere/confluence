@@ -27,9 +27,8 @@ export const confluenceResources = () => {
                             <a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
                             The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                         </div>
-
                         <div class="consortia-desc">
-                            <a data-href="https://projectreporter.nih.gov/project_info_description.cfm?aid=9040408&icde=30184576&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
+                        <a href="mailto:wei.zheng@vanderbilt.edu">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
                             The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                         </div>
 
