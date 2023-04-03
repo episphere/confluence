@@ -13,12 +13,13 @@ export const archivedFolder = 198962088100;
 export const returnToSubmitterFolder = 200908340220;
 export const completedFolder = 200926990513;
 export const chairsInfo = [
-    {id: 'user_1', email:"ahearntu@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['sbehpour@deloitte.com']}, 
-    {id: 'user_2', email:"kopchickbp@nih.gov", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['sbehpour@deloitte.com']}, 
-    {id: 'user_3', email:"troisir@nih.gov", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:['sbehpour@deloitte.com']}, 
-    {id: 'user_4', email:"mukopadhyays2@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['sbehpour@deloitte.com']}, 
-    {id: 'user_5', email:"kraftp2@nih.gov", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['sbehpour@deloitte.com']}, 
-    {id: 'user_6', email:"garciacm@nih.gov", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com']}
+    {id: 'user_1', email:"wei.zheng@vumc.org", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146,boxIdNew: 199271619056 ,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_4', email:"georgia.trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_5', email:"dhuo@bsd.uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['sbehpour@deloitte.com']}, 
+    {id: 'user_6', email:"roger.milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['sbehpour@deloitte.com']},
+    {id: 'user_7', email:"ahearntu@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:['sbehpour@deloitte.com']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -26,7 +27,8 @@ export const messagesForChair = {
     user_3: 'LAGENO DACC Chair',
     user_4: 'CIMBA DACC Chair',
     user_5: 'C-NCI DACC Chair',
-    user_6: 'BCAC DACC Chair'
+    user_6: 'BCAC DACC Chair',
+    user_7: 'TEST DACC Chair'
 }
 export const getFolderItems = async (id) => {
     try{
