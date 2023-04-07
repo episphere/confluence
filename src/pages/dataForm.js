@@ -15,25 +15,26 @@ export const formtemplate = () => {
 
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
-                            <p>Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
-                            of the consortia participating in Confluence. A description of the <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request process</a> and individual 
-                            consortia DACC guidelines can be viewed <a href="#join/description" target="_blank" rel="noopener noreferrer">here</a>. 
+                            <p> Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
+                            of the consortia participating in Confluence. For more information about the data access request process 
+                            please see this description of the <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request process </a> 
+                            and the <a href="#join/description" target="_blank" rel="noopener noreferrer">individual consortia DACC guidelines</a>. 
                             Access to data for approved concepts will only be given to investigators listed below, each of whose Institutions 
-                            will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.</p>
+                            will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.
                             <form>
 
                             <div class="input-group">
-                              <label for="date"><b>Date</b></label>
+                              <label for="date"><b>Date</b><span class='required-label'>*</span></label>
                               <input id="date" name="date" type="date" value='${today}' required/>
                             </div>
 
                             <div class="input-group">
-                              <label for="projname"><b>Title of Proposed Project</b></label>
+                              <label for="projname"><b>Title of Proposed Project</b><span class='required-label'>*</span></label>
                               <input id="projname" name="projname" type="text" required/>
                             </div>
                             
                             <div class="input-group">
-                                <label for="amendment"> <b>Is this an amendment?</b> </label>
+                                <label for="amendment"> <b>Is this an amendment?</b><span class='required-label'>*</span> </label>
                                     
                                     <input id="amendmentyes" name="amendment" type="radio" value="Yes" required/>
                                         <label class="ul-container" for="amendmentyes"> Yes </label>
@@ -45,22 +46,22 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="investigators"><b>Contact Investigator(s)</b></label>
+                              <label for="investigators"><b>Contact Investigator(s)</b><span class='required-label'>*</span></label>
                               <input id="investigators" name="investigators" type="text" required/>
                             </div>
 
                             <div class="input-group">
-                              <label for="institution"><b>Institution</b></label>
+                              <label for="institution"><b>Institution</b><span class='required-label'>*</span></label>
                               <input id="institution" name="institution" type="text" required/>
                             </div>
                             
                             <div class="input-group">
-                              <label for="email"><b>Contact E-mail</b></label>
+                              <label for="email"><b>Contact E-mail</b><span class='required-label'>*</span></label>
                               <input id="email" name="email" type="email" required/>
                             </div>
 
                             <div class="input-group">
-                                <label for="mem-con"><b>Member of Consortia?</b></label>
+                                <label for="mem-con"><b>Member of Consortia?</b><span class='required-label'>*</span></label>
                             </div>
                             
                             <div class="input-group">
@@ -95,30 +96,32 @@ export const formtemplate = () => {
                                     <label class="container-ul" for="mem-none"> None</label>
                                   </div>
                                 </ul>
+                                <p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>
                               </div>
                             </div>
                             
                             <div class="input-group">
-                              <label for="acro"><b>Confluence Study Acronym(s) for the Contact Investigator</b></label>
+                              <label for="acro"><b>Confluence Study Acronym(s) for the Contact Investigator</b><span class='required-label'>*</span></label>
                               <textarea id="acro" name="acro" rows="2" cols="65" required></textarea>
                             </div>
 
                             <div class="input-group">
-                              <label for="otherinvest"><b>OTHER Investigators and their institutions</b></label>
+                              <label for="otherinvest"><b>OTHER Investigators and their institutions</b><span class='required-label'>*</span></label>
                               <textarea id="otherinvest" name="otherinvest" rows="2" cols="65" required></textarea>
                             </div>
 
                             <div class="input-group">
-                                <label for="allinvest"><b>ALL Investigators (and their institutions) who will require access to the data requested</b></label>
+                                <label for="allinvest"><b>ALL Investigators (and their institutions) who will require access to the data requested</b><span class='required-label'>*</span></label>
                                 <textarea id="allinvest" name="allinvest" rows="2" cols="65" required></textarea>
+                                <p><b>Note:</b> Datasets cannot be exchanged between institutions. See the data access request procedures for more information.</p>
                             </div>
 
                             <div class="input-group">
-                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b></label>
+                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b><span class='required-label'>*</span></label>
                             </div>
 
                             <div class="input-group">
-                                <label for="data-con"><b>Consortia data being requested</b> <i>(please check all boxes that apply)</i></label>
+                                <label for="data-con"><b>Consortia data being requested</b><span class='required-label'>*</span> <i>(please check all boxes that apply)</i></label>
                             </div>
 
                             <div class="input-group">
@@ -153,12 +156,12 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="condesc"><b>Concept Description</b> <i> Please provide a concise description of Background/Aims</i></label>
+                              <label for="condesc"><b>Concept Description</b> <i> Please provide a concise description of Background/Aims</i><span class='required-label'>*</span></label>
                               <textarea id="condesc" name="condesc" rows="6" cols="65" required></textarea>
                             </div>
 
                             <div class="input-group">
-                              <label for="prim-end"><b>Primary Endpoint</b> <i> (please check box)</i> </label>
+                              <label for="prim-end"><b>Primary Endpoint</b><span class='required-label'>*</span><i> (please check box)</i> </label>
                             </div>
 
                             <div class="input-group">
@@ -196,6 +199,31 @@ export const formtemplate = () => {
 
                                 <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
                                 <input id="fileVar" name="fileVar" type="file">
+                              </div>
+                            </div>
+
+                            <div class="input-group">
+                              <label for="sex"><b>Data Requested From</b></label>
+                            </div>
+                            <div class="input-group">
+                              <div class="inline-field">
+                                <input id="females" name="sex" type="checkbox" value="females"/>
+                                <label class="container-ul" for="females"> Females </label>
+
+                                <input id="males" name="sex" type="checkbox" value="males"/>
+                                <label class="container-ul" for="males"> Males</label>
+                              </div>
+                            </div>
+
+                            <div class="input-group">
+                              <label for="carStatus"><b>Carrier Status</b></label>
+                            </div>
+                            <div class="input-group">
+                              <div class="inline-field">
+                              <p>Request for data on <i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
+                              status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
+                                <input id="carStatusYes" name="carStatus" type="checkbox" value="yes"/>
+                                <label class="container-ul" for="carStatusYes"> Request <i>BRCA1 and BRCA2</i> carrier status </label>
                               </div>
                             </div>
 
@@ -362,7 +390,7 @@ export const formtemplate = () => {
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
 
                             <div class="input-group">
-                              <label for="analdesc"><b>Description of Analysis Plan</b></label>
+                              <label for="analdesc"><b>Description of Analysis Plan</b><span class='required-label'>*</span></label>
                               <textarea id="analdesc" name="analdesc" rows="6" cols="65" required></textarea>
                             </div>
 
@@ -373,12 +401,16 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                               <label for="time"><b>Time Plan</b></label>
-                              <textarea id="time" name="time" rows="4" cols="65" required></textarea>
+                              <textarea id="time" name="time" rows="4" cols="65"></textarea>
                             </div>
 
                             <div class="input-group">
+                              <label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/><b> Please confirm that you agree to comply with Confluence authorship requirements.</b><span class='required-label'>*</span></label>
+                          </div>
+
+                            <div class="input-group">
                               <label for="anyoth"><b>Any other considerations you would like the DACCs to be aware of</b></label>
-                              <textarea id="anyoth" name="anyoth" rows="4" cols="65" required></textarea>
+                              <textarea id="anyoth" name="anyoth" rows="4" cols="65"></textarea>
                             </div>
                             
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 
@@ -508,6 +540,7 @@ export const dataForm = async () => {
     jsondata.datacon = data.getAll("data-con");
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
+    jsondata.sex = data.getAll("sex");
     jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.pathvar = data.getAll("pathvar");
     jsondata.surtrevar = data.getAll("surtrevar");
@@ -1014,7 +1047,9 @@ export const dataForm = async () => {
     jsondata.genotyping = data.getAll("genotyping");
     jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.pathvar = data.getAll("pathvar");
+    jsondata.sex = data.getAll("sex");
     jsondata.surtrevar = data.getAll("surtrevar");
+    console.log(jsondata);
     await generateWord(jsondata);
     btn.classList.toggle("buttonsubmit--loading");
     btn.disabled = false;
@@ -1330,6 +1365,60 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
+                  text: "Data Requested From: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.sex, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "BRCA1 and BRCA2 carrier status requested: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.carStatus,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Genotyping: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.genotyping, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
                   text: "Risk Factor Variables: ",
                 }),
                 new docx.TextRun({
@@ -1435,6 +1524,22 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
+                  text: "Confluence authorship requirements: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.confirmationAuth,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
                   text: "Time Plan: ",
                 }),
                 new docx.TextRun({
@@ -1494,7 +1599,7 @@ export const dataForm = async () => {
       } else {
       let fileid = response.entries[0].id;
       console.log(fileid);
-      const downloadLink = await URL.createObjectURL(blob);
+      const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
       a.download = filename;

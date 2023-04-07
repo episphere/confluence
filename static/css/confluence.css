@@ -2114,3 +2114,8 @@ ul.form {
     font-weight: bold;
     color: white;
 }
+
+.required-label {
+    content: "*";
+    color: red;
+  }
