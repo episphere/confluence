@@ -63,42 +63,48 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="mem-con"><b>Member of Consortia?</b><span class='required-label'>*</span></label>
                             </div>
-                            
-                            <div class="input-group">
-                              <div class="col-8">
-                                <ul class="form" id='mem-conlist'>
-                                  <div class="inline-field">
-                                    <input id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
-                                    <label class="container-ul" for="mem-aabcg"> AABCG</label>
+
+                          <div class="input-group">
+                            <div class="container-lg">
+                              <div class="row">
+                                <div class="col-12 col-md-2 col-sm-12">
+                                  <div class="form-check">
+                                    <input class="form-check-input" id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
+                                    <label class="form-check-label" for="mem-aabcg"> AABCG</label>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="mem-bcac" name="mem-con" type="checkbox" value="BCAC"/>
-                                    <label class="container-ul" for="mem-bcac"> BCAC</label>
+                                  <div class="form-check">
+                                    <input class="form-check-input" id="mem-bcac" name="mem-con" type="checkbox" value="BCAC"/>
+                                    <label class="form-check-label" for="mem-bcac"> BCAC</label>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="mem-cimba" name="mem-con" type="checkbox" value="CIMBA"/>
-                                    <label class="container-ul" for="mem-cimba"> CIMBA</label>
-                                  </div>                                    
-                                  <div class="inline-field">
-                                    <input id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI"/>
-                                    <label class="container-ul" for="mem-nci-dceg"> C-NCI</label>
+                                  <div class="form-check">
+                                    <input class="form-check-input"  id="mem-cimba" name="mem-con" type="checkbox" value="CIMBA"/>
+                                    <label class="form-check-label" for="mem-cimba"> CIMBA</label>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO"/>
-                                    <label class="container-ul" for="mem-lageno"> LAGENO</label>
+                                </div>
+                                <div class="col-12 col-md-2 col-sm-12">                                    
+                                  <div class="form-check">
+                                    <input class="form-check-input"  id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI"/>
+                                    <label class="form-check-label" for="mem-nci-dceg"> C-NCI</label>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="mem-merge" name="mem-con" type="checkbox" value="MERGE"> 
-                                    <label class="container-ul" for="mem-merge"> MERGE</label>
+                                  <div class="form-check">
+                                    <input class="form-check-input"  id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO"/>
+                                    <label class="form-check-label" for="mem-lageno"> LAGENO</label>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="mem-none" name="mem-con" type="checkbox" value="None"/>
-                                    <label class="container-ul" for="mem-none"> None</label>
+                                  <div class="form-check">
+                                    <input class="form-check-input"  id="mem-merge" name="mem-con" type="checkbox" value="MERGE"> 
+                                    <label class="form-check-label" for="mem-merge"> MERGE</label>
                                   </div>
-                                </ul>
-                                <p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>
+                                </div>
+                                <div class="col-12 col-md-2 col-sm-12">
+                                  <div class="form-check">
+                                    <input class="form-check-input"  id="mem-none" name="mem-con" type="checkbox" value="None"/>
+                                    <label class="form-check-label" for="mem-none"> None</label>
+                                  </div>
+                                </div>
                               </div>
                             </div>
+                            <p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>
+                          </div>
                             
                             <div class="input-group">
                               <label for="acro"><b>Confluence Study Acronym(s) for the Contact Investigator</b><span class='required-label'>*</span></label>
@@ -125,33 +131,39 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <div class="col-8">
-                                <ul class="form">
-                                  <div class="inline-field">
-                                    <input id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG"/>
-                                    <label class="container-ul" for="consortia-aabcg"> AABCG</label>
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-2 col-sm-12">
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG"/>
+                                      <label class="form-check-label" for="consortia-aabcg"> AABCG</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC"/>
+                                      <label class="form-check-label" for="consortia-BCAC"> BCAC</label>
+                                    </div>
+                                    </div>
+                                  <div class="col-12 col-md-2 col-sm-12">   
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA"/>
+                                      <label class="form-check-label" for="consortia-cimba"> CIMBA</label>
+                                    </div>                                  
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-c-nci" name="data-con" type="checkbox" value="C-NCI"/>
+                                      <label class="form-check-label" for="consortia-c-nci"> C-NCI</label>
+                                    </div>
+                                    </div>
+                                  <div class="col-12 col-md-2 col-sm-12">   
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-lageno" name="data-con" type="checkbox" value="LAGENO"/>
+                                      <label class="form-check-label" for="consortia-lageno"> LAGENO</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-merge" name="data-con" type="checkbox" value="MERGE"/>
+                                      <label class="form-check-label" for="consortia-merge"> MERGE</label>
+                                    </div>
                                   </div>
-                                  <div class="inline-field">
-                                    <input id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC"/>
-                                    <label class="container-ul" for="consortia-BCAC"> BCAC</label>
-                                  </div>
-                                  <div class="inline-field">
-                                    <input id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA"/>
-                                    <label class="container-ul" for="consortia-cimba"> CIMBA</label>
-                                  </div>                                  
-                                  <div class="inline-field">
-                                    <input id="consortia-c-nci" name="data-con" type="checkbox" value="C-NCI"/>
-                                    <label class="container-ul" for="consortia-c-nci"> C-NCI</label>
-                                  </div>
-                                  <div class="inline-field">
-                                    <input id="consortia-lageno" name="data-con" type="checkbox" value="LAGENO"/>
-                                    <label class="container-ul" for="consortia-lageno"> LAGENO</label>
-                                  </div>
-                                  <div class="inline-field">
-                                    <input id="consortia-merge" name="data-con" type="checkbox" value="MERGE"/>
-                                    <label class="container-ul" for="consortia-merge"> MERGE</label>
-                                  </div>
-                                </ul>
+                                </div>
                               </div>
                             </div>
 
@@ -165,21 +177,31 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <div class="inline-field">
-                                <input id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk"/>
-                                <label class="container-ul" for="consortia-bcr"> Breast Cancer Risk</label>
-
-                                <input id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
-                                <label class="container-ul" for="sbc"> Subtype of Breast Cancer</label>
-
-                                <input id="sur" name="prim-end" type="checkbox" value="Survival"/>
-                                <label class="container-ul" for="sur"> Survival</label>
-
-                                <input id="other" name="prim-end" type="checkbox" value="Other"/>
-                                <label class="container-ul" for="other"> Other</label>
-
-                                <label for="otherinput"></label>
-                                <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk"/>
+                                      <label class="form-check-label" for="consortia-bcr"> Breast Cancer Risk</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
+                                      <label class="form-check-label" for="sbc"> Subtype of Breast Cancer</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival"/>
+                                      <label class="form-check-label" for="sur"> Survival</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="other" name="prim-end" type="checkbox" value="Other"/>
+                                      <label class="form-check-label" for="other"> Other</label>
+                                    </div>
+                                    <div class="form-group">
+                                      <label for="otherinput"></label>
+                                      <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
+                                    </div>
+                                  </div>
+                                </div>  
                               </div>
                             </div>
 
@@ -190,15 +212,21 @@ export const formtemplate = () => {
                               <label for="genotyping"><b>Genotyping</b></label>
                             </div>
                             <div class="input-group">
-                              <div class="inline-field">
-                                <input id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data"/>
-                                <label class="container-ul" for="genotyped"> Individual-level genotyped data</label>
-
-                                <input id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
-                                <label class="container-ul" for="imputed"> Individual-level imputed data</label>
-
-                                <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
-                                <input id="fileVar" name="fileVar" type="file">
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data"/>
+                                      <label class="form-check-label" for="genotyped"> Individual-level genotyped data</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
+                                      <label class="form-check-label" for="imputed"> Individual-level imputed data</label>
+                                    </div>
+                                    <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
+                                    <input id="fileVar" name="fileVar" type="file">
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -206,12 +234,19 @@ export const formtemplate = () => {
                               <label for="sex"><b>Data Requested From</b></label>
                             </div>
                             <div class="input-group">
-                              <div class="inline-field">
-                                <input id="females" name="sex" type="checkbox" value="females"/>
-                                <label class="container-ul" for="females"> Females </label>
-
-                                <input id="males" name="sex" type="checkbox" value="males"/>
-                                <label class="container-ul" for="males"> Males</label>
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="females" name="sex" type="checkbox" value="females"/>
+                                      <label class="form-check-label" for="females"> Females </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="males" name="sex" type="checkbox" value="males"/>
+                                      <label class="form-check-label" for="males"> Males</label>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -219,11 +254,17 @@ export const formtemplate = () => {
                               <label for="carStatus"><b>Carrier Status</b></label>
                             </div>
                             <div class="input-group">
-                              <div class="inline-field">
-                              <p>Request for data on <i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
-                              status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
-                                <input id="carStatusYes" name="carStatus" type="checkbox" value="yes"/>
-                                <label class="container-ul" for="carStatusYes"> Request <i>BRCA1 and BRCA2</i> carrier status </label>
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <p>Request for data on <i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
+                                    status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="carStatusYes" name="carStatus" type="checkbox" value="yes"/>
+                                      <label class="form-check-label" for="carStatusYes"> Request <i>BRCA1 and BRCA2</i> carrier status </label>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -243,61 +284,67 @@ export const formtemplate = () => {
                             </div>
 
                               <div class="input-group">
-                                <div class="col-8">
-                                  <ul class="form" id='riskfactlist'>
-                                    <div class="inline-field">
-                                      <input id="c1" name="riskfactvar" type="checkbox" value="Education"/>
-                                      <label class="container-ul" for="c1"> Education </label>
+                                <div class="container-lg">
+                                  <div class="row" id='riskfactlist'>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c1" name="riskfactvar" type="checkbox" value="Education"/>
+                                        <label class="form-check-label" for="c1"> Education </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c2" name="riskfactvar" type="checkbox" value="Menstrual Cycle"/>
+                                        <label class="form-check-label" for="c2"> Menstrual Cycle</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c3" name="riskfactvar" type="checkbox" value="Children"/>
+                                        <label class="form-check-label" for="c3"> Children</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c4" name="riskfactvar" type="checkbox" value="Breastfeeding"/>
+                                        <label class="form-check-label" for="c4"> Breastfeeding</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c5" name="riskfactvar" type="checkbox" value="BMI"/>
+                                        <label class="form-check-label" for="c5"> BMI</label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="c2" name="riskfactvar" type="checkbox" value="Menstrual Cycle"/>
-                                      <label class="container-ul" for="c2"> Menstrual Cycle</label>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c6" name="riskfactvar" type="checkbox" value="OC"/>
+                                        <label class="form-check-label" for="c6"> OC</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c7" name="riskfactvar" type="checkbox" value="HRT"/>
+                                        <label class="form-check-label" for="c7"> HRT</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c8" name="riskfactvar" type="checkbox" value="Alcohol"/>
+                                        <label class="form-check-label" for="c8"> Alcohol</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c9" name="riskfactvar" type="checkbox" value="Smoking"/>
+                                        <label class="form-check-label" for="c9"> Smoking</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c10" name="criskfactvar10" type="checkbox" value="Family history"/>
+                                        <label class="form-check-label" for="c10"> Family history</label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="c3" name="riskfactvar" type="checkbox" value="Children"/>
-                                      <label class="container-ul" for="c3"> Children</label>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c11" name="riskfactvar" type="checkbox" value="Biopsies"/>
+                                        <label class="form-check-label" for="c11"> Biopsies</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c12" name="riskfactvar" type="checkbox" value="Benign breast disease"/>
+                                        <label class="form-check-label" for="c12"> Benign breast disease</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="c13" name="riskfactvar" type="checkbox" value="Detection"/>
+                                        <label class="form-check-label" for="c13"> Detection</label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="c4" name="riskfactvar" type="checkbox" value="Breastfeeding"/>
-                                      <label class="container-ul" for="c4"> Breastfeeding</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c5" name="riskfactvar" type="checkbox" value="BMI"/>
-                                      <label class="container-ul" for="c5"> BMI</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c6" name="riskfactvar" type="checkbox" value="OC"/>
-                                      <label class="container-ul" for="c6"> OC</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c7" name="riskfactvar" type="checkbox" value="HRT"/>
-                                      <label class="container-ul" for="c7"> HRT</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c8" name="riskfactvar" type="checkbox" value="Alcohol"/>
-                                      <label class="container-ul" for="c8"> Alcohol</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c9" name="riskfactvar" type="checkbox" value="Smoking"/>
-                                      <label class="container-ul" for="c9"> Smoking</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c10" name="criskfactvar10" type="checkbox" value="Family history"/>
-                                      <label class="container-ul" for="c10"> Family history</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c11" name="riskfactvar" type="checkbox" value="Biopsies"/>
-                                      <label class="container-ul" for="c11"> Biopsies</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c12" name="riskfactvar" type="checkbox" value="Benign breast disease"/>
-                                      <label class="container-ul" for="c12"> Benign breast disease</label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="c13" name="riskfactvar" type="checkbox" value="Detection"/>
-                                      <label class="container-ul" for="c13"> Detection</label>
-                                    </div>
-                                  </ul>
+                                  </div>
                                 </div>
                               </div>
 
@@ -310,25 +357,29 @@ export const formtemplate = () => {
                             </div>
 
                                 <div class="input-group">
-                                  <div class="col-8">
-                                    <ul class="form" id='pathlist'>
-                                        <div class="inline-field">
-                                          <input id="p1" name="pathvar" type="checkbox" value="Tumor Characteristics"/>
-                                          <label class="container-ul" for="p1"> Tumor Characteristics</label>
+                                  <div class="container-lg">
+                                    <div class="row" id='pathlist'>
+                                      <div class="col-12 col-md-3 col-sm-12">
+                                        <div class="form-check">
+                                          <input class="form-check-input" id="p1" name="pathvar" type="checkbox" value="Tumor Characteristics"/>
+                                          <label class="form-check-label" for="p1"> Tumor Characteristics</label>
                                         </div>
-                                        <div class="inline-field">
-                                          <input id="p2" name="pathvar" type="checkbox" value="ER"/>
-                                          <label class="container-ul" for="p2"> ER</label>
+                                        <div class="form-check">
+                                          <input class="form-check-input" id="p2" name="pathvar" type="checkbox" value="ER"/>
+                                          <label class="form-check-label" for="p2"> ER</label>
                                         </div>
-                                        <div class="inline-field">
-                                          <input id="p3" name="pathvar" type="checkbox" value="PR"/>
-                                          <label class="container-ul" for="p3"> PR</label>
+                                      </div>
+                                      <div class="col-12 col-md-3 col-sm-12">
+                                        <div class="form-check">
+                                          <input class="form-check-input" id="p3" name="pathvar" type="checkbox" value="PR"/>
+                                          <label class="form-check-label" for="p3"> PR</label>
                                         </div>
-                                        <div class="inline-field">
-                                          <input id="p4" name="pathvar" type="checkbox" value="HER2"/>
-                                          <label class="container-ul" for="p4"> HER2</label>
+                                        <div class="form-check">
+                                          <input class="form-check-input" id="p4" name="pathvar" type="checkbox" value="HER2"/>
+                                          <label class="form-check-label" for="p4"> HER2</label>
                                         </div>
-                                    </ul>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
 
@@ -341,41 +392,47 @@ export const formtemplate = () => {
                           </div>
 
                               <div class="input-group">
-                                <div class="col-8">
-                                  <ul class="form" id='surtrelist'>
-                                    <div class="inline-field">
-                                      <input id="s1" name="surtrevar" type="checkbox" value="Survival"/>
-                                      <label class="container-ul" for="s1"> Survival </label>
+                                <div class="container-lg">
+                                  <div class="row" id='surtrelist'>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s1" name="surtrevar" type="checkbox" value="Survival"/>
+                                        <label class="form-check-label" for="s1"> Survival </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s2" name="surtrevar" type="checkbox" value="Relapse"/>
+                                        <label class="form-check-label" for="s2"> Relapse </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s3" name="surtrevar" type="checkbox" value="Adjuvant chemotherapy"/>
+                                        <label class="form-check-label" for="s3"> Adjuvant Chemotherapy </label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="s2" name="surtrevar" type="checkbox" value="Relapse"/>
-                                      <label class="container-ul" for="s2"> Relapse </label>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s4" name="surtrevar" type="checkbox" value="Adjuvant anti-hormone"/>
+                                        <label class="form-check-label" for="s4"> Adjuvant anti-hormone </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s5" name="surtrevar" type="checkbox" value="Adjuvant trastuzumab"/>
+                                        <label class="form-check-label" for="s5"> Adjuvant trastuzumab </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s6" name="surtrevar" type="checkbox" value="Surgery"/>
+                                        <label class="form-check-label" for="s6"> Surgery </label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="s3" name="surtrevar" type="checkbox" value="Adjuvant chemotherapy"/>
-                                      <label class="container-ul" for="s3"> Adjuvant Chemotherapy </label>
+                                    <div class="col-12 col-md-3 col-sm-12">
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s7" name="surtrevar" type="checkbox" value="Radiation therapy"/>
+                                        <label class="form-check-label" for="s7"> Radiation therapy </label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" id="s8" name="surtrevar" type="checkbox" value="Neoadjuvant chemotherapy"/>
+                                        <label class="form-check-label" for="s8"> Neoadjuvant chemotherapy</label>
+                                      </div>
                                     </div>
-                                    <div class="inline-field">
-                                      <input id="s4" name="surtrevar" type="checkbox" value="Adjuvant anti-hormone"/>
-                                      <label class="container-ul" for="s4"> Adjuvant anti-hormone </label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="s5" name="surtrevar" type="checkbox" value="Adjuvant trastuzumab"/>
-                                      <label class="container-ul" for="s5"> Adjuvant trastuzumab </label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="s6" name="surtrevar" type="checkbox" value="Surgery"/>
-                                      <label class="container-ul" for="s6"> Surgery </label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="s7" name="surtrevar" type="checkbox" value="Radiation therapy"/>
-                                      <label class="container-ul" for="s7"> Radiation therapy </label>
-                                    </div>
-                                    <div class="inline-field">
-                                      <input id="s8" name="surtrevar" type="checkbox" value="Neoadjuvant chemotherapy"/>
-                                      <label class="container-ul" for="s8"> Neoadjuvant chemotherapy</label>
-                                    </div>
-                                  </ul>
+                                  </div>
                                 </div>
                               </div>
 
@@ -509,513 +566,6 @@ export const dataForm = async () => {
     "_" +
     d.getFullYear() +
     ".docx";
-
-  // Find unique name
-  // let entries = files.entries;
-  // let i = 1;
-  // while (entries.includes(filename)) {
-  //   let indexOfExtension = filename.indexOf(".");
-  //   filename =
-  //     filename.substring(0, indexOfExtension) +
-  //     `(${i})` +
-  //     filename.substring(indexOfExtension);
-  //   i++;
-  // }
-  // const filesinfoldernames = [];
-  // const filesinfolderids = [];
-  // for (let i = 0; i < files.entries.length; i++) {
-  //   filesinfoldernames.push(files.entries[i].name);
-  //   filesinfolderids.push(files.entries[i].id);
-  // }
-
-  async function handleFormDownload(eventtest) {
-    const btn = document.activeElement;
-    btn.classList.toggle("buttonsubmit--loading");
-    btn.disabled = true;
-    eventtest.preventDefault();
-    const form = document.querySelector(".contact-form form");
-    const data = new FormData(form);
-    const jsondata = Object.fromEntries(data.entries());
-    jsondata.memcon = data.getAll("mem-con");
-    jsondata.datacon = data.getAll("data-con");
-    jsondata.primend = data.getAll("prim-end");
-    jsondata.genotyping = data.getAll("genotyping");
-    jsondata.sex = data.getAll("sex");
-    jsondata.riskfactvar = data.getAll("riskfactvar");
-    jsondata.pathvar = data.getAll("pathvar");
-    jsondata.surtrevar = data.getAll("surtrevar");
-
-    let parentEl = eventtest.target.parentElement;
-    let blob;
-    if (parentEl.id === "downloadWord") {
-      const doc = new docx.Document({
-        styles: {
-          default: {
-            heading1: {
-              run: {
-                size: 22,
-                bold: true,
-                color: "#000000",
-                font: "Verdana",
-              },
-            },
-            heading2: {
-              run: {
-                size: 18,
-                bold: true,
-                color: "#000000",
-                font: "Verdana",
-              },
-            },
-          },
-        },
-        sections: [
-          {
-            properties: {},
-            headers: {
-              default: new docx.Header({
-                children: [
-                  new docx.Paragraph({
-                    text: "Confluence Project Analysis Proposal",
-                    heading: docx.HeadingLevel.HEADING_1,
-                    alignment: docx.AlignmentType.CENTER,
-                  }),
-                ],
-              }),
-            },
-            children: [
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Date: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.date,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Project Title: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.projname,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Is this an amendment: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.amendment,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Amendment: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.conNum,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Contact Investigator(s): ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.investigators,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Institution(s): ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.institution,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Contact Email: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.email,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Member of Consortia? ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.memcon, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Confluence Study Acronym(s) for the Contact Investigator: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.acro,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "OTHER Investigators and their institutions: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.otherinvest,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "ALL Investigators (and Institutions) who require access: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.allinvest,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Consortia data being requested: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.datacon, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Concept Description: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.condesc,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Primary Endpoint: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.primend, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Other Primary Endpoint: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.otherinput,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Genotyping: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.genotyping, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Risk Factor Variables: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.riskfactvar, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Pathology Variables: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.pathvar, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Survival and Treatment Variables: ",
-                  }),
-                  new docx.TextRun({
-                    text: JSON.stringify(jsondata.surtrevar, null, 1)
-                      .replace("[", "")
-                      .replace("]", "")
-                      .replace(/"/g, ''),
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Mammographic Density Variable: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.mammvarv,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Description of Analysis Plan: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.analdesc,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Budgetary consideratsion, if applicable: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.budget,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Time Plan: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.time,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_2,
-                alignment: docx.AlignmentType.START,
-                children: [
-                  new docx.TextRun({
-                    text: "Any other considerations you would like the DACC to be aware of: ",
-                  }),
-                  new docx.TextRun({
-                    text: jsondata.anyoth,
-                    bold: false,
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-            ],
-          },
-        ],
-      });
-
-      blob = await docx.Packer.toBlob(doc);
-    }
-
-    if (parentEl.id === "downloadJSON") {
-      blob = new Blob([JSON.stringify(jsondata)], {
-        type: "application/json",
-      });
-    }
-    const downloadLink = await URL.createObjectURL(blob);
-    //let UID = Date.now()
-    let filename = jsondata.projname + '_' + Date.now() + '.docx';
-
-    let a = document.createElement("a");
-
-    a.href = downloadLink;
-    a.download = filename;
-
-    a.click();
-    btn.classList.toggle("buttonsubmit--loading");
-    btn.disabled = false;
-    location.href = "#upload_data_form";
-  }
 
   async function handleFormSubmit(eventtest) {
     // const btn = document.activeElement;
@@ -1617,47 +1167,9 @@ export const dataForm = async () => {
         }
       }
     })
-    //document.location.reload(true);
-
-    // await docx.Packer.toBlob(doc).then(async (blob) => {
-    //   if (filesinfoldernames.includes(filename)) {
-    //     const [name, extension] = filename.split(".");
-    //     let i = 1;
-    //     while (filesinfoldernames.includes(filename)) {
-    //       if (filename.includes(")")) {
-    //         const [name, version] = filename.split("(");
-    //         filename = name + `(${i})` + version.substring(2);
-    //       } else {
-    //         filename = name + `(${i}).` + extension;
-    //       }
-    //       i++;
-    //     }
-    //     let response = await uploadWordFile(blob, filename, uploadFormFolder);
-    //     await assigntasktochair();
-    //     let fileid = response.entries[0].id;
-    //     //Modal code here
-    //     document.getElementById("modalBody").innerHTML = `
-    //       <p>File was successfully uploaded.</p>
-    //       <p>Document ID: ${fileid}</p>`;
-    //     $("#popUpModal").modal("show");
-    //   } else {
-    //     // Adding keywords
-    //     let response = await uploadWordFile(blob, filename, uploadFormFolder);
-    //     if (response.status === 201) {
-    //       await assigntasktochair();
-    //       let fileid = response.entries[0].id;
-    //       //Modal code here
-    //       document.getElementById("modalBody").innerHTML = `
-    //     <p>File was successfully uploaded.</p>
-    //     <p>Document ID: ${fileid}</p>`;
-    //       $("#popUpModal").modal("show");
-    //     } else {
-    //     }
-    //   }
-    // });
   }
 
-  const form = await document.querySelector(".contact-form");
+  const form = document.querySelector(".contact-form");
   form.addEventListener("submit", handleFormSubmit);
 
   // const downloadJSON = document.getElementById("downloadJSON");
@@ -1688,11 +1200,3 @@ export const uploaddataFormTemplate = () => {
                 </div>`
   return template;
 }
-{/* <div class="general-bg padding-bottom-1rem">
-<div class="container body-min-height">
-
-    <div class="main-summary-row">
-        <div class="align-left">
-            <h1 class="page-header">Analysis Concept Form</h1>
-        </div>
-    </div> */}
