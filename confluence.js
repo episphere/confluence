@@ -7,7 +7,7 @@ import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateA
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
-import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData } from './src/event.js';
+import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
 import { aboutConfluence, renderOverView } from './src/pages/about.js';
@@ -91,6 +91,7 @@ export const confluence = async () => {
             document.title = 'Confluence - Summary Statistics';
             confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true);
             addEventUpdateSummaryStatsData();
+            addEventUpdateAllCollaborators();
             dataSummaryStatisticsTemplate();
             if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
                 e.preventDefault();
@@ -113,6 +114,7 @@ export const confluence = async () => {
                 document.title = 'Confluence - Subset Statistics';
                 confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true);
                 addEventUpdateSummaryStatsData();
+                addEventUpdateAllCollaborators();
                 removeActiveClass('nav-link', 'active');
                 document.querySelectorAll('[href="#data_exploration/subset"]')[1].classList.add('active');
                 dataSummaryMissingTemplate();
@@ -127,6 +129,7 @@ export const confluence = async () => {
                 document.title = 'Confluence - Data Dictionary';
                 confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false);
                 addEventUpdateSummaryStatsData();
+                addEventUpdateAllCollaborators();
                 removeActiveClass('nav-link', 'active');
                 document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
                 dataDictionaryTemplate();

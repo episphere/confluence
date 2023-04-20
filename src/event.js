@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, updateBoxCollaboratorTime } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -378,6 +378,7 @@ export const addEventShowAllCollaborator = () => {
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = ``;
         const response = await getCollaboration(ID,`${type}s`);
+        console.log(response);
         const userPermission = checkPermissionLevel(response);
         let table = '';
         let allEntries = [];
@@ -385,13 +386,17 @@ export const addEventShowAllCollaborator = () => {
             let entries = response.entries;
             
             entries.forEach(entry => {
+                console.log(entry);
                 const name = !entry.invite_email ? entry.accessible_by.name : '';
                 const email = !entry.invite_email ? entry.accessible_by.login : entry.invite_email;
                 const role = entry.role;
                 const status = entry.status;
                 const id = entry.id;
+                let addedBy = '';
                 // const folderName = entry.item.name;
-                const addedBy = `${entry.created_by.name}`;
+                if (entry.created_by) {
+                    addedBy = `${entry.created_by.name}`;
+                }
                 const addedAt = (new Date(entry.created_at)).toLocaleString();
                 allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
@@ -418,6 +423,7 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body allow-overflow max-height-collaboration-list">${table}</div>
             <div class="modal-footer">
+                <button type="button" id="extendCollaborations" title="Extend" class="btn btn-light" data-dismiss="modal">Extend Collaboration</button>
                 <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
         `;
@@ -435,12 +441,12 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     let table = `
         <thead>
             <tr>
+                <th>Check </th>
                 <th>Name <button class="transparent-btn sort-column" data-column-name="name" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Email <button class="transparent-btn sort-column" data-column-name="email" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Role <button class="transparent-btn sort-column" data-column-name="role" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Added by <button class="transparent-btn sort-column" data-column-name="addedBy" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Added at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
-                <th></th>
             </tr>
         </thead>
         <tbody id="tBodyCollaboratorList"></tbody>
@@ -448,6 +454,7 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     document.getElementById('collaboratorsList').innerHTML = table;
     renderCollaboratorListTBody(allEntries, userPermission);
     addEventSortTable(allEntries, userPermission);
+    addEventExtendCollaborations();
 }
 
 const renderCollaboratorListTBody = (allEntries, userPermission) => {
@@ -456,6 +463,7 @@ const renderCollaboratorListTBody = (allEntries, userPermission) => {
         const { name, email, role, addedBy, addedAt, id, folderName, status} = entry;
         const userName = JSON.parse(localStorage.parms).name
         tbody += `<tr>
+                    <td title="${id}"><input type="checkbox" id="${id}" name="extendCollab" value="${role}" checked></td>
                     <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
                     <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
@@ -466,6 +474,7 @@ const renderCollaboratorListTBody = (allEntries, userPermission) => {
                     <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
                 </tr>`
     });
+
     document.getElementById('tBodyCollaboratorList').innerHTML = tbody;
     addEventRemoveCollaborator();
     addEventUpdateCollaborator();
@@ -573,6 +582,73 @@ const addEventRemoveCollaborator = () => {
             }
         });
     });
+}
+
+const addEventExtendCollaborations = async () => {
+    const btn = document.getElementById('extendCollaborations');
+    if(!btn) return;
+    btn.addEventListener('click', async () => {
+        var checkboxes = document.getElementsByName('extendCollab');
+        console.log(checkboxes);
+        var result = [];
+        const promises = []
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+        var date = new Date();
+        const newDate = date.addDays(90);
+        const newDateString = newDate.toISOString();
+        for (var i=0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                const promise = updateBoxCollaboratorTime(checkboxes[i].id, checkboxes[i].value, newDateString)
+                    .then(response => response.json());
+                promises.push(promise);
+                //result.push(checkboxes[i].id);
+                //promises.push(checkboxes[i].value);
+            }
+        }
+        Promise.all(promises).then(results => {
+            console.log(results);
+        });
+    })
+
+}
+
+export const addEventUpdateAllCollaborators = async () => {
+    const btn = document.getElementById('updateCollaborations');
+    if(!btn) return;
+    btn.addEventListener('click', async () => {
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Update Collaborations</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+        const ID = 156698557621;
+        let collabs = await getCollaboration(ID, 'folders');
+        console.log(collabs);
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+        var date = new Date();
+        const newDate = date.addDays(360);
+        const newDateString = newDate.toISOString();
+        console.log(newDateString);
+        const allEntries = collabs.entries;
+        console.log(allEntries[0]);
+        let test = await updateBoxCollaboratorTime(43582145593, "editor", newDateString);
+        console.log(test);
+        // allEntries.forEach(entry => {
+        //     console.log(entry);
+        //     let test = await updateBoxCollaboratorTime()
+        // })
+
+    })
 }
 
 const checkPermissionLevel = (data) => {

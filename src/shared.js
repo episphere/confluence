@@ -666,7 +666,28 @@ export const getCurrentUser = async () => {
     }
 }
 
-
+export const getUser = async (id) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/users/${id}`, {
+            headers: {
+                Authorization: "Bearer "+access_token
+            }
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await getUser(id);
+        }
+        if(response.status === 200){
+            return response.json();
+        }
+        else{
+            return null;
+        }
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await getUser(id);
+    }
+}
 
 
 export const addNewCollaborator = async (id, type, login, role) => {
@@ -780,42 +801,51 @@ export const removeBoxCollaborator = async (id) => {
 
 
 export const updateBoxCollaborator = async (id, role) => {
-
     try {
-
         const access_token = JSON.parse(localStorage.parms).access_token;
-
         const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
-
             method: 'PUT',
-
             headers: {
-
                 Authorization: "Bearer "+access_token
-
             },
-
             body: JSON.stringify({role: role})
-
         });
-
         if(response.status === 401){
-
             if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
-
         }
-
         else {
-
             return response;
-
         }
-
     }
     catch(err) {
         if((await refreshToken()) === true) return await updateBoxCollaborator(id, role);
     }
 }
+
+export const updateBoxCollaboratorTime = async (id, role, time) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        const response = await fetch(`https://api.box.com/2.0/collaborations/${id}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: "Bearer "+access_token
+            },
+            body: JSON.stringify(
+                {role: role,
+                expires_at: time})
+        });
+        if(response.status === 401){
+            if((await refreshToken()) === true) return await updateBoxCollaboratorTime(id, role, time);
+        }
+        else {
+            return response;
+        }
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await updateBoxCollaboratorTime(id, role, time);
+    }
+}
+
 export const removeActiveClass = (className, activeClass) => {
     let fileIconElement = document.getElementsByClassName(className);
     Array.from(fileIconElement).forEach(elm => {
