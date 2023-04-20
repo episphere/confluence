@@ -35,6 +35,7 @@ export const dataSummary = (
                     <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 `
                     : `
+                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                     <button class="sub-menu-btn"><a class="nav-link active black-font font-size-14" href="#data_exploration/summary"><strong>Summary Statistics</strong></a></button>
                     ${
                       location.origin.match(applicationURLs.prod)
@@ -43,7 +44,6 @@ export const dataSummary = (
                         <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></button>
                     `
                     }
-                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
                 `
                 } 
                 </div>
@@ -83,7 +83,6 @@ export const dataSummary = (
                   ) !== -1
                     ? `
                     <div class="main-summary-row"><button id="updateSummaryStatsData" class="btn btn-outline-dark" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update data</button></div>
-                    <div class="main-summary-row"><button id="updateCollaborations" class="btn btn-outline-dark" aria-label="Update collaborations in Confluence" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update Collaborations</button></div>
                 `
                     : ``
                 }

@@ -168,8 +168,13 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="condesc"><b>Concept Description</b> <i> Please provide a concise description of Background/Aims</i><span class='required-label'>*</span></label>
+                              <label for="condesc"><b>Background/Aims</b> <i> Please provide a concise description of Background/Aims</i><span class='required-label'>*</span></label>
                               <textarea id="condesc" name="condesc" rows="6" cols="65" required></textarea>
+                            </div>
+
+                            <div class="input-group">
+                              <label for="analdesc"><b>Description of Analysis Plan</b> <i> Please provide a concise description of your Analysis Plan</i><span class='required-label'>*</span></label>
+                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" required></textarea>
                             </div>
 
                             <div class="input-group">
@@ -447,27 +452,17 @@ export const formtemplate = () => {
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
 
                             <div class="input-group">
-                              <label for="analdesc"><b>Description of Analysis Plan</b><span class='required-label'>*</span></label>
-                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" required></textarea>
-                            </div>
-
-                            <div class="input-group">
-                              <label for="budget"><b>Budgetary considerations, if applicable</b></label>
-                              <textarea id="budget" name="budget" rows="2" cols="65"></textarea>
-                            </div>
-
-                            <div class="input-group">
                               <label for="time"><b>Time Plan</b></label>
                               <textarea id="time" name="time" rows="4" cols="65"></textarea>
                             </div>
 
                             <div class="input-group">
-                              <label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/><b> Please confirm that you agree to comply with Confluence authorship requirements.</b><span class='required-label'>*</span></label>
-                          </div>
-
-                            <div class="input-group">
                               <label for="anyoth"><b>Any other considerations you would like the DACCs to be aware of</b></label>
                               <textarea id="anyoth" name="anyoth" rows="4" cols="65"></textarea>
+                            </div>
+
+                            <div class="input-group">
+                              <label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/><b> Please confirm that you agree to comply with Confluence authorship requirements.</b><span class='required-label'>*</span></label>
                             </div>
                             
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 
@@ -1053,22 +1048,22 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
-            new docx.Paragraph({
-              heading: docx.HeadingLevel.HEADING_2,
-              alignment: docx.AlignmentType.START,
-              children: [
-                new docx.TextRun({
-                  text: "Budgetary consideratsion, if applicable: ",
-                }),
-                new docx.TextRun({
-                  text: jsondata.budget,
-                  bold: false,
-                }),
-              ],
-              spacing: {
-                after: 150,
-              },
-            }),
+            // new docx.Paragraph({
+            //   heading: docx.HeadingLevel.HEADING_2,
+            //   alignment: docx.AlignmentType.START,
+            //   children: [
+            //     new docx.TextRun({
+            //       text: "Budgetary consideratsion, if applicable: ",
+            //     }),
+            //     new docx.TextRun({
+            //       text: jsondata.budget,
+            //       bold: false,
+            //     }),
+            //   ],
+            //   spacing: {
+            //     after: 150,
+            //   },
+            // }),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,

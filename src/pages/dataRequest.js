@@ -4,7 +4,7 @@ export const template = () => {
             <div class="container body-min-height">
                 <div class="main-summary-row">
                     <div class="align-left">
-                        <h1 class="page-header">Description of Data Access Process</h1>
+                        <h1 class="page-header">Data Access Process</h1>
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
@@ -29,7 +29,7 @@ export const templateAfterLogin = () => {
             <div class="container body-min-height">
                 <div class="main-summary-row">
                     <div class="align-left">
-                        <h1 class="page-header">Description of Data Access Process</h1>
+                        <h1 class="page-header">Data Access Process</h1>
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
