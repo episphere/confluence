@@ -397,7 +397,7 @@ export const addEventShowAllCollaborator = () => {
                 if (entry.created_by) {
                     addedBy = `${entry.created_by.name}`;
                 }
-                const addedAt = (new Date(entry.created_at)).toLocaleString();
+                const addedAt = (new Date(entry.expires_at)).toLocaleString();
                 allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
@@ -446,7 +446,7 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
                 <th>Email <button class="transparent-btn sort-column" data-column-name="email" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Role <button class="transparent-btn sort-column" data-column-name="role" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Added by <button class="transparent-btn sort-column" data-column-name="addedBy" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
-                <th>Added at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
+                <th>Expires at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
             </tr>
         </thead>
         <tbody id="tBodyCollaboratorList"></tbody>
@@ -588,6 +588,13 @@ const addEventExtendCollaborations = async () => {
     const btn = document.getElementById('extendCollaborations');
     if(!btn) return;
     btn.addEventListener('click', async () => {
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Collaborations Updating</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
         var checkboxes = document.getElementsByName('extendCollab');
         console.log(checkboxes);
         var result = [];
@@ -609,8 +616,10 @@ const addEventExtendCollaborations = async () => {
                 //promises.push(checkboxes[i].value);
             }
         }
+        showAnimation();
         Promise.all(promises).then(results => {
-            console.log(results);
+            alert("Please confirm collaborations have been updated");
+            hideAnimation();
         });
     })
 

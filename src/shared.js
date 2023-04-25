@@ -19,7 +19,7 @@ export const chairsInfo = [
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:['kopchickbp@nih.gov', 'ahearntu@nih.gov']}, 
     {id: 'user_5', email:"dhuo@bsd.uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:['kopchickbp@nih.gov', 'ahearntu@nih.gov']}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:['kopchickbp@nih.gov', 'ahearntu@nih.gov']},
-    {id: 'user_7', email:"ahearntu@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:['kopchickbp@nih.gov', 'ahearntu@nih.gov']}
+    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:['kopchickbp@nih.gov', 'ahearntu@nih.gov']}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -1627,5 +1627,34 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
     }
     catch(err) {
         if((await refreshToken()) === true) return await getFileURL(id);
+    }
+};
+
+export const createZip = async (files, name) => {
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/zip_downloads`,{
+            method:'POST',
+            headers:{
+                Authorization:"Bearer "+access_token
+            },
+            body: JSON.stringify({
+                download_file_name: name,
+                items: files
+            }),
+        });
+        if(r.status === 401) {
+            if((await refreshToken()) === true) return await createZip(files, name);
+        }
+        else if(r.status === 202) {
+            return r.json();
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await createZip(files, name);
     }
 };

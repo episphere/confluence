@@ -27,7 +27,9 @@ import {
   returnToSubmitterFolder,
   createFolder,
   completedFolder,
-  listComments
+  listComments,
+  getFile,
+  createZip
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -135,7 +137,6 @@ export const generateChairMenuFiles = async () => {
     console.log(filesIncompleted);
 
   const message = messagesForChair[userChairItem.id];
-  console.log(message);
   //   let template = `
   //                   <div class="general-bg padding-bottom-1rem">
   //                       <div class="container body-min-height">
@@ -442,17 +443,28 @@ export const commentSubmit = async () => {
 
 export const downloadAll = (tab, files) => {
   const downloadFile = async (e) => {
+    console.log(message);
     console.log(files);
+    let items = []
     files.forEach(async ({id}, index) => {
       console.log(id);
-      let response = await getFileURL(id)
-      let a = document.createElement('a');
-      a.href = response;
-      a.download = files[index].name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    })
+      let item = {
+        "type": "file",
+        "id": id
+      }
+      items.push(item);
+    });
+    console.log(items);
+    var chairName = document.getElementsByClassName("page-header")[0].innerHTML.replace(/ /g, "_");
+    const d = new Date();
+    let filename = chairName + "_" + d.getDate() + "_" + (d.getMonth() + 1) + "_" + d.getFullYear()
+    let response = await createZip(items, filename);
+    console.log(response);
+    let a = document.createElement('a');
+    a.href = response.download_url;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   isElementLoaded(`#${tab}-download-all`).then(() => {

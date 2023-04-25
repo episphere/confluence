@@ -7,7 +7,7 @@ export const template = async () => {
     // const array = response.entries.filter(obj => obj.type === 'folder' && obj.id === '137304373658');
     // const array = filterConsortiums(response.entries);
     let AllFolders = [];
-    const array = await getFolderInfo('137304373658'); //137304373658, 156698557621
+    const array = await getFolderInfo('156698557621'); //137304373658, 156698557621
     //const events = await getFolderInfo('155546882525');
     if(array) AllFolders.push(array);
    //if(events) AllFolders.push(events);
