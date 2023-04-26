@@ -225,7 +225,6 @@ export const generateChairMenuFiles = async () => {
                 <option value = "3"> 3 - Approved, but data release will be delayed </option>
                 <option value = "4"> 4 - Not approved </option>
                 <option value = "5"> 5 - Decision requires clarification</option>
-                <option value = "777"> 777 - Duplicate Proposal</option>
                 </select>
               <br>
                 <div class="input-group">
