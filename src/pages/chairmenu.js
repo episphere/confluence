@@ -29,7 +29,8 @@ import {
   completedFolder,
   listComments,
   getFile,
-  createZip
+  createZip,
+  addMetaData
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -459,7 +460,6 @@ export const downloadAll = (tab, files) => {
     const d = new Date();
     let filename = chairName + "_" + d.getDate() + "_" + (d.getMonth() + 1) + "_" + d.getFullYear()
     let response = await createZip(items, filename);
-    console.log(response);
     let a = document.createElement('a');
     a.href = response.download_url;
     document.body.appendChild(a);

@@ -1,4 +1,4 @@
-import { submitterFolder, uploadWordFile } from "../shared.js"
+import { submitterFolder, uploadWordFile, addMetaData} from "../shared.js"
 
 export const formtemplate = () => {
   const date = new Date();
@@ -103,7 +103,7 @@ export const formtemplate = () => {
                                 </div>
                               </div>
                             </div>
-                            <p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>
+                            <!---<p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>--->
                           </div>
                             
                             <div class="input-group">
@@ -168,8 +168,13 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="condesc"><b>Background/Aims</b> <i> Please provide a concise description of Background/Aims</i><span class='required-label'>*</span></label>
+                              <label for="condesc"><b>Background</b> <i> Please provide a concise description of Background</i><span class='required-label'>*</span></label>
                               <textarea id="condesc" name="condesc" rows="6" cols="65" required></textarea>
+                            </div>
+
+                            <div class="input-group">
+                              <label for="condescAims"><b>Aims</b> <i> Please provide a concise description of Aims</i><span class='required-label'>*</span></label>
+                              <textarea id="condescAims" name="condescAims" rows="6" cols="65" required></textarea>
                             </div>
 
                             <div class="input-group">
@@ -236,7 +241,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="sex"><b>Data Requested From</b></label>
+                              <label for="sex"><b>Select Population</b></label>
                             </div>
                             <div class="input-group">
                               <div class="container-lg">
@@ -262,7 +267,7 @@ export const formtemplate = () => {
                               <div class="container-lg">
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
-                                    <p>Request for data on <i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
+                                    <p><i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="carStatusYes" name="carStatus" type="checkbox" value="yes"/>
@@ -280,7 +285,7 @@ export const formtemplate = () => {
                                 <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided.</p>
                             </div>
                             <div class="input-group">
-                                <label for="riskfactvar"><b>Risk Factor Variables</b></label>
+                                <label for="riskfactvar"><b>Risk Factor</b></label>
                                 
                                 <label> 
                                   <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
@@ -354,14 +359,14 @@ export const formtemplate = () => {
                               </div>
 
                             <div class="input-group">
-                                <label for="pathvar"><b>Pathology Variables</b></label>
+                                <label for="pathvar"><b>Pathology</b></label>
                                 <label>
-                                  <input id="pathvarv" name="pathvarv" type="checkbox" value="pathvarv"/> 
-                                  Check all 
+                                  <input id="pathvarv" name="pathvarv" type="checkbox" value="Yes"/> 
+                                  Select
                                 </label>
                             </div>
 
-                                <div class="input-group">
+<!---                                <div class="input-group">
                                   <div class="container-lg">
                                     <div class="row" id='pathlist'>
                                       <div class="col-12 col-md-3 col-sm-12">
@@ -386,10 +391,10 @@ export const formtemplate = () => {
                                       </div>
                                     </div>
                                   </div>
-                                </div>
+                                </div> --->
 
                           <div class="input-group">
-                            <label for="surtrevar"><b>Survival and Treatment Variables</b></label>
+                            <label for="surtrevar"><b>Survival and Treatment</b></label>
                             <label> 
                               <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
                               Check all 
@@ -442,9 +447,9 @@ export const formtemplate = () => {
                               </div>
 
                             <div class="input-group">
-                              <label for="mammvar"><b>Mammographic Density Variable</b></label>
+                              <label for="mammvar"><b>Mammographic Density</b></label>
                               <label> 
-                              <input id="mammvarv" name="mammvarv" type="checkbox" value="Yes"/> Select
+                                <input id="mammvarv" name="mammvarv" type="checkbox" value="Yes"/> Select
                               </label>
                             </div>
 
@@ -519,20 +524,20 @@ export const formFunctions = () => {
       }
     }
   });
-  document.getElementById('pathvarv').addEventListener('click', (e) => {
-    const inputList = document.getElementById('pathlist').getElementsByTagName('input');
+  // document.getElementById('pathvarv').addEventListener('click', (e) => {
+  //   const inputList = document.getElementById('pathlist').getElementsByTagName('input');
 
-    if (e.target.checked) {
-      for (const element of inputList) {
-        element.checked = true;
-      }
-    }
-    else{
-      for (const element of inputList) {
-        element.checked = false;
-      }
-    }
-  });
+  //   if (e.target.checked) {
+  //     for (const element of inputList) {
+  //       element.checked = true;
+  //     }
+  //   }
+  //   else{
+  //     for (const element of inputList) {
+  //       element.checked = false;
+  //     }
+  //   }
+  // });
   document.getElementById('surtrevarv').addEventListener('click', (e) => {
     const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
     
@@ -550,35 +555,8 @@ export const formFunctions = () => {
 }
 
 export const dataForm = async () => {
-  //let files = await getFolderItems(uploadFormFolder);
-  const d = new Date();
-  let filename =
-    JSON.parse(localStorage.parms).login.split("@")[0] +
-    "_" +
-    d.getDate() +
-    "_" +
-    (d.getMonth() + 1) +
-    "_" +
-    d.getFullYear() +
-    ".docx";
 
   async function handleFormSubmit(eventtest) {
-    // const btn = document.activeElement;
-    // btn.classList.toggle("buttonsubmit--loading");
-    // btn.disabled = true;
-    // eventtest.preventDefault();
-    // const data = new FormData(eventtest.target);
-
-    // const formJSON = Object.fromEntries(data.entries());
-    // formJSON.basevar = data.getAll("basevar");
-    // formJSON.ibcvar = data.getAll("ibcvar");
-    // formJSON.reqcoh = data.getAll("reqcoh");
-    // // const results = document.querySelector(".results pre");
-    // // results.innerText = JSON.stringify(formJSON, null, 2);
-    // // fs.wrtieFile('test.json', formJSON);
-    // await generateWord(formJSON);
-    // btn.classList.toggle("buttonsubmit--loading");
-    // btn.disabled = false;
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
     btn.disabled = true;
@@ -591,7 +569,7 @@ export const dataForm = async () => {
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
     jsondata.riskfactvar = data.getAll("riskfactvar");
-    jsondata.pathvar = data.getAll("pathvar");
+    //jsondata.pathvar = data.getAll("pathvar");
     jsondata.sex = data.getAll("sex");
     jsondata.surtrevar = data.getAll("surtrevar");
     console.log(jsondata);
@@ -856,6 +834,38 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
+                  text: "Concept Aims: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.condescAims,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Description of Analysis Plan: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.analdesc,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
                   text: "Primary Endpoint: ",
                 }),
                 new docx.TextRun({
@@ -986,10 +996,7 @@ export const dataForm = async () => {
                   text: "Pathology Variables: ",
                 }),
                 new docx.TextRun({
-                  text: JSON.stringify(jsondata.pathvar, null, 1)
-                    .replace("[", "")
-                    .replace("]", "")
-                    .replace(/"/g, ''),
+                  text: jsondata.pathvarv,
                   bold: false,
                 }),
               ],
@@ -1025,22 +1032,6 @@ export const dataForm = async () => {
                 }),
                 new docx.TextRun({
                   text: jsondata.mammvarv,
-                  bold: false,
-                }),
-              ],
-              spacing: {
-                after: 150,
-              },
-            }),
-            new docx.Paragraph({
-              heading: docx.HeadingLevel.HEADING_2,
-              alignment: docx.AlignmentType.START,
-              children: [
-                new docx.TextRun({
-                  text: "Description of Analysis Plan: ",
-                }),
-                new docx.TextRun({
-                  text: jsondata.analdesc,
                   bold: false,
                 }),
               ],
@@ -1125,7 +1116,10 @@ export const dataForm = async () => {
     //   filesinfoldernames.push(files.entries[i].name);
     //   filesinfolderids.push(files.entries[i].id);
     // }
-    let filename = jsondata.projname + '_' + Date.now() + '.docx';
+    let user = JSON.parse(localStorage.parms).login.split('@')[0];
+    const date = new Date();
+    const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+    let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
     await docx.Packer.toBlob(doc).then(async (blob, btn) => {
       let response = await uploadWordFile(blob, filename, submitterFolder);
       console.log(response);
@@ -1143,7 +1137,7 @@ export const dataForm = async () => {
         btn.disabled = false;
       } else {
       let fileid = response.entries[0].id;
-      console.log(fileid);
+      let metaData = addMetaData(fileid, jsondata.datacon);
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;

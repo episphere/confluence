@@ -105,45 +105,45 @@ export const confluenceResourcesDes = () => {
                                     <th scope="col">Consortium Name</th>
                                     <th scope="col">DACC Chair</th>
                                     <th scope="col">DACC Chair Email</th>
-                                    <th scope="col">DACC Guidelines</th>
+                                    <th scope="col" style="text-align: center">DACC Guidelines</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>African-ancestry Breast Cancer Genetic Consortium</td>
+                                    <td><a href="mailto:wei.zheng@vanderbilt.edu">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
                                     <td>Wei Zheng</td>
-                                    <td>wei.zheng@vumc.org</td>
-                                    <td><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer">AABCG DACC Guidelines</td>
+                                    <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>
+                                    <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
-                                    <td>Breast Cancer Association Consortium</td>
+                                    <td><a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
                                     <td>Roger Milne</td>
-                                    <td>roger.milne@cancervic.org.au</td>
-                                    <td>BCAC DACC Guidelines</td>
+                                    <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>
+                                    <td style="text-align: center">TBD</td>
                                 </tr>
                                 <tr>
-                                    <td>Consortium of Investigators of Modifiers of BRCA1/2</td>
+                                    <td><a href="#join" class="external-url" data-href="http://cimba.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
                                     <td>Georgia Chenevix-Trench</td>
-                                    <td>georgia.trench@qimrberghofer.edu.au</td>
-                                    <td><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer">CIMBA DACC Guidelines</td>
+                                    <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>
+                                    <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                     <tr>
-                                    <td>Latin America Genomics Breast Cancer Consortium</td>
+                                    <td><a href= "#join" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
                                     <td>Laura Fejerman</td>
-                                    <td>lfejerman@ucdavis.edu</td>
-                                    <td><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer">LAGENO DACC Guidelines</td>
+                                    <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>
+                                    <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
-                                    <td>Male Breast Cancer Genetics Consortium</td>
+                                    <td><a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium</a> (MERGE)</td>
                                     <td>Nick Orr</td>
-                                    <td>nick.orr@qub.ac.uk</td>
-                                    <td><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer">MERGE DACC Guidelines</td>
+                                    <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>
+                                    <td style="text-align: center"><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
-                                    <td>Confluence National Cancer Institute Studies</td>
+                                    <td>Confluence National Cancer Institute Studies (C-NCI)</td>
                                     <td>Dezheng Huo</td>
-                                    <td>dhuo@bsd.uchicago.edu</td>
-                                    <td><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer">C-NCI DACC Guidelines</td>
+                                    <td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>
+                                    <td style="text-align: center"><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                             </tbody>
                         </table>

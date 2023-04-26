@@ -606,6 +606,11 @@ label {
     color: #df8723;
 }
 
+.fa-external-link-alt.join {
+    font-size: 1.0em;
+    color: #df8723;
+}
+
 .fa-download {
     color: #343fdb;
 }
@@ -1031,6 +1036,10 @@ label {
     color: #A41652 !important;
     padding: 0.35rem 1rem !important;
     font-weight: bold !important;
+}
+
+.dropdown-menu-links:hover {
+    background-color: #e4e4e4 !important;
 }
 
 .banner-overlay-line {
