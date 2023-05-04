@@ -194,12 +194,13 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
             <div class="col-md-11">
                 <div class="row">
-                    <div class="col-md-4 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-3 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-5 font-bold">Label <button class="transparent-btn sort-column" data-column-name="Label"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-3 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold">Category <button class="transparent-btn sort-column" data-column-name="Category"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
-            <div class="ml-auto"></div>
+            <div class="col-md-1"></div>
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
         `
@@ -211,19 +212,19 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                 <div class="row">
                     <div class="col-md-11">
                         <div class="row">
-                            <div class="col-md-4">${desc['Variable'] ? desc['Variable'] : ''}</div>
+                            <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
                             <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
-                            <div class="col-md-3">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
+                            <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
+                            <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
                         </div>
                     </div>
-                    <div class="ml-auto">
+                    <div class="col-md-1">
                         <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
             </div>
             <div id="study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                    ${desc['Category'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Category</div><div class="col">${desc['Category']}</div></div>`: ``}
                     ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                     ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
                     ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
