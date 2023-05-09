@@ -10,7 +10,7 @@ import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, ina
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
-import { aboutConfluence, renderOverView } from './src/pages/about.js';
+import { aboutConfluence, renderOverView, renderDataDescription } from './src/pages/about.js';
 import { confluenceResources, confluenceResourcesDes, participatingConfluence } from './src/pages/join.js';
 import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
@@ -312,6 +312,20 @@ const manageRouter = async () => {
         renderDescription(fileInfo['content_modified_at'])
         renderOverView();
     }
+    else if(hash === '#about/confluence'){
+        console.log("this one clicked");
+        const element = document.getElementById('aboutConfluenceCon');
+        if(!element) return;
+        if(element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Confluence Description';
+        assignNavbarActive(document.querySelector('[href="#about/confluence"]'));
+        //const fileInfo = await getFileInfo(761599566277);
+        //console.log(fileInfo);
+        aboutConfluence('confluence');
+        renderDataDescription();
+        //renderOverView();
+        console.log("everything passed");
+    }
     else if(hash === '#join/overview'){
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
@@ -516,6 +530,24 @@ const manageHash = async () => {
         }
         aboutConfluence('description', fileInfo ? true : false);
         renderDescription(fileInfo['content_modified_at']);
+        hideAnimation();
+    }
+    else if(hash === '#about/confluence'){
+        const element = document.getElementById('aboutConfluenceCon');
+        if(!element) return;
+        //if(element.classList.contains('navbar-active')) return;
+        //assignNavbarActive(element, 1);
+        assignNavbarActive(document.querySelector('[href="#about/confluence"]'), 1);
+        document.title = 'Confluence - Description';
+        showAnimation();
+        const fileInfo = await getFileInfo(761599566277);
+        if(!fileInfo) {
+            location.hash = '#about/confluence';
+            hideAnimation();
+            return;
+        }
+        aboutConfluence('confluence', fileInfo ? true : false);
+        renderDataDescription();
         hideAnimation();
     }
     else if(hash === '#join/overview'){

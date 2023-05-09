@@ -2145,3 +2145,7 @@ ul.form {
 .form-check {
     margin: 5px 0 0 0
 }
+
+.nav-pills .nav-link.active {
+    background-color: #757575 !important;
+}
