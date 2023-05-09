@@ -9,6 +9,7 @@ export const template = async () => {
     let AllFolders = [];
     const array = await getFolderInfo('156698557621'); //137304373658, 156698557621
     //const events = await getFolderInfo('155546882525');
+    console.log(array);
     if(array) AllFolders.push(array);
    //if(events) AllFolders.push(events);
     // if(array.length <= 0) return;

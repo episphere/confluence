@@ -236,37 +236,37 @@ export const confluence = async () => {
         //         if (bool === true) showProjects = true;
         //     }
         // }
-        if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
-            document.getElementById('governanceNav').innerHTML = `
-                ${getMyPermissionLevel ? `
-                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-                        Data Governance
-                    </a>
-                `: ``}
-            `;
-            document.getElementById('myProjectsNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
-                    My Projects
-                </a>
-            `;
-            addEventDataGovernanceNavBar(true);
-            addEventMyProjects();
-        } else if (array.length > 0 && getMyPermissionLevel) {
-            document.getElementById('governanceNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-                    Data Governance
-                </a>
-            `;
-            addEventDataGovernanceNavBar(true);
-        } else if (projectArray.length > 0 && showProjects === true) {
-            document.getElementById('myProjectsNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
-                    My Projects
-                </a>
-            `;
-            addEventMyProjects();
-        }
-        else if (getMyPermissionLevel) {
+        // if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
+        //     document.getElementById('governanceNav').innerHTML = `
+        //         ${getMyPermissionLevel ? `
+        //             <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+        //                 Data Governance
+        //             </a>
+        //         `: ``}
+        //     `;
+        //     document.getElementById('myProjectsNav').innerHTML = `
+        //         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+        //             My Projects
+        //         </a>
+        //     `;
+        //     addEventDataGovernanceNavBar(true);
+        //     addEventMyProjects();
+        // } else if (array.length > 0 && getMyPermissionLevel) {
+        //     document.getElementById('governanceNav').innerHTML = `
+        //         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+        //             Data Governance
+        //         </a>
+        //     `;
+        //     addEventDataGovernanceNavBar(true);
+        // } else if (projectArray.length > 0 && showProjects === true) {
+        //     document.getElementById('myProjectsNav').innerHTML = `
+        //         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
+        //             My Projects
+        //         </a>
+        //     `;
+        //     addEventMyProjects();
+        // }
+        if (getMyPermissionLevel) {
             document.getElementById('governanceNav').innerHTML = `
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
                     Data Governance
