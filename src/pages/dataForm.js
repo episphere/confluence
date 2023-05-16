@@ -325,7 +325,7 @@ export const formtemplate = () => {
                                     <div class="col-12 col-md-3 col-sm-12">
                                       <div class="form-check">
                                         <input class="form-check-input" id="c6" name="riskfactvar" type="checkbox" value="OC"/>
-                                        <label class="form-check-label" for="c6"> OC</label>
+                                        <label class="form-check-label" for="c6"> Oral Contraceptive</label>
                                       </div>
                                       <div class="form-check">
                                         <input class="form-check-input" id="c7" name="riskfactvar" type="checkbox" value="HRT"/>
