@@ -271,11 +271,11 @@ export const formtemplate = () => {
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="BRCA1Yes" name="BRCA1" type="checkbox" value="yes"/>
-                                      <label class="form-check-label" for="BRCA1Yes"> Request <i>BRCA1</i> carrier status </label>
+                                      <label class="form-check-label" for="BRCA1Yes">BRCA1</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="BRCA2Yes" name="BRCA2" type="checkbox" value="yes"/>
-                                      <label class="form-check-label" for="BRCA2Yes"> Request <i>BRCA2</i> carrier status </label>
+                                      <label class="form-check-label" for="BRCA2Yes">BRCA2</label>
                                     </div>
                                   </div>
                                 </div>
