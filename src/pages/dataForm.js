@@ -396,12 +396,12 @@ export const formtemplate = () => {
                           <div class="input-group">
                             <label for="surtrevar"><b>Survival and Treatment</b></label>
                             <label> 
-                              <input id="surtrevarv" name="surtrevarv" type="checkbox" value="surtrevarv"/>
-                              Check all 
+                              <input id="surtrevarv" name="surtrevarv" type="checkbox" value="Yes"/>
+                              Select
                             </label>
                           </div>
 
-                              <div class="input-group">
+<!---                              <div class="input-group">
                                 <div class="container-lg">
                                   <div class="row" id='surtrelist'>
                                     <div class="col-12 col-md-3 col-sm-12">
@@ -444,7 +444,7 @@ export const formtemplate = () => {
                                     </div>
                                   </div>
                                 </div>
-                              </div>
+                              </div>--->
 
                             <div class="input-group">
                               <label for="mammvar"><b>Mammographic Density</b></label>
@@ -538,20 +538,20 @@ export const formFunctions = () => {
   //     }
   //   }
   // });
-  document.getElementById('surtrevarv').addEventListener('click', (e) => {
-    const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
+//   document.getElementById('surtrevarv').addEventListener('click', (e) => {
+//     const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
     
-    if (e.target.checked) {
-      for (const element of inputList) {
-        element.checked = true;
-      }
-    }
-    else{
-      for (const element of inputList) {
-        element.checked = false;
-      }
-    }
-  });
+//     if (e.target.checked) {
+//       for (const element of inputList) {
+//         element.checked = true;
+//       }
+//     }
+//     else{
+//       for (const element of inputList) {
+//         element.checked = false;
+//       }
+//     }
+//   });
 }
 
 export const dataForm = async () => {
@@ -571,7 +571,7 @@ export const dataForm = async () => {
     jsondata.riskfactvar = data.getAll("riskfactvar");
     //jsondata.pathvar = data.getAll("pathvar");
     jsondata.sex = data.getAll("sex");
-    jsondata.surtrevar = data.getAll("surtrevar");
+    //jsondata.surtrevar = data.getAll("surtrevar");
     console.log(jsondata);
     await generateWord(jsondata);
     btn.classList.toggle("buttonsubmit--loading");
@@ -1012,7 +1012,7 @@ export const dataForm = async () => {
                   text: "Survival and Treatment Variables: ",
                 }),
                 new docx.TextRun({
-                  text: JSON.stringify(jsondata.surtrevar, null, 1)
+                  text: JSON.stringify(jsondata.surtrevarv, null, 1)
                     .replace("[", "")
                     .replace("]", "")
                     .replace(/"/g, ''),
