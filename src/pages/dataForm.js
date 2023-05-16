@@ -241,7 +241,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="sex"><b>Select Population</b></label>
+                              <label for="sex"><b>Select Sex</b></label>
                             </div>
                             <div class="input-group">
                               <div class="container-lg">
@@ -270,8 +270,12 @@ export const formtemplate = () => {
                                     <p><i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="carStatusYes" name="carStatus" type="checkbox" value="yes"/>
-                                      <label class="form-check-label" for="carStatusYes"> Request <i>BRCA1 and BRCA2</i> carrier status </label>
+                                      <input class="form-check-input" id="BRCA1Yes" name="BRCA1" type="checkbox" value="yes"/>
+                                      <label class="form-check-label" for="BRCA1Yes"> Request <i>BRCA1</i> carrier status </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="BRCA2Yes" name="BRCA2" type="checkbox" value="yes"/>
+                                      <label class="form-check-label" for="BRCA2Yes"> Request <i>BRCA2</i> carrier status </label>
                                     </div>
                                   </div>
                                 </div>
@@ -939,10 +943,26 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "BRCA1 and BRCA2 carrier status requested: ",
+                  text: "BRCA1 carrier status requested: ",
                 }),
                 new docx.TextRun({
-                  text: jsondata.carStatus,
+                  text: jsondata.BRCA1,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "BRCA2 carrier status requested: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.BRCA2,
                   bold: false,
                 }),
               ],
