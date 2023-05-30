@@ -475,7 +475,34 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/><b> Please confirm that you agree to comply with Confluence authorship requirements.</b><span class='required-label'>*</span></label>
+                            <u id="tooltip1"><a><label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/> 
+                              <b>Please confirm that you agree to comply with Confluence authorship requirements.</b>
+                              <span>It is expected that manuscripts will be co-led across multiple contributing groups and consortia. 
+                              Authorship for cross-consortia manuscripts using individual-level data or unpublished summary data will be proposed by 
+                              lead investigators at the time of concept submission to the DACCs, who will need to approve the proposed authorship. 
+                              It is anticipated that Recipient will propose authorships in the form of one of these alternatives:
+                              <ul>
+                                <li>Group(s) authorship with each group/consortium listed in the authorship byline. Contributions of the writing group 
+                                and other authors will be noted in the contributions section of the manuscript. Authors will be PubMed searchable.</li>
+                              </ul>
+                              <p class="indent"> or </p>
+                              <ul>
+                                <li>Named authors including co-first and co-last positions when appropriate. It is expected that manuscripts with named 
+                                authors will include 2-4 authors per study, plus other contributors to data generation and analyses.</li>
+                              </ul>
+                              
+                              A “hybrid authorship model” that includes some named authors in the author byline that are PubMed searchable, 
+                              while other authors are not listed in the author byline and are not PubMed searchable will not be acceptable. 
+                              The corresponding author of the manuscript is responsible for contacting journals of interest to learn about their 
+                              authorship guidelines early in the process of writing the manuscript to confirm the journal's guidelines are 
+                              compatible with the preferred authorship of the Confluence writing group.
+
+                              </span></a></u>
+                              <span class='required-label'>*</span></label>
+                            </div>
+
+                            <div>
+                              <p id="tooltip1"><a>Testing<span> Does this work? </span> </a></p>
                             </div>
                             
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 

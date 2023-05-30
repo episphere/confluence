@@ -1828,6 +1828,11 @@ form {
     margin-top: 0.5rem;
     font-size: 87.5%;
   }
+
+  p.indent {
+    text-indent: 50px;
+    font-size: 95%;
+  }
   #email {
     font-size: 87.5%;
     float: right;
@@ -2149,3 +2154,7 @@ ul.form {
 .nav-pills .nav-link.active {
     background-color: #757575 !important;
 }
+
+#tooltip1 { position: relative; }
+#tooltip1 a span { display: none; color: #FFFFFF; }
+#tooltip1 a:hover span { display: inline-block; position: absolute; width: 800px; background: #ffffff; height: 375px; left: 10px; top: -375px; color: #000000; padding: 0 5px; z-index: 1; border-style: groove;}
