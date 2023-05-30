@@ -197,6 +197,7 @@ export const formtemplate = () => {
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
                                       <label class="form-check-label" for="sbc"> Subtype of Breast Cancer</label>
+                                      <input type="text" id="sbc-in" name="sbc" placeholder="Subtype"/>
                                     </div>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival"/>
@@ -205,11 +206,12 @@ export const formtemplate = () => {
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="other" name="prim-end" type="checkbox" value="Other"/>
                                       <label class="form-check-label" for="other"> Other</label>
-                                    </div>
-                                    <div class="form-group">
-                                      <label for="otherinput"></label>
                                       <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
                                     </div>
+                                    <!---<div class="form-group">
+                                      <label for="otherinput"></label>
+                                      <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
+                                    </div>--->
                                   </div>
                                 </div>  
                               </div>
