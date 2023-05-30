@@ -283,10 +283,12 @@ export const formtemplate = () => {
                             </div>
 
                             <br>
-                            <p><u>2. PHENOTYPE DATA REQUESTED (<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>)</u></p>
+                            <p><u>2. PHENOTYPE DATA REQUESTED</u></p>
 
                             <div class="input-group">
-                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. All variables within the category will be provided.</p>
+                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. 
+                                All variables within the category will be provided. [<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>]
+                                for a description of the variables in each category.</p>
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
