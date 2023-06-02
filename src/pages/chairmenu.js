@@ -30,7 +30,9 @@ import {
   listComments,
   getFile,
   createZip,
-  addMetaData
+  addMetaData,
+  DACCmembers,
+  csv2Json
 } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
@@ -95,14 +97,10 @@ export const generateChairMenuFiles = async () => {
     let filearrayClara = responseClara.entries;
     let filearrayAllFiles = allFiles.entries;
 
-    // let fileinfo = await getFileInfo(1169802034671);
-    // let filename = fileinfo.name;
-    // //let allFiles = await getFolderItems(submitterFolder);
-    // //let entries = allFiles.entries;
-    // console.log(filename);
-    // let test = allFiles.entries.find(element => element.name === filename);
-    // console.log(test.id);
-
+    let test = await getFile(DACCmembers);
+    const { data, headers } = csv2Json(test);
+    const consortium = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).consortium
+    const daccEmails = data.filter(item => item['DACC']==consortium).map(dt => dt['Email']).splice(1);
 
     const filesIncompleted = [];
     for (let obj of filearrayChair) {
@@ -189,13 +187,13 @@ export const generateChairMenuFiles = async () => {
     template += `<div class='tab-pane fade show active'
                   id='recommendation' role='tabpanel'
                   aria-labeledby='recommendationTab'>
-                  <a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
+                  <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
     template += renderFilePreviewDropdown(filesIncompleted, "recommendation");
 
     template += `<div class='tab-pane fade' 
                   id='conceptNeedingClarification' role='tabpanel' 
                   aria-labeledby='conceptNeedingClarificationTab'>
-                  <a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
+                  <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
     template += renderFilePreviewDropdown(filesClaraIncompleted, "conceptNeedingClarification");
 
     template += `<div class='tab-pane fade'
@@ -203,7 +201,7 @@ export const generateChairMenuFiles = async () => {
                   aria-labeledby='daccDecisionTab'>
                   daccDecisionTab tab  content 
                   </div>`
-                  //<a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
+                  //<a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
     template += `<div id='filePreview'>`;
     //template += `<div id='filePreview'>`;
     if (filesIncompleted.length !== 0 ||
@@ -243,7 +241,7 @@ export const generateChairMenuFiles = async () => {
     // template += `<div class='tab-pane fade'
     // id='daccDecision' role='tabpanel'
     // aria-labeledby='daccDecision'>daccDecisionTab tab  content </div>
-    // <a href="mailto:${chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).dacc.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
+    // <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>`;
     // // TODO: For Concept Needing Clarification Tab
     // template += `<div class='tab-pane fade' id='conceptNeedingClarification' role='tabpanel' aria-labeledby='conceptNeedingClarification'>`;
     // template += renderFilePreviewDropdown(filesClaraIncompleted, "conceptNeedingClarification");
