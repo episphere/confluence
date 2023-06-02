@@ -57,7 +57,7 @@ export const formtemplate = () => {
                             
                             <div class="input-group">
                               <label for="email"><b>Contact E-mail</b><span class='required-label'>*</span></label>
-                              <input id="email" name="email" type="email" required/>
+                              <input id="email" name="email" type="text" required/>
                             </div>
 
                             <div class="input-group">
