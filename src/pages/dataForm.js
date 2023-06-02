@@ -142,7 +142,7 @@ export const formtemplate = () => {
                                       <input class="form-check-input" id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC"/>
                                       <label class="form-check-label" for="consortia-BCAC"> BCAC</label>
                                     </div>
-                                    </div>
+                                  </div>
                                   <div class="col-12 col-md-2 col-sm-12">   
                                     <div class="form-check">
                                       <input class="form-check-input" id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA"/>
@@ -231,6 +231,16 @@ export const formtemplate = () => {
                                       <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
                                       <label class="form-check-label" for="imputed"> Individual-level imputed data</label>
                                     </div>
+                                  </div>
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence"/>
+                                      <label class="form-check-label" for="preconfluence"> Data generated pre-Confluence</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data"/>
+                                      <label class="form-check-label" for="postconfluence"> Confluence generated data</label>
+                                    </div>
                                     <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
                                     <input id="fileVar" name="fileVar" type="file">
                                   </div>
@@ -265,7 +275,7 @@ export const formtemplate = () => {
                               <div class="container-lg">
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
-                                    <p><i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
+                                    <p><i>BRCA1</i> and <i>BRCA2</i> carrier status can be made only from CIMBA, and from some MERGE participants. Carrier 
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="BRCA1Yes" name="carStatus" type="checkbox" value="BRCA1"/>
@@ -284,9 +294,9 @@ export const formtemplate = () => {
                             <p><u>2. PHENOTYPE DATA REQUESTED</u></p>
 
                             <div class="input-group">
-                                <p>All data requests will be provided access to the Confluence core variables. Please select the category of variables being requested. 
-                                All variables within the category will be provided. [<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>]
-                                for a description of the variables in each category.</p>
+                                <p>All data requests will be provided access to the Confluence core variables. Please select the variable category needed for the proposed project. 
+                                All variables within the category will be provided [<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>].
+                                The data analysis plan should describe why the variables are being requested.</p>
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
