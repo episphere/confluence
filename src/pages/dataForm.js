@@ -551,34 +551,6 @@ export const formFunctions = () => {
       }
     }
   });
-  // document.getElementById('pathvarv').addEventListener('click', (e) => {
-  //   const inputList = document.getElementById('pathlist').getElementsByTagName('input');
-
-  //   if (e.target.checked) {
-  //     for (const element of inputList) {
-  //       element.checked = true;
-  //     }
-  //   }
-  //   else{
-  //     for (const element of inputList) {
-  //       element.checked = false;
-  //     }
-  //   }
-  // });
-//   document.getElementById('surtrevarv').addEventListener('click', (e) => {
-//     const inputList = document.getElementById('surtrelist').getElementsByTagName('input');
-    
-//     if (e.target.checked) {
-//       for (const element of inputList) {
-//         element.checked = true;
-//       }
-//     }
-//     else{
-//       for (const element of inputList) {
-//         element.checked = false;
-//       }
-//     }
-//   });
 }
 
 export const dataForm = async () => {
@@ -597,10 +569,7 @@ export const dataForm = async () => {
     jsondata.genotyping = data.getAll("genotyping");
     jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.carStatus = data.getAll("carStatus");
-    //jsondata.pathvar = data.getAll("pathvar");
     jsondata.sex = data.getAll("sex");
-    //jsondata.surtrevar = data.getAll("surtrevar");
-    console.log(jsondata);
     await generateWord(jsondata);
     btn.classList.toggle("buttonsubmit--loading");
     btn.disabled = false;
@@ -997,38 +966,6 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
-            // new docx.Paragraph({
-            //   heading: docx.HeadingLevel.HEADING_2,
-            //   alignment: docx.AlignmentType.START,
-            //   children: [
-            //     new docx.TextRun({
-            //       text: "BRCA1 carrier status requested: ",
-            //     }),
-            //     new docx.TextRun({
-            //       text: jsondata.BRCA1,
-            //       bold: false,
-            //     }),
-            //   ],
-            //   spacing: {
-            //     after: 150,
-            //   },
-            // }),
-            // new docx.Paragraph({
-            //   heading: docx.HeadingLevel.HEADING_2,
-            //   alignment: docx.AlignmentType.START,
-            //   children: [
-            //     new docx.TextRun({
-            //       text: "BRCA2 carrier status requested: ",
-            //     }),
-            //     new docx.TextRun({
-            //       text: jsondata.BRCA2,
-            //       bold: false,
-            //     }),
-            //   ],
-            //   spacing: {
-            //     after: 150,
-            //   },
-            // }),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1151,22 +1088,13 @@ export const dataForm = async () => {
         },
       ],
     });
-
-    //filename = jsondata.projname.substring(0, 10) + "_" + filename;
-    // let files = await getFolderItems(uploadFormFolder);
-    // const filesinfoldernames = [];
-    // const filesinfolderids = [];
-    // for (let i = 0; i < files.entries.length; i++) {
-    //   filesinfoldernames.push(files.entries[i].name);
-    //   filesinfolderids.push(files.entries[i].id);
-    // }
     let user = JSON.parse(localStorage.parms).login.split('@')[0];
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
     await docx.Packer.toBlob(doc).then(async (blob, btn) => {
-      //let response = await uploadWordFile(blob, filename, submitterFolder);
-      let response = {'status': 201};
+      let response = await uploadWordFile(blob, filename, submitterFolder);
+      // let response = {'status': 201};
       console.log(response);
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
@@ -1181,9 +1109,9 @@ export const dataForm = async () => {
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
       } else {
-      //let fileid = response.entries[0].id;
-      let fileid = "testing";
-      //let metaData = addMetaData(fileid, jsondata.datacon);
+      let fileid = response.entries[0].id;
+      //let fileid = "testing";
+      let metaData = addMetaData(fileid, jsondata.datacon);
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
@@ -1206,12 +1134,6 @@ export const dataForm = async () => {
 
   const form = document.querySelector(".contact-form");
   form.addEventListener("submit", handleFormSubmit);
-
-  // const downloadJSON = document.getElementById("downloadJSON");
-  // downloadJSON.addEventListener("click", handleFormDownload);
-
-  // const downloadWord = document.getElementById("downloadWord");
-  // downloadWord.addEventListener("click", handleFormDownload);
 }
 
 export const uploaddataFormTemplate = () => {
