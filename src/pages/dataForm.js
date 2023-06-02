@@ -1019,10 +1019,7 @@ export const dataForm = async () => {
                   text: "Survival and Treatment Variables: ",
                 }),
                 new docx.TextRun({
-                  text: JSON.stringify(jsondata.surtrevarv, null, 1)
-                    .replace("[", "")
-                    .replace("]", "")
-                    .replace(/"/g, ''),
+                  text: jsondata.surtrevarv,
                   bold: false,
                 }),
               ],
