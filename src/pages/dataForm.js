@@ -197,7 +197,7 @@ export const formtemplate = () => {
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
                                       <label class="form-check-label" for="sbc"> Subtype of Breast Cancer</label>
-                                      <input type="text" id="sbc-in" name="sbc" placeholder="Subtype"/>
+                                      <input type="text" id="sbcin" name="sbcin" placeholder="Subtype"/>
                                     </div>
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival"/>
@@ -208,10 +208,6 @@ export const formtemplate = () => {
                                       <label class="form-check-label" for="other"> Other</label>
                                       <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
                                     </div>
-                                    <!---<div class="form-group">
-                                      <label for="otherinput"></label>
-                                      <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
-                                    </div>--->
                                   </div>
                                 </div>  
                               </div>
@@ -272,11 +268,11 @@ export const formtemplate = () => {
                                     <p><i>BRCA1 and BRCA2</i> carrier status can be made only from CIMBA and MERGE. Carrier 
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="BRCA1Yes" name="BRCA1" type="checkbox" value="yes"/>
+                                      <input class="form-check-input" id="BRCA1Yes" name="carStatus" type="checkbox" value="BRCA1"/>
                                       <label class="form-check-label" for="BRCA1Yes">BRCA1</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="BRCA2Yes" name="BRCA2" type="checkbox" value="yes"/>
+                                      <input class="form-check-input" id="BRCA2Yes" name="carStatus" type="checkbox" value="BRCA2"/>
                                       <label class="form-check-label" for="BRCA2Yes">BRCA2</label>
                                     </div>
                                   </div>
@@ -500,10 +496,6 @@ export const formtemplate = () => {
                               </span></a></u>
                               <span class='required-label'>*</span></label>
                             </div>
-
-                            <div>
-                              <p id="tooltip1"><a>Testing<span> Does this work? </span> </a></p>
-                            </div>
                             
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 
                               <span class="buttonsubmit__text"> Send Form & Download</span>
@@ -604,6 +596,7 @@ export const dataForm = async () => {
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
     jsondata.riskfactvar = data.getAll("riskfactvar");
+    jsondata.carStatus = data.getAll("carStatus");
     //jsondata.pathvar = data.getAll("pathvar");
     jsondata.sex = data.getAll("sex");
     //jsondata.surtrevar = data.getAll("surtrevar");
@@ -853,7 +846,7 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "Concept Description: ",
+                  text: "Concept Background: ",
                 }),
                 new docx.TextRun({
                   text: jsondata.condesc,
@@ -920,6 +913,22 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
+                  text: "Subtype of Breast Cancer: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.sbcin,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
                   text: "Other Primary Endpoint: ",
                 }),
                 new docx.TextRun({
@@ -955,7 +964,7 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "Data Requested From: ",
+                  text: "Select Sex: ",
                 }),
                 new docx.TextRun({
                   text: JSON.stringify(jsondata.sex, null, 1)
@@ -974,42 +983,10 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "BRCA1 carrier status requested: ",
+                  text: "Carrier Status requested: ",
                 }),
                 new docx.TextRun({
-                  text: jsondata.BRCA1,
-                  bold: false,
-                }),
-              ],
-              spacing: {
-                after: 150,
-              },
-            }),
-            new docx.Paragraph({
-              heading: docx.HeadingLevel.HEADING_2,
-              alignment: docx.AlignmentType.START,
-              children: [
-                new docx.TextRun({
-                  text: "BRCA2 carrier status requested: ",
-                }),
-                new docx.TextRun({
-                  text: jsondata.BRCA2,
-                  bold: false,
-                }),
-              ],
-              spacing: {
-                after: 150,
-              },
-            }),
-            new docx.Paragraph({
-              heading: docx.HeadingLevel.HEADING_2,
-              alignment: docx.AlignmentType.START,
-              children: [
-                new docx.TextRun({
-                  text: "Genotyping: ",
-                }),
-                new docx.TextRun({
-                  text: JSON.stringify(jsondata.genotyping, null, 1)
+                  text: JSON.stringify(jsondata.carStatus, null, 1)
                     .replace("[", "")
                     .replace("]", "")
                     .replace(/"/g, ''),
@@ -1020,6 +997,38 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
+            // new docx.Paragraph({
+            //   heading: docx.HeadingLevel.HEADING_2,
+            //   alignment: docx.AlignmentType.START,
+            //   children: [
+            //     new docx.TextRun({
+            //       text: "BRCA1 carrier status requested: ",
+            //     }),
+            //     new docx.TextRun({
+            //       text: jsondata.BRCA1,
+            //       bold: false,
+            //     }),
+            //   ],
+            //   spacing: {
+            //     after: 150,
+            //   },
+            // }),
+            // new docx.Paragraph({
+            //   heading: docx.HeadingLevel.HEADING_2,
+            //   alignment: docx.AlignmentType.START,
+            //   children: [
+            //     new docx.TextRun({
+            //       text: "BRCA2 carrier status requested: ",
+            //     }),
+            //     new docx.TextRun({
+            //       text: jsondata.BRCA2,
+            //       bold: false,
+            //     }),
+            //   ],
+            //   spacing: {
+            //     after: 150,
+            //   },
+            // }),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1090,38 +1099,6 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
-            // new docx.Paragraph({
-            //   heading: docx.HeadingLevel.HEADING_2,
-            //   alignment: docx.AlignmentType.START,
-            //   children: [
-            //     new docx.TextRun({
-            //       text: "Budgetary consideratsion, if applicable: ",
-            //     }),
-            //     new docx.TextRun({
-            //       text: jsondata.budget,
-            //       bold: false,
-            //     }),
-            //   ],
-            //   spacing: {
-            //     after: 150,
-            //   },
-            // }),
-            new docx.Paragraph({
-              heading: docx.HeadingLevel.HEADING_2,
-              alignment: docx.AlignmentType.START,
-              children: [
-                new docx.TextRun({
-                  text: "Confluence authorship requirements: ",
-                }),
-                new docx.TextRun({
-                  text: jsondata.confirmationAuth,
-                  bold: false,
-                }),
-              ],
-              spacing: {
-                after: 150,
-              },
-            }),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1154,6 +1131,22 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Confluence authorship requirements: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.confirmationAuth,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
           ],
         },
       ],
@@ -1172,7 +1165,8 @@ export const dataForm = async () => {
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
     await docx.Packer.toBlob(doc).then(async (blob, btn) => {
-      let response = await uploadWordFile(blob, filename, submitterFolder);
+      //let response = await uploadWordFile(blob, filename, submitterFolder);
+      let response = {'status': 201};
       console.log(response);
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
@@ -1187,8 +1181,9 @@ export const dataForm = async () => {
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
       } else {
-      let fileid = response.entries[0].id;
-      let metaData = addMetaData(fileid, jsondata.datacon);
+      //let fileid = response.entries[0].id;
+      let fileid = "testing";
+      //let metaData = addMetaData(fileid, jsondata.datacon);
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
