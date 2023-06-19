@@ -135,6 +135,13 @@ export const variables = {
             888: "Don't Know",
             'label': 'Ethnic origin (refined)'
         },
+        continental_region: {
+            1: 'South America',
+            2: 'USA & Canada',
+            3: 'Sub-Saharan Africa',
+            4: 'South Asia',
+            'label': 'Continental Region'
+        },
         ethnOt: {
             777: 'Not Applicable',
             888: "Don't Know",

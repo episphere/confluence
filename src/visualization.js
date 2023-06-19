@@ -47,6 +47,16 @@ const allFilters = (jsonData, headers, cimba) => {
                     <option value='Other chip'>Other Array</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
+                <select class="form-control font-size-15" id="continentalRegionSelection" data-variable='chip'>
+                    <option selected value='all'>All</option>
+                    <option value='South America'>South America</option>
+                    <option value='USA & Canada'>USA & Canada</option>
+                    <option value='Sub-Saharan Africa'>Sub-Saharan Africa</option>
+                    <option value='South Asia'>South Asia</option>
+                </select>
+            </div>
     `;
     template += `
     <div class="form-group">
@@ -167,7 +177,7 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
     renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
-    renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+    renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
     if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
@@ -370,6 +380,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
     let allLabels = getUniqueConsortium(jsonData, parameter);
+    console.log(allLabels);
     const valueCount = [];
     for(let studyDesign of allLabels){
         valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
@@ -384,8 +395,9 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
             },
         }
     ];
+    console.log(data);
     const layout = {
-        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
+        xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}, type:'category'},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'

@@ -580,6 +580,18 @@ export const dataForm = async () => {
     jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.carStatus = data.getAll("carStatus");
     jsondata.sex = data.getAll("sex");
+    console.log(jsondata.condesc.split('/n'));
+    //Added for testing --->
+    // console.log(jsondata);
+    // const downloadJSON = document.getElementById("downloadJSON");
+    // let blob = new Blob([JSON.stringify(jsondata)], {type: "application/json",});
+    // const downloadLink = URL.createObjectURL(blob);
+    // let filename = jsondata.projname;
+    // let a = document.createElement("a");
+    // a.href = downloadLink;
+    // a.download = filename;
+    // a.click();
+    //<---
     await generateWord(jsondata);
     btn.classList.toggle("buttonsubmit--loading");
     btn.disabled = false;
@@ -827,6 +839,7 @@ export const dataForm = async () => {
                 new docx.TextRun({
                   text: "Concept Background: ",
                 }),
+                console.log(jsondata.condesc),
                 new docx.TextRun({
                   text: jsondata.condesc,
                   bold: false,
@@ -1100,8 +1113,8 @@ export const dataForm = async () => {
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
     await docx.Packer.toBlob(doc).then(async (blob, btn) => {
-      let response = await uploadWordFile(blob, filename, submitterFolder);
-      // let response = {'status': 201};
+      //let response = await uploadWordFile(blob, filename, submitterFolder);
+      let response = {'status': 201};
       console.log(response);
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
@@ -1116,9 +1129,9 @@ export const dataForm = async () => {
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
       } else {
-      let fileid = response.entries[0].id;
-      //let fileid = "testing";
-      let metaData = addMetaData(fileid, jsondata.datacon);
+      //let fileid = response.entries[0].id;
+      let fileid = "testing";
+      //let metaData = addMetaData(fileid, jsondata.datacon);
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;

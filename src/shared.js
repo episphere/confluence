@@ -3,7 +3,7 @@ import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
 export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov', 'sbehpour@deloitte.com']
 export const publicDataFileId = 697309514903;
-export const summaryStatsFileId = 691143057533;
+export const summaryStatsFileId = 1238676877781;//691143057533;1238676877781
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
 export const acceptedFolder = 196011761030;

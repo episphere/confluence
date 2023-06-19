@@ -1364,6 +1364,11 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
         filterData(jsonData, headers);
     });
 
+    const contSelection = document.getElementById('continentalRegionSelection');
+    contSelection.addEventListener('change', () => {
+        filterData(jsonData, headers);
+    });
+
     const elements = document.getElementsByClassName('select-consortium');
     Array.from(elements).forEach((el,index) => {
         el.addEventListener('click', () => {
@@ -1388,8 +1393,10 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
 const filterData = (jsonData, headers) => {
     const gender = document.getElementById('genderSelection').value;
     const chip = document.getElementById('genotypingChipSelection').value;
+    const cont = document.getElementById('continentalRegionSelection').value;
     const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
     const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
+    const contFilter = Array.from(document.getElementById('continentalRegionSelection').options).filter(op => op.selected)[0].textContent;
     let finalData = jsonData;
     let onlyCIMBA = false;
     
@@ -1428,6 +1435,9 @@ const filterData = (jsonData, headers) => {
     if(chip !== 'all') {
         finalData = finalData.filter(dt => dt['chip'] === chip);
     }
+    if(cont !== 'all') {
+        finalData = finalData.filter(dt => dt['continental_region'] === cont);
+    }
     updateCounts(finalData);
     if(array.length > 0){
         finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
@@ -1436,6 +1446,7 @@ const filterData = (jsonData, headers) => {
     document.getElementById('listFilters').innerHTML = `
         <span class="font-bold">Sex: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="font-bold">Continental region: </span>${contFilter}
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
     renderAllCharts(finalData, headers, onlyCIMBA);
