@@ -1,4 +1,5 @@
 import { submitterFolder, uploadWordFile, addMetaData} from "../shared.js"
+//import * as docx from "docx";
 
 export const formtemplate = () => {
   const date = new Date();
@@ -580,7 +581,12 @@ export const dataForm = async () => {
     jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.carStatus = data.getAll("carStatus");
     jsondata.sex = data.getAll("sex");
-    console.log(jsondata.condesc.split('/n'));
+    jsondata.condescsplit = jsondata.condesc.split('\n');
+    jsondata.aimssplit = jsondata.condescAims.split('\n');
+    jsondata.descsplit = jsondata.analdesc.split('\n');
+    jsondata.timesplit = jsondata.time.split('\n');
+    jsondata.anyothsplit = jsondata.anyoth.split('\n');
+
     //Added for testing --->
     // console.log(jsondata);
     // const downloadJSON = document.getElementById("downloadJSON");
@@ -598,6 +604,12 @@ export const dataForm = async () => {
   }
 
   async function generateWord(jsondata) {
+    const condescRun = jsondata.condescsplit.map(line=>new docx.TextRun({break:1,text:line}));
+    const aimsRun = jsondata.aimssplit.map(line=>new docx.TextRun({break:1,text:line}));
+    const descRun = jsondata.descsplit.map(line=>new docx.TextRun({break:1,text:line}));
+    const timeRun = jsondata.timesplit.map(line=>new docx.TextRun({break:1,text:line}));
+    const anyothRun = jsondata.anyothsplit.map(line=>new docx.TextRun({break:1,text:line}));
+
     const doc = new docx.Document({
       styles: {
         default: {
@@ -839,16 +851,14 @@ export const dataForm = async () => {
                 new docx.TextRun({
                   text: "Concept Background: ",
                 }),
-                console.log(jsondata.condesc),
-                new docx.TextRun({
-                  text: jsondata.condesc,
-                  bold: false,
-                }),
               ],
               spacing: {
-                after: 150,
+                after: 0,
               },
             }),
+
+            new docx.Paragraph({children: condescRun}),
+
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1176,4 +1186,232 @@ export const uploaddataFormTemplate = () => {
                   </div>
                 </div>`
   return template;
+}
+
+export const createPar = (text) => {
+  return new docx.Paragraph({
+      text: text,
+      bullet: {
+          level: 0,
+      },
+  })
+};
+
+export const createHeading = (text) => {
+  return new docx.Paragraph({
+      text: text,
+      heading: docx.HeadingLevel.HEADING_1,
+      thematicBreak: true,
+  });
+}
+
+class DocumentCreator {
+  create([experiences, educations, skills, achivements]) {
+      const document = new Document({
+          sections: [{
+              children: [
+                  new Paragraph({
+                      text: "Dolan Miu",
+                      heading: HeadingLevel.TITLE,
+                  }),
+                  this.createContactInfo(PHONE_NUMBER, PROFILE_URL, EMAIL),
+                  this.createHeading("Education"),
+                  ...educations
+                      .map((education) => {
+                          const arr = [];
+                          arr.push(
+                              this.createInstitutionHeader(education.schoolName, `${education.startDate.year} - ${education.endDate.year}`),
+                          );
+                          arr.push(this.createRoleText(`${education.fieldOfStudy} - ${education.degree}`));
+
+                          const bulletPoints = this.splitParagraphIntoBullets(education.notes);
+                          bulletPoints.forEach((bulletPoint) => {
+                              arr.push(this.createBullet(bulletPoint));
+                          });
+
+                          return arr;
+                      })
+                      .reduce((prev, curr) => prev.concat(curr), []),
+                  this.createHeading("Experience"),
+                  ...experiences
+                      .map((position) => {
+                          const arr = [];
+
+                          arr.push(
+                              this.createInstitutionHeader(
+                                  position.company.name,
+                                  this.createPositionDateText(position.startDate, position.endDate, position.isCurrent),
+                              ),
+                          );
+                          arr.push(this.createRoleText(position.title));
+
+                          const bulletPoints = this.splitParagraphIntoBullets(position.summary);
+
+                          bulletPoints.forEach((bulletPoint) => {
+                              arr.push(this.createBullet(bulletPoint));
+                          });
+
+                          return arr;
+                      })
+                      .reduce((prev, curr) => prev.concat(curr), []),
+                  this.createHeading("Skills, Achievements and Interests"),
+                  this.createSubHeading("Skills"),
+                  this.createSkillList(skills),
+                  this.createSubHeading("Achievements"),
+                  ...this.createAchivementsList(achivements),
+                  this.createSubHeading("Interests"),
+                  this.createInterests("Programming, Technology, Music Production, Web Design, 3D Modelling, Dancing."),
+                  this.createHeading("References"),
+                  new Paragraph(
+                      "Dr. Dean Mohamedally Director of Postgraduate Studies Department of Computer Science, University College London Malet Place, Bloomsbury, London WC1E d.mohamedally@ucl.ac.uk",
+                  ),
+                  new Paragraph("More references upon request"),
+                  new Paragraph({
+                      text: "This CV was generated in real-time based on my Linked-In profile from my personal website www.dolan.bio.",
+                      alignment: AlignmentType.CENTER,
+                  }),
+              ],
+          }],
+      });
+
+      return document;
+  }
+
+  createContactInfo(phoneNumber, profileUrl, email) {
+      return new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+              new TextRun(`Mobile: ${phoneNumber} | LinkedIn: ${profileUrl} | Email: ${email}`),
+              new TextRun({
+                  text: "Address: 58 Elm Avenue, Kent ME4 6ER, UK",
+                  break: 1,
+              }),
+          ],
+      });
+  }
+
+  createHeading(text) {
+      return new Paragraph({
+          text: text,
+          heading: HeadingLevel.HEADING_1,
+          thematicBreak: true,
+      });
+  }
+
+  createSubHeading(text) {
+      return new Paragraph({
+          text: text,
+          heading: HeadingLevel.HEADING_2,
+      });
+  }
+
+  createInstitutionHeader(institutionName, dateText) {
+      return new Paragraph({
+          tabStops: [
+              {
+                  type: TabStopType.RIGHT,
+                  position: TabStopPosition.MAX,
+              },
+          ],
+          children: [
+              new TextRun({
+                  text: institutionName,
+                  bold: true,
+              }),
+              new TextRun({
+                  text: `\t${dateText}`,
+                  bold: true,
+              }),
+          ],
+      });
+  }
+
+  createRoleText(roleText) {
+      return new Paragraph({
+          children: [
+              new TextRun({
+                  text: roleText,
+                  italics: true,
+              }),
+          ],
+      });
+  }
+
+  createBullet(text) {
+      return new Paragraph({
+          text: text,
+          bullet: {
+              level: 0,
+          },
+      });
+  }
+
+  // tslint:disable-next-line:no-any
+  createSkillList(skills) {
+      return new Paragraph({
+          children: [new TextRun(skills.map((skill) => skill.name).join(", ") + ".")],
+      });
+  }
+
+  // tslint:disable-next-line:no-any
+  createAchivementsList(achivements) {
+      return achivements.map(
+          (achievement) =>
+              new Paragraph({
+                  text: achievement.name,
+                  bullet: {
+                      level: 0,
+                  },
+              }),
+      );
+  }
+
+  createInterests(interests) {
+      return new Paragraph({
+          children: [new TextRun(interests)],
+      });
+  }
+
+  splitParagraphIntoBullets(text) {
+      return text.split("\n\n");
+  }
+
+  // tslint:disable-next-line:no-any
+  createPositionDateText(startDate, endDate, isCurrent) {
+      const startDateText = this.getMonthFromInt(startDate.month) + ". " + startDate.year;
+      const endDateText = isCurrent ? "Present" : `${this.getMonthFromInt(endDate.month)}. ${endDate.year}`;
+
+      return `${startDateText} - ${endDateText}`;
+  }
+
+  getMonthFromInt(value) {
+      switch (value) {
+          case 1:
+              return "Jan";
+          case 2:
+              return "Feb";
+          case 3:
+              return "Mar";
+          case 4:
+              return "Apr";
+          case 5:
+              return "May";
+          case 6:
+              return "Jun";
+          case 7:
+              return "Jul";
+          case 8:
+              return "Aug";
+          case 9:
+              return "Sept";
+          case 10:
+              return "Oct";
+          case 11:
+              return "Nov";
+          case 12:
+              return "Dec";
+          default:
+              return "N/A";
+      }
+  }
 }
