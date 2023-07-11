@@ -57,6 +57,14 @@ const allFilters = (jsonData, headers, cimba) => {
                     <option value='South Asia'>South Asia</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label class="filter-label font-size-13" for="caseControlSelection">Case-control</label>
+                <select class="form-control font-size-15" id="caseControlSelection" data-variable='caseCon'>
+                    <option selected value='all'>All</option>
+                    <option value='case'>Case</option>
+                    <option value='control'>Control</option>
+                </select>
+            </div>
     `;
     template += `
     <div class="form-group">
