@@ -4,8 +4,10 @@ import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, pagin
 let previousValue = '';
 
 export const dataDictionaryTemplate = async () => {
-    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
+    //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
+    const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
     const tsvData = tsv2Json(data);
+    console.log(tsvData);
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
     let template = `
