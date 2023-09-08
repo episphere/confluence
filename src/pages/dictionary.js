@@ -3,7 +3,8 @@ import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 export const dataDictionaryTemplate = async () => {
-    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
+    //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
+    const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     const tsvData = tsv2Json(data);
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
@@ -219,11 +220,11 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                         </div>
                     </div>
                     <div class="col-md-1">
-                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
             </div>
-            <div id="study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
+            <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
                     ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                     ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
