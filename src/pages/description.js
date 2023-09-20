@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { defaultPageSize, getFile, shortenText, tsv2Json } from "./../shared.js";
+import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
@@ -63,10 +63,11 @@ export const renderDescription = (modified_at) => {
 }
 
 const getDescription = async () => {
-    const data = await getFile(761599566277);//1072836692276);//761599566277);
-    console.log(data);
+    const data = await getFile(761599566277);//1072836692276);//761599566277)//1077912734937;
     const tsv2json = tsv2Json(data);
+    //const tsv2json = csv2Json(data);
     const json = tsv2json.data;
+    //console.log(json);
     const headers = tsv2json.headers;
     let newJsons = {};
     let prevAcronym = '';
@@ -142,7 +143,7 @@ const getDescription = async () => {
                         filterTemplate += `
                             <li class="filter-list-item">
                                 <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="select-study-design" style="margin-left: 1px !important;">
-                                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 15)}</label>
+                                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 25)}</label>
                             </li>
                         `
                     })
