@@ -2,9 +2,9 @@ import { addEventFilterBarToggle } from "../event.js";
 import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
-
 export const dataDictionaryTemplate = async () => {
-    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
+    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
+    //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
     const tsvData = tsv2Json(data);
     console.log(tsvData);
@@ -42,19 +42,16 @@ export const dataDictionaryTemplate = async () => {
     addEventFilterBarToggle();
     hideAnimation();
 }
-
 const paginationHandler = (data, pageSize, headers) => {
     const dataLength = data.length;
     const pages = Math.ceil(dataLength/pageSize);
     const array = [];
-
     for(let i = 0; i< pages; i++){
         array.push(i+1);
     }
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
     addEventPageBtns(pageSize, data, headers);
 }
-
 const addEventPageBtns = (pageSize, data, headers) => {
     const elements = document.getElementsByClassName('page-link');
     Array.from(elements).forEach(element => {
@@ -79,7 +76,6 @@ const addEventPageBtns = (pageSize, data, headers) => {
         })
     });
 }
-
 const renderDataDictionaryFilters = (dictionary, headers) => {
     const allVariableType = Object.values(dictionary).filter(dt => dt['Data Type']).map(dt => dt['Data Type']);
     const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i);
@@ -123,7 +119,6 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(dictionary, 60);
     addEventPageSizeSelection(dictionary, headers);
 };
-
 const addEventPageSizeSelection = (data, headers) => {
     const select = document.getElementById('pageSizeSelector');
     select.addEventListener('change', () => {
@@ -132,7 +127,6 @@ const addEventPageSizeSelection = (data, headers) => {
         paginationHandler(data, value, headers)
     })
 }
-
 const addEventFilterDataDictionary = (dictionary, headers) => {
     const variableTypeSelection = document.getElementsByClassName('select-variable-type');
     Array.from(variableTypeSelection).forEach(ele => {
@@ -140,25 +134,21 @@ const addEventFilterDataDictionary = (dictionary, headers) => {
             filterDataBasedOnSelection(dictionary, headers)
         });
     });
-
     const input = document.getElementById('searchDataDictionary');
     input.addEventListener('input', () => {
         filterDataBasedOnSelection(dictionary, headers);
     })
 }
-
 const filterDataBasedOnSelection = (dictionary, headers) => {
     const highlightData = filterDataHandler(dictionary)
-    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
     const pageSize = highlightData.length < 60 ? Math.floor(highlightData.length / 10) * 10 === 0 ? 10 : Math.floor(highlightData.length / 10) * 10 : 60;
     paginationHandler(highlightData, pageSize);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(highlightData, pageSize);
     addEventPageSizeSelection(highlightData);
+    renderDataDictionary(highlightData, document.getElementById('pageSizeSelector').value, headers);
 }
-
 const filterDataHandler = (dictionary) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
-    
     let filteredData = dictionary;
     if(variableTypeSelection.length > 0) {
         filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Data Type']) !== -1);
@@ -171,7 +161,6 @@ const filterDataHandler = (dictionary) => {
     `:`
         <span class="font-bold">Data Type:</span> All`}
     `;
-
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
     if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
@@ -193,7 +182,6 @@ const filterDataHandler = (dictionary) => {
     })
     return highlightData;
 }
-
 const addEventSortColumn = (dictionary, pageSize, headers) => {
     const btns = document.getElementsByClassName('sort-column');
     Array.from(btns).forEach(btn => {
@@ -204,18 +192,18 @@ const addEventSortColumn = (dictionary, pageSize, headers) => {
         })
     })
 }
-
 const renderDataDictionary = (dictionary, pageSize, headers) => {
     let template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
             <div class="col-md-11">
                 <div class="row">
-                    <div class="col-md-4 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-3 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-5 font-bold">Label <button class="transparent-btn sort-column" data-column-name="Label"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-3 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold">Category <button class="transparent-btn sort-column" data-column-name="Category"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
-            <div class="ml-auto"></div>
+            <div class="col-md-1"></div>
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
         `
@@ -227,19 +215,19 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                 <div class="row">
                     <div class="col-md-11">
                         <div class="row">
-                            <div class="col-md-4">${desc['Variable'] ? desc['Variable'] : ''}</div>
+                            <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
                             <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
-                            <div class="col-md-3">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
+                            <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
+                            <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
                         </div>
                     </div>
-                    <div class="ml-auto">
-                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}"><i class="fas fa-caret-down fa-2x"></i></button></div>
+                    <div class="col-md-1">
+                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}"><i class="fas fa-caret-down fa-2x"></i></button></div>
                     </div>
                 </div>
             </div>
-            <div id="study${desc['Variable'].replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Variable']}">
+            <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="collapse" aria-labelledby="heading${desc['Variable']}">
                 <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                    ${desc['Category'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Category</div><div class="col">${desc['Category']}</div></div>`: ``}
                     ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                     ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
                     ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
@@ -255,7 +243,6 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(dictionary, pageSize, headers);
 }
-
 export const downloadFiles = (data, headers, fileName, studyDescription) => {
     if(studyDescription) {
         let flatArray = [];
@@ -290,7 +277,6 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         link.click(); 
         document.body.removeChild(link);
     })
-
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
     downloadDictionaryTSV.addEventListener('click', e => {
         e.stopPropagation();
@@ -303,4 +289,4 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         link.click(); 
         document.body.removeChild(link);
     })
-}
+} 

@@ -1,12 +1,12 @@
-import { showAnimation, removeActiveClass, uploadFile, createFolder, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, updateBoxCollaboratorTime } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
 import { myProjectsTemplate } from './pages/myProjects.js';
 import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
+import { showPreview } from "./components/boxPreview.js";
 
 let top = 0;
-
 export const addEventStudyRadioBtn = () => {
     const createStudyRadio = document.getElementsByName('createStudyRadio');
     Array.from(createStudyRadio).forEach(element => {
@@ -226,17 +226,17 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     location.reload();
 }
 
-const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
-    const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
-    let ID = '';
-    if(folderExists.length === 0) {
-        ID = (await (await createFolder(studyId, folderName)).json()).id;
-    }
-    else {
-        ID = folderExists[0].id;
-    }
-    return ID;
-}
+// const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
+//     const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
+//     let ID = '';
+//     if(folderExists.length === 0) {
+//         ID = (await (await createFolder(studyId, folderName)).json()).id;
+//     }
+//     else {
+//         ID = folderExists[0].id;
+//     }
+//     return ID;
+// }
 
 const performQAQC = async (textFromFileLoaded, fileName) => {
     document.getElementById('uploadErrorReport').innerHTML = `
@@ -378,6 +378,7 @@ export const addEventShowAllCollaborator = () => {
         const collaboratorModalBody = document.getElementById('collaboratorModalBody');
         collaboratorModalBody.innerHTML = ``;
         const response = await getCollaboration(ID,`${type}s`);
+        console.log(response);
         const userPermission = checkPermissionLevel(response);
         let table = '';
         let allEntries = [];
@@ -385,14 +386,18 @@ export const addEventShowAllCollaborator = () => {
             let entries = response.entries;
             
             entries.forEach(entry => {
+                console.log(entry);
                 const name = !entry.invite_email ? entry.accessible_by.name : '';
                 const email = !entry.invite_email ? entry.accessible_by.login : entry.invite_email;
                 const role = entry.role;
                 const status = entry.status;
                 const id = entry.id;
+                let addedBy = '';
                 // const folderName = entry.item.name;
-                const addedBy = `${entry.created_by.name}`;
-                const addedAt = (new Date(entry.created_at)).toLocaleString();
+                if (entry.created_by) {
+                    addedBy = `${entry.created_by.name}`;
+                }
+                const addedAt = (new Date(entry.expires_at)).toLocaleString();
                 allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
@@ -418,6 +423,7 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body allow-overflow max-height-collaboration-list">${table}</div>
             <div class="modal-footer">
+                <button type="button" id="extendCollaborations" title="Extend" class="btn btn-light" data-dismiss="modal">Extend Collaboration</button>
                 <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
             </div>
         `;
@@ -435,12 +441,12 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     let table = `
         <thead>
             <tr>
+                <th>Check </th>
                 <th>Name <button class="transparent-btn sort-column" data-column-name="name" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Email <button class="transparent-btn sort-column" data-column-name="email" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Role <button class="transparent-btn sort-column" data-column-name="role" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
                 <th>Added by <button class="transparent-btn sort-column" data-column-name="addedBy" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
-                <th>Added at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
-                <th></th>
+                <th>Expires at <button class="transparent-btn sort-column" data-column-name="addedAt" data-order-by="asc"><i class="fas fa-sort"></i></button></th>
             </tr>
         </thead>
         <tbody id="tBodyCollaboratorList"></tbody>
@@ -448,6 +454,7 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     document.getElementById('collaboratorsList').innerHTML = table;
     renderCollaboratorListTBody(allEntries, userPermission);
     addEventSortTable(allEntries, userPermission);
+    addEventExtendCollaborations();
 }
 
 const renderCollaboratorListTBody = (allEntries, userPermission) => {
@@ -456,6 +463,7 @@ const renderCollaboratorListTBody = (allEntries, userPermission) => {
         const { name, email, role, addedBy, addedAt, id, folderName, status} = entry;
         const userName = JSON.parse(localStorage.parms).name
         tbody += `<tr>
+                    <td title="${id}"><input type="checkbox" id="${id}" name="extendCollab" value="${role}" checked></td>
                     <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
                     <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
                     <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
@@ -466,6 +474,7 @@ const renderCollaboratorListTBody = (allEntries, userPermission) => {
                     <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
                 </tr>`
     });
+
     document.getElementById('tBodyCollaboratorList').innerHTML = tbody;
     addEventRemoveCollaborator();
     addEventUpdateCollaborator();
@@ -573,6 +582,82 @@ const addEventRemoveCollaborator = () => {
             }
         });
     });
+}
+
+const addEventExtendCollaborations = async () => {
+    const btn = document.getElementById('extendCollaborations');
+    if(!btn) return;
+    btn.addEventListener('click', async () => {
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Collaborations Updating</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+        var checkboxes = document.getElementsByName('extendCollab');
+        console.log(checkboxes);
+        var result = [];
+        const promises = []
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+        var date = new Date();
+        const newDate = date.addDays(90);
+        const newDateString = newDate.toISOString();
+        for (var i=0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                const promise = updateBoxCollaboratorTime(checkboxes[i].id, checkboxes[i].value, newDateString)
+                    .then(response => response.json());
+                promises.push(promise);
+                //result.push(checkboxes[i].id);
+                //promises.push(checkboxes[i].value);
+            }
+        }
+        showAnimation();
+        Promise.all(promises).then(results => {
+            alert("Please confirm collaborations have been updated");
+            hideAnimation();
+        });
+    })
+
+}
+
+export const addEventUpdateAllCollaborators = async () => {
+    const btn = document.getElementById('updateCollaborations');
+    if(!btn) return;
+    btn.addEventListener('click', async () => {
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Update Collaborations</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>`;
+        const ID = 156698557621;
+        let collabs = await getCollaboration(ID, 'folders');
+        console.log(collabs);
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+        var date = new Date();
+        const newDate = date.addDays(360);
+        const newDateString = newDate.toISOString();
+        console.log(newDateString);
+        const allEntries = collabs.entries;
+        console.log(allEntries[0]);
+        let test = await updateBoxCollaboratorTime(43582145593, "editor", newDateString);
+        console.log(test);
+        // allEntries.forEach(entry => {
+        //     console.log(entry);
+        //     let test = await updateBoxCollaboratorTime()
+        // })
+
+    })
 }
 
 const checkPermissionLevel = (data) => {
@@ -1279,6 +1364,16 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
         filterData(jsonData, headers);
     });
 
+    const contSelection = document.getElementById('continentalRegionSelection');
+    contSelection.addEventListener('change', () => {
+        filterData(jsonData, headers);
+    });
+
+    const caseConSelection = document.getElementById('caseControlSelection');
+    caseConSelection.addEventListener('change', () => {
+        filterData(jsonData, headers);
+    });
+
     const elements = document.getElementsByClassName('select-consortium');
     Array.from(elements).forEach((el,index) => {
         el.addEventListener('click', () => {
@@ -1303,8 +1398,12 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
 const filterData = (jsonData, headers) => {
     const gender = document.getElementById('genderSelection').value;
     const chip = document.getElementById('genotypingChipSelection').value;
+    const cont = document.getElementById('continentalRegionSelection').value;
+    const caseCon = document.getElementById('caseControlSelection').value;
     const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
     const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
+    const contFilter = Array.from(document.getElementById('continentalRegionSelection').options).filter(op => op.selected)[0].textContent;
+    const caseConFilter = Array.from(document.getElementById('caseControlSelection').options).filter(op => op.selected)[0].textContent;
     let finalData = jsonData;
     let onlyCIMBA = false;
     
@@ -1343,6 +1442,12 @@ const filterData = (jsonData, headers) => {
     if(chip !== 'all') {
         finalData = finalData.filter(dt => dt['chip'] === chip);
     }
+    if(cont !== 'all') {
+        finalData = finalData.filter(dt => dt['continental_region'] === cont);
+    }
+    if(caseCon !== 'all') {
+        finalData = finalData.filter(dt => dt['status'] === caseCon);
+    }
     updateCounts(finalData);
     if(array.length > 0){
         finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
@@ -1351,6 +1456,8 @@ const filterData = (jsonData, headers) => {
     document.getElementById('listFilters').innerHTML = `
         <span class="font-bold">Sex: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="font-bold">Continental region: </span>${contFilter}
+        <span class="font-bold">Case-control status: </span>${caseConFilter}
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
     renderAllCharts(finalData, headers, onlyCIMBA);
@@ -1391,4 +1498,408 @@ export const addEventConsortiaFilter = (d) => {
             }
         })
     })
+}
+// export function switchTabs(show, hide, files) {
+
+//     try {
+
+//       if (!Array.isArray(hide)) {
+
+//         return;
+
+//       }
+
+//     //   else if (!Array.isArray(files)) {
+
+//     //     return;
+
+//     //   } else if (show === "decided") {
+
+//     //     document.getElementById(show + "Tab").addEventListener("click", (e) => {
+
+//     //       e.preventDefault();
+
+//     //       const boxPreview = document.getElementById("filePreview");
+
+//     //       boxPreview.classList.remove("d-block");
+
+//     //       boxPreview.classList.add("d-none");
+
+ 
+
+//     //       for (const tab of hide) {
+
+//     //         document.getElementById(tab + "Tab").classList.remove("active");
+
+//     //         document.getElementById(tab).classList.remove("show", "active");
+
+//     //       }
+
+//     //       document.getElementById(show + "Tab").classList.add("active");
+
+//     //       document.getElementById(show).classList.add("show", "active");
+
+ 
+
+//     //       localStorage.setItem("currentTab", show + "Tab");
+
+//     //       return;
+
+//     //     });
+
+//     //   }
+
+//       else {
+
+//         // const boxPreview = document.getElementById("filePreview");
+
+//         console.log('switch: ', document.getElementById(show + "Tab"))
+
+//         document.getElementById(show + "Tab").addEventListener("click", (e) => {
+
+//           e.preventDefault();
+
+//         //   if (boxPreview !== null) {
+
+//         //     if (files.length != 0) {
+
+//         //       if (!boxPreview.classList.contains("d-block")) {
+
+//         //         boxPreview.classList.add("d-block");
+
+//         //       }
+
+//         //       switchFiles(show);
+
+//         //       document.getElementById(show + "selectedDoc").value = files[0].id;
+
+//         //       showPreview(files[0].id);
+
+//         //       if (show !== "toBeCompleted") {
+
+//         //         document.getElementById("boxFilePreview").classList.add("col-8");
+
+//         //         showComments(files[0].id);
+
+//         //       } else {
+
+//         //         document
+
+//         //           .getElementById("boxFilePreview")
+
+//         //           .classList.remove("col-8");
+
+//         //       }
+
+//         //       if (show === "toBeCompleted") {
+
+//         //         document.getElementById("sendtodaccButton").style.display =
+
+//         //           "block";
+
+//         //         document.getElementById("finalChairDecision").style.display =
+
+//         //           "none";
+
+//         //         document.getElementById("daccOverride").style.display = "none";
+
+//         //         document.getElementById("fileComments").style.display = "none";
+
+//         //         // document.getElementById('fileComments').innerHTML = listComments(files[0].id);
+
+//         //       }
+
+//         //       if (show === "inProgress") {
+
+//         //         document.getElementById("sendtodaccButton").style.display =
+
+//         //           "none";
+
+//         //         document.getElementById("fileComments").style.display = "block";
+
+//         //         document.getElementById("finalChairDecision").style.display =
+
+//         //           "none";
+
+//         //         document.getElementById("daccOverride").style.display = "block";
+
+//         //         document.getElementById("fileComments").style.display = "block";
+
+//         //       }
+
+//         //       if (show === "daccCompleted") {
+
+//         //         document.getElementById("sendtodaccButton").style.display =
+
+//         //           "none";
+
+//         //         document.getElementById("daccOverride").style.display = "none";
+
+//         //         document.getElementById("fileComments").style.display = "block";
+
+//         //         document.getElementById("finalChairDecision").style.display =
+
+//         //           "block";
+
+//         //         document.getElementById("fileComments").style.display = "block";
+
+//         //       }
+
+//         //       if (show === "dacctoBeCompleted") {
+
+//         //         document.getElementById("daccComment").style.display = "block";
+
+//         //       }
+
+//         //       if (show === "completed") {
+
+//         //         document.getElementById("daccComment").style.display = "none";
+
+//         //       }
+
+//         //       if (show === "daccReview") {
+
+//         //         document.getElementById("boxFilePreview").classList.add("col-8");
+
+//         //         document.getElementById("daccComment").style.display = "block";
+
+//         //         showComments(files[0].id);
+
+//         //       }
+
+//         //     } else {
+
+//         //       boxPreview.classList.remove("d-block");
+
+//         //       boxPreview.classList.add("d-none");
+
+//         //       if (show === "completed") {
+
+//         //         if (document.getElementById("daccComment")) {
+
+//         //           document.getElementById("daccComment").style.display = "none";
+
+//         //         }
+
+//         //       }
+
+//         //     }
+
+//         //   }
+
+//         for (const tab of hide) {
+
+//               console.log('switch: 1', document.getElementById(tab + "Tab"))
+
+//             document.getElementById(tab + "Tab").classList.remove("active");
+
+//             document.getElementById(tab).classList.remove("show", "active");
+
+//           }
+
+//           console.log({show})
+
+//           document.getElementById(show + "Tab").classList.add("active");
+
+//           document.getElementById(show).classList.add("show", "active");
+
+ 
+
+//           localStorage.setItem("currentTab", show + "Tab");
+
+//           return;
+
+//         });
+
+//       }
+
+//     } catch (err) {
+
+//       return;
+
+//     }
+
+//   }
+
+export function switchTabs(show, hide, files) {
+    console.log(show);
+    try {
+      if (!Array.isArray(hide)) {
+        return;
+      } else if (!Array.isArray(files)) {
+        return;
+      } else if (show === "daccDecision") {
+        document.getElementById(show + "Tab").addEventListener("click", (e) => {
+          e.preventDefault();
+          const boxPreview = document.getElementById("filePreview");
+          boxPreview.classList.remove("d-block");
+          boxPreview.classList.add("d-none");
+  
+          for (const tab of hide) {
+            document.getElementById(tab + "Tab").classList.remove("active");
+            document.getElementById(tab + "Tab").parentElement.classList.remove("active");
+            document.getElementById(tab).classList.remove("show", "active");
+          }
+          document.getElementById(show + "Tab").classList.add("active");
+          document.getElementById(show + "Tab").parentElement.classList.add("active");
+          document.getElementById(show).classList.add("show", "active");
+  
+          localStorage.setItem("currentTab", show + "Tab");
+          return;
+        });
+      } else {
+        const boxPreview = document.getElementById("filePreview");
+  
+        document.getElementById(show + "Tab").addEventListener("click", (e) => {
+          e.preventDefault();
+          if (boxPreview !== null) {
+            if (files.length != 0) {
+              if (!boxPreview.classList.contains("d-block")) {
+                boxPreview.classList.add("d-block");
+              }
+              switchFiles(show);
+              document.getElementById(show + "selectedDoc").value = files[0].id;
+              showPreview(files[0].id);
+              if (show !== "recommendation") {
+                document.getElementById("boxFilePreview").classList.add("col-8");
+                showComments(files[0].id);
+              } else {
+                document
+                  .getElementById("boxFilePreview")
+                  .classList.remove("col-8");
+              }
+              if (show === "recommendation") {
+                document.getElementById("finalChairDecision").style.display ="block";
+                // document.getElementById("finalChairDecision").style.display ="none";
+                // document.getElementById("daccOverride").style.display = "none";
+                document.getElementById("fileComments").style.display = "none";
+                // document.getElementById('fileComments').innerHTML = listComments(files[0].id);
+              }
+              if (show === "conceptNeedingClarification") {
+                // document.getElementById("sendtodaccButton").style.display ="none";
+                // document.getElementById("fileComments").style.display = "block";
+                document.getElementById("finalChairDecision").style.display ="block";
+                // document.getElementById("daccOverride").style.display = "block";
+                document.getElementById("fileComments").style.display = "block";
+              }
+            //   if (show === "daccCompleted") {
+            //     document.getElementById("sendtodaccButton").style.display ="none";
+            //     document.getElementById("daccOverride").style.display = "none";
+            //     document.getElementById("fileComments").style.display = "block";
+            //     document.getElementById("finalChairDecision").style.display ="block";
+            //     document.getElementById("fileComments").style.display = "block";
+            //   }
+            //   if (show === "dacctoBeCompleted") {
+            //     document.getElementById("daccComment").style.display = "block";
+            //   }
+            //   if (show === "completed") {
+            //     document.getElementById("daccComment").style.display = "none";
+            //   }
+            //   if (show === "daccReview") {
+            //     document.getElementById("boxFilePreview").classList.add("col-8");
+            //     document.getElementById("daccComment").style.display = "block";
+            //     showComments(files[0].id);
+            //   }
+            } else {
+              boxPreview.classList.remove("d-block");
+              boxPreview.classList.add("d-none");
+              if (show === "completed") {
+                if (document.getElementById("daccComment")) {
+                  document.getElementById("daccComment").style.display = "none";
+                }
+              }
+            }
+          }
+  
+          for (const tab of hide) {
+            document.getElementById(tab + "Tab").classList.remove("active");
+            document.getElementById(tab + "Tab").parentElement.classList.remove("active");
+            document.getElementById(tab).classList.remove("show", "active");
+          }
+          document.getElementById(show + "Tab").classList.add("active");
+          document.getElementById(show + "Tab").parentElement.classList.add("active");
+          document.getElementById(show).classList.add("show", "active");
+  
+          localStorage.setItem("currentTab", show + "Tab");
+          return;
+        });
+      }
+    } catch (err) {
+      return;
+    }
+  }
+
+  export function switchFiles(tab) {
+    document
+      .getElementById(`${tab}selectedDoc`)
+      .addEventListener("change", (e) => {
+        const file_id = e.target.value;
+        showPreview(file_id);
+        showComments(file_id);
+      });
+  }
+
+export function sortTableByColumn(table, column, asc = true) {
+    const direction = asc ? 1 : -1;
+    const rows = Array.from(document.getElementsByClassName("filedata"));
+
+    //Get only visible rows
+    let filteredRows = rows;
+    filteredRows = filteredRows.filter(
+        (row) => row.parentElement.style.display !== "none"
+    );
+    //Sort each row
+    const sortedRows = filteredRows.sort((a, b) => {
+        let aContent = "";
+        let bContent = "";
+        if (column === 0) {
+        aContent = a.firstElementChild.firstElementChild.textContent
+            .trim()
+            .toLowerCase();
+        bContent = b.firstElementChild.firstElementChild.textContent
+            .trim()
+            .toLowerCase();
+        } else {
+        bContent = b
+            .querySelector(`div:nth-child(${column + 1})`)
+            .textContent.trim()
+            .toLowerCase();
+        aContent = a
+            .querySelector(`div:nth-child(${column + 1})`)
+            .textContent.trim()
+            .toLowerCase();
+        }
+        if (!isNaN(Date.parse(aContent)) && !isNaN(Date.parse(bContent))) {
+        return Date.parse(aContent) - Date.parse(bContent) > 0
+            ? 1 * direction
+            : -1 * direction;
+        }
+
+        return aContent > bContent ? 1 * direction : -1 * direction;
+    });
+    sortedRows.forEach((row) => {
+        row.parentElement.remove();
+    });
+
+    //Add Data Back
+    sortedRows.forEach((row) => {
+        const divEl = document.createElement("div");
+        divEl.classList.add("card", "mt-1", "mb-1", "align-left");
+        divEl.appendChild(row);
+        document.getElementById("files").appendChild(divEl);
+    });
+    //Remember how colmmn is sorted
+    Array.from(table.querySelectorAll(".header-sortable")).forEach((header) => {
+        header.classList.remove("header-sort-asc", "header-sort-desc");
+    });
+
+    if (direction === 1) {
+        table
+        .querySelector(`.div-sticky`)
+        .children[column].classList.toggle("header-sort-asc", direction);
+    } else {
+        table
+        .querySelector(`.div-sticky`)
+        .children[column].classList.toggle("header-sort-desc", -direction);
+    }
 }

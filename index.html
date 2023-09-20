@@ -2,7 +2,7 @@
 <html lang="en-US">
 
 <head>
-    <script>
+    <!-- <script>
         const host = location.host;
         let measurementID = '';
         if(host === 'confluence.cancer.gov') measurementID = 'G-GY2GCE9J90'
@@ -18,16 +18,16 @@
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', measurementID);
-    </script>
+    </script> -->
 
-    <script>
+    <!-- <script>
         if(host !== 'confluence.cancer.gov') {
             const meta = document.createElement('meta');
             meta.name = 'robots';
             meta.content = 'noindex, nofollow';
             document.head.appendChild(meta);
         }
-    </script>
+    </script> -->
 
     <meta charset="UTF-8">
     <meta name="Description" content="Confluence is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the Division of Cancer Epidemiology and Genetics (DCEG) of NCI.">
@@ -84,8 +84,9 @@
                             </button>
                             <div class="dropdown-menu navbar-dropdown">
                                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluence">Description of Studies</a>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join" id="resourcesConfluence">Participating Consortium</a>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/confluence" id="aboutConfluenceCon">Description of Confluence</a>
+                                <!-- <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluence">Description of Studies</a> -->
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a>
                                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
                             </div>
                         </div>
@@ -99,7 +100,7 @@
                             </div>
                         </div>
                         <div class="grid-elements">
-                            <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
+                            <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
                                 Report issue
                             </a>
                         </div>
@@ -135,7 +136,7 @@
 
             <div class="modal fade" id="confluencePreviewerModal" data-keyboard="false" data-backdrop="static"
                 tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="height: 80%">
                     <div class="modal-content h-100">
                         <div class="modal-header" id="confluencePreviewerModalHeader"></div>
                         <div class="modal-body" id="confluencePreviewerModalBody"></div>
@@ -157,6 +158,9 @@
                                 <li>
                                     <button title="All collaborator(s)" class="nav-link" id="listCollaborators">All collaborator(s)</button>
                                 </li>
+                                <!-- <li>
+                                    <button title="Update collaborator(s)" class="nav-link" id="updateCollaborators">Updated collaborator(s)</button>
+                                </li> -->
                             </ul>
                             <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -167,6 +171,30 @@
                     </div>
                 </div>
             </div>
+            <!-- <div class="modal fade" id="modalCollabFolder" data-keyboard="false" data-backdrop="static" tabindex="-1"
+                role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header allow-overflow">
+                            <div id="folderToCollab"></div>
+                            <ul class="nav nav-tabs">
+                                <li>
+                                    <button title="Add collaborator(s)" class="nav-link" id="addNewCollaborators">Add collaborator(s)</button>
+                                </li>
+
+                                <li>
+                                    <button title="All collaborator(s)" class="nav-link" id="listCollaborators">All collaborator(s)</button>
+                                </li>
+                            </ul>
+                            <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div id="collabModalBody"></div>
+                    </div>
+                </div>
+            </div> -->
             <div class="modal fade" id="modalFileAccessStats" data-keyboard="false" data-backdrop="static"
                 tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -188,7 +216,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" defer crossorigin="anonymous"></script>
     <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" defer></script>
     <script crossorigin="anonymous" src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
-    <script crossorigin="anonymous" src="https://unpkg.com/docx@7.1.0/build/index.js" defer></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/docx@8.0.4/build/index.js" defer></script>
     <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js" defer></script>
     <script crossorigin="anonymous" src="https://episphere.github.io/qaqc/lorena.js" defer></script>
     <script crossorigin="anonymous" src="https://cdn01.boxcdn.net/platform/preview/2.81.0/en-US/preview.js" defer></script>

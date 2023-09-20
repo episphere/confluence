@@ -156,8 +156,8 @@ const addEventPreviewFile = () => {
     btns.forEach(btn => {
         btn.addEventListener('click', () => {
             const header = document.getElementById('confluencePreviewerModalHeader');
-                const body = document.getElementById('confluencePreviewerModalBody');
-                header.innerHTML = `<h5 class="modal-title">File preview</h5>
+            const body = document.getElementById('confluencePreviewerModalBody');
+            header.innerHTML = `<h5 class="modal-title">File preview</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>`;

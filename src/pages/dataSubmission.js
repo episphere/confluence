@@ -65,7 +65,7 @@ export const dataSubmissionTemplate = async () => {
                             <i title="${title}" data-id="${obj.id}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
                         </button> 
                         ${consortiaName}
-                        <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>
+                        <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>
                     </li>`
     }
 
@@ -104,7 +104,7 @@ export const lazyload = (element) => {
                                     <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.name}" data-status="pending" class="lazy-loading-spinner"></i>
                                 </button> 
                                 ${obj.name}
-                                <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>`;
+                                <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>`;
                 ul.appendChild(li);
             }
 
@@ -124,7 +124,7 @@ export const lazyload = (element) => {
                 li.classList = ['collapsible-items'];
                 li.innerHTML = `<a><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> 
                                 ${obj.name}
-                                <a href="https://nih.app.box.com/${obj.type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>
+                                <a href="https://nih.app.box.com/${obj.type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>
                                 `;
                 ul.appendChild(li);
             }

@@ -135,6 +135,17 @@ body {
     padding: 0px !important;
 }
 
+.container-lg {
+    max-width: 95% !important;
+    margin-bottom: 10px 
+}
+
+.uploadContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #pieChartLabel {
     /* margin-top: 1rem !important; */
     white-space: normal;
@@ -434,9 +445,9 @@ label {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.first-list-item {
-    /* margin-top: 1rem; */
-}
+/* .first-list-item {
+    margin-top: 1rem;
+} */
 
 .main-summary-row {
     flex-wrap: wrap;
@@ -592,6 +603,11 @@ label {
 
 .fa-external-link-alt {
     font-size: 0.6em;
+    color: #df8723;
+}
+
+.fa-external-link-alt.join {
+    font-size: 1.0em;
     color: #df8723;
 }
 
@@ -1020,6 +1036,10 @@ label {
     color: #A41652 !important;
     padding: 0.35rem 1rem !important;
     font-weight: bold !important;
+}
+
+.dropdown-menu-links:hover {
+    background-color: #e4e4e4 !important;
 }
 
 .banner-overlay-line {
@@ -1799,8 +1819,8 @@ form {
   /* Set up general layout rules for outer containers. */
   .contact-form,
   .results {
-    width: 90vw;
-    max-width: 750px;
+    width: 75vw;
+    max-width: 80vw;
     margin: 2vh auto;
   }
   
@@ -1808,7 +1828,17 @@ form {
     margin-top: 0.5rem;
     font-size: 87.5%;
   }
-  
+
+  p.indent {
+    text-indent: 50px;
+    font-size: 95%;
+  }
+  #email {
+    font-size: 87.5%;
+    float: right;
+    padding-right: 10px;
+    display: inline;
+  }
   .results pre {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -1826,7 +1856,15 @@ form {
     border-bottom: 1px solid var(--color-gray-light);
     overflow: hidden;
   }
-  
+  .preview-container {
+
+    border: 2px solid #eee;
+
+    height: 1000px;
+
+    width: 99%;
+
+  }
   .input-group {
     margin-top: 0.25rem;
     padding: .5rem 1rem;
@@ -1845,6 +1883,10 @@ form {
     display: block;
     margin-right: 1rem;
     font-size: 90%;
+  }
+
+  .authTable input[type=checkbox]{
+    margin-right: .5rem;
   }
   
   .contact-form label.inline {
@@ -2060,3 +2102,59 @@ ul.form {
     -ms-user-select: none;
     user-select: none;
 }
+
+.badge-1 {
+    background-color: green;
+    font-weight: bold;
+    color: white;
+}
+.badge-2 {
+    background-color: #fff200;
+    font-weight: bold;
+    color: black;
+}
+.badge-3 {
+    background-color: #ffa700;
+    font-weight: bold;
+    color: black
+}
+.badge-4 {
+    background-color: #ff0000;
+    font-weight: bold;
+    color: white;
+}
+.badge-5 {
+    background-color: #7700ff;
+    font-weight: bold;
+    color: white;
+}
+.badge-777 {
+    background-color: #757575;
+    font-weight: bold;
+    color: white;
+}
+
+.required-label {
+    content: "*";
+    color: red;
+  }
+
+#grid {
+    height: 100px;
+    display: grid;
+    grid-template-areas: "a a";
+    gap: 10px;
+    grid-auto-columns: 400px;
+}
+
+.form-check {
+    margin: 5px 0 0 0
+}
+
+.nav-pills .nav-link.active {
+    background-color: #757575 !important;
+}
+
+#tooltip1 { position: relative; }
+#tooltip1 a span { display: none; color: #FFFFFF; }
+#tooltip1 a:hover span { display: inline-block; position: absolute; width: 800px; background: #ffffff; height: 375px; left: 10px; top: -375px; color: #000000; padding: 0 5px; z-index: 1; border-style: groove;}
