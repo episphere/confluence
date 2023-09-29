@@ -81,7 +81,7 @@ export const eventsBody = async () => {
                     <div class="row">
                         <div class="col-md-11">
                             <div class="row">
-                                <div class="col-md-4">${type['id'] ? type['id'] : ''}</div>
+                                <div class="col-md-4 border-bottom">${type['id'] ? type['id'] : ''}</div>
                             </div>
                         </div>
                         <div class="ml-auto">
