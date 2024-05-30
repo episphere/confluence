@@ -3,10 +3,8 @@ ID	UniqueID	Confluence unique person identifier		qualitative - text	"Concatenati
 ID	PersonID	Person identified unique within original study	assigned by study	qualitative - continuous		Yes	Core
 ID	Study	Confluence acronym for study	assigned by study	qualitative - text		Yes	Core
 ID	Genotyping_chip	Genotyping chip used to generate GWAS data	"1=Confluence array, 2=Other array, 3=Re-genotype in Confluence"	qualitative - categorical	"Please code ""Confluence array"" if material is being provided for a subject that does not have existing genotyping data and is being genotyped for the first time by the Confluence project; Please code ""Other array"" if subject has existing GWAS data that will shared with the Confluence project; Please code ""Re-genotype in Confluence"" if the subject has existing GWAS data, but the subject will be re-genotyped by the Confluence project."	Yes	Core
-ID	Genotyping_chip_existing	Name of genotyping array used to generate existing GWAS data	"1=OncoArray, 2=iCOGs, 3=Global Screening Array, 4=Multi-Ethnic Global Array, 5=Global Diversity Array, 6=HumanHap Series, 7=Omni Series, 8=H3Africa, 9=Human Arrays 5.0_6.0, 10=Axiom, 11=Other, 777=NA"	qualitative - categorical	"If the value of ""Genotyping_chip"" is ""2=Other array"" or ""3=Re-genotype in Confluence"", then please select the name of the genotyping array that was used to generate the existing genotyping data.
-If the value of ""Genotyping_chip"" is ""1=Confluence array"" then please give a value ""777=NA"""	Yes	Core
-ID	Genotyping_chipOt	"Name of genotyping array used to generate existing GWAS data, if value of Genotyping_chip_existing is ""11=Other"""	"Specify type of arrays; 777=NA, 888=DK"	qualitative - text	"If the value of ""Genotyping_chip"" is ""2=Other array"" or ""3=Re-genotype in Confluence"" and the value of Genotyping_chip_existing is ""11=Other"" then please provide the name of the genotyping array that was used to generate the existing genotyping data.
-If the value of ""Genotyping_chip"" is ""1=Confluence array"" then please give a value ""777=NA"""	Yes	Core
+ID	Genotyping_chip_existing	Name of genotyping array used to generate existing GWAS data	"1=OncoArray, 2=iCOGs, 3=Global Screening Array, 4=Multi-Ethnic Global Array, 5=Global Diversity Array, 6=HumanHap Series, 7=Omni Series, 8=H3Africa, 9=Human Arrays 5.0_6.0, 10=Axiom, 11=Other, 777=NA"	qualitative - categorical	"If the value of ""Genotyping_chip"" is ""2=Other array"" or ""3=Re-genotype in Confluence"", then please select the name of the genotyping array that was used to generate the existing genotyping data. If the value of """"Genotyping_chip"""" is """"1=Confluence array"""" then please give a value """"777=NA"""""""	Yes	Core
+ID	Genotyping_chipOt	"Name of genotyping array used to generate existing GWAS data, if value of Genotyping_chip_existing is ""11=Other"""	"Specify type of arrays; 777=NA, 888=DK"	qualitative - text	"If the value of ""Genotyping_chip"" is ""2=Other array"" or ""3=Re-genotype in Confluence"" and the value of Genotyping_chip_existing is ""11=Other"" then please provide the name of the genotyping array that was used to generate the existing genotyping data. If the value of """"Genotyping_chip"""" is """"1=Confluence array"""" then please give a value """"777=NA"""""""	Yes	Core
 ID	contrType	Type of control	"1=population-based, 2=hospital-based, 3=family-based, 4=blood donor, 5 =nested case-control, 6=BRCA1/2 carrier without bc, 777=NA=not applicable (for cases), 888=DK=don't know"	qualitative - categorical		Yes	Core
 ID	Status	Case-control status	"0=control, 1=invasive case, 2=in-situ case, 3=case unknown invasiveness, 9=excluded sample"	qualitative - categorical	The status of the tumor should be the status of the INDEX tumor (in line with variables DateDiagIndex and AgeDiagIndex)	Yes	Core
 ID	DNA_source	DNA collection source	"1=whole blood, 2=buccal cell, 3=mouthwash/saliva, 4=other, 5=no DNA, 888=DK"	qualitative - categorical	"If you coded 'other', please provide additional information in ""DNA_sourceOt"" variable"	Yes	Core
@@ -26,19 +24,18 @@ Age	refYear	Year of diagnosis of breast cancer for cases and year of completing 
 Age	AgeDiagIndex	Age at diagnosis of index breast cancer for cases	"years, 888=DK"	quantitative - continuous 		Yes	Core
 Sex	Sex		"M=male, F=female, U=unknown"	qualitative - categorical		Yes	Core
 Ethnicity	EthnicityClass	Ethnic origin	"1=European (for EthnicitySubClass 1, 2, 3, 4, 5), 
-2=Latinx / Caribbean (for EthnicitySubClass 6, 17),
-3=African (for EthnicitySubClass 7, 8, 9), 
+2=Latinx / Caribbean (for EthnicitySubClass 6, 17), 
+3=African (for EthnicitySubClass 7, 8, 9),
 4=Asian Subcontinent (for EthnicitySubClass 10, 11, 12), 
 5=South-East Asian (for EthnicitySubClass 13, 14, 15), 
-6=Other (including 'mixed race'), 
-888=DK"	qualitative - categorical		Yes	Core
-Ethnicity	EthnicitySubClass	Ethnic origin (refined)	"1=Northern European, 2=Southern European, 3=Western European, 4=Eastern European, 5=American European, 6=Hispanic Latinx, 7=African (Africa), 8=Carribbean African, 9=American African, 10=Indian, 11=Pakistani, 12=East and West Bengali, 13=Chinese, 14=Malaysian Peninsula, 15=Japanese, 16=Other (including 'mixed race'), 888=DK, 17 = Caribbean Latinx "	qualitative - categorical	"(1) If EthnicityClass=1, then EthnicitySubClass should be 1, 2, 3, 4, 5, or 888. 
+6=Other (including 'mixed race'), 888=DK"""	qualitative - categorical		Yes	Core
+Ethnicity	EthnicitySubClass	Ethnic origin (refined)	"1=Northern European, 2=Southern European, 3=Western European, 4=Eastern European, 5=American European, 6=Hispanic Latinx, 7=African (Africa), 8=Carribbean African, 9=American African, 10=Indian, 11=Pakistani, 12=East and West Bengali, 13=Chinese, 14=Malaysian Peninsula, 15=Japanese, 16=Other (including 'mixed race'), 888=DK, 17 = Caribbean Latinx "	qualitative - categorical	"(1) If EthnicityClass=1, then EthnicitySubClass should be 1, 2, 3, 4, 5, or 888
 (2) if EthnicityClass=2, then EthnicitySubClass=6, 17 or 888
 (3) if EthnicityClass=3, then EthnicitySubClass=7, 8, 9 or 888
 (4) if EthnicityClass=4, then EthnicitySubClass=10, 11, 12 or 888
 (5) if EthnicityClass=5, then EthnicitySubClass=13, 14, 15 or 888
 (6) if EthnicityClass=6, then EthnicitySubClass=16, ethnOt­777
-(7) if EthnicityClass=888, then EthnicitySubClass=888 and ethnOt=888; "	Yes	Core
+(7) if EthnicityClass=888, then EthnicitySubClass=888 and ethnOt=888"	Yes	Core
 Ethnicity	ethnOt	Details of specific ethnicity	"Specify ethnicity; 777=NA, 888=DK"	qualitative - text	No coding. Please provide details of ethnicity as free text if this is known	Yes	Core
 Ethnicity	raceM	Race/ethnicity of mother 	"1=European, 2=Hispanic American, 3=African, 4=Asian Subcontinent, 5=South-East Asian, 6=Other (including 'mixed race'), 888=DK"	qualitative - categorical		Yes	Core
 Ethnicity	raceF	Race/ethnicity of father	"1=European, 2=Hispanic American, 3=African, 4=Asian Subcontinent, 5=South-East Asian, 6=Other (including 'mixed race'), 888=DK"	qualitative - categorical		Yes	Core
