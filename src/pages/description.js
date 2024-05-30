@@ -193,6 +193,7 @@ const getDescription = async () => {
 
 const renderStudyDescription = (descriptions, pageSize, headers) => {
     let template = '';
+    console.log(descriptions);
     if(descriptions.length > 0) {
         template = `
         <div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
@@ -204,6 +205,7 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
             <div class="col-md-1"></div>
         </div>`
         descriptions.forEach((desc, index) => {
+            console.log(desc);
             if(index > pageSize ) return
             template += `
             <div class="card mt-1 mb-1 align-left">

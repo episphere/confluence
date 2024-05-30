@@ -1055,6 +1055,7 @@ export const addEventFileStats = (element) => {
             </button>
         `;
         const response = await getFileAccessStats(ID);
+        console.log(response);
         document.getElementById('modalFileStatsBody').innerHTML = `
             <div class="row file-stats-row">
                 <div class="col" title="File download count">
