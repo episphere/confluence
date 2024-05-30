@@ -65,10 +65,12 @@ export const navBarMenutemplate = () => {
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Approved Confluence Concepts </a>
             </div>
         </div>
-        
-        <div class="grid-elements dropdown">
+
+        ${
+            (authChair || authAdmin) ? (
+        `<div class="grid-elements dropdown">
             <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Projects
+                DACC Menu
             </button>
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 ${
@@ -88,6 +90,8 @@ export const navBarMenutemplate = () => {
                 <div id="governanceNav" class="grid-elements"></div>
             </div>
         </div>
+            `) :''
+        }
 
         <div class="grid-elements">
             <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">

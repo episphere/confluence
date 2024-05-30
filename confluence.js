@@ -72,39 +72,43 @@ export const confluence = async () => {
         const authTableElement = document.getElementById('authTable');
         const acceptedFormsElement = document.getElementById('acceptedForms');
 
-        dataSubmissionElement.addEventListener('click', async () => {
-            if (dataSubmissionElement.classList.contains('navbar-active')) return;
-            showAnimation();
-            assignNavbarActive(dataSubmissionElement, 1)
-            document.title = 'Confluence - Data Submit';
-            confluenceDiv.innerHTML = await dataSubmissionTemplate();
-            lazyload();
-            addEventStudyRadioBtn();
-            addEventConsortiaSelect();
-            addEventUploadStudyForm();
-            hideAnimation();
-        });
-        dataSummaryElement.addEventListener('click', () => {
-            if (dataSummaryElement.classList.contains('navbar-active')) return;
-            showAnimation();
-            assignNavbarActive(dataSummaryElement, 1)
-            document.title = 'Confluence - Summary Statistics';
-            confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true);
-            addEventUpdateSummaryStatsData();
-            addEventUpdateAllCollaborators();
-            dataSummaryStatisticsTemplate();
-            if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
-                e.preventDefault();
-                const header = document.getElementById('confluenceModalHeader');
-                const body = document.getElementById('confluenceModalBody');
-                header.innerHTML = `<h5 class="modal-title">Filter summary data</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>`;
-                body.innerHTML = `<span>Select Consortia or Studies to Display</span>`;
-            })
-            getFileContent();
-        });
+        if(dataSubmissionElement) {
+            dataSubmissionElement.addEventListener('click', async () => {
+                if (dataSubmissionElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(dataSubmissionElement, 1)
+                document.title = 'Confluence - Data Submit';
+                confluenceDiv.innerHTML = await dataSubmissionTemplate();
+                lazyload();
+                addEventStudyRadioBtn();
+                addEventConsortiaSelect();
+                addEventUploadStudyForm();
+                hideAnimation();
+            });
+        }
+        if(dataSummaryElement) {
+            dataSummaryElement.addEventListener('click', () => {
+                if (dataSummaryElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(dataSummaryElement, 1)
+                document.title = 'Confluence - Summary Statistics';
+                confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true);
+                addEventUpdateSummaryStatsData();
+                addEventUpdateAllCollaborators();
+                dataSummaryStatisticsTemplate();
+                if(document.getElementById('dataSummaryFilter')) document.getElementById('dataSummaryFilter').addEventListener('click', e => {
+                    e.preventDefault();
+                    const header = document.getElementById('confluenceModalHeader');
+                    const body = document.getElementById('confluenceModalBody');
+                    header.innerHTML = `<h5 class="modal-title">Filter summary data</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>`;
+                    body.innerHTML = `<span>Select Consortia or Studies to Display</span>`;
+                })
+                getFileContent();
+            });
+        }
         if(dataSummarySubsetElement) {
             dataSummarySubsetElement.addEventListener('click', () => {
                 if (dataSummarySubsetElement.classList.contains('navbar-active')) return;
