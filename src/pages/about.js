@@ -8,7 +8,7 @@ export const aboutConfluence = (activeTab, showDescripton) => {
                 <div class="main-summary-row white-bg div-border">
                     <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></button>
                     ${showDescripton ? `<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'description' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></button>`:``}
-                    <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'confluence' ? 'active': ''} black-font font-size-14" href="#about/confluence"> <strong>Description of Confluence</strong></a></button>
+                    <!--<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'confluence' ? 'active': ''} black-font font-size-14" href="#about/confluence"> <strong>Description of Confluence</strong></a></button>-->
                 </div>
                 <div id="overview"></div>
             </div>

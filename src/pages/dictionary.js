@@ -3,8 +3,8 @@ import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 export const dataDictionaryTemplate = async () => {
-    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
-    //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
+    //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
+    const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
     const tsvData = tsv2Json(data);
     console.log(tsvData);

@@ -18,7 +18,7 @@ export const navBarMenutemplate = () => {
             <div class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluenceDes">Description of Studies</a>
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/confluence" id="aboutConfluenceCon">Description of Confluence</a>
+                <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/confluence" id="aboutConfluenceCon">Description of Confluence</a>-->
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/description" id="resourcesConfluenceDes">Consortium DACC Chairs</a>
                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>

@@ -104,45 +104,45 @@ export const confluenceResourcesDes = () => {
                                 <tr>
                                     <th scope="col">Consortium Name</th>
                                     <th scope="col">DACC Chair</th>
-                                    <th scope="col">DACC Chair Email</th>
+                                    <!--<th scope="col">DACC Chair Email</th>-->
                                     <th scope="col" style="text-align: center">DACC Guidelines</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><a href="mailto:wei.zheng@vanderbilt.edu">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
-                                    <td>Wei Zheng</td>
-                                    <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>
+                                    <td>Wei Zheng (Vanderbilt University Medical Center)</td>
+                                    <!--<td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td><a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
-                                    <td>Roger Milne</td>
-                                    <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>
+                                    <td>Roger Milne (Cancer Council Victoria)</td>
+                                    <!--<td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>-->
                                     <td style="text-align: center">TBD</td>
                                 </tr>
                                 <tr>
                                     <td><a href="#join" class="external-url" data-href="http://cimba.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
-                                    <td>Georgia Chenevix-Trench</td>
-                                    <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>
+                                    <td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
+                                    <!--<td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                     <tr>
                                     <td><a href= "#join" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
-                                    <td>Laura Fejerman</td>
-                                    <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>
+                                    <td>Laura Fejerman (University of California, Davis)</td>
+                                    <!--<td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td><a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium</a> (MERGE)</td>
-                                    <td>Nick Orr</td>
-                                    <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>
+                                    <td>Nick Orr (Queen's University Belfast)</td>
+                                    <!--<td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td>Confluence National Cancer Institute Studies (C-NCI)</td>
-                                    <td>Dezheng Huo</td>
-                                    <td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>
+                                    <td>Dezheng Huo (The University of Chicago)</td>
+                                    <!--<td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                             </tbody>
