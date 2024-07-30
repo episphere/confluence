@@ -6,7 +6,7 @@ export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781;//691143057533;1238676877781
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
-export const acceptedFolder = 196011761030;
+export const acceptedFolder = 276757490309;//196011761030;
 export const deniedFolder = 198940989727;
 export const submitterFolder = 198962088100;
 export const archivedFolder = 198962088100;
@@ -20,7 +20,7 @@ export const chairsInfo = [
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
-    {id: 'user_7', email:"ahearntu@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
+    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',
@@ -1126,7 +1126,7 @@ export const assignNavbarActive = (element, parent) => {
     removeActiveClass('nav-menu-links', 'navbar-active');
     removeActiveClass('grid-elements', 'navbar-active');
     element.classList.add('navbar-active');
-    if(parent && parent === 1) element.parentElement.previousElementSibling.classList.add('navbar-active');
+    if(parent && parent === 1) element.parentElement.classList.add('navbar-active');
     if(parent && parent === 2) element.parentElement.parentElement.previousElementSibling.classList.add('navbar-active');
 }
 export const reSizePlots = () => {

@@ -592,9 +592,7 @@ const addEventExtendCollaborations = async () => {
         const body = document.getElementById('confluenceModalBody');
         
         header.innerHTML = `<h5 class="modal-title">Collaborations Updating</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
         var checkboxes = document.getElementsByName('extendCollab');
         console.log(checkboxes);
         var result = [];
@@ -633,9 +631,7 @@ export const addEventUpdateAllCollaborators = async () => {
         const body = document.getElementById('confluenceModalBody');
         
         header.innerHTML = `<h5 class="modal-title">Update Collaborations</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
         const ID = 156698557621;
         let collabs = await getCollaboration(ID, 'folders');
         console.log(collabs);
@@ -763,7 +759,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
     dataGovernanceElement.addEventListener('click', async () => {
         // if(dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
-        assignNavbarActive(dataGovernanceElement, 2 );
+        assignNavbarActive(dataGovernanceElement, 1);
         document.title = 'Confluence - Data Governance';
         const confluenceDiv = document.getElementById('confluenceDiv');
         // if(bool){
@@ -1145,9 +1141,7 @@ export const addEventVariableDefinitions = () => {
             const body = document.getElementById('confluenceModalBody');
             
             header.innerHTML = `<h5 class="modal-title">${variableName}</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>`;
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
             body.innerHTML = `<span>${definition}</span>`;
         });
     });
@@ -1161,9 +1155,7 @@ export const addEventUpdateSummaryStatsData = () => {
         const body = document.getElementById('confluenceModalBody');
         
         header.innerHTML = `<h5 class="modal-title">Update data</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
 
         let template = '<form id="updateSummaryStatsForm">';
         template += `<label>Select data type</label></br> <div style="padding-left:40px"><input type="radio" required value="summary" name="summarydataType"> Summary data</div><div style="padding-left:40px"><input value="missingness" required type="radio" name="summarydataType"> Missingness data</div>`
@@ -1378,11 +1370,12 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
     const elements = document.getElementsByClassName('select-consortium');
     Array.from(elements).forEach((el,index) => {
         el.addEventListener('click', () => {
+            console.log(el);
             if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
             }
             else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
             filterData(jsonData, headers);
         })
@@ -1455,8 +1448,8 @@ const filterData = (jsonData, headers) => {
     }
     const selectedStudies = array.map(s => s.split('@#$')[1]);
     document.getElementById('listFilters').innerHTML = `
-        <span class="font-bold">Sex: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Genotyping chip: </span>${chipFilter}${selectedStudies.length > 0 ? `
+        <span class="font-bold">Sex: </span>${genderFilter}<span class="vertical-line"></span>
         <span class="font-bold">Continental region: </span>${contFilter}
         <span class="font-bold">Case-control status: </span>${caseConFilter}
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}

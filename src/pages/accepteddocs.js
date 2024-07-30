@@ -67,12 +67,14 @@ export const acceptedDocsView = async () => {
 }
 
 export function viewAcceptedFilesColumns() {
-    return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-      <div class="col-lg-5 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-left font-bold ws-nowrap text-wrap header-sortable">Accepted Date <button class="transparent-btn sort-column" data-column-name="Accepted Date"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-2 text-center font-bold ws-nowrap text-wrap header-sortable">Author <button class="transparent-btn sort-column" data-column-name="Author"><i class="fas fa-sort"></i></button></div>
-      <div class="col-lg-1 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
+    return `<div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+      <div class="col-md-12">
+        <div class="row ps-3 pe-5">
+          <div class="col-lg-8 text-left font-bold">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+          <div class="col-lg-2 text-left font-bold">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+          <div class="col-lg-2 text-left font-bold">Accepted Date <button class="transparent-btn sort-column" data-column-name="Accepted Date"><i class="fas fa-sort"></i></button></div>
+        </div>
+      </div>
     </div>`;
   }
 
@@ -88,7 +90,8 @@ export async function viewAcceptedFilesTemplate(files) {
       <div id='decidedFiles'>
         <div class='col-xl-12 pr-0'>`;
       template += viewAcceptedFilesColumns();
-      template += '<div id="files"> </div>';
+      template += `<div id="files"> 
+      </div>`;
     } else {
       template += `
                 No files to show.            
@@ -110,9 +113,7 @@ export async function viewAcceptedFilesTemplate(files) {
           const header = document.getElementById("confluencePreviewerModalHeader");
           const body = document.getElementById("confluencePreviewerModalBody");
           header.innerHTML = `<h5 class="modal-title">File preview</h5>
-                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                          <span aria-hidden="true">&times;</span>
-                                      </button>`;
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
           const fileId = btn.dataset.fileId;
           $("#confluencePreviewerModal").modal("show");
           showPreview(fileId, "confluencePreviewerModalBody");
@@ -148,46 +149,37 @@ export async function viewAcceptedFilesTemplate(files) {
   }
 
   export async function viewAcceptedFiles(files) {
-    let template = "";
+    let template = `<div class="row m-0 align-left allow-overflow w-100">
+          <div class="accordion accordion-flush col-md-12" id="acceptedAccordian">`;
     for (const fileInfo of files) {
       const fileId = fileInfo.id;
+      console.log(fileInfo);
       const comments = await listComments(fileInfo.id);
       let commentsjson = JSON.parse(comments).entries;
-      let author = commentsjson[0].message.slice(7);
-      //console.log(fileInfo);
+      console.log(commentsjson);
+      //let author = commentsjson[0].message.slice(7);
       let filename = fileInfo.name.slice(0,-19);
-      const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
+      const shortfilename = filename.length > 55 ? filename.substring(0, 54) + "..." : filename;
       //let completion_date = await getChairApprovalDate(fileId);
       template += `
-    <div class="card mt-1 mb-1 align-left" >
-      <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
-          <div class="row">
-              <div class="col-lg-5 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-              <div class="col-lg-2 text-left">${new Date(fileInfo.content_created_at).toDateString().substring(4)}</div>
-              <div class="col-lg-2 text-left">${new Date(fileInfo.modified_at).toDateString().substring(4)}</div>
-              <div class="col-lg-2 text-center" id="author${fileId}">${author}</div>
-              <div class="col-lg-1 text-right">
-                  <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
-                      <i class="fas fa-caret-down fa-2x"></i>
-                  </button>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingOne">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+              <div class="col-lg-8">${shortfilename}</div>
+              <div class="col-lg-2">${new Date(fileInfo.content_created_at).toDateString().substring(4)}</div>
+              <div class="col-lg-2">${new Date(fileInfo.modified_at).toDateString().substring(4)}</div>
+            </button>
+          </h2>
+          <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+            <div class="accordion-body">
+              <div class="col-12">
+                  Concept: ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
               </div>
+            </div>
           </div>
-          <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
-            <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-              <div class="row mb-1 m-0">
-                <div class="col-12 font-bold">
-                    Concept: ${filename}
-                </div>
-              </div>
-              <!--<div class="row mb-1 m-0">
-                <div id='file${fileId}Comments' class='col-12'></div>
-              </div>-->
-          </div>
-          </div>
-        </div>
-      </div>`;
+        </div>`;
     }
-    template += `</div></div></div></div>`;
+    template += `</div></div></div></div></div></div>`;
     if (document.getElementById("files") != null)
       document.getElementById("files").innerHTML = template;
 }

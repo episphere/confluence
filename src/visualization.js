@@ -32,24 +32,24 @@ const allFilters = (jsonData, headers, cimba) => {
     let template =`
         <div style="width: 100%;">
             <div class="form-group">
-                <label class="filter-label font-size-13" for="genderSelection">Sex</label>
-                <select class="form-control font-size-15" id="genderSelection" data-variable='sex'>
-                    <option selected value='all'>All</option>
-                    <option value='female'>Female</option>
-                    <option value='male'>Male</option>
-                </select>
-            </div>
-            <div class="form-group">
                 <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
-                <select class="form-control font-size-15" id="genotypingChipSelection" data-variable='chip'>
+                <select class="form-select font-size-15" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
                 </select>
             </div>
             <div class="form-group">
+                <label class="filter-label font-size-13" for="genderSelection">Sex</label>
+                <select class="form-select font-size-15" id="genderSelection" data-variable='sex'>
+                    <option selected value='all'>All</option>
+                    <option value='female'>Female</option>
+                    <option value='male'>Male</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
-                <select class="form-control font-size-15" id="continentalRegionSelection" data-variable='chip'>
+                <select class="form-select font-size-15" id="continentalRegionSelection" data-variable='chip'>
                     <option selected value='all'>All</option>
                     <option value='South America'>South America</option>
                     <option value='USA & Canada'>USA & Canada</option>
@@ -59,7 +59,7 @@ const allFilters = (jsonData, headers, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="caseControlSelection">Case-control</label>
-                <select class="form-control font-size-15" id="caseControlSelection" data-variable='caseCon'>
+                <select class="form-select font-size-15" id="caseControlSelection" data-variable='caseCon'>
                     <option selected value='all'>All</option>
                     <option value='case'>Case</option>
                     <option value='control'>Control</option>
@@ -69,7 +69,7 @@ const allFilters = (jsonData, headers, cimba) => {
     template += `
     <div class="form-group">
         <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
-        <select class="form-control font-size-15" id="consortiumTypeSelection">
+        <select class="form-select font-size-15" id="consortiumTypeSelection">
             <option value='allOther'>Non-CIMBA</option>
             <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
         </select>
@@ -78,31 +78,33 @@ const allFilters = (jsonData, headers, cimba) => {
     
     for(let consortium in obj){
         let innerTemplate = `
-                    <ul class="remove-padding-left font-size-15 consortium-ul" data-consortium="${consortium}" ${consortium === 'CIMBA' ? 'style="display:none"': ''}>
-                        <li class="custom-borders filter-list-item">
-                            <button type="button" class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-                                <i class="fas fa-caret-down"></i>
-                            </button>
-                            <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                            <label for="label${consortium}" class="consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
-                            <div class="ml-auto">
-                                <div class="filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
-                                    ${numberWithCommas(obj[consortium].consortiumTotal)}
-                                </div>
+                    <ul class="list-group remove-padding-left font-size-15 consortium-ul" data-consortium="${consortium}" ${consortium === 'CIMBA' ? 'style="display:none"': ''}>
+                        <li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <button type="button" class="consortium-selection consortium-selection-btn" data-bs-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+                                    <i class="fas fa-caret-down"></i>
+                                </button>
+                                <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="form-check-input select-consortium"/>
+                                <label for="label${consortium}" class="form-check-label consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
                             </div>
+                            <span class="mr-auto filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
+                                ${numberWithCommas(obj[consortium].consortiumTotal)}
+                            </span>
                         </li>
-                    <ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
+                    <ul class="list-group collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
         for(let study in obj[consortium]){
             if(study !== 'consortiumTotal') {
                 const total = obj[consortium][study].total;
-                innerTemplate += `<li class="filter-list-item">
-                                <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
-                                <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0,8)}...`:study}</label>
-                                <div class="ml-auto">
+                innerTemplate += `<li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="form-check-input select-study"/>
+                                    <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0,8)}...`:study}</label>
+                                </div>
+                                <span class="mr-auto filter-btn custom-margin consortia-total">
                                     <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
                                         ${numberWithCommas(total)}
                                     </div>
-                                </div>
+                                </span>
                             </li>`;
             }
         }
@@ -139,6 +141,7 @@ export const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
+            console.log("clicked")
             if (element.lastElementChild.classList.contains('fa-caret-up')){
                 element.lastElementChild.classList.add('fa-caret-down');
                 element.lastElementChild.classList.remove('fa-caret-up');
@@ -154,10 +157,10 @@ export const addEventConsortiumSelect = () => {
     Array.from(consortiums).forEach(el => {
         el.addEventListener('click', () => {
             if(el.checked){
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked = true);
             }
             else {
-                Array.from(el.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
+                Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
         });
     });
@@ -165,13 +168,13 @@ export const addEventConsortiumSelect = () => {
     const studies = document.querySelectorAll('.select-study');
     Array.from(studies).forEach(element => {
         element.addEventListener('click', () => {
-            const allStudiesInConsortium = element.parentElement.parentElement.querySelectorAll('.select-study').length
-            const selectedStudiesInConsortium = element.parentElement.parentElement.querySelectorAll('input:checked.select-study').length
+            const allStudiesInConsortium = element.parentElement.parentElement.parentElement.querySelectorAll('.select-study').length
+            const selectedStudiesInConsortium = element.parentElement.parentElement.parentElement.querySelectorAll('input:checked.select-study').length
             if(allStudiesInConsortium === selectedStudiesInConsortium) {
-                element.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = true;
+                element.parentElement.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = true;
             }
             else {
-                element.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = false;
+                element.parentElement.parentElement.parentElement.parentElement.querySelector('.select-consortium').checked = false;
             }
         });
     })

@@ -11,7 +11,7 @@ export const dataDictionaryTemplate = async () => {
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
     let template = `
-    <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
+    <div class="col-xl-2 filter-column black-font" id="summaryFilterSiderBar">
         <div class="div-border white-bg align-left p-2">
             <div class="main-summary-row">
                 <div class="col-xl-12 pl-1 pr-0">
@@ -21,15 +21,16 @@ export const dataDictionaryTemplate = async () => {
             </div>
         </div>
     </div>
-    <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
-        <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
+    <!--<button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>-->
+    <div class="col-xl-10 padding-right-zero padding-left-1 position-relative" id="summaryStatsCharts">
+        <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
         <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-bold">Data Type:</span> All
             </div>
         </div>
-        <div class="main-summary-row pl-2">
-            <div class="col-xl-12 pb-2 pr-0 pl-0 white-bg div-border">
+        <div class="main-summary-row">
+            <div class="col-xl-12 pb-2 pe-0 ps-0 white-bg div-border">
                 <div class="allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="dataDictionaryBody"></div>
             </div>
         </div>
@@ -86,9 +87,9 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
             <div class="form-group" margin:0px>
                 <div class="input-group">
                     <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataDictionary" aria-describedby="search-addon" />
-                    <span class="input-group-text border-0 search-input">
+                    <!--<span class="input-group-text border-0 search-input">
                         <i class="fas fa-search"></i>
-                    </span>
+                    </span>-->
                 </div>
             </div>
         </div>
@@ -195,22 +196,41 @@ const addEventSortColumn = (dictionary, pageSize, headers) => {
 const renderDataDictionary = (dictionary, pageSize, headers) => {
     let template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
-            <div class="col-md-11">
-                <div class="row">
+            <div class="col-md-12">
+                <div class="row ps-3 pe-5">
                     <div class="col-md-3 font-bold">Variable <button class="transparent-btn sort-column" data-column-name="Variable"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-5 font-bold">Label <button class="transparent-btn sort-column" data-column-name="Label"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-2 font-bold">Category <button class="transparent-btn sort-column" data-column-name="Category"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-2 font-bold">Data Type <button class="transparent-btn sort-column" data-column-name="Data Type"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
-            <div class="col-md-1"></div>
         </div>
         <div class="row m-0 align-left allow-overflow w-100">
+            <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">
         `
     dictionary.forEach((desc, index) => {
         if(index > pageSize ) return
         template += `
-        <div class="card border-0 mt-1 mb-1 align-left w-100 pt-md-1">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" aria-expanded="false" aria-controls="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}">
+                        <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
+                        <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
+                        <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
+                        <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
+                    </button>
+                </h2>
+                <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+                    <div class="accordion-body">
+                        ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
+                        ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
+                        ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
+                        ${desc['Confluence Variable'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
+                    </div>
+                </div>
+            </div>
+
+        <!--<div class="card border-0 mt-1 mb-1 align-left w-100 pt-md-1">
             <div class="pl-3 pt-1 pr-3 pb-1" aria-expanded="false" id="heading${desc['Variable']}">
                 <div class="row">
                     <div class="col-md-11">
@@ -236,9 +256,9 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                 template +=`
                 </div>
             </div>
-        </div>`
+        </div>-->`
     });
-    template += `</div>`;
+    template += `</div></div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(dictionary, pageSize, headers);

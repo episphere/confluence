@@ -31,7 +31,7 @@ export const confluence = async () => {
         }
     }
     const confluenceDiv = document.getElementById('confluenceDiv');
-    const navBarOptions = document.getElementById('navBarOptions');
+    const navBarOptions = document.getElementById('navbarToggler');
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);
     document.getElementById('loginBoxAppStage').addEventListener('click', loginObs);
     document.getElementById('loginBoxAppEpisphere').addEventListener('click', loginAppEpisphere);
@@ -76,7 +76,7 @@ export const confluence = async () => {
             dataSubmissionElement.addEventListener('click', async () => {
                 if (dataSubmissionElement.classList.contains('navbar-active')) return;
                 showAnimation();
-                assignNavbarActive(dataSubmissionElement, 1)
+                assignNavbarActive(dataSubmissionElement, 2);
                 document.title = 'Confluence - Data Submit';
                 confluenceDiv.innerHTML = await dataSubmissionTemplate();
                 lazyload();
@@ -90,7 +90,7 @@ export const confluence = async () => {
             dataSummaryElement.addEventListener('click', () => {
                 if (dataSummaryElement.classList.contains('navbar-active')) return;
                 showAnimation();
-                assignNavbarActive(dataSummaryElement, 1)
+                assignNavbarActive(dataSummaryElement, 2)
                 document.title = 'Confluence - Summary Statistics';
                 confluenceDiv.innerHTML = dataSummary('Summary Statistics', false, true);
                 addEventUpdateSummaryStatsData();
@@ -101,9 +101,7 @@ export const confluence = async () => {
                     const header = document.getElementById('confluenceModalHeader');
                     const body = document.getElementById('confluenceModalBody');
                     header.innerHTML = `<h5 class="modal-title">Filter summary data</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>`;
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
                     body.innerHTML = `<span>Select Consortia or Studies to Display</span>`;
                 })
                 getFileContent();
@@ -114,7 +112,7 @@ export const confluence = async () => {
                 if (dataSummarySubsetElement.classList.contains('navbar-active')) return;
                 const confluenceDiv = document.getElementById('confluenceDiv');
                 showAnimation();
-                assignNavbarActive(dataSummarySubsetElement, 1);
+                assignNavbarActive(dataSummarySubsetElement, 2);
                 document.title = 'Confluence - Subset Statistics';
                 confluenceDiv.innerHTML = dataSummary('Subset Statistics', false, true);
                 addEventUpdateSummaryStatsData();
@@ -129,7 +127,7 @@ export const confluence = async () => {
                 if (dataDictionaryElement.classList.contains('navbar-active')) return;
                 const confluenceDiv = document.getElementById('confluenceDiv');
                 showAnimation();
-                assignNavbarActive(dataDictionaryElement, 1);
+                assignNavbarActive(dataDictionaryElement, 2);
                 document.title = 'Confluence - Data Dictionary';
                 confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false);
                 addEventUpdateSummaryStatsData();
@@ -142,7 +140,7 @@ export const confluence = async () => {
         dataRequestElement.addEventListener('click', () => {
             if (dataRequestElement.classList.contains('navbar-active')) return;
             showAnimation();
-            assignNavbarActive(dataRequestElement, 1)
+            assignNavbarActive(dataRequestElement, 2)
             document.title = 'Confluence - Data Access';
             confluenceDiv.innerHTML = dataRequestTemplateAfterLogin();
             hideAnimation();
@@ -169,7 +167,7 @@ export const confluence = async () => {
             dataFormElement.addEventListener('click', () => {
                 if (dataFormElement.classList.contains('navbar-active')) return;
                 showAnimation();
-                assignNavbarActive(dataFormElement, 1);
+                assignNavbarActive(dataFormElement, 2);
                 document.title = 'Confluence - Data Form';
                 confluenceDiv.innerHTML = dataFormTemplate();
                 dataForm();
@@ -194,7 +192,7 @@ export const confluence = async () => {
                  if (chairMenuElement.classList.contains('navbar-active')) return;
                  const element = document.getElementById("chairMenu")
                  showAnimation();
-                 assignNavbarActive(element, 1);
+                 assignNavbarActive(element, 2);
                  document.title = 'Confluence - Chair Menu';
                  confluenceDiv.innerHTML = chairMenuTemplate();
                  generateChairMenuFiles();
@@ -208,7 +206,7 @@ export const confluence = async () => {
                 if (authTableElement.classList.contains('navbar-active')) return;
                 const element = document.getElementById("authTable")
                 showAnimation();
-                assignNavbarActive(element, 1);
+                assignNavbarActive(element, 2);
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
@@ -219,7 +217,7 @@ export const confluence = async () => {
                 if (acceptedFormsElement.classList.contains('navbar-active')) return;
                 const element = document.getElementById("acceptedForms")
                 showAnimation();
-                assignNavbarActive(element, 1);
+                assignNavbarActive(element, 2);
                 document.title = 'Confluence - Accepted Data Requests';
                 //confluenceDiv.innerHTML = authTableTemplate();
                 console.log("accepted forms");
@@ -272,10 +270,11 @@ export const confluence = async () => {
         // }
         if (getMyPermissionLevel) {
             document.getElementById('governanceNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
+                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance">
                     Data Governance
                 </a>
             `;
+            removeActiveClass('nav-link', 'active');
             addEventDataGovernanceNavBar(true);
         }
         manageHash();
@@ -300,7 +299,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Overview';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element,2);
         aboutConfluence('overview');
         renderOverView();
     }
@@ -309,7 +308,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Study Description';
-        assignNavbarActive(document.querySelector('[href="#about/description"]'));
+        assignNavbarActive(element, 1);
         const fileInfo = await getFileInfo(761599566277);
         console.log(fileInfo);
         aboutConfluence('description', fileInfo ? true : false);
@@ -322,7 +321,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Confluence Description';
-        assignNavbarActive(document.querySelector('[href="#about/confluence"]'));
+        assignNavbarActive(element, 1);
         //const fileInfo = await getFileInfo(761599566277);
         //console.log(fileInfo);
         aboutConfluence('confluence');
@@ -335,17 +334,17 @@ const manageRouter = async () => {
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element,2);
         participatingConfluence('overview', false);
         confluenceResources();
         hideAnimation();
     }
     else if(hash === '#join/description'){
-        const element = document.getElementById('resourcesConfluence');
+        const element = document.getElementById('resourcesConfluenceDes');
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Resources Description';
-        assignNavbarActive(document.querySelector('[href="#join/description"]'));
+        assignNavbarActive(element,2);
         participatingConfluence('description', false);
         confluenceResourcesDes();
         hideAnimation();
@@ -355,7 +354,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Contact';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element,2);
         confluenceDiv.innerHTML = confluenceContactPage();
     }
     else if (hash === '#data_access') {
@@ -363,7 +362,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Data Access';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = dataRequestTemplate();
     }
     else if (hash === '#data_form') {
@@ -371,7 +370,7 @@ const manageRouter = async () => {
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Data Form';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = dataFormTemplate();
         dataForm();  
         formFunctions(); 
@@ -391,7 +390,7 @@ const manageRouter = async () => {
         if (!element) return;
         if (element.classList.contains('navbar-active')) return;
         document.title = 'Chair Menu';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         confluenceDiv.innderHTML = chairMenuTemplate();
         generateChairMenuFiles();
     }
@@ -400,7 +399,7 @@ const manageRouter = async () => {
         if (!element) return;
         if (element.classList.contains('navbar-active')) return;
         document.title = 'Admin Table';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = AuthTableTemplate();
         generateAuthTableFiles();
     }
@@ -409,7 +408,7 @@ const manageRouter = async () => {
         if (!element) return;
         if (element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Accepted Data Requests';
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         //confluenceDiv.innerHTML = AuthTableTemplate();
         console.log("accepted forms");
         confluenceDiv.innerHTML = acceptedDocs();
@@ -419,11 +418,12 @@ const manageRouter = async () => {
         const dataDictionaryElement = document.getElementById('dataDictionary');
         if (!dataDictionaryElement || dataDictionaryElement.classList.contains('navbar-active')) return;
         showAnimation();
-        assignNavbarActive(dataDictionaryElement, 1);
+        assignNavbarActive(dataDictionaryElement, 2);
         document.title = 'Confluence - Data Dictionary';
         confluenceDiv.innerHTML = dataSummary('Data Dictionary', true, false, true);
         removeActiveClass('nav-link', 'active');
-        document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active');
+        try{document.querySelectorAll('[href="#data_exploration/dictionary"]')[1].classList.add('active')}
+        catch(err){'Public Site'};
         dataDictionaryTemplate();
     }
     else window.location.hash = '#home';
@@ -511,7 +511,7 @@ const manageHash = async () => {
         const element = document.getElementById('aboutConfluence');
         if(!element) return;
         // if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Overview';
         const fileInfo = await getFileInfo(761599566277);
         aboutConfluence('overview', fileInfo ? true : false);
@@ -523,7 +523,7 @@ const manageHash = async () => {
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
         //assignNavbarActive(element, 1);
-        assignNavbarActive(document.querySelector('[href="#about/description"]'), 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Study Description';
         showAnimation();
         const fileInfo = await getFileInfo(761599566277);
@@ -541,7 +541,7 @@ const manageHash = async () => {
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
         //assignNavbarActive(element, 1);
-        assignNavbarActive(document.querySelector('[href="#about/confluence"]'), 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Description';
         showAnimation();
         const fileInfo = await getFileInfo(761599566277);
@@ -558,17 +558,20 @@ const manageHash = async () => {
         const element = document.getElementById('resourcesConfluence');
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Resources';
         participatingConfluence('overview', true);
         confluenceResources();
         hideAnimation();
     }
     else if(hash === '#join/description'){
-        const element = document.getElementById('resourcesConfluence');
+        const element = document.getElementById('resourcesConfluenceDes');
         if(!element) return;
         //if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(document.querySelector('[href="#join/description"]'), 1);
+        assignNavbarActive(element, 2);
+        // removeActiveClass('nav-menu-links', 'navbar-active');
+        // try{document.querySelectorAll('[href="#join/description"]')[0].classList.add('navbar-active')}
+        // catch(err){'Public Site'};
         document.title = 'Confluence - Resources Description';
         participatingConfluence('description', true);
         confluenceResourcesDes();
@@ -578,7 +581,7 @@ const manageHash = async () => {
         const element = document.getElementById('contactConfluence');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Contact';
         confluenceDiv.innerHTML = confluenceContactPage();
         hideAnimation();
@@ -587,7 +590,7 @@ const manageHash = async () => {
         const element = document.getElementById('events');
         if(!element) return;
         if(element.classList.contains('navbar-active')) return;
-        assignNavbarActive(element, 1);
+        assignNavbarActive(element, 2);
         document.title = 'Confluence - Events';
         showAnimation();
         confluenceDiv.innerHTML = confluenceEventsPage();

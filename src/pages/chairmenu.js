@@ -483,18 +483,32 @@ const isElementLoaded = async selector => {
 
 
 export function viewFinalDecisionFilesColumns() {
-  return `<div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-    <div class="col-lg-3 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
-    <div hidden class="col-lg-1 text-center font-bold ws-nowrap text-wrap header-sortable">TEST<button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
-    <div class="col-lg-1 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
+  return `<div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+  <div class="row">
+    <div class="col-xs-4>
+      <div class="row">
+        <div class="col-xs-8 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-4 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+      </div>
+    </div>
+    <div class="col-xs-4>
+      <div class="row">
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+      </div>
+    </div>
+    <div class="col-xs-4>
+      <div class="row">
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+        <div hidden class="col-xs-1 text-center font-bold ws-nowrap text-wrap header-sortable">TEST<button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
+        <div class="col-xs-3 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
+      </div>
+    </div>
+    </div>
   </div>`;
 }
 
@@ -551,9 +565,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
         const header = document.getElementById("confluencePreviewerModalHeader");
         const body = document.getElementById("confluencePreviewerModalBody");
         header.innerHTML = `<h5 class="modal-title">File preview</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>`;
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
         const fileId = btn.dataset.fileId;
         $("#confluencePreviewerModal").modal("show");
         showPreview(fileId, "confluencePreviewerModalBody");
@@ -744,9 +756,7 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
         const header = document.getElementById("confluencePreviewerModalHeader");
         const body = document.getElementById("confluencePreviewerModalBody");
         header.innerHTML = `<h5 class="modal-title">File preview</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>`;
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
         const fileId = btn.dataset.fileId;
         $("#confluencePreviewerModal").modal("show");
         showPreview(fileId, "confluencePreviewerModalBody");
@@ -934,9 +944,7 @@ export const returnToSubmitter = () => {
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
     header.innerHTML = `<h5 class="modal-title">Returning to File to Sender</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>`;
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
     let template = '<form id="returnToSubmitterInfo"></form>';
     body.innerHTML = template;
     $("#confluenceMainModal").modal("show");

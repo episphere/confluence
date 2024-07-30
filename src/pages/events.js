@@ -11,7 +11,7 @@ export const confluenceEventsPage = () => {
                     </div>
                 </div>
                 <div class="main-summary-row confluence-resources white-bg div-border font-size-18" id="eventsBody"></div>
-                <div id="previewContainer" class="mt-3 h-100"></div>
+                <!--<div id="previewContainer" class="mt-3 h-100"></div>-->
             </div>
         </div>
     `;
@@ -158,9 +158,7 @@ const addEventPreviewFile = () => {
             const header = document.getElementById('confluencePreviewerModalHeader');
             const body = document.getElementById('confluencePreviewerModalBody');
             header.innerHTML = `<h5 class="modal-title">File preview</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>`;
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
             const fileId = btn.dataset.fileId;
             filePreviewer(fileId, '#confluencePreviewerModalBody');
         })

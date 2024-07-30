@@ -38,13 +38,14 @@
     <meta name="theme-color" content="#cd2f5a" />
     <link rel="apple-touch-icon" href="./static/images/icons/icon-144x144.png">
     <link type="image/x-icon" rel="shortcut icon" href="./static/images/favicon.ico">
-    <link type="text/css" rel="stylesheet" href="./static/css/confluence.css">
     <link crossorigin="anonymous" type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" defer>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" defer>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" defer> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com/">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" defer>
     <link href="./static/css/helvetica.css" rel="stylesheet" defer>
     <link href="https://cdn01.boxcdn.net/platform/preview/2.81.0/en-US/preview.css" rel="stylesheet" defer>
+    <link type="text/css" rel="stylesheet" href="./static/css/confluence.css">
 </head>
 
 <body>
@@ -72,46 +73,82 @@
                 </div>
             </div>
         </div>
-        <nav class="navbar navbar-expand-xl navbar-dark" role="navigation" id="confluenceNav">
+        <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Navbar</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Dropdown
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <li><a class="dropdown-item" href="#">Action</a></li>
+                      <li><a class="dropdown-item" href="#">Another action</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                  </li>
+                </ul>
+                <form class="d-flex">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+              </div>
+            </div>
+          </nav> -->
+        <nav class="navbar navbar-expand-lg navbar-dark" id="confluenceNav">
             <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
                     id="navBarBtn" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarToggler">
-                    <div class="navbar-nav grid" id="navBarOptions">
-                        <div class="grid-elements">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navBarOptions">
+                        <li class="nav-item grid-elements">
                             <a class="nav-link nav-menu-links white-font" rel="noopener" href="#" title="Confluence Home" id="homePage">
                                 Home
                             </a>
-                        </div>
-                        <div class="grid-elements dropdown">
-                            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" role="button" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </li>
+                        <li class="nav-item dropdown grid-elements">
+                            <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 About Confluence
-                            </button>
-                            <div class="dropdown-menu navbar-dropdown">
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a>
+                            </a>
+                            <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a></li>
                                 <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/confluence" id="aboutConfluenceCon">Description of Confluence</a> -->
                                 <!-- <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluence">Description of Studies</a> -->
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a>
-                            </div>
-                        </div>
-                        <div class="grid-elements dropdown">
-                            <button class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" role="button" title="Confluence" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a></li>
+                                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown grid-elements">
+                            <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown2" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 About the Data
-                            </button>
-                            <div class="dropdown-menu navbar-dropdown">
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" id="dataRequest">Data Access</a>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_exploration/dictionary" id="dataDictionary">Data Dictionary</a>
-                            </div>
-                        </div>
-                        <div class="grid-elements">
+                            </a>
+                            <ul class="dropdown-menu navbar-dropdown">
+                                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" id="dataRequest">Data Access</a></li>
+                                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_exploration/dictionary" id="dataDictionary">Data Dictionary</a></li>
+                            </ul>
+                        </li>
+                        <li class="grid-elements">
                             <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
                                 Report issue
                             </a>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
                     <div class="navbar-nav ml-auto">
                         <div class="grid-elements">
                             <button hidden=true class="nav-link nav-menu-links white-font custom-btn" title="Login Dev" id="loginBoxAppDev">Login Dev</button>
@@ -169,9 +206,7 @@
                                     <button title="Update collaborator(s)" class="nav-link" id="updateCollaborators">Updated collaborator(s)</button>
                                 </li> -->
                             </ul>
-                            <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div id="collaboratorModalBody"></div>
@@ -219,8 +254,9 @@
     </main>
     <footer role="contentinfo"></footer>
     <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" defer crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" defer crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" defer crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" defer crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" defer crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" defer></script>
     <script crossorigin="anonymous" src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
     <script crossorigin="anonymous" src="https://unpkg.com/docx@8.0.4/build/index.js" defer></script>

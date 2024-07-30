@@ -28,24 +28,26 @@ export const dataSummary = (
   return `
         <div class="general-bg">
             <div class="container body-min-height">
-                <div class="main-summary-row white-bg div-border">
-                ${
-                  publicAccess
-                    ? `
-                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
-                `
-                    : `
-                    <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></button>
-                    <button class="sub-menu-btn"><a class="nav-link active black-font font-size-14" href="#data_exploration/summary"><strong>Summary Statistics</strong></a></button>
-                    ${
-                      location.origin.match(applicationURLs.prod)
-                        ? ``
-                        : `
-                        <button class="sub-menu-btn"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></button>
-                    `
-                    }
-                `
-                } 
+              <div class="main-summary-row white-bg div-border">
+                <ul class="nav nav-pills">
+                  ${
+                    publicAccess
+                      ? `
+                      <!--<li class="nav-item"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></li>-->
+                  `
+                      : `
+                      <li class="nav-item"><a class="nav-link black-font font-size-14" href="#data_exploration/dictionary"> <strong>Dictionary</strong></a></li>
+                      <li class="nav-item"><a class="nav-link active black-font font-size-14" href="#data_exploration/summary"><strong>Summary Statistics</strong></a></li>
+                      ${
+                        location.origin.match(applicationURLs.prod)
+                          ? ``
+                          : `
+                          <li class="nav-item"><a class="nav-link black-font font-size-14" href="#data_exploration/subset"> <strong>Subset Statistics</strong></a></li>
+                      `
+                      }
+                  `
+                  } 
+                  </ul>
                 </div>
                 <div class="main-summary-row">
                     <div class="row align-left w-100 m-0">
@@ -53,18 +55,18 @@ export const dataSummary = (
                         ${
                           showPages
                             ? `
-                            <div class="ml-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
-                            <div class="ml-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
-                            <div class="ml-auto mt-3 mb-3" id="downloadContainer">
+                              <div class="col-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
+                              <div class="col-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
+                              <div class="col-auto mt-3 mb-3" id="downloadContainer">
                                 <div class="col-md-12 p-0 dropdown">
-                                    <div class="grid-elements ">
-                                        <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#000000 !important">
+                                    <div class="grid-elements">
+                                        <button title="Download" class="form-control dropdown-toggle download-btn" type="button" data-bs-toggle="dropdown" id="downloadDictionary" aria-expanded="false">
                                             Download <i class="fas fa-download" style="color:#000000 !important"></i>
                                         </button>
-                                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
-                                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
-                                            <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
-                                        </div>
+                                        <ul class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                                            <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button></li>
+                                            <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button></li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -101,18 +103,18 @@ export const dataSummaryStatisticsTemplate = () => {
   let template = "";
 
   template = `
-    <div class="col-xl-2 filter-column" id="summaryFilterSiderBar">
-        <div class="card">
-            <div class="card-header align-left card-filter-header">
-                <strong class="side-panel-header font-size-17">Filter</strong>
-            </div>
-            <div id="cardContent" class="card-body">
-                <div id="allFilters" class="align-left"></div>
+    <div class="col-xl-2 filter-column black-font" id="summaryFilterSiderBar">
+      <div class="div-border white-bg align-left p-2">
+        <div class="main-summary-row">
+            <div class="col-xl-12 pl-1 pr-0">
+              <strong class="font-size-17 font-bold">Filter</strong>
+              <div id="allFilters" class="align-left"></div>
             </div>
         </div>
+      </div>
     </div>
-    <div class="col-xl-10 padding-right-zero" id="summaryStatsCharts">
-        <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
+    <div class="col-xl-10 padding-right-zero padding-left-1 position-relative black-font" id="summaryStatsCharts">
+        <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
         <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-bold">Sex:</span> All<span class="vertical-line"></span>
@@ -164,11 +166,10 @@ export const dataSummaryMissingTemplate = async () => {
   div1.id = "missingnessFilter";
 
   const div2 = document.createElement("div");
-  div2.classList = ["col-xl-10"];
+  div2.classList = ["col-xl-10 padding-right-zero padding-left-1 position-relative"];
+  div2.id = "summaryStatsCharts";
   div2.innerHTML = `
-        <button id="filterBarToggle">
-            <i class="fas fa-lg fa-caret-left"></i>
-        </button>
+        <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
         <div class="main-summary-row" style="min-height: 10px;margin-bottom: 1rem;margin-left: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                 <span class="font-bold">Status:</span> All<span class="vertical-line"></span>
@@ -252,7 +253,7 @@ const renderMidsetFilterData = (
         <div style="width:100%;">
             <div class="form-group" id="statusList">
                 <label class="filter-label font-size-13" for="statusSelection">Status</label>
-                <select class="form-control font-size-15" id="statusSelection">
+                <select class="form-select font-size-15" id="statusSelection">
                     <option selected value='All'>All</option>
                     <option value='status_case'>case</option>
                     <option value='status_control'>control</option>
@@ -260,7 +261,7 @@ const renderMidsetFilterData = (
             </div>
             <div class="form-group" id="ancestryList">
                 <label class="filter-label font-size-13" for="ancestrySelection">Ancestry</label>
-                <select class="form-control font-size-15" id="ancestrySelection">`;
+                <select class="form-select font-size-15" id="ancestrySelection">`;
   ancestory.forEach((anc) => {
     template += `<option value="${anc}" ${
       anc === "All" ? "selected" : ""
@@ -274,37 +275,26 @@ const renderMidsetFilterData = (
                 <div id="studiesList" class="font-size-15">`;
   for (let consortium in studies) {
     let innerTemplate = `
-            <ul class="remove-padding-left">
-                <li class="custom-borders filter-list-item consortia-study-list" data-consortia="${consortium}">
-                    <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="select-consortium"/>
-                    <label for="label${consortium}" class="consortia-name">${consortium}</label>
-                    <div class="ml-auto">
-                        <button type="button" ${
-                          Object.keys(studies[consortium]).length !== 0
-                            ? ``
-                            : `disabled title="Doesn't have any study data."`
-                        } class="consortium-selection consortium-selection-btn" data-toggle="collapse" href="#toggle${consortium.replace(
-      / /g,
-      ""
-    )}">
-                            <i class="fas fa-caret-down"></i>
-                        </button>
-                    </div>
+            <ul class="list-group remove-padding-left font-size-15 consortium-ul">
+                <li class="list-group-item filter-list-item d-flex justify-content-between align-items-center" data-consortia="${consortium}">
+                  <div>
+                    <button type="button" ${Object.keys(studies[consortium]).length !== 0? ``: `disabled title="Doesn't have any study data."`} class="consortium-selection consortium-selection-btn" data-bs-toggle="collapse" href="#toggle${consortium.replace(/ /g,"")}">
+                      <i class="fas fa-caret-down"></i>
+                    </button>
+                    <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="form-check-input select-consortium"/>
+                    <label for="label${consortium}" class="form-check-label consortia-name">${consortium}</label>
+                  </div>
                 </li>
         `;
     if (Object.keys(studies[consortium]).length !== 0) {
-      innerTemplate += `<ul class="collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(
-        / /g,
-        ""
-      )}">`;
-
+      innerTemplate += `<ul class="list-group collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g,"")}">`;
       for (let study in studies[consortium]) {
         innerTemplate += `
-                    <li class="filter-list-item">
-                        <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="select-study"/>
-                        <label for="label${study}" class="study-name" title="${study}">${
-          study.length > 8 ? `${study.substring(0, 8)}...` : study
-        }</label>
+                    <li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="form-check-input select-study"/>
+                        <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0, 8)}...` : study}</label>
+                      </div>
                     </li>`;
       }
       innerTemplate += `</ul>`;
@@ -320,18 +310,12 @@ const renderMidsetFilterData = (
                 <ul class="remove-padding-left font-size-15" id="variableSelectionList">
             `;
   headers.forEach((variable) => {
-    template += `<li class="filter-list-item">
-                        <input type="checkbox" ${
-                          acceptedVariables.indexOf(variable) !== -1
-                            ? "checked"
-                            : ""
-                        } data-variable="${variable}" id="label${variable}" class="select-variable"/>
-                        <label for="label${variable}" class="variable-name" title="${variable}">${
-      variable.replace("_Data available", "").length > 20
-        ? `${variable.replace("_Data available", "").slice(0, 20)}...`
-        : `${variable.replace("_Data available", "")}`
-    }</label>
-                    </li>`;
+    template += `<li class="list-group-item no-list-style filter-list-item d-flex justify-content-between align-items-center">
+                  <div> 
+                    <input type="checkbox" ${acceptedVariables.indexOf(variable) !== -1? "checked": ""} data-variable="${variable}" id="label${variable}" class="form-check-input select-variable"/>
+                    <label for="label${variable}" class="variable-name" title="${variable}">${variable.replace("_Data available", "").length > 20 ? `${variable.replace("_Data available", "").slice(0, 20)}...` : `${variable.replace("_Data available", "")}`}</label>
+                  </div>
+                </li>`;
   });
   template += `</ul></div></br>
         </div>
@@ -369,6 +353,7 @@ const addEventMidsetFilterForm = (data) => {
   const studies = document.getElementsByClassName("select-study");
   Array.from(studies).forEach((ele) => {
     ele.addEventListener("click", () => {
+      console.log("clicked");
       filterMidsetData(data);
     });
   });

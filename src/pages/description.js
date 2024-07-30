@@ -8,34 +8,36 @@ export const renderDescription = (modified_at) => {
     <div class="main-summary-row">
             <div class="row align-left w-100 m-0">
                 <h1 class="col page-header pl-0 pt-2">Learn about Confluence</h1>
-                <div class="ml-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
-                <div class="ml-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
-                <div class="ml-auto mt-3 mb-3" id="downloadContainer">
+                <div class="col-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
+                <div class="col-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
+                <div class="col-auto mt-3 mb-3" id="downloadContainer">
                     <div class="col-md-12 p-0 dropdown">
-                        <div class="grid-elements ">
-                            <button title="Download" class="transparent-btn form-control dropdown-toggle dropdown-btn" data-toggle="dropdown" id="downloadDictionary" style="color:#000000 !important">
+                        <div class="grid-elements">
+                            <button title="Download" class="form-control dropdown-toggle download-btn" type="button" data-bs-toggle="dropdown" id="downloadDictionary" aria-expanded="false">
                                 Download <i class="fas fa-download" style="color:#000000 !important"></i>
                             </button>
-                            <div class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
-                                <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
-                                <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
-                            </div>
+                            <ul class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button></li>
+                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="main-summary-row">
-            <div class="col-xl-2 filter-column div-border white-bg align-left p-2" id="summaryFilterSiderBar">
-                <div class="main-summary-row">
-                    <div class="col-xl-12 pl-1 pr-0">
-                        <span class="font-size-17 font-bold">Filter</span>
-                        <div id="filterDataCatalogue" class="align-left"></div>
+            <div class="col-xl-2 filter-column black-font" id="summaryFilterSiderBar">
+                <div class="div-border white-bg align-left p-2">
+                    <div class="main-summary-row">
+                        <div class="col-xl-12 pl-1 pr-0">
+                            <span class="font-size-17 font-bold">Filter</span>
+                            <div id="filterDataCatalogue" class="align-left"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-10 padding-right-zero font-size-16" id="summaryStatsCharts">
-                <button id="filterBarToggle"><i class="fas fa-lg fa-caret-left"></i></button>
+            <div class="col-xl-10 padding-right-zero padding-left-1 position-relative" id="summaryStatsCharts">
+                <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
                 <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
                     <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
                         <span class="font-bold">Consortium:</span> All
@@ -46,8 +48,8 @@ export const renderDescription = (modified_at) => {
                     </div>
                 </div>
                 <div class="main-summary-row pl-2">
-                    <div class="col-xl-12 pb-2 pl-0 pr-0 white-bg div-border">
-                        <div class="pt-0 pl-2 pb-2 pr-2 allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
+                    <div class="col-xl-12 pb-2 ps-0 pe-0 white-bg div-border">
+                        <div class="allow-overflow" style="height: calc(100vh - 190px) !important;min-height: 500px;" id="descriptionBody"></div>
                     </div>
                 </div>
             </div>
@@ -177,9 +179,6 @@ const getDescription = async () => {
     document.getElementById('searchContainer').innerHTML = `
     <div class="input-group">
         <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
-        <span class="input-group-text border-0 search-input">
-            <i class="fas fa-search"></i>
-        </span>
     </div>
     `;
     addEventFilterDataCatalogue(descriptions, headers);
@@ -196,35 +195,35 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
     console.log(descriptions);
     if(descriptions.length > 0) {
         template = `
-        <div class="row m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1);">
-            <div class="col-md-2 font-bold ws-nowrap pl-2">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-3 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
-            <div class="col-md-1"></div>
-        </div>`
+        <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
+            <div class="col-md-12">
+                <div class="row ps-3 pe-5">
+                    <div class="col-md-2 font-bold ws-nowrap">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-4 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
+                </div>
+            </div>
+        </div>
+        <div class="row m-0 align-left allow-overflow w-100">
+            <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">`
         descriptions.forEach((desc, index) => {
             console.log(desc);
             if(index > pageSize ) return
             template += `
-            <div class="card mt-1 mb-1 align-left">
-                <div style="padding: 10px" aria-expanded="false" id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
-                    <div class="row">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
                         <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
-                        <div class="col-md-3">${desc['Study'] ? desc['Study'] : ''}</div>
+                        <div class="col-md-4">${desc['Study'] ? desc['Study'] : ''}</div>
                         <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
                         <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
                         <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
-                        <div class="col-md-1">
-                            <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Consortium'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '')}">
-                                <i class="fas fa-caret-down fa-2x"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="study${desc['Consortium'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '').trim()}${desc['Study Acronym'].replace(/\s/g, '').replace(/(<b>)|(<\/b>)/g, '')}" class="collapse" aria-labelledby="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
-                    <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
+                    </button>
+                </h2>
+                <div id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+                    <div class="accordion-body">
                         ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
                         ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
@@ -415,7 +414,7 @@ export const pageSizeTemplate = (array, startPageSize) => {
         pageSizes.push(i);
     }
     let template = `
-    <select class="form-control" id="pageSizeSelector">`
+    <select class="form-select" id="pageSizeSelector">`
     pageSizes.forEach(size => {
         template += `<option value="${size}">${size}</option>`
     })
@@ -441,18 +440,18 @@ export const paginationTemplate = (array) => {
     array.forEach((a,i) => {
         if(i === 0){
             template += `<li class="page-item">
-                            <button class="page-link transparent-btn" id="previousPage" data-previous="1" aria-label="Previous">
+                            <button class="page-link" id="previousPage" data-previous="1" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                             <span class="sr-only">Previous</span>
                             </button>
                         </li>`
         }
-        template += `<li class="page-item"><button class="page-link transparent-btn ${i === 0 ? 'active-page':''}" data-page=${a}>${a}</button></li>`;
+        template += `<li class="page-item"><button class="page-link ${i === 0 ? 'active-page':''}" data-page=${a}>${a}</button></li>`;
 
         if(i === (array.length - 1)){
             template += `
             <li class="page-item">
-                <button class="page-link transparent-btn" id="nextPage" data-next="1" aria-label="Next">
+                <button class="page-link" id="nextPage" data-next="1" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Next</span>
                 </button>

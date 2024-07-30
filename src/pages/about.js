@@ -6,9 +6,11 @@ export const aboutConfluence = (activeTab, showDescripton) => {
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
                 <div class="main-summary-row white-bg div-border">
-                    <button class="sub-menu-btn"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></button>
-                    ${showDescripton ? `<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'description' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></button>`:``}
-                    <!--<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'confluence' ? 'active': ''} black-font font-size-14" href="#about/confluence"> <strong>Description of Confluence</strong></a></button>-->
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></li>
+                        ${showDescripton ? `<li class="nav-item"><a class="nav-link ${activeTab === 'description' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>`:``}
+                        <!--<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'confluence' ? 'active': ''} black-font font-size-14" href="#about/confluence"> <strong>Description of Confluence</strong></a></button>-->
+                    </ul>
                 </div>
                 <div id="overview"></div>
             </div>
@@ -24,8 +26,8 @@ export const renderOverView = async () => {
                 <h1 class="page-header">Learn about Confluence</h1>
             </div>
         </div>
-        <div class="home-page-stats font-size-18">
-            <div class="main-summary-row">
+        <div class="home-page-stats font-size-18 ps-2 pe-2">
+            <div class="main-summary-row black-font">
                 <div class="col align-left pt-2">
                     <div class="mb-3">
                         The Confluence project is developing a large research resource to uncover breast cancer genetics through genome-wide association studies (GWAS) in diverse populations.
@@ -49,7 +51,7 @@ export const renderOverView = async () => {
                     </div>
                 </div>
             </div>
-            <div class="align-left" id="confluenceDataSummary"></div>
+            <div class="align-left black-font" id="confluenceDataSummary"></div>
             <div class="main-summary-row align-left">
                 <div class="col">
                     <!---For more information:</br>
@@ -77,14 +79,14 @@ const countPublicStatistics = (d, caseControl) => {
     `
     </br>
         <div class="align-center">
-            <div class="main-summary-row" style="margin: 0px 15px;margin-bottom:10px">
+            <div class="main-summary-row" style="margin: 0px 10px;margin-bottom:10px">
                 <div class="col-md-2" style="padding: 0px">
                     <div class="custom-border allow-overflow align-left" style="height:100%; padding-left: 5px !important; margin-right: 15px;">
                     <span class="font-size-17 font-bold">Filter</span></br>
                     ${data['CIMBA'] ? `
-                        <div class="form-group pr-1">
+                        <div class="form-group pe-2">
                             <label class="filter-label font-size-17" for="overviewConsortiumSelection">Consortium</label>
-                            <select class="form-control font-size-15" id="overviewConsortiumSelection">
+                            <select class="form-select aria-label="Select If CIMBA" font-size-15" id="overviewConsortiumSelection">
                                 <option value='allOther'>Non-CIMBA</option>
                                 <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
                             </select>
@@ -101,15 +103,15 @@ const countPublicStatistics = (d, caseControl) => {
         totalStudies += data[key].studies;
         if(data[key].BRCA1) totalBRCA1 += data[key].BRCA1
         if(data[key].BRCA2) totalBRCA2 += data[key].BRCA2
-        summary += `<div class="row font-size-16" style="margin:2px 2px;">
+        summary += `<div class="form-check font-size-16" style="margin:2px 2px;">
             ${key !== 'CIMBA' ? `
-                <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="checkbox-consortia"/>
-                    <label for="label${data[key].name}" class="study-name" title="${data[key].name}">${data[key].name === `NCI-DCEG` ? `C-NCI`:data[key].name.length > 8 ? `${data[key].name.substr(0,8)}...`:data[key].name}</label>
+                <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="form-check-input checkbox-consortia"/>
+                    <label for="label${data[key].name}" class="form-check-label study-name" title="${data[key].name}">${data[key].name === `NCI-DCEG` ? `C-NCI`:data[key].name.length > 8 ? `${data[key].name.substr(0,8)}...`:data[key].name}</label>
             `:``}
             </div>`
     }         
     summary += `</div></div>
-                <div class="col-md-10 align-center" style="padding: 0px">
+                <div class="col-md-10 align-center" style="padding: 0px margin-right: 15px !important;">
                     <div class="custom-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts"></div>
                 </div></div>
                 <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
@@ -564,8 +566,8 @@ export const renderDataDescription = async () => {
                 <h1 class="page-header">Confluence Project Description</h1>
             </div>
         </div>
-        <div class="home-page-stats font-size-18">
-            <div class="main-summary-row">
+        <div class="home-page-stats font-size-18 ps-2">
+            <div class="main-summary-row black-font">
                 <div class="col align-left pt-2">
                 <hr>
                     <div class="row">

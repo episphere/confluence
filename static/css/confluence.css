@@ -94,9 +94,25 @@ body {
     height: fit-content;
     position: absolute;
     z-index: 9;
-    left: -0px;
+    left: -5px;
     margin-right: 5px !important;
 }
+
+/* #filterBarToggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: rgb(129, 140, 149);
+    background-color: rgb(228, 230, 233);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute !important;
+    top: 20px;
+    left: -10px;
+    transition: right 0.4s ease;
+    z-index: 200;
+  } */
 
 #filterBarToggle:hover {
     cursor: pointer !important;
@@ -179,7 +195,7 @@ body {
 }
 
 .list-group-item {
-    background-color: #D0CECE !important;
+    background-color: #ffffff !important;
     text-align: left !important;
     border: 1px solid #ffffff !important;
 }
@@ -239,6 +255,10 @@ body {
 
 .padding-left-zero {
     padding-left: 0px !important;
+}
+
+.padding-left-1 {
+    padding-left: 1rem !important;
 }
 
 .padding-left-20 {
@@ -454,7 +474,7 @@ label {
     height: inherit;
     display: flex;
     min-height: 30%;
-    width: inherit;
+    width: 100%;
 }
 
 .summary-inner-row {
@@ -783,7 +803,7 @@ label {
 .list-group-item{
     padding: 0.25rem 1.25rem !important;
     width: inherit;
-    color: #495057;
+    color: #000000;
     margin: 1;
 }
 
@@ -998,6 +1018,18 @@ label {
     border: 0px;
     width: 100%;
     text-align: left;
+}
+
+.download-btn {
+    background-color: #ffffff;
+    border: 0px;
+    width: 100%;
+    text-align: left;
+}
+
+.download-btn:hover, .download-btn:focus {
+    background-color: #d6d6d6;
+    color:#000;
 }
 
 .dropdown-menu {
@@ -2152,7 +2184,8 @@ ul.form {
 }
 
 .nav-pills .nav-link.active {
-    background-color: #757575 !important;
+    background-color: #e6e3e3 !important;
+    border-bottom: 2px solid #A41652;
 }
 
 #tooltip1 { position: relative; }
@@ -2196,3 +2229,19 @@ ul.form {
   .nci-shutdown-banner__body a:visited {
     color: white;
   }
+
+  .accordion {
+	--bs-accordion-active-bg: rgb(255, 236, 239);
+    }
+
+  .accordion-body {
+    background-color: rgb(245, 245, 245);
+    }
+
+  .pagination {
+    background-color: white;
+  }
+
+  .noHover{
+    pointer-events: none;
+}

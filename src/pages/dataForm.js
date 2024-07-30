@@ -62,7 +62,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                                <label for="mem-con"><b>Member of Consortia?</b><span class='required-label'>*</span></label>
+                                <label for="mem-con"><b>Member of Consortia or Study / Trial Group?</b><span class='required-label'>*</span></label>
                             </div>
 
                           <div class="input-group">
@@ -98,6 +98,10 @@ export const formtemplate = () => {
                                 </div>
                                 <div class="col-12 col-md-2 col-sm-12">
                                   <div class="form-check">
+                                    <input class="form-check-input"  id="mem-trial" name="mem-trial" type="checkbox" value="Trial"> 
+                                    <label class="form-check-label" for="mem-trial"> Clinical Trial Group</label>
+                                  </div>
+                                  <div class="form-check">
                                     <input class="form-check-input"  id="mem-none" name="mem-con" type="checkbox" value="None"/>
                                     <label class="form-check-label" for="mem-none"> None</label>
                                   </div>
@@ -128,7 +132,7 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                                <label for="data-con"><b>Consortia data being requested</b><span class='required-label'>*</span> <i>(please check all boxes that apply)</i></label>
+                                <label for="data-con"><b>Consortia or Study / Trial Group data being requested</b><span class='required-label'>*</span> <i>(please check all boxes that apply)</i></label>
                             </div>
 
                             <div class="input-group">
@@ -164,6 +168,11 @@ export const formtemplate = () => {
                                       <label class="form-check-label" for="consortia-merge"> MERGE</label>
                                     </div>
                                   </div>
+                                  <div class="col-12 col-md-2 col-sm-12">   
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="consortia-trial" name="data-con" type="checkbox" value="Trial"/>
+                                      <label class="form-check-label" for="consortia-trial"> Clinical Trial Group</label>
+                                    </div>
                                 </div>
                               </div>
                             </div>
@@ -301,14 +310,13 @@ export const formtemplate = () => {
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
-                                
                                 <label> 
                                   <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
                                   Check all 
                                 </label>
                             </div>
 
-                              <div class="input-group">
+                              <!--<div class="input-group">
                                 <div class="container-lg">
                                   <div class="row" id='riskfactlist'>
                                     <div class="col-12 col-md-3 col-sm-12">
@@ -371,7 +379,7 @@ export const formtemplate = () => {
                                     </div>
                                   </div>
                                 </div>
-                              </div>
+                              </div>-->
 
                             <div class="input-group">
                                 <label for="pathvar"><b>Pathology</b></label>
@@ -521,9 +529,7 @@ export const formtemplate = () => {
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body" id='modalBody'>
                               
@@ -778,7 +784,7 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "Member of Consortia? ",
+                  text: "Member of Consortia or Study / Trial Group? ",
                 }),
                 new docx.TextRun({
                   text: JSON.stringify(jsondata.memcon, null, 1)

@@ -11,12 +11,12 @@ export const confluenceContactPage = () => {
                     <div class="col">
                         <span class="text-bold">Have a question about Confluence?</span></br>
                         <strong>Send emails to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>
-                        </br></br>
+                        </br>
                         <span class="text-bold">Confluence Project Manager</span></br>
                         Dr. Thomas Ahearn</br>
                         Division of Cancer Epidemiology and Genetics, National Cancer Institute
                         </br></br>
-                        <span class="text-bold">Scientific Steering Committee</span></br>
+                        <span class="text-bold">Scientific Steering Committee (SSC)</span></br>
                         <div class="row">
                             <div class="col">
                                 <table class="table table-bordered table-responsive w-100 d-block d-md-table">
@@ -26,13 +26,13 @@ export const confluenceContactPage = () => {
                                     <tbody>
                                         <tr>
                                             <td>Montserrat Garcia-Closas</td>
-                                            <td>Division of Cancer Epidemiology and Genetics, USA</td>
-                                            <td>Chair</td>
+                                            <td>The Institute of Cancer Research, England</td>
+                                            <td>SSC Chair</td>
                                         </tr>
                                         <tr>
                                             <td>Doug Easton</td>
                                             <td>Cambridge University, England</td>
-                                            <td>Co-Chair (BCAC)</td>
+                                            <td>SSC Co-Chair (BCAC)</td>
                                         </tr>
                                         <tr>
                                             <td>Jonas Almeida</td>
@@ -52,7 +52,7 @@ export const confluenceContactPage = () => {
                                         <tr>
                                             <td>Nilanjan Chatterjee</td>
                                             <td>Johns Hopkins University, USA</td>
-                                            <td>Statistical genetics</td>
+                                            <td>Statistical Genetics</td>
                                         </tr>
                                         <tr>
                                             <td>Georgia Chenevix-Trench</td>
@@ -83,7 +83,7 @@ export const confluenceContactPage = () => {
                                         <tr>
                                         <td>Gretchen Gierach</td>
                                         <td>Division of Cancer Epidemiology and Genetics, USA</td>
-                                        <td>Clinical Trials</td>
+                                        <td>Project Co-Coordinator, Clinical Trials</td>
                                         </tr>
                                         
                                         <tr>
@@ -93,8 +93,8 @@ export const confluenceContactPage = () => {
                                         </tr>
                                         <tr>
                                             <td>Pete Kraft</td>
-                                            <td>Harvard University, USA</td>
-                                            <td>Prospective cohorts/ Statistical genetics</td>
+                                            <td>Division of Cancer Epidemiology and Genetics, USA</td>
+                                            <td>Project Co-Coordinators, Statistical Genetics</td>
                                         </tr>
                                         <tr>
                                             <td>Roger Milne</td>
@@ -104,7 +104,7 @@ export const confluenceContactPage = () => {
                                         <tr>
                                             <td>Nick Orr</td>
                                             <td>Queen’s University Belfast,  North Ireland</td>
-                                            <td>Male breast cancer studies</td>
+                                            <td>MERGE</td>
                                         </tr>
                                         <tr>
                                             <td>Julie Palmer</td>
@@ -113,7 +113,7 @@ export const confluenceContactPage = () => {
                                         </tr>
                                         <tr>
                                             <td>Paul Pharoah</td>
-                                            <td>Cambridge University, England</td>
+                                            <td>Cedars-Sinai Medical Center, USA</td>
                                             <td>BCAC pathology/survival Working Group</td>
                                         </tr>
                                         <tr>
@@ -129,7 +129,7 @@ export const confluenceContactPage = () => {
                                         <tr>
                                             <td>Wei Zhang</td>
                                             <td>Vanderbilt University, USA</td>
-                                            <td>ABCC and AABCGS</td>
+                                            <td>AABCGS</td>
                                         </tr>
 
 
