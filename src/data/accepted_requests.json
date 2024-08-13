@@ -1,0 +1,18 @@
+{
+    "name": "Accepted Data Requests",
+    "last_update": "8/13/2024",
+    "files": [
+        {
+            "title": "Multi-ancestry GWAS to identify novel variants and build polygenic risk scores for breast cancer risk",
+            "contact": "Montserrat Garcia-Closas, Nilanjan Chatterjee",
+            "box_id": "1602088813937",
+            "accepted_group": "Main Concept"
+        },
+        {
+            "title": "Integrative analysis to identify candidate causal variants and genesunderlying breast cancer risk (Confluence Main Concept 2)",
+            "contact": "Douglas Easton, Georgia Chenevix-Trench",
+            "box_id": "1602088818737",
+            "accepted_group": "Main Concept"
+        }
+    ]
+}
