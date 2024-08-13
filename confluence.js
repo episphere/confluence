@@ -22,14 +22,19 @@ import { acceptedDocs, acceptedDocsView } from './src/pages/accepteddocs.js';
 
 export const confluence = async () => {
     // handleRangeRequests();
-    if('serviceWorker' in navigator){
-        try {
-            navigator.serviceWorker.register('./serviceWorker.js');
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
+    if(window.navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations()
+        .then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log("Service worker removed.")
+          }
+        });
+      }
+    if (window.location.href.includes("index.html")){
+        location.href = location.href.replace("index.html", "");
+      };
+
     const confluenceDiv = document.getElementById('confluenceDiv');
     const navBarOptions = document.getElementById('navbarToggler');
     document.getElementById('loginBoxAppDev').addEventListener('click', loginAppDev);

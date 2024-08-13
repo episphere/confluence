@@ -31,6 +31,7 @@ import {
   completedFolder,
   listComments
 } from "../shared.js";
+import accepted_data from '../data/accepted_requests.json' with { type: 'json' };
 
 export const acceptedDocs = () => {
    //const userInfo = JSON.parse(localStorage.getItem('parms'))
@@ -60,8 +61,10 @@ export const acceptedDocs = () => {
 }
 
 export const acceptedDocsView = async () => {
-    const allFiles = await getFolderItems(acceptedFolder);
-    let filearrayAllFiles = allFiles.entries;
+    console.log(accepted_data.files);
+
+    //const allFiles = await getFolderItems(acceptedFolder);
+    let filearrayAllFiles = accepted_data.files;
     viewAcceptedFilesTemplate(filearrayAllFiles);
     hideAnimation();
 }
@@ -70,21 +73,21 @@ export function viewAcceptedFilesColumns() {
     return `<div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
       <div class="col-md-12">
         <div class="row ps-3 pe-5">
-          <div class="col-lg-8 text-left font-bold">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-          <div class="col-lg-2 text-left font-bold">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-          <div class="col-lg-2 text-left font-bold">Accepted Date <button class="transparent-btn sort-column" data-column-name="Accepted Date"><i class="fas fa-sort"></i></button></div>
+          <div class="col-lg-7 text-left font-bold">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+          <div class="col-lg-3 text-left font-bold">Contact <button class="transparent-btn sort-column" data-column-name="Contact"><i class="fas fa-sort"></i></button></div>
+          <div class="col-lg-2 text-left font-bold">Group <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
         </div>
       </div>
     </div>`;
   }
 
-export async function viewAcceptedFilesTemplate(files) {
+export async function viewAcceptedFilesTemplate(filesInfo) {
     let template = "";
-    let filesInfo = [];
-    for (const file of files) {
-      const fileInfo = await getFileInfo(file.id);
-      filesInfo.push(fileInfo);
-    }
+    // let filesInfo = [];
+    // for (const file of files) {
+    //   const fileInfo = await getFileInfo(file.id);
+    //   filesInfo.push(fileInfo);
+    // }
     if (filesInfo.length > 0) {
       template += `
       <div id='decidedFiles'>
@@ -152,34 +155,34 @@ export async function viewAcceptedFilesTemplate(files) {
     let template = `<div class="row m-0 align-left allow-overflow w-100">
           <div class="accordion accordion-flush col-md-12" id="acceptedAccordian">`;
     for (const fileInfo of files) {
-      const fileId = fileInfo.id;
-      console.log(fileInfo);
-      const comments = await listComments(fileInfo.id);
-      let commentsjson = JSON.parse(comments).entries;
-      console.log(commentsjson);
+      const fileId = fileInfo.box_id;
+      // const comments = await listComments(fileId);
+      // let commentsjson = JSON.parse(comments).entries;
+      // console.log(commentsjson);
       //let author = commentsjson[0].message.slice(7);
-      let filename = fileInfo.name.slice(0,-19);
-      const shortfilename = filename.length > 55 ? filename.substring(0, 54) + "..." : filename;
+      let filename = fileInfo.title;
+      const shortfilename = filename.length > 105 ? filename.substring(0, 104) + "..." : filename;
       //let completion_date = await getChairApprovalDate(fileId);
       template += `
         <div class="accordion-item">
           <h2 class="accordion-header" id="flush-headingOne">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
-              <div class="col-lg-8">${shortfilename}</div>
-              <div class="col-lg-2">${new Date(fileInfo.content_created_at).toDateString().substring(4)}</div>
-              <div class="col-lg-2">${new Date(fileInfo.modified_at).toDateString().substring(4)}</div>
+              <div class="col-lg-7">${shortfilename}</div>
+              <div class="col-lg-3">${fileInfo.contact}</div>
+              <div class="col-lg-2">${fileInfo.accepted_group}</div>
             </button>
           </h2>
           <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
             <div class="accordion-body">
               <div class="col-12">
-                  Concept: ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
+                  <b>Concept:</b> ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
               </div>
             </div>
           </div>
         </div>`;
     }
-    template += `</div></div></div></div></div></div>`;
+    template += `</div></div></div></div></div></div>
+    `;
     if (document.getElementById("files") != null)
       document.getElementById("files").innerHTML = template;
 }
