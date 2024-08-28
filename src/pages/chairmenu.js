@@ -44,12 +44,12 @@ export function renderFilePreviewDropdown(files, tab) {
         template += `
         <button style="margin-right: 10px; float: right" id='${tab}-download-all' class='btn btn-dark'>Download All</button>
         <div class='card-body p-0'>
-          <div class='card-title'>
+          <div class='card-title col-5'>
             <label for='${tab}selectedDoc'>
                 <b>Select Concept Form:</b>
             </label>
             <br>
-            <select id='${tab}selectedDoc'>`;
+            <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
       for (const file of files) {
         template += `
             <option value='${file.id}'>
@@ -211,23 +211,25 @@ export const generateChairMenuFiles = async () => {
               <div id='boxFilePreview' class="col-8 preview-container"></div>
               <div id='fileComments' class='col-4 mt-2'></div>
             </div>
-
+            </br>
             <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#f6f6f6; display:none">
               <form>
                 <label for="message">Enter Message for submitter</label>
                 <div class='text-muted small'>Submitter will only see the below comment after final decision is made. </div>
-                <label for="grade">Select recommendation: </label>
-              <select name="grade" id="grade2"></option>
-                <option value = "1"> 1 - Approved as submitted</option>
-                <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
-                <option value = "3"> 3 - Approved, but data release will be delayed </option>
-                <option value = "4"> 4 - Not approved </option>
-                <option value = "5"> 5 - Decision requires clarification</option>
-                </select>
-              <br>
                 <div class="input-group">
                     <textarea id="message" name="message" rows="6" cols="65"></textarea>
                 </div>
+                <div class='col-5'>
+                  <label for="grade">Select recommendation: </label>
+                  <select name="grade" id="grade2" class="form-select" aria-label="Select Document to Review">
+                    <option value = "1"> 1 - Approved as submitted</option>
+                    <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
+                    <option value = "3"> 3 - Approved, but data release will be delayed </option>
+                    <option value = "4"> 4 - Not approved </option>
+                    <option value = "5"> 5 - Decision requires clarification</option>
+                  </select>
+                </div>
+                </br>
                 <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
                   <span class="buttonsubmit__text"> Submit </span></button>
               </form>
@@ -283,12 +285,11 @@ export const generateChairMenuFiles = async () => {
     commentSubmit();
     downloadAll('recommendation', filesIncompleted)
     downloadAll('conceptNeedingClarification', filesClaraIncompleted)
+    console.log(filesIncompleted);
     if (!!filesIncompleted.length) {
       showPreview(filesIncompleted[0].id);
       switchFiles("recommendation");
-      document.getElementById(
-        "recommendationselectedDoc"
-      ).children[0].selected = true;
+      document.getElementById("recommendationselectedDoc").children[0].selected = true;
     } else {
       document.getElementById("filePreview").classList.remove("d-block");
       document.getElementById("filePreview").classList.add("d-None");
@@ -404,8 +405,8 @@ export const commentSubmit = async () => {
       let allFileMatch = entries.find(element => element.name === filename);
       let tasklist = await getTaskList(fileId);
       console.log(tasklist);
-      let grade = e.target[0].value;
-      let comment = e.target[1].value;
+      let grade = e.target[1].value;
+      let comment = e.target[0].value;
       let message = "Rating: " + grade + "\nComment: " + comment;
       console.log(message)
       await createComment(fileId, message);
@@ -483,32 +484,20 @@ const isElementLoaded = async selector => {
 
 
 export function viewFinalDecisionFilesColumns() {
-  return `<div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-  <div class="row">
-    <div class="col-xs-4>
-      <div class="row">
-        <div class="col-xs-8 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-4 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-      </div>
-    </div>
-    <div class="col-xs-4>
-      <div class="row">
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">Status <button class="transparent-btn sort-column" data-column-name="Status"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">AABCG<button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">BCAC<button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">C-NCI<button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
-      </div>
-    </div>
-    <div class="col-xs-4>
-      <div class="row">
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA<button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO<button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE<button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
-        <div hidden class="col-xs-1 text-center font-bold ws-nowrap text-wrap header-sortable">TEST<button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
-        <div class="col-xs-3 text-right font-bold ws-nowrap text-wrap header-sortable"></div>
-      </div>
-    </div>
-    </div>
+  return `
+  <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+        <div class="row">
+          <div class="col-3 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+          <div class="col-2 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+          <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable" hidden>TEST <button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
+        </div>
   </div>`;
 }
 
@@ -554,9 +543,11 @@ export async function viewFinalDecisionFilesTemplate(files) {
   if (filesInfo.length !== 0) {
     await viewFinalDecisionFiles(filesInfo);
     for (const file of filesInfo) {
-      document
-        .getElementById(`study${file.id}`)
-        .addEventListener("click", showCommentsDCEG(file.id));
+      showCommentsDCEG(file.id)
+      // console.log(file.id);
+      // document
+      //   .getElementById(`study${file.id}`)
+      //   .addEventListener("click", showCommentsDCEG(file.id));
     }
     let btns = Array.from(document.querySelectorAll(".preview-file"));
     btns.forEach((btn) => {
@@ -600,7 +591,10 @@ export async function viewFinalDecisionFilesTemplate(files) {
 }
 
 export async function viewFinalDecisionFiles(files) {
-  let template = "";
+  let template = `
+    <div class="row m-0 align-left allow-overflow w-100">
+      <div class="accordion accordion-flush col-md-12" id="daccAccordian">
+  `;
   for (const fileInfo of files) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
@@ -608,39 +602,29 @@ export async function viewFinalDecisionFiles(files) {
     const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
-  <div class="card mt-1 mb-1 align-left" >
-    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
-        <div class="row">
-            <div class="col-lg-3 text-left">${shortfilename}<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center">Ongoing</div>
-            <div class="col-lg-1 text-center" id="AABCG${fileId}" data-value="AABCG">--</div>
-            <div class="col-lg-1 text-center" id="BCAC${fileId}" data-value="BCAC">--</div>
-            <div class="col-lg-1 text-center" id="C-NCI${fileId}" data-value="C-NCI">--</div>
-            <div class="col-lg-1 text-center" id="CIMBA${fileId}" data-value="CIMBA">--</div>
-            <div class="col-lg-1 text-center" id="LAGENO${fileId}" data-value="LAGENO">--</div>
-            <div class="col-lg-1 text-center" id="MERGE${fileId}" data-value="MERGE">--</div>
-            <div hidden class="col-lg-1 text-center" id="TEST${fileId}" data-value="TEST">--</div>
-            <div class="col-lg-1 text-right">
-                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
-                    <i class="fas fa-caret-down fa-2x"></i>
-                </button>
-            </div>
-        </div>
-        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
-          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-            <div class="row mb-1 m-0">
-              <div class="col-12 font-bold">
-                  Concept: ${filename}
-              </div>
-            </div>
-            <div class="row mb-1 m-0">
-              <div id='file${fileId}Comments' class='col-12'></div>
-            </div>
-        </div>
-        </div>
+  <div class="accordian-item" >
+    <h2 class="accordion-header" id="flush-headingOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+        <div class="col-lg-3 text-left">${shortfilename}</div>
+        <!--<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>-->
+        <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+        <div class="col-lg-1 text-left">Ongoing</div>
+        <div class="col-lg-1 text-center" id="AABCG${fileId}" data-value="AABCG">--</div>
+        <div class="col-lg-1 text-center" id="BCAC${fileId}" data-value="BCAC">--</div>
+        <div class="col-lg-1 text-center" id="C-NCI${fileId}" data-value="C-NCI">--</div>
+        <div class="col-lg-1 text-center" id="CIMBA${fileId}" data-value="CIMBA">--</div>
+        <div class="col-lg-1 text-center" id="LAGENO${fileId}" data-value="LAGENO">--</div>
+        <div class="col-lg-1 text-center" id="MERGE${fileId}" data-value="MERGE">--</div>
+        <div hidden class="col-lg-1 text-center" id="TEST${fileId}" data-value="TEST">--</div>
+      </button>
+    </h2>
+    <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+      <div class="accordion-body">
+        <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
+        <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
       </div>
-    </div>`;
+    </div>
+  </div>`;
   }
   template += `</div></div></div></div>`;
   if (document.getElementById("files") != null)

@@ -1743,13 +1743,15 @@ export function switchTabs(show, hide, files) {
         });
       } else {
         const boxPreview = document.getElementById("filePreview");
-  
         document.getElementById(show + "Tab").addEventListener("click", (e) => {
           e.preventDefault();
           if (boxPreview !== null) {
             if (files.length != 0) {
               if (!boxPreview.classList.contains("d-block")) {
                 boxPreview.classList.add("d-block");
+                if(boxPreview.classList.contains("d-none")) {
+                    boxPreview.classList.remove("d-none");
+                }
               }
               switchFiles(show);
               document.getElementById(show + "selectedDoc").value = files[0].id;
