@@ -527,8 +527,6 @@ export async function viewFinalDecisionFilesTemplate(files) {
           </div>
       </div>
       </div>
-      <!--div class='table-responsive'>
-      <table class='table'-->
       <div class='col-xl-12 pr-0'>`;
     template += viewFinalDecisionFilesColumns();
     template += '<div id="files"> </div>';
@@ -603,7 +601,7 @@ export async function viewFinalDecisionFiles(files) {
     let completion_date = await getChairApprovalDate(fileId);
     template += `
   <div class="accordian-item" >
-    <h2 class="accordion-header" id="flush-headingOne">
+    <h2 class="accordion-header" id="flush-heading${fileId}">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
         <div class="col-lg-3 text-left">${shortfilename}</div>
         <!--<button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>-->
@@ -618,7 +616,7 @@ export async function viewFinalDecisionFiles(files) {
         <div hidden class="col-lg-1 text-center" id="TEST${fileId}" data-value="TEST">--</div>
       </button>
     </h2>
-    <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+    <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}">
       <div class="accordion-body">
         <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
         <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
@@ -724,14 +722,16 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
   if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0) {
     await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom);
     for (const file of filesInfoSub) {
-      document
-        .getElementById(`study${file.id}`)
-        .addEventListener("click", showCommentsDCEG(file.id));
+      showCommentsDCEG(file.id)
+      // document
+      //   .getElementById(`study${file.id}`)
+      //   .addEventListener("click", showCommentsDCEG(file.id));
     }
     for (const file of filesInfoCom) {
-      document
-        .getElementById(`study${file.id}`)
-        .addEventListener("click", showCommentsDCEG(file.id));
+      showCommentsDCEG(file.id)
+      // document
+      //   .getElementById(`study${file.id}`)
+      //   .addEventListener("click", showCommentsDCEG(file.id));
     }
     let btns = Array.from(document.querySelectorAll(".preview-file"));
     btns.forEach((btn) => {
@@ -775,7 +775,10 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
 }
 
 export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
-  let template = "";
+  let template = `
+    <div class="row m-0 align-left allow-overflow w-100">
+      <div class="accordion accordion-flush col-md-12" id="adminAccordian">
+  `;
   for (const fileInfo of filesInfoSub) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
@@ -783,39 +786,28 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
-  <div class="card mt-1 mb-1 align-left" >
-    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
-        <div class="row authTable">
-            <div class="col-lg-3 text-left"><input type="checkbox" class = "pl" id="${fileId}" name="${fileId}" value="${fileInfo.name}"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center">Ongoing</div>
-            <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
-            <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
-            <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
-            <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
-            <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
-            <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
-            <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
-            <div class="col-lg-1 text-right">
-                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
-                    <i class="fas fa-caret-down fa-2x"></i>
-                </button>
-            </div>
+    <div class="accordian-item" >
+      <h2 class="accordion-header" id="flush-heading${fileId}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+              <div class="col-lg-3 text-left"><input type="checkbox" class = "pl" id="${fileId}" name="${fileId}" value="${fileInfo.name}"><label for="${fileId}">${shortfilename}</label></div>
+              <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+              <div class="col-lg-1 text-left">Ongoing</div>
+              <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
+              <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
+              <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
+              <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
+              <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
+              <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
+              <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
+          </button>
+        </h2>
+        <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}" data-bs-parent="#adminAccordian">
+          <div class="accordion-body">
+            <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
+            <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
+          </div>
         </div>
-        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
-          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-            <div class="row mb-1 m-0">
-              <div class="col-12 font-bold">
-                  Concept: ${filename}
-              </div>
-            </div>
-            <div class="row mb-1 m-0">
-              <div id='file${fileId}Comments' class='col-12'></div>
-            </div>
-        </div>
-        </div>
-      </div>
-    </div>`;
+      </div>`;
   }
   for (const fileInfo of filesInfoCom) {
     const fileId = fileInfo.id;
@@ -824,12 +816,12 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
-  <div class="card mt-1 mb-1 align-left" >
-    <div style="padding: 10px" aria-expanded="false" id="file${fileId}" class='filedata'>
-        <div class="row authTable">
-            <div class="col-lg-3 text-left"><label for="${fileId}">${shortfilename}</label><button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div>
-            <div class="col-lg-1 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-center">Returned</div>
+    <div class="accordian-item" >
+      <h2 class="accordion-header" id="flush-heading${fileId}">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+            <div class="col-lg-3 text-left"><label for="${fileId}">${shortfilename}</label></div>
+            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
+            <div class="col-lg-1 text-left">Returned</div>
             <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
             <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
             <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
@@ -837,23 +829,12 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
             <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
             <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
             <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
-            <div class="col-lg-1 text-right">
-                <button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${fileId}">
-                    <i class="fas fa-caret-down fa-2x"></i>
-                </button>
-            </div>
-        </div>
-        <div id="study${fileId}" class="collapse" aria-labelledby="file${fileId}">
-          <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-            <div class="row mb-1 m-0">
-              <div class="col-12 font-bold">
-                  Concept: ${filename}
-              </div>
-            </div>
-            <div class="row mb-1 m-0">
-              <div id='file${fileId}Comments' class='col-12'></div>
-            </div>
-        </div>
+        </button>
+      </h2>
+      <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}" data-bs-parent="#adminAccordian">
+        <div class="accordion-body">
+          <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
+          <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
         </div>
       </div>
     </div>`;
