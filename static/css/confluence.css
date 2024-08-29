@@ -2238,6 +2238,14 @@ ul.form {
     background-color: rgb(245, 245, 245);
     }
 
+    .accordion-button {
+        pointer-events: none;
+    }
+    
+    .accordion-button::after {
+        pointer-events: all;
+    }
+
   .pagination {
     background-color: white;
   }
