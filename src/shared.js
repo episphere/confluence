@@ -127,6 +127,31 @@ export const getFile = async (id) => {
     }
 };
 
+export const getFileXLSX = async (id) => {
+    try{
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`,{
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        if(r.status === 401) {
+            if((await refreshToken()) === true) return await getFile(id);
+        }
+        else if(r.status === 200) {
+            return r;
+        }
+        else{
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch(err) {
+        if((await refreshToken()) === true) return await getFile(id);
+    }
+};
+
 export const createComment = async (id, msg = "") => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
@@ -1091,6 +1116,19 @@ export const csv2Json = (csv) => {
     }
     return {data:result, headers};
 }
+
+export const array2Json = (array) => {
+    const keys = array.shift();
+    const json = array.reduce((agg, arr) => {
+        agg.push(arr.reduce((obj, item, index) => {
+          obj[keys[index]] = item;
+          return obj;
+        }, {}));
+        return agg;
+      }, [])
+    return json;
+}
+
 export const json2csv = (json, fields) => {
     if(!fields.includes('study')) fields.push('study');
     const replacer = (key, value) => { return value === null ? '' : value }

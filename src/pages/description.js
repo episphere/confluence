@@ -1,13 +1,15 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json } from "./../shared.js";
+import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json, emailsAllowedToUpdateData, getFileXLSX, array2Json, getFolderItems } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
 export const renderDescription = (modified_at) => {
+    let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
     let template = `
     <div class="main-summary-row">
             <div class="row align-left w-100 m-0">
                 <h1 class="col page-header pl-0 pt-2">Learn about Confluence</h1>
+                ${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3" title="Update Study Descriptions Based on Files in Box" id="updateDesc">Update Descriptions</button>`) :''}
                 <div class="col-auto allow-overflow mr-2" style="margin:1rem 0" id="pagesContainer"></div>
                 <div class="col-auto mt-3 mb-3 mr-2" id="pageSizeContainer"></div>
                 <div class="col-auto mt-3 mb-3" id="downloadContainer">
@@ -62,15 +64,24 @@ export const renderDescription = (modified_at) => {
     `;
     document.getElementById('overview').innerHTML = template;
     getDescription();
+    updateDesc();
 }
 
 const getDescription = async () => {
-    const data = await getFile(761599566277);//1072836692276);//761599566277)//1077912734937;
-    const tsv2json = tsv2Json(data);
+    const data = await getFile(1673495829037);//1072836692276);//761599566277)//1077912734937;1673495829037
+    //const datatest = await getFile(1673495829037);
+   // const tsv2json = tsv2Json(data);
+    //console.log(tsv2json);
+    const json = JSON.parse(data);
+    const headers = getAllKeys(json);
+    console.log(json);
+    console.log(headers);
+    //console.log(tsv2json);
     //const tsv2json = csv2Json(data);
-    const json = tsv2json.data;
+    //const json = tsv2json.data;
     //console.log(json);
-    const headers = tsv2json.headers;
+    //console.log(json);
+    //const headers = tsv2json.headers;
     let newJsons = {};
     let prevAcronym = '';
     json.forEach(obj => {
@@ -192,14 +203,14 @@ const getDescription = async () => {
 
 const renderStudyDescription = (descriptions, pageSize, headers) => {
     let template = '';
-    console.log(descriptions);
+    //console.log(descriptions);
     if(descriptions.length > 0) {
         template = `
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
             <div class="col-md-12">
                 <div class="row ps-3 pe-5">
                     <div class="col-md-2 font-bold ws-nowrap">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-4 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-md-4 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study Name"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
                     <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
@@ -209,14 +220,14 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
         <div class="row m-0 align-left allow-overflow w-100">
             <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">`
         descriptions.forEach((desc, index) => {
-            console.log(desc);
+            //console.log(desc);
             if(index > pageSize ) return
             template += `
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingOne">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
                         <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
-                        <div class="col-md-4">${desc['Study'] ? desc['Study'] : ''}</div>
+                        <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'] : ''}</div>
                         <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
                         <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
                         <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
@@ -496,3 +507,46 @@ const addEventPageBtns = (pageSize, data, headers) => {
         })
     });
 }
+
+export const updateDesc = () => {
+    const updateDescButton = document.getElementById('updateDesc');
+    updateDescButton.addEventListener('click', async e => {
+        const descFolders = await getFolderItems(276763770481);
+        let filearrayDesc = descFolders.entries;
+        let json_list = [];
+        for (let obj of filearrayDesc) {
+            let data = await getFileXLSX(obj.id);
+            let file = await data.arrayBuffer();
+            let workbook = XLSX.read(file);
+            let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            let raw_data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            let json_input = array2Json(raw_data);
+            let json_input_noempty = json_input.filter(obj => Object.keys(obj).length !== 0);
+            json_list = json_list.concat(json_input_noempty);
+            console.log(json_list);
+        }
+        JSONToFile(json_list, 'studyDescriptions');
+    })
+}
+
+const JSONToFile = (obj, filename) => {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const getAllKeys = (arr) => {
+    const allKeys = new Set();
+  
+    arr.forEach((obj) => {
+      Object.keys(obj).forEach((key) => allKeys.add(key));
+    });
+  
+    return Array.from(allKeys);
+  };
