@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json, emailsAllowedToUpdateData, getFileXLSX, array2Json, getFolderItems } from "./../shared.js";
+import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json, emailsAllowedToUpdateData, getFileXLSX, array2Json, getFolderItems, hideAnimation, uploadFileVersion,uploadFileVersion2, showAnimation } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
@@ -240,10 +240,10 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                         ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
                         ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
                         ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
-                        ${desc['Description of Ascertainment Process for Male Subjects'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Subjects</div><div class="col">${desc['Description of Ascertainment Process for Male Subjects']}</div></div>`: ``}
+                        ${desc['Description of Ascertainment Process or details of study design male participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design male participants']}</div></div>`: ``}
                         ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
                         ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
-                        ${desc['Description of Ascertainment Process for Female Subjects'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Subjects</div><div class="col">${desc['Description of Ascertainment Process for Female Subjects']}</div></div>`: ``}
+                        ${desc['Description of Ascertainment Process or details of study design female participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design female participants']}</div></div>`: ``}
                     `
                     if(desc['pis'].length > 0) {
                         desc['pis'].forEach(info => {
@@ -511,6 +511,7 @@ const addEventPageBtns = (pageSize, data, headers) => {
 export const updateDesc = () => {
     const updateDescButton = document.getElementById('updateDesc');
     updateDescButton.addEventListener('click', async e => {
+        showAnimation();
         const descFolders = await getFolderItems(276763770481);
         let filearrayDesc = descFolders.entries;
         let json_list = [];
@@ -526,6 +527,7 @@ export const updateDesc = () => {
             console.log(json_list);
         }
         JSONToFile(json_list, 'studyDescriptions');
+        hideAnimation();
     })
 }
 
@@ -533,12 +535,13 @@ const JSONToFile = (obj, filename) => {
     const blob = new Blob([JSON.stringify(obj, null, 2)], {
       type: 'application/json',
     });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    //const url = URL.createObjectURL(blob);
+    //const a = document.createElement('a');
+    //a.href = url;
+    //a.download = `${filename}.json`;
+    //a.click();
+    //URL.revokeObjectURL(url);
+    uploadFileVersion2(blob,'1673495829037','application/json')
   };
 
   const getAllKeys = (arr) => {
