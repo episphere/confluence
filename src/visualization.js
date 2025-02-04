@@ -29,6 +29,8 @@ const allFilters = (jsonData, headers, cimba) => {
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
     const obj = aggegrateData(jsonData);
+    let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
+    console.log(cont_reg);
     let template =`
         <div style="width: 100%;">
             <div class="form-group">
@@ -51,10 +53,13 @@ const allFilters = (jsonData, headers, cimba) => {
                 <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
                 <select class="form-select font-size-15" id="continentalRegionSelection" data-variable='chip'>
                     <option selected value='all'>All</option>
-                    <option value='South America'>South America</option>
-                    <option value='USA & Canada'>USA & Canada</option>
-                    <option value='Sub-Saharan Africa'>Sub-Saharan Africa</option>
-                    <option value='South Asia'>South Asia</option>
+                `
+    for(let cont of cont_reg){
+        console.log(cont)
+        template += `
+                    <option value='${cont}'>${cont}</option>`
+                }
+    template += `
                 </select>
             </div>
             <div class="form-group">
@@ -225,7 +230,7 @@ export const getSelectedStudies = () => {
 
 const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     const data = [
@@ -250,7 +255,7 @@ const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
 
 const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     document.getElementById(id).innerHTML = '';
@@ -288,7 +293,7 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
 
 const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     let pieLabel = ''
@@ -350,7 +355,7 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, xarray, chartRow
         pieLabel = parameter;
     }
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
 
@@ -384,7 +389,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     }
 
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
@@ -432,7 +437,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
         pieLabel = parameter;
     }
     const div = document.createElement('div');
-    div.classList = ['col-xl-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
@@ -448,7 +453,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
             y: valueCount,
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#cb4880', '#d876a0','#e5a3bf', '#BF1B61', '#cb4880', '#7F7F7F']
+                color: ['#BF1B61', '#cb4880', '#d876a0','#e5a3bf', '#BF1B61', '#cb4880', '#d876a0','#e5a3bf']
             },
         }
     ];

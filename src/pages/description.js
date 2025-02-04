@@ -519,9 +519,11 @@ export const updateDesc = () => {
             let data = await getFileXLSX(obj.id);
             let file = await data.arrayBuffer();
             let workbook = XLSX.read(file);
+            console.log(workbook);
             let worksheet = workbook.Sheets[workbook.SheetNames[0]];
             let raw_data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
             let json_input = array2Json(raw_data);
+            console.log(json_input);
             let json_input_noempty = json_input.filter(obj => Object.keys(obj).length !== 0);
             json_list = json_list.concat(json_input_noempty);
             console.log(json_list);

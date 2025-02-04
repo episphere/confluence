@@ -228,35 +228,7 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                         ${desc['Confluence Variable'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
                     </div>
                 </div>
-            </div>
-
-        <!--<div class="card border-0 mt-1 mb-1 align-left w-100 pt-md-1">
-            <div class="pl-3 pt-1 pr-3 pb-1" aria-expanded="false" id="heading${desc['Variable']}">
-                <div class="row">
-                    <div class="col-md-11">
-                        <div class="row">
-                            <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
-                            <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
-                            <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
-                            <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-1">
-                        <div class="col-md-12"><button title="Expand/Collapse" class="transparent-btn collapse-panel-btn" data-toggle="collapse" data-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}"><i class="fas fa-caret-down fa-2x"></i></button></div>
-                    </div>
-                </div>
-            </div>
-            <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="collapse" aria-labelledby="heading${desc['Variable']}">
-                <div class="card-body" style="padding-left: 10px;background-color:#f6f6f6;">
-                    ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
-                    ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
-                    ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
-                    ${desc['Confluence Variable'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
-                `;
-                template +=`
-                </div>
-            </div>
-        </div>-->`
+            </div>`
     });
     template += `</div></div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
