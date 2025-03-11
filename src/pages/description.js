@@ -106,7 +106,7 @@ const getDescription = async () => {
     const allCountries = [];
     Object.values(newJsons).forEach(dt => {
         if(dt['Country'] === undefined) return;
-        dt['Country'].split(',').forEach(ctr => {
+        dt['Country'].split(/,|;/).forEach(ctr => {
             ctr.split(' and ').forEach(c => {
                 if(c.trim()) allCountries.push(c.trim())
             });
