@@ -51,11 +51,10 @@ const allFilters = (jsonData, headers, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
-                <select class="form-select font-size-15" id="continentalRegionSelection" data-variable='chip'>
+                <select class="form-select font-size-15" id="continentalRegionSelection" data-variable='cont'>
                     <option selected value='all'>All</option>
                 `
     for(let cont of cont_reg){
-        console.log(cont)
         template += `
                     <option value='${cont}'>${cont}</option>`
                 }
@@ -79,6 +78,7 @@ const allFilters = (jsonData, headers, cimba) => {
             <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
         </select>
     </div>
+    <div id="consortium-picks">
     `
     
     for(let consortium in obj){
@@ -117,7 +117,7 @@ const allFilters = (jsonData, headers, cimba) => {
         template += innerTemplate;
         
     }
-    template += `</br>
+    template += `</div></br>
     </div>`;
     div1.innerHTML = template;
     document.getElementById('allFilters').appendChild(div1);
@@ -127,7 +127,9 @@ const allFilters = (jsonData, headers, cimba) => {
 
 const aggegrateData = (jsonData) => {
     let obj = {};
+    //console.log(jsonData);
     jsonData.forEach(value => {
+        //console.log(value)
         if(obj[value.consortium] === undefined) obj[value.consortium] = {};
         if(obj[value.consortium]){
             if(obj[value.consortium]['consortiumTotal'] === undefined) obj[value.consortium]['consortiumTotal'] = 0;
@@ -195,13 +197,54 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
     renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
-    renderPlotlyPieChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+    renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
     if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
         else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
 }
 
-export const updateCounts = (data) => {
+export const updateCounts = (data, headers) => {
+    console.log(data);
     const obj = aggegrateData(data);
+    console.log(obj);
+    // let template = '';
+    // for(let consortium in obj){
+    //     let innerTemplate = `
+    //                 <ul class="list-group remove-padding-left font-size-15 consortium-ul" data-consortium="${consortium}" ${consortium === 'CIMBA' ? 'style="display:none"': ''}>
+    //                     <li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
+    //                         <div>
+    //                             <button type="button" class="consortium-selection consortium-selection-btn" data-bs-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
+    //                                 <i class="fas fa-caret-down"></i>
+    //                             </button>
+    //                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="form-check-input select-consortium"/>
+    //                             <label for="label${consortium}" class="form-check-label consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
+    //                         </div>
+    //                         <span class="mr-auto filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
+    //                             ${numberWithCommas(obj[consortium].consortiumTotal)}
+    //                         </span>
+    //                     </li>
+    //                 <ul class="list-group collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
+    //     for(let study in obj[consortium]){
+    //         if(study !== 'consortiumTotal') {
+    //             const total = obj[consortium][study].total;
+    //             innerTemplate += `<li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
+    //                             <div>
+    //                                 <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="form-check-input select-study"/>
+    //                                 <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0,8)}...`:study}</label>
+    //                             </div>
+    //                             <span class="mr-auto filter-btn custom-margin consortia-total">
+    //                                 <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
+    //                                     ${numberWithCommas(total)}
+    //                                 </div>
+    //                             </span>
+    //                         </li>`;
+    //         }
+    //     }
+    //     innerTemplate += `</ul></ul>`
+    //     template += innerTemplate
+    // }
+    // document.getElementById("consortium-picks").innerHTML = template;
+    // addEventSummaryStatsFilterForm(data, headers);
+    // addEventConsortiumSelect();
     for(let consortia in obj){
         const elements = document.querySelectorAll(`[data-consortia="${consortia}"]`);
         Array.from(elements).forEach(element => {
@@ -291,7 +334,7 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
     document.getElementById(labelID).innerHTML = `${variables.BCAC[parameter]['label']}`;
 }
 
-const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
+const renderERChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     const div = document.createElement('div');
     div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
@@ -308,10 +351,12 @@ const renderPlotlyPieChart = (jsonData, parameter, id, labelID, headers, chartRo
     let labels = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => chartLabels[dt.replace(/ER_statusIndex_/, '')] ? chartLabels[dt.replace(/ER_statusIndex_/, '')] : dt.replace(/ER_statusIndex_/, ''));
     let tmpObj = {};
     labels.forEach((l,i) => tmpObj[l] = values[i])
-    for(let obj in tmpObj) {
-        if(tmpObj[obj] === 0) delete tmpObj[obj];
-    }
+    // for(let obj in tmpObj) {
+    //     if(tmpObj[obj] === 0) delete tmpObj[obj];
+    // }
+    console.log(values);
     values = Object.values(tmpObj);
+    console.log(values);
     labels = Object.keys(tmpObj);
     const d3 = Plotly.d3
     const format = d3.format(',3f')
@@ -411,7 +456,6 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
             },
         }
     ];
-    console.log(data);
     const layout = {
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}, type:'category'},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},

@@ -1442,7 +1442,7 @@ const filterData = (jsonData, headers) => {
     if(caseCon !== 'all') {
         finalData = finalData.filter(dt => dt['status'] === caseCon);
     }
-    updateCounts(finalData);
+    updateCounts(finalData, headers);
     if(array.length > 0){
         finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
     }
