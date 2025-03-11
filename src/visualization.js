@@ -31,17 +31,22 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
-    let obj;
-    let cont_reg;
-    if(cimba) {
-        console.log("CIMBA");
-        obj = aggegrateData(jsonDataCIMBA);
-        cont_reg = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
-        console.log(cont_reg);
-    } else {
-        obj = aggegrateData(jsonData);
-        cont_reg = getUniqueConsortium(jsonData, 'continental_region');
-    }
+    console.log(jsonData);
+    console.log(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
+
+    jsonData = jsonData.concat(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
+
+    let obj = aggegrateData(jsonData);
+    let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
+    let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
+
+    console.log(jsonData);
+    console.log(obj);
+
+    // let objC = aggegrateData(jsonDataCIMBA);
+    // let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
+    // obj.CIMBA = objC['CIMBA'];
+    // console.log(cont_regC);
 
     let template =`
         <div style="width: 100%;">
@@ -133,7 +138,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
     </div>`;
     div1.innerHTML = template;
     document.getElementById('allFilters').appendChild(div1);
-    addEventSummaryStatsFilterForm(jsonData, headers, jsonDataCIMBA, headersCIMBA);
+    addEventSummaryStatsFilterForm(jsonData, headers);
     addEventConsortiumSelect();
 }
 
@@ -449,18 +454,18 @@ const getUniqueConsortium = (jsonData, parameter) => {
 }
 
 const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => {
-    let pieLabel = ''
+    let barLabel = ''
     if(variables.BCAC[parameter] && variables.BCAC[parameter]['label']){
-        pieLabel = variables.BCAC[parameter]['label'];
+        barLabel = variables.BCAC[parameter]['label'];
     }else{
-        pieLabel = parameter;
+        barLabel = parameter;
     }
     const div = document.createElement('div');
     div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
-    document.getElementById(labelID).innerHTML = `${pieLabel}`;
+    document.getElementById(labelID).innerHTML = `${barLabel}`;
     const allLabels = getUniqueConsortium(jsonData, parameter);
     const valueCount = [];
     for(let studyDesign of allLabels){
