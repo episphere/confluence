@@ -351,12 +351,7 @@ const renderERChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     let labels = headers.filter(dt => /ER_statusIndex_/.test(dt)).map(dt => chartLabels[dt.replace(/ER_statusIndex_/, '')] ? chartLabels[dt.replace(/ER_statusIndex_/, '')] : dt.replace(/ER_statusIndex_/, ''));
     let tmpObj = {};
     labels.forEach((l,i) => tmpObj[l] = values[i])
-    // for(let obj in tmpObj) {
-    //     if(tmpObj[obj] === 0) delete tmpObj[obj];
-    // }
-    console.log(values);
     values = Object.values(tmpObj);
-    console.log(values);
     labels = Object.keys(tmpObj);
     const d3 = Plotly.d3
     const format = d3.format(',3f')
