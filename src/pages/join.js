@@ -26,26 +26,26 @@ export const confluenceResources = () => {
                     <div class="col font-size-18 align-left">
                         <div>The following breast cancer consortia are participating in Confluence:</div>
                         <div class="consortia-desc">
-                            <a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
+                            <a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
                             The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                         </div>
                         <div class="consortia-desc">
-                        <a href="mailto:wei.zheng@vanderbilt.edu">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
+                        <a href="mailto:wei.zheng@vanderbilt.edu" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium </a> (AABCG)</br>
                             The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                         </div>
 
                         <div class="consortia-desc">
-                            <a href= "#join" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
+                            <a href= "https://www.lageno-bc.org/about/" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
                             LAGENO-BC is a collaborative effort including a multinational team of investigators sharing knowledge and materials to facilitate breast cancer genetics research relevant to the diverse populations of Latin America and its diaspora.
                         </div>
 
                         <div class="consortia-desc">
-                            <a href="#join" class="external-url" data-href="http://cimba.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
+                            <a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
                             The CIMBA was formed by a collaborative group of researchers working on genetic modifiers of cancer risk in BRCA1 and BRCA2 mutation carriers. The aim of CIMBA is to provide sufficient sample sizes to allow large scale studies in order to evaluate reliably the effects of genetic modifiers.
                         </div>
 
                         <div class="consortia-desc">
-                            <a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium</a> (MERGE) </br>
+                            <a href="mailto:nick.orr@qub.ac.uk" target="_blank" rel="noopener noreferrer">Male Breast Cancer Genetics Consortium</a> (MERGE) </br>
                             The MERGE is a GWAS of male breast cancer cases and similar number of controls.
                         </div>
 
@@ -54,7 +54,7 @@ export const confluenceResources = () => {
                         </div>
                         <div class="consortia-desc">
                             For more information:</br>
-                            Email: <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                            Email: <a href="mailto:ConfluenceProject@nih.gov" target="_blank" rel="noopener noreferrer">ConfluenceProject@nih.gov</a>
                         </div>
                     <div>
                 <div>
@@ -112,13 +112,13 @@ export const confluenceResourcesDes = () => {
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="#join" class="external-url" data-href="http://bcac.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
+                                    <td><a href="#join" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
                                     <td>Roger Milne (Cancer Council Victoria)</td>
                                     <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>
                                     <td style="text-align: center">TBD</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="#join" class="external-url" data-href="http://cimba.ccge.medschl.cam.ac.uk/" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
+                                    <td><a href="#join" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
                                     <td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
                                     <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>
                                     <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
