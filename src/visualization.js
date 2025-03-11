@@ -203,48 +203,15 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
 }
 
 export const updateCounts = (data, headers) => {
-    console.log(data);
-    const obj = aggegrateData(data);
-    console.log(obj);
-    // let template = '';
-    // for(let consortium in obj){
-    //     let innerTemplate = `
-    //                 <ul class="list-group remove-padding-left font-size-15 consortium-ul" data-consortium="${consortium}" ${consortium === 'CIMBA' ? 'style="display:none"': ''}>
-    //                     <li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
-    //                         <div>
-    //                             <button type="button" class="consortium-selection consortium-selection-btn" data-bs-toggle="collapse" href="#toggle${consortium.replace(/ /g, '')}">
-    //                                 <i class="fas fa-caret-down"></i>
-    //                             </button>
-    //                             <input type="checkbox" data-consortia="${consortium}" id="label${consortium}" class="form-check-input select-consortium"/>
-    //                             <label for="label${consortium}" class="form-check-label consortia-name">${consortium === `NCI` ? `C-NCI`:consortium}</label>
-    //                         </div>
-    //                         <span class="mr-auto filter-btn custom-margin consortia-total" data-consortia='${consortium}'>
-    //                             ${numberWithCommas(obj[consortium].consortiumTotal)}
-    //                         </span>
-    //                     </li>
-    //                 <ul class="list-group collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g, '')}">`;
-    //     for(let study in obj[consortium]){
-    //         if(study !== 'consortiumTotal') {
-    //             const total = obj[consortium][study].total;
-    //             innerTemplate += `<li class="list-group-item filter-list-item d-flex justify-content-between align-items-center">
-    //                             <div>
-    //                                 <input type="checkbox" data-study="${study}" data-consortium="${consortium}" id="label${study}" class="form-check-input select-study"/>
-    //                                 <label for="label${study}" class="study-name" title="${study}">${study.length > 8 ? `${study.substring(0,8)}...`:study}</label>
-    //                             </div>
-    //                             <span class="mr-auto filter-btn custom-margin consortia-total">
-    //                                 <div class="filter-btn custom-margin study-total" data-consortia-study='${consortium}@#$${study}'>
-    //                                     ${numberWithCommas(total)}
-    //                                 </div>
-    //                             </span>
-    //                         </li>`;
-    //         }
-    //     }
-    //     innerTemplate += `</ul></ul>`
-    //     template += innerTemplate
-    // }
-    // document.getElementById("consortium-picks").innerHTML = template;
-    // addEventSummaryStatsFilterForm(data, headers);
-    // addEventConsortiumSelect();
+    const obj = aggegrateData(data); // Gather all aggregated data
+
+    //Reset all Consortium filters to 0
+    const reset = document.querySelectorAll(`[data-consortia-study]`);
+    for(let item of reset){
+        item.innerHTML = numberWithCommas(0);
+    };
+
+    //Count all Consortia and Study values
     for(let consortia in obj){
         const elements = document.querySelectorAll(`[data-consortia="${consortia}"]`);
         Array.from(elements).forEach(element => {
