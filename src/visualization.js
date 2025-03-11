@@ -1,4 +1,4 @@
-import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, reSizePlots } from './shared.js';
+import { hideAnimation, getFile, csvJSON, numberWithCommas, summaryStatsFileId, getFileInfo, mapReduce, reSizePlots, summaryStatsFileCIMBAID } from './shared.js';
 import { variables } from './variables.js';
 import { addEventSummaryStatsFilterForm } from './event.js';
 const plotTextSize = 10;
@@ -14,6 +14,9 @@ const chartLabels = {
 export const getFileContent = async () => {
     const {jsonData, headers} = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
     const lastModified = (await getFileInfo(summaryStatsFileId)).modified_at;
+    const dataCIMBA = csvJSON(await getFile(summaryStatsFileCIMBAID));
+    const jsonDataCIMBA = dataCIMBA.jsonData;
+    const headersCIMBA = dataCIMBA.headers;
     document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     hideAnimation();
     if(jsonData.length === 0) {
@@ -21,16 +24,25 @@ export const getFileContent = async () => {
         return;
     };
     renderAllCharts(jsonData, headers);
-    allFilters(jsonData, headers, false);
+    allFilters(jsonData, headers, jsonDataCIMBA, headersCIMBA, false);
 };
 
-const allFilters = (jsonData, headers, cimba) => {
+const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
-    const obj = aggegrateData(jsonData);
-    let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
-    console.log(cont_reg);
+    let obj;
+    let cont_reg;
+    if(cimba) {
+        console.log("CIMBA");
+        obj = aggegrateData(jsonDataCIMBA);
+        cont_reg = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
+        console.log(cont_reg);
+    } else {
+        obj = aggegrateData(jsonData);
+        cont_reg = getUniqueConsortium(jsonData, 'continental_region');
+    }
+
     let template =`
         <div style="width: 100%;">
             <div class="form-group">
@@ -121,7 +133,7 @@ const allFilters = (jsonData, headers, cimba) => {
     </div>`;
     div1.innerHTML = template;
     document.getElementById('allFilters').appendChild(div1);
-    addEventSummaryStatsFilterForm(jsonData, headers);
+    addEventSummaryStatsFilterForm(jsonData, headers, jsonDataCIMBA, headersCIMBA);
     addEventConsortiumSelect();
 }
 
@@ -195,7 +207,8 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     else finalData = data;
     renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
     renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
-    renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+    if (onlyCIMBA) renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+        else renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
     generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
     renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
     if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');

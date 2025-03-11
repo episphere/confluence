@@ -4,6 +4,7 @@ import { confluence } from '../confluence.js';
 export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov', 'sbehpour@deloitte.com']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781;//691143057533;1238676877781
+export const summaryStatsFileCIMBAID = 691143057533; // Temporary until CIMBA has updated data
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
 export const acceptedFolder = 276757490309;//196011761030;
@@ -1064,6 +1065,7 @@ export const csvJSON = (csv) => {
     const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
     const result = [];
     const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
+    console.log(headers);
     for(let i=1; i < lines.length; i++){
         const obj = {};
         const currentline = lines[i].split(/[,\t]/g);

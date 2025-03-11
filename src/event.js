@@ -1338,33 +1338,32 @@ export const addEventMissingnessFilterBarToggle = () => {
     })
 }
 
-export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
-
+export const addEventSummaryStatsFilterForm = (jsonData, headers, jsonDataCIMBA, headersCIMBA) => {
     const consortiumTypeSelection = document.getElementById('consortiumTypeSelection');
     if(consortiumTypeSelection) {
         consortiumTypeSelection.addEventListener('change', () => {
-            filterData(jsonData, headers);
+            filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
         });
     }
 
     const genderSelection = document.getElementById('genderSelection');
     genderSelection.addEventListener('change', () => {
-        filterData(jsonData, headers);
+        filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
     });
 
     const chipSelection = document.getElementById('genotypingChipSelection');
     chipSelection.addEventListener('change', () => {
-        filterData(jsonData, headers);
+        filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
     });
 
     const contSelection = document.getElementById('continentalRegionSelection');
     contSelection.addEventListener('change', () => {
-        filterData(jsonData, headers);
+        filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
     });
 
     const caseConSelection = document.getElementById('caseControlSelection');
     caseConSelection.addEventListener('change', () => {
-        filterData(jsonData, headers);
+        filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
     });
 
     const elements = document.getElementsByClassName('select-consortium');
@@ -1377,19 +1376,19 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
             else {
                 Array.from(el.parentNode.parentNode.parentNode.querySelectorAll('.select-study')).forEach(btns => btns.checked =  false);
             }
-            filterData(jsonData, headers);
+            filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA);
         })
     })
 
     const studyElements = document.getElementsByClassName('select-study');
     Array.from(studyElements).forEach(ele => {
         ele.addEventListener('click', () => {
-            filterData(jsonData, headers)
+            filterData(jsonData, headers, jsonDataCIMBA, headersCIMBA)
         })
     });
 };
 
-const filterData = (jsonData, headers) => {
+const filterData = (jsonData, headers, jsonDataCIMBA, headersCIMBA) => {
     const gender = document.getElementById('genderSelection').value;
     const chip = document.getElementById('genotypingChipSelection').value;
     const cont = document.getElementById('continentalRegionSelection').value;
@@ -1398,11 +1397,13 @@ const filterData = (jsonData, headers) => {
     const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
     const contFilter = Array.from(document.getElementById('continentalRegionSelection').options).filter(op => op.selected)[0].textContent;
     const caseConFilter = Array.from(document.getElementById('caseControlSelection').options).filter(op => op.selected)[0].textContent;
-    let finalData = jsonData;
+    let finalData;
     let onlyCIMBA = false;
     
     const consortiumTypeSelection = document.getElementById('consortiumTypeSelection');
     if(consortiumTypeSelection.value === 'cimba') {
+        finalData = jsonDataCIMBA;
+        console.log(finalData);
         Array.from(document.getElementsByClassName('consortium-ul')).forEach(ele => {
             if(ele.dataset.consortium === 'CIMBA') ele.style.display = 'block';
             else {
@@ -1411,9 +1412,12 @@ const filterData = (jsonData, headers) => {
             }
         });
         onlyCIMBA = true;
+        console.log(finalData);
         finalData = finalData.filter(dt => dt.consortium === 'CIMBA');
+        console.log(finalData);
     }
     else {
+        finalData = jsonData;
         Array.from(document.getElementsByClassName('consortium-ul')).forEach(ele => {
             if(ele.dataset.consortium === 'CIMBA') {
                 Array.from(ele.querySelectorAll('input:checked.select-study')).forEach(e => e.checked = false);
@@ -1442,7 +1446,9 @@ const filterData = (jsonData, headers) => {
     if(caseCon !== 'all') {
         finalData = finalData.filter(dt => dt['status'] === caseCon);
     }
-    updateCounts(finalData, headers);
+
+    if(onlyCIMBA) updateCounts(finalData, headersCIMBA);
+    else updateCounts(finalData, headers);
     if(array.length > 0){
         finalData = finalData.filter(dt => array.indexOf(`${dt.consortium}@#$${dt.study}`) !== -1);
     }
@@ -1454,7 +1460,10 @@ const filterData = (jsonData, headers) => {
         <span class="font-bold">Case-control status: </span>${caseConFilter}
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
-    renderAllCharts(finalData, headers, onlyCIMBA);
+
+    console.log(finalData);
+    if(onlyCIMBA) renderAllCharts(finalData, headersCIMBA, onlyCIMBA);
+    else renderAllCharts(finalData, headers, onlyCIMBA);
 }
 
 export const addEventConsortiaFilter = (d) => {
