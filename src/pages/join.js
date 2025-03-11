@@ -93,9 +93,9 @@ export const confluenceResourcesDes = () => {
                     <div class="col font-size-18 align-left">
                         The following DACCs provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
                         participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="_blank" rel="noopener noreferrer">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
-                    <div>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
+                    </div>
+                    <div class="table-responsive text-start">
+                        <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">Consortium Name</th>
@@ -112,19 +112,19 @@ export const confluenceResourcesDes = () => {
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="#join" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
+                                    <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
                                     <td>Roger Milne (Cancer Council Victoria)</td>
                                     <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>
                                     <td style="text-align: center">TBD</td>
                                 </tr>
                                 <tr>
-                                    <td><a href="#join" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
+                                    <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
                                     <td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
                                     <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>
                                     <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                     <tr>
-                                    <td><a href= "#join" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
+                                    <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
                                     <td>Laura Fejerman (University of California, Davis)</td>
                                     <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>
                                     <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
@@ -144,7 +144,7 @@ export const confluenceResourcesDes = () => {
                             </tbody>
                         </table>
                     </div>
-                <div>
+                </div>
     `;
     document.getElementById('overview').innerHTML = template;
     handleExternalLinks();
