@@ -6,7 +6,7 @@ import { template as dataRequestTemplate, templateAfterLogin as dataRequestTempl
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -314,7 +314,7 @@ const manageRouter = async () => {
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Study Description';
         assignNavbarActive(element, 1);
-        const fileInfo = await getFileInfo(761599566277);
+        const fileInfo = await getFileInfo(studyDescriptions);
         console.log(fileInfo);
         aboutConfluence('description', fileInfo ? true : false);
         renderDescription(fileInfo['content_modified_at'])
@@ -518,7 +518,7 @@ const manageHash = async () => {
         // if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Overview';
-        const fileInfo = await getFileInfo(761599566277);
+        const fileInfo = await getFileInfo(studyDescriptions);
         aboutConfluence('overview', fileInfo ? true : false);
         renderOverView();
         hideAnimation();
@@ -531,7 +531,7 @@ const manageHash = async () => {
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Study Description';
         showAnimation();
-        const fileInfo = await getFileInfo(761599566277);
+        const fileInfo = await getFileInfo(studyDescriptions);
         if(!fileInfo) {
             location.hash = '#about/overview';
             hideAnimation();
@@ -549,7 +549,7 @@ const manageHash = async () => {
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Description';
         showAnimation();
-        const fileInfo = await getFileInfo(761599566277);
+        const fileInfo = await getFileInfo(studyDescriptions);
         if(!fileInfo) {
             location.hash = '#about/confluence';
             hideAnimation();

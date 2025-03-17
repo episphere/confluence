@@ -1,4 +1,4 @@
-import { getFileInfo } from "./../shared.js";
+import { getFileInfo, studyDescriptions } from "./../shared.js";
 
 export const infoDeck = () => {
     let template = '';
@@ -54,7 +54,7 @@ export const infoDeck = () => {
 }
 
 export const infoDeckAfterLoggedIn = async () => {
-    const studyDescription = await getFileInfo(761599566277);
+    const studyDescription = await getFileInfo(studyDescriptions);
     let template = '';
     template += `
         <div class="secondary-bg padding-bottom-1rem">

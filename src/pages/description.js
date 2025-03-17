@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json, emailsAllowedToUpdateData, getFileXLSX, array2Json, getFolderItems, hideAnimation, uploadFileVersion,uploadFileVersion2, showAnimation } from "./../shared.js";
+import { csv2Json, defaultPageSize, getFile, shortenText, tsv2Json, emailsAllowedToUpdateData, getFileXLSX, array2Json, getFolderItems, hideAnimation, uploadFileVersion,uploadFileVersion2, showAnimation, studyDescriptions } from "./../shared.js";
 import { downloadFiles } from "./dictionary.js";
 let previousValue = '';
 
@@ -68,7 +68,7 @@ export const renderDescription = (modified_at) => {
 }
 
 const getDescription = async () => {
-    const data = await getFile(1673495829037);//1072836692276);//761599566277)//1077912734937;1673495829037
+    const data = await getFile(studyDescriptions);//1072836692276);//761599566277)//1077912734937;1673495829037
     //const datatest = await getFile(1673495829037);
    // const tsv2json = tsv2Json(data);
     //console.log(tsv2json);
@@ -543,7 +543,7 @@ const JSONToFile = (obj, filename) => {
     //a.download = `${filename}.json`;
     //a.click();
     //URL.revokeObjectURL(url);
-    uploadFileVersion2(blob,'1673495829037','application/json')
+    uploadFileVersion2(blob, studyDescriptions, 'application/json')
   };
 
   const getAllKeys = (arr) => {
