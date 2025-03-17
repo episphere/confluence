@@ -38,15 +38,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
 
     let obj = aggegrateData(jsonData);
     let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
-    let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
-
-    console.log(jsonData);
-    console.log(obj);
-
-    // let objC = aggegrateData(jsonDataCIMBA);
-    // let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
-    // obj.CIMBA = objC['CIMBA'];
-    // console.log(cont_regC);
+    //let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
 
     let template =`
         <div style="width: 100%;">
@@ -224,8 +216,13 @@ export const updateCounts = (data, headers) => {
     const obj = aggegrateData(data); // Gather all aggregated data
 
     //Reset all Consortium filters to 0
-    const reset = document.querySelectorAll(`[data-consortia-study]`);
-    for(let item of reset){
+    const resetStu = document.querySelectorAll(`[data-consortia-study]`);
+    for(let item of resetStu){
+        item.innerHTML = numberWithCommas(0);
+    };
+
+    const resetCon = document.querySelectorAll(`[data-consortia]`);
+    for(let item of resetCon){
         item.innerHTML = numberWithCommas(0);
     };
 

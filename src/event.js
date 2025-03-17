@@ -1399,8 +1399,6 @@ const filterData = (jsonData, headers) => {
     const caseConFilter = Array.from(document.getElementById('caseControlSelection').options).filter(op => op.selected)[0].textContent;
     let finalData = jsonData;
     let onlyCIMBA = false;
-
-    console.log(finalData);
     
     const consortiumTypeSelection = document.getElementById('consortiumTypeSelection');
     if(consortiumTypeSelection.value === 'cimba') {
