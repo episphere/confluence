@@ -38,6 +38,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
 
     let obj = aggegrateData(jsonData);
     let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
+    cont_reg = cont_reg.filter(element => element !== undefined);
     //let cont_regC = getUniqueConsortium(jsonDataCIMBA, 'ethnicityClass');
 
     let template =`
@@ -202,14 +203,29 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     let finalData = {};
     if(onlyCIMBA === undefined) finalData = data.filter(dt => dt.consortium !== 'CIMBA');
     else finalData = data;
-    renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-    renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
-    if (onlyCIMBA) renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
-        else renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
-    generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
-    renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
-    if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
-        else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
+    if (onlyCIMBA) {
+        renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
+        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
+        generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow1');
+        renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+        renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
+    } else {
+        renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
+        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
+        renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+        generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
+        renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+        generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
+    }
+    console.log(finalData);
+    // renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
+    // renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
+    // if (onlyCIMBA) renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+    //     else renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+    // generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
+    // renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
+    // if (onlyCIMBA) renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
+    //     else generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
 }
 
 export const updateCounts = (data, headers) => {
@@ -418,7 +434,6 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     document.getElementById(labelID).innerHTML = `${pieLabel}`;
     
     let allLabels = getUniqueConsortium(jsonData, parameter);
-    console.log(allLabels);
     const valueCount = [];
     for(let studyDesign of allLabels){
         valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
