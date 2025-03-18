@@ -351,14 +351,14 @@ const renderERChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     labels.forEach((l,i) => tmpObj[l] = values[i])
     values = Object.values(tmpObj);
     labels = Object.keys(tmpObj);
-    const d3 = Plotly.d3
-    const format = d3.format(',3f')
-    const total = values.reduce((a, b) => a + b)
-    const text = values.map((v, i) => `
-            ${labels[i]}<br>
-            ${format(v)}<br>
-            ${v / total * 100}%
-        `)
+    // const d3 = Plotly.d3
+    // const format = d3.format(',3f')
+    // const total = values.reduce((a, b) => a + b)
+    // const text = values.map((v, i) => `
+    //         ${labels[i]}<br>
+    //         ${format(v)}<br>
+    //         ${v / total * 100}%
+    //     `)
     const data = [
         {
             y: values,
