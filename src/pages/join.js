@@ -90,55 +90,55 @@ export const confluenceResourcesDes = () => {
                     </div>
                 </div>
                 <div class="main-summary-row white-bg div-border">
-                    <div class="col font-size-18 align-left">
+                    <div class="font-size-18 align-left modal-body">
                         The following DACCs provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
                         participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="_blank" rel="noopener noreferrer">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
                     </div>
-                    <div class="table-responsive text-start">
+                    <div class="table-responsive text-start modal-body">
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">Consortium Name</th>
-                                    <th scope="col">DACC Chair</th>
-                                    <th scope="col">Email</th>
+                                    <!--<th scope="col">DACC Chair</th>
+                                    <th scope="col">Email</th>-->
                                     <th scope="col" style="text-align: center">DACC Guidelines</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><a href="mailto:wei.zheng@vanderbilt.edu">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
-                                    <td>Wei Zheng (Vanderbilt University Medical Center)</td>
-                                    <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>
+                                    <td><a>African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
+                                    <!--<td>Wei Zheng (Vanderbilt University Medical Center)</td>
+                                    <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
-                                    <td>Roger Milne (Cancer Council Victoria)</td>
-                                    <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>
+                                    <!--<td>Roger Milne (Cancer Council Victoria)</td>
+                                    <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>-->
                                     <td style="text-align: center">TBD</td>
                                 </tr>
                                 <tr>
                                     <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
-                                    <td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
-                                    <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>
+                                    <!--<td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
+                                    <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                     <tr>
                                     <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
-                                    <td>Laura Fejerman (University of California, Davis)</td>
-                                    <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>
+                                    <!--<td>Laura Fejerman (University of California, Davis)</td>
+                                    <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td><a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium</a> (MERGE)</td>
-                                    <td>Nick Orr (Queen's University Belfast)</td>
-                                    <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>
+                                    <!--<td>Nick Orr (Queen's University Belfast)</td>
+                                    <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                                 <tr>
                                     <td>Confluence National Cancer Institute Studies (C-NCI)</td>
-                                    <td>Dezheng Huo (The University of Chicago)</td>
-                                    <td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>
+                                    <!--<td>Dezheng Huo (The University of Chicago)</td>
+                                    <td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>-->
                                     <td style="text-align: center"><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                                 </tr>
                             </tbody>

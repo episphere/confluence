@@ -44,7 +44,7 @@ export const renderOverView = async () => {
                     </div>
                     
                     <div class="mb-3">
-                        The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 cases and 200,000 controls and double it by generating new genotypes from at least 150,000 additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 300,000 controls of different ancestries. Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies. Genotyping and harmonization of data is expected to be completed in 2022.
+                        The Confluence project will harmonize existing genome-wide genotyping data from about 150,000 cases and 200,000 controls and double it by generating new genotypes from at least 150,000 additional breast cancer cases and 100,000 controls, for a total of at least 300,000 cases and 300,000 controls of different ancestries. Confluence will also harmonize risk factor, pathology, treatment, toxicities and survival data across studies. Genotyping and harmonization of data is expected to be completed in 2025.
                     </div>
                     <div>
                         The table below shows the current number of cases and controls from different participating consortia/studies. Numbers are updated regularly.
@@ -1832,7 +1832,7 @@ export const renderDataDescription = async () => {
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
                                                 <img src="../../static/images/timeline.png" height="200"
-                                                    alt="Approximate Timeline: Study Recruitment: 2018 to 2021 Sample Collection: mid 2019 – 2022 Genotyping: 2021 – 2023 Statistical Analysis &amp; Data Sharing: mid 2022 and beyond Publications: mid 2023 and beyond."
+                                                    alt="Approximate Timeline: Study Recruitment: 2018 to 2021 Sample Collection: mid 2019 – 2022 Genotyping: 2021 – 2023 Statistical Analysis &amp; Data Sharing: mid 2025 and beyond Publications: mid 2025 and beyond."
                                                     loading="lazy"></div>
                                             <div class="callout-box">
                                                 <h3>Interested in participating or have questions?</h3>
