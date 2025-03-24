@@ -5,7 +5,7 @@ export const participatingConfluence = (activeTab, showDescripton) => {
                 ${showDescripton ? `<div class="main-summary-row white-bg div-border">
                     <ul class="nav nav-pills">
                         <li class="nav-item"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></li>
-                        <li class="nav-item"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#join/description"> <strong>DACC Chairs</strong></a></li>
+                        <li class="nav-item"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>
                     </ul>
                 </div>`:``}
                 <div id="overview"></div>
@@ -91,7 +91,7 @@ export const confluenceResourcesDes = () => {
                 </div>
                 <div class="main-summary-row white-bg div-border">
                     <div class="font-size-18 align-left modal-body">
-                        The following DACCs provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
+                        The following Data Access Coordinating Committees (DACCs) provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
                         participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="_blank" rel="noopener noreferrer">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
                     </div>
                     <div class="table-responsive text-start modal-body">

@@ -35,7 +35,7 @@ export const navBarMenutemplate = () => {
         </li>
         <li class="nav-item dropdown grid-elements">
             <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown3" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Explore Data
+                Data
             </a>
             <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/dictionary" title="Data Dictionary" id="dataDictionary">
@@ -44,7 +44,10 @@ export const navBarMenutemplate = () => {
                 <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/summary" title="Summary Statistics" id="dataSummary">
                     Summary Statistics
                 </a></li>
-                ${
+                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">Data Access Process</a></li>
+               <!-- <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a></li>-->
+                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Approved Confluence Concepts </a></li>
+                <!--${
                     location.origin.match(applicationURLs.prod) ? 
                     ``:
                     `
@@ -52,7 +55,7 @@ export const navBarMenutemplate = () => {
                             Subset Statistics
                         </a></li>
                     `
-                }
+                }-->
                 <li><div id="myProjectsNav" class="grid-elements"></div></li>
             </ul>
         </li>
@@ -62,7 +65,7 @@ export const navBarMenutemplate = () => {
             </a>
             <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">Data Access Process</a></li>
-                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a></li>
+               <!-- <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a></li>-->
                 <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Approved Confluence Concepts </a></li>
             </ul>
         </li>
@@ -85,10 +88,10 @@ export const navBarMenutemplate = () => {
                     ) :''
                 }
                 <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Accepted Data Requests </a>-->
-                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
+                <!--<li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
                     Submitted
-                </a></li>
-                <li><div id="governanceNav" class="grid-elements"></div></li>
+                </a></li>-->
+                <!--<li><div id="governanceNav" class="grid-elements"></div></li>-->
             </ul>
         </li>
             `) :''

@@ -273,15 +273,15 @@ export const confluence = async () => {
         //     `;
         //     addEventMyProjects();
         // }
-        if (getMyPermissionLevel) {
-            document.getElementById('governanceNav').innerHTML = `
-                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance">
-                    Data Governance
-                </a>
-            `;
-            removeActiveClass('nav-link', 'active');
-            addEventDataGovernanceNavBar(true);
-        }
+        // if (getMyPermissionLevel) {
+        //     document.getElementById('governanceNav').innerHTML = `
+        //         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance">
+        //             Data Governance
+        //         </a>
+        //     `;
+        //     removeActiveClass('nav-link', 'active');
+        //     addEventDataGovernanceNavBar(true);
+        // }
         manageHash();
     }
 };
