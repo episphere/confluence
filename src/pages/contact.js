@@ -45,11 +45,6 @@ export const confluenceContactPage = () => {
                                             <td>CIMBA/Statistical Genetics</td>
                                         </tr>
                                         <tr>
-                                            <td>Jenny Chang-Claude</td>
-                                            <td>German Cancer Research Center DKFZ, Heidelberg, Germany</td>
-                                            <td>BCAC risk factor working group</td>
-                                        </tr>
-                                        <tr>
                                             <td>Nilanjan Chatterjee</td>
                                             <td>Johns Hopkins University, USA</td>
                                             <td>Statistical Genetics</td>
