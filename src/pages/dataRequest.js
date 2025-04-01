@@ -35,7 +35,7 @@ export const template = () => {
                         The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. This page will be updated when data is available for request by the research community. Data access will be in accordance to data use agreements signed between participating studies and the Data Coordinating Centers from Consortia participating in Confluence.
                     </div>
                     <div class="row m-0">The following data access procedures will be facilitated through this platform:</div>
-                    <div class="row m-0">
+                    <div class="row px-5">
                         <ul>
                             <li> Researcher submits a study concept describing the project, including variables of interest, via the Confluence Data Platform. This request will be sent via the platform to the relevant consortia data access coordinating committees (DACCs) that govern the requested data.</li>
                             <li> After approval by the relevant consortia DACCs, individual studies contributing data will be notified and given a time period to determine if their study will participate in the approved project. </li>
@@ -87,7 +87,7 @@ export const templateAfterLogin = () => {
                     The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. This page will be updated when data is available for request by the research community. Data access will be in accordance to data use agreements signed between participating studies and the Data Coordinating Centers from Consortia participating in Confluence.
                 </div>
                 <div class="row m-0">The following data access procedures will be facilitated through this platform:</div>
-                <div class="row m-0">
+                <div class="row px-5">
                     <ul>
                         <li> Researcher submits a study concept describing the project, including variables of interest, via the Confluence Data Platform. This request will be sent via the platform to the relevant consortia data access coordinating committees (DACCs) that govern the requested data.</li>
                         <li> After approval by the relevant consortia DACCs, individual studies contributing data will be notified and given a time period to determine if their study will participate in the approved project. </li>
