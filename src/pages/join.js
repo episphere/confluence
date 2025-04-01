@@ -4,8 +4,11 @@ export const participatingConfluence = (activeTab, showDescripton) => {
             <div class="container">
                 ${showDescripton ? `<div class="main-summary-row white-bg div-border">
                     <ul class="nav nav-pills">
+                        <li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></li>
+                        <li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>
                         <li class="nav-item"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></li>
-                        <li class="nav-item"><a class="nav-link ${activeTab !== 'overview' ? 'active': ''} black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>
+                        <li class="nav-item"><a class="nav-link ${activeTab === 'description' ? 'active': ''} black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>
+                        <li class="nav-item"><a class="nav-link black-font font-size-14" href="#contact"> <strong>Contacts</strong></a></li>
                     </ul>
                 </div>`:``}
                 <div id="overview"></div>
