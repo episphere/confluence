@@ -360,7 +360,7 @@ const manageRouter = async () => {
         if(element.classList.contains('navbar-active')) return;
         document.title = 'Confluence - Contact';
         assignNavbarActive(element,2);
-        confluenceDiv.innerHTML = confluenceContactPage();
+        confluenceDiv.innerHTML = confluenceContactPage(false);
     }
     else if (hash === '#data_access') {
         const element = document.getElementById('dataRequest');
@@ -588,7 +588,7 @@ const manageHash = async () => {
         if(element.classList.contains('navbar-active')) return;
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Contact';
-        confluenceDiv.innerHTML = confluenceContactPage();
+        confluenceDiv.innerHTML = confluenceContactPage(true);
         hideAnimation();
     }
     else if(hash === '#events/meetings') {
