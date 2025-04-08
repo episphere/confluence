@@ -279,7 +279,7 @@ const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
             x: ['<20','20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '>=90', 'Don\'t Know'],
             y: [ mapReduce(jsonData, '10-19'), mapReduce(jsonData, '20-29'), mapReduce(jsonData, '30-39'), mapReduce(jsonData, '40-49'), mapReduce(jsonData, '50-59'), mapReduce(jsonData, '60-69'), mapReduce(jsonData, '70-79'), mapReduce(jsonData, '80-89'), mapReduce(jsonData, '90-99') + mapReduce(jsonData, '100-109'), mapReduce(jsonData, 'ageDK') ],
             marker:{
-                color: ['#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61', '#BF1B61']
+                color: ['#BF1B61', '#f7b6d2', '#BF1B61', '#f7b6d2', '#BF1B61', '#f7b6d2', '#BF1B61', '#f7b6d2', '#BF1B61', '#7F7F7F']
             },
           type: 'bar'
         }
