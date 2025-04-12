@@ -172,8 +172,12 @@ const filterDataHandler = (dictionary) => {
     let searchedData = JSON.parse(JSON.stringify(filteredData));
     searchedData = searchedData.filter(dt => {
         let found = false;
-        if(dt['Variable'].toLowerCase().includes(currentValue)) found = true;
-        if(dt['Label'].toLowerCase().includes(currentValue)) found = true;
+        if (dt['Variable']){ 
+                if(dt['Variable'].toLowerCase().includes(currentValue)) found = true
+            };
+        if (dt['Label']){
+                if(dt['Label'].toLowerCase().includes(currentValue)) found = true;
+            };
         if(found) return dt;
     });
     let highlightData = JSON.parse(JSON.stringify(searchedData));
