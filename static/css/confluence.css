@@ -2254,6 +2254,10 @@ ul.form {
     pointer-events: none;
 }
 
+.white-space {
+    white-space: pre-wrap;
+}
+
 /* ul {
     padding-inline-start: 0;
     list-style-position: inside;

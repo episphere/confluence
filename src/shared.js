@@ -1112,6 +1112,24 @@ export const csvJSON = (csv) => {
     }
     return {jsonData:result, headers};
 }
+export const tsv2JsonDict = (tsv) => {
+    const lines = tsv.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,'').replace(/\n/g, '').split(/[\r]+/g);
+    const result = [];
+    const headers = lines[0].replace(/"/g,'').split(/[\t]/g);
+    for(let i=1; i < lines.length; i++){
+        const obj = {};
+        const currentline = lines[i].split(/[\t]/g);
+        for(let j = 0; j<headers.length; j++){
+            if(currentline[j]){
+                let value = headers[j];
+                obj[value] = currentline[j];
+            }
+        }
+        if(Object.keys(obj).length > 0) result.push(obj);
+    }
+    return {data:result, headers};
+
+}
 export const tsv2Json = (tsv) => {
     const lines = tsv.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,'').replace(/\n/g, '').split(/[\r]+/g);
     const result = [];

@@ -1,13 +1,13 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, shortenText, tsv2Json, json2other } from "./../shared.js";
+import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 export const dataDictionaryTemplate = async () => {
-    const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/Confluence_Data_Dictionary.txt')).text();
+    //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/Confluence_Data_Dictionary.txt')).text();
     //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
-    //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
-    //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2%2040_Oct8_2019.txt')).text();
-    const tsvData = tsv2Json(data);
+    //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
+    const data = await (await fetch('./Confluence_Data_Dictionary.txt')).text();
+    const tsvData = tsv2JsonDict(data);
     console.log(tsvData);
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
@@ -223,9 +223,9 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                 </h2>
                 <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
                     <div class="accordion-body">
-                        ${desc['Coding'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
+                        ${desc['Coding'] ? `<div class="row mb-1 m-0 white-space"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                         ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
-                        ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
+                        ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold white-space">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
                         ${desc['Confluence Variable'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
                     </div>
                 </div>

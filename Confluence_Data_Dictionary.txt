@@ -23,19 +23,8 @@ Age	refMonth	Month of diagnosis of breast cancer for cases and month of completi
 Age	refYear	Year of diagnosis of breast cancer for cases and year of completing interview/questionnaire for controls	"year, YYYY; 888=DK"	quantitative - continuous 		Yes	Core
 Age	AgeDiagIndex	Age at diagnosis of index breast cancer for cases	"years, 888=DK"	quantitative - continuous 		Yes	Core
 Sex	Sex		"M=male, F=female, U=unknown"	qualitative - categorical		Yes	Core
-Ethnicity	EthnicityClass	Ethnic origin	"1=European (for EthnicitySubClass 1, 2, 3, 4, 5), 
-2=Latinx / Caribbean (for EthnicitySubClass 6, 17), 
-3=African (for EthnicitySubClass 7, 8, 9),
-4=Asian Subcontinent (for EthnicitySubClass 10, 11, 12), 
-5=South-East Asian (for EthnicitySubClass 13, 14, 15), 
-6=Other (including 'mixed race'), 888=DK"""	qualitative - categorical		Yes	Core
-Ethnicity	EthnicitySubClass	Ethnic origin (refined)	"1=Northern European, 2=Southern European, 3=Western European, 4=Eastern European, 5=American European, 6=Hispanic Latinx, 7=African (Africa), 8=Carribbean African, 9=American African, 10=Indian, 11=Pakistani, 12=East and West Bengali, 13=Chinese, 14=Malaysian Peninsula, 15=Japanese, 16=Other (including 'mixed race'), 888=DK, 17 = Caribbean Latinx "	qualitative - categorical	"(1) If EthnicityClass=1, then EthnicitySubClass should be 1, 2, 3, 4, 5, or 888
-(2) if EthnicityClass=2, then EthnicitySubClass=6, 17 or 888
-(3) if EthnicityClass=3, then EthnicitySubClass=7, 8, 9 or 888
-(4) if EthnicityClass=4, then EthnicitySubClass=10, 11, 12 or 888
-(5) if EthnicityClass=5, then EthnicitySubClass=13, 14, 15 or 888
-(6) if EthnicityClass=6, then EthnicitySubClass=16, ethnOt­777
-(7) if EthnicityClass=888, then EthnicitySubClass=888 and ethnOt=888"	Yes	Core
+Ethnicity	EthnicityClass	Ethnic origin	"1=European (for EthnicitySubClass 1, 2, 3, 4, 5), 2=Latinx / Caribbean (for EthnicitySubClass 6, 17), 3=African (for EthnicitySubClass 7, 8, 9), 4=Asian Subcontinent (for EthnicitySubClass 10, 11, 12), 5=South-East Asian (for EthnicitySubClass 13, 14, 15), 6=Other (including 'mixed race'), 888=DK"""	qualitative - categorical		Yes	Core
+Ethnicity	EthnicitySubClass	Ethnic origin (refined)	"1=Northern European, 2=Southern European, 3=Western European, 4=Eastern European, 5=American European, 6=Hispanic Latinx, 7=African (Africa), 8=Carribbean African, 9=American African, 10=Indian, 11=Pakistani, 12=East and West Bengali, 13=Chinese, 14=Malaysian Peninsula, 15=Japanese, 16=Other (including 'mixed race'), 888=DK, 17 = Caribbean Latinx "	qualitative - categorical	"(1) If EthnicityClass=1, then EthnicitySubClass should be 1, 2, 3, 4, 5, or 888 (2) if EthnicityClass=2, then EthnicitySubClass=6, 17 or 888 (3) if EthnicityClass=3, then EthnicitySubClass=7, 8, 9 or 888 (4) if EthnicityClass=4, then EthnicitySubClass=10, 11, 12 or 888 (5) if EthnicityClass=5, then EthnicitySubClass=13, 14, 15 or 888 (6) if EthnicityClass=6, then EthnicitySubClass=16, ethnOt­777 (7) if EthnicityClass=888, then EthnicitySubClass=888 and ethnOt=888"	Yes	Core
 Ethnicity	ethnOt	Details of specific ethnicity	"Specify ethnicity; 777=NA, 888=DK"	qualitative - text	No coding. Please provide details of ethnicity as free text if this is known	Yes	Core
 Ethnicity	raceM	Race/ethnicity of mother 	"1=European, 2=Hispanic American, 3=African, 4=Asian Subcontinent, 5=South-East Asian, 6=Other (including 'mixed race'), 888=DK"	qualitative - categorical		Yes	Core
 Ethnicity	raceF	Race/ethnicity of father	"1=European, 2=Hispanic American, 3=African, 4=Asian Subcontinent, 5=South-East Asian, 6=Other (including 'mixed race'), 888=DK"	qualitative - categorical		Yes	Core

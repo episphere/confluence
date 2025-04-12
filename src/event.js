@@ -1151,6 +1151,7 @@ export const addEventUpdateSummaryStatsData = () => {
     const btn = document.getElementById('updateSummaryStatsData');
     if(!btn) return;
     btn.addEventListener('click', async () => {
+        console.log("click");
         const header = document.getElementById('confluenceModalHeader');
         const body = document.getElementById('confluenceModalBody');
         
@@ -1164,6 +1165,7 @@ export const addEventUpdateSummaryStatsData = () => {
         template += '<div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update data</button></div>'
         template += '</form>';
         body.innerHTML = template;
+        document.getElementById('confluenceMainModal').style.display = "block";
         addEventDataTypeRadio();
         addEventUpdateSummaryStatsForm();
     });
