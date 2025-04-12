@@ -380,22 +380,22 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
     let searchedData = JSON.parse(JSON.stringify(filteredData));
     searchedData = searchedData.filter(dt => {
         let found = false;
-        if(dt['Country'] && dt['Country'].toLowerCase().includes(currentValue)) found = true;
-        if(dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
-        if(dt['Study'].toLowerCase().includes(currentValue)) found = true;
-        if(dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
+        if(typeof dt['Country'] !== 'undefined' && dt['Country'] && dt['Country'].toLowerCase().includes(currentValue)) found = true;
+        if(typeof dt['Study Acronym'] !== 'undefined' && dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
+        if(typeof dt['Study Name'] !== 'undefined' && dt['Study Name'].toLowerCase().includes(currentValue)) found = true;
+        if(typeof dt['Study design'] !== 'undefined' && dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
         dt['pis'].forEach(element => {
-            if(element['PI'] && element['PI'].toLowerCase().includes(currentValue)) found = true;
+            if(typeof element['PI'] !== 'undefined' && element['PI'] && element['PI'].toLowerCase().includes(currentValue)) found = true;
         });
         if(found) return dt;
     })
     searchedData = searchedData.map(dt => {
-        dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        dt['Study'] = dt['Study'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        dt['pis'].forEach(element => {
-            element['PI'] = element['PI'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if(dt['Country']) dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if(dt['Study Acronym']) dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if(dt['Study design']) dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if(dt['Study Name']) dt['Study Name'] = dt['Study Name'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if(dt['pis']) dt['pis'].forEach(element => {
+            if(element['PI']) element['PI'] = element['PI'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         });
         return dt;
     })
