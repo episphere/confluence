@@ -39,8 +39,8 @@ export const dataDictionaryTemplate = async () => {
     `;
     document.getElementById('dataSummaryStatistics').innerHTML = template;
     renderDataDictionaryFilters(dictionary, headers);
-    renderDataDictionary(dictionary, 60, headers);
-    paginationHandler(dictionary, 60, headers);
+    renderDataDictionary(dictionary, dictionary.length, headers);
+    paginationHandler(dictionary, dictionary.length, headers);
     addEventFilterBarToggle();
     hideAnimation();
 }
@@ -214,7 +214,7 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
             <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">
         `
     dictionary.forEach((desc, index) => {
-        if(index > pageSize ) return
+        if(index > pageSize) return
         template += `
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingOne">

@@ -194,8 +194,8 @@ const getDescription = async () => {
     `;
     addEventFilterDataCatalogue(descriptions, headers);
     downloadFiles(descriptions, headers, 'study_description', true);
-    renderStudyDescription(descriptions, defaultPageSize, headers);
-    paginationHandler(descriptions, defaultPageSize, headers);
+    renderStudyDescription(descriptions, descriptions.length, headers);
+    paginationHandler(descriptions, descriptions.length, headers);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, defaultPageSize);
     addEventPageSizeSelection(descriptions, headers);
     addEventFilterBarToggle();
@@ -422,8 +422,16 @@ export const pageSizeTemplate = (array, startPageSize) => {
     const contentSize = Math.ceil(array.length / defaultPageSize) * defaultPageSize;
     let pageSizes = [];
     for(let i = startPageSize; i <= contentSize; i += defaultPageSize) {
-        pageSizes.push(i);
+        if (array.length > i){
+            console.log(i);
+            pageSizes.push(i)
+        }
+        else {
+            console.log(i);
+            pageSizes.push(array.length);
+        }
     }
+    pageSizes.reverse();
     let template = `
     <select class="form-select" id="pageSizeSelector">`
     pageSizes.forEach(size => {
