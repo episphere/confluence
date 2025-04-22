@@ -31,8 +31,6 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
-    console.log(jsonData);
-    console.log(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
 
     jsonData = jsonData.concat(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
 
@@ -137,9 +135,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
 
 const aggegrateData = (jsonData) => {
     let obj = {};
-    //console.log(jsonData);
     jsonData.forEach(value => {
-        //console.log(value)
         if(obj[value.consortium] === undefined) obj[value.consortium] = {};
         if(obj[value.consortium]){
             if(obj[value.consortium]['consortiumTotal'] === undefined) obj[value.consortium]['consortiumTotal'] = 0;
@@ -158,7 +154,6 @@ export const addEventConsortiumSelect = () => {
     const elements = document.getElementsByClassName('consortium-selection');
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
-            console.log("clicked")
             if (element.lastElementChild.classList.contains('fa-caret-up')){
                 element.lastElementChild.classList.add('fa-caret-down');
                 element.lastElementChild.classList.remove('fa-caret-up');
@@ -217,7 +212,6 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
         renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
         generateBarSingleSelect('famHist', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', finalData, headers, 'chartRow2');
     }
-    console.log(finalData);
     // renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
     // renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
     // if (onlyCIMBA) renderEthnicityBarChart(finalData, 'ethnicityClass', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');

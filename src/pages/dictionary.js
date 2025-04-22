@@ -8,7 +8,6 @@ export const dataDictionaryTemplate = async () => {
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     const data = await (await fetch('./Confluence_Data_Dictionary.txt')).text();
     const tsvData = tsv2JsonDict(data);
-    console.log(tsvData);
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
     

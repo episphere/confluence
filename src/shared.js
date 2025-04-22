@@ -1066,7 +1066,6 @@ export const csvJSON = (csv) => {
     const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
     const result = [];
     const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
-    console.log(headers);
     for(let i=1; i < lines.length; i++){
         const obj = {};
         const currentline = lines[i].split(/[,\t]/g);

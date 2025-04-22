@@ -423,11 +423,9 @@ export const pageSizeTemplate = (array, startPageSize) => {
     let pageSizes = [];
     for(let i = startPageSize; i <= contentSize; i += defaultPageSize) {
         if (array.length > i){
-            console.log(i);
             pageSizes.push(i)
         }
         else {
-            console.log(i);
             pageSizes.push(array.length);
         }
     }
