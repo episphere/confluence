@@ -206,14 +206,14 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
     //console.log(descriptions);
     if(descriptions.length > 0) {
         template = `
-        <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky">
-            <div class="col-md-12">
-                <div class="row ps-3 pe-5">
-                    <div class="col-md-2 font-bold ws-nowrap">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-4 font-bold ws-nowrap">Study <button class="transparent-btn sort-column" data-column-name="Study Name"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-2 font-bold ws-nowrap">Study Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-2 font-bold ws-nowrap">Study Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-md-2 font-bold ws-nowrap">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
+        <div class="row pt-3 pb-3 m-0 align-left div-sticky">
+            <div class="col-lg-12">
+                <div class="row ps-lg-3 pe-lg-5">
+                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-4 font-bold ws-nowrap fs-5">Study <button class="transparent-btn sort-column" data-column-name="Study Name"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
         </div>

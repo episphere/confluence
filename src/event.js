@@ -1166,6 +1166,7 @@ export const addEventUpdateSummaryStatsData = () => {
         template += '</form>';
         body.innerHTML = template;
         document.getElementById('confluenceMainModal').style.display = "block";
+        $("#confluenceMainModal").modal("show");
         addEventDataTypeRadio();
         addEventUpdateSummaryStatsForm();
     });

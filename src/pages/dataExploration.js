@@ -51,7 +51,7 @@ export const dataSummary = (
                 </div>
                 <div class="main-summary-row">
                     <div class="row align-left w-100 m-0">
-                        <h1 class="col page-header pl-0 pt-2">${pageHeader}</h1>
+                        <h1 class="col page-header pl-0 pt-2" id="pageHeader">${pageHeader}</h1>
                         ${
                           showPages
                             ? `

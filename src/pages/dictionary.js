@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other } from "./../shared.js";
+import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other, emailsAllowedToUpdateData, getFileXLSX, showAnimation, array2Json, getFileURL } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 export const dataDictionaryTemplate = async () => {
@@ -11,6 +11,15 @@ export const dataDictionaryTemplate = async () => {
     console.log(tsvData);
     const dictionary = tsvData.data;
     const headers = tsvData.headers;
+    
+    if(localStorage.parms){
+        let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)
+        if (emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)){
+            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3" title="Update Dictionar Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
+            const pageHeader = document.getElementById("pageHeader");
+            pageHeader.insertAdjacentHTML("afterend", updateButton);
+        }
+    };
     let template = `
     <div class="col-xl-2 filter-column black-font" id="summaryFilterSiderBar">
         <div class="div-border white-bg align-left p-2">
@@ -42,6 +51,7 @@ export const dataDictionaryTemplate = async () => {
     renderDataDictionary(dictionary, dictionary.length, headers);
     paginationHandler(dictionary, dictionary.length, headers);
     addEventFilterBarToggle();
+    updateDict();
     hideAnimation();
 }
 const paginationHandler = (data, pageSize, headers) => {
@@ -286,4 +296,56 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         link.click(); 
         document.body.removeChild(link);
     })
-} 
+}
+
+export const updateDict = () => {
+    const updateDictButton = document.getElementById('updateDict');
+        updateDictButton.addEventListener('click', async e => {
+            // let data = await getFileURL(1834994253194);
+            // // let file = await data.arrayBuffer();
+            // // let workbook = XLSX.read(file);
+
+            // // let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            // // let raw_data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            // // let json_input = array2Json(raw_data);
+            // // JSONToFile(json_input, 'testing');
+            // const a = document.createElement('a');
+            // a.href = data;
+            // //a.download = `test`;
+            // a.click();
+            const header = document.getElementById("confluenceModalHeader");
+            const body = document.getElementById("confluenceModalBody");
+
+            header.innerHTML = `<h5 class="modal-title">New Dictionary Download</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+            let template = '<form id="updateDictionaryForm">';
+            template += `<p>The Download Dictionary button will download from Box a copy of the dictionary. It should be uploaded to: <a href="https://github.com/episphere/confluence/tree/master/src/data" target="__blank">Confluence GitHub Data Folder</a> for the dictionary to be updated.</p>`;
+            template += '<div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Download Dictionary</button></div>'
+            template += "</form>";
+            body.innerHTML = template;
+            $("#confluenceMainModal").modal("show");
+            //URL.revokeObjectURL(url);
+            const form = document.getElementById('updateDictionaryForm');
+            form.addEventListener('submit', async e => {
+                showAnimation();
+                let data = await getFileURL(1834994253194);
+                const a = document.createElement('a');
+                a.href = data;
+                a.click();
+                hideAnimation();
+            })
+        })
+}
+
+const JSONToFile = (obj, filename) => {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    //uploadFileVersion2(blob, studyDescriptions, 'application/json')
+  };
