@@ -8,23 +8,20 @@ export const dataDictionaryTemplate = async () => {
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     const data = await (await fetch('./Confluence_Data_Dictionary.txt')).text();
     const tsvData = tsv2JsonDict(data);
-    //const dictionary = tsvData.data;
+    const dictionary = tsvData.data;
     const headers = tsvData.headers;
     // console.log(dictionary);
     // console.log(headers);
 
-    const dataxlsx =  await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
-    let file = await dataxlsx.arrayBuffer();
-    let workbook = XLSX.read(file);
-    console.log(workbook);
-    let worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    console.log(worksheet);
-    let raw_data = XLSX.utils.sheet_to_json(worksheet, {range:3});
-    console.log(raw_data);
-    const dictionary = raw_data;
-    // let json_input_noempty = json_input.filter(obj => Object.keys(obj).length !== 0);
-    // json_list = json_list.concat(json_input_noempty);
-    // console.log(json_list);
+    // const dataxlsx =  await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
+    // let file = await dataxlsx.arrayBuffer();
+    // let workbook = XLSX.read(file);
+    // console.log(workbook);
+    // let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    // console.log(worksheet);
+    // let raw_data = XLSX.utils.sheet_to_json(worksheet, {range:3});
+    // console.log(raw_data);
+    // const dictionary = raw_data;
 
     
     if(localStorage.parms){
