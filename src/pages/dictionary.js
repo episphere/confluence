@@ -1,5 +1,5 @@
 import { addEventFilterBarToggle } from "../event.js";
-import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other, emailsAllowedToUpdateData, getFileXLSX, showAnimation, array2Json, getFileURL } from "./../shared.js";
+import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other, emailsAllowedToUpdateData, getFileXLSX, showAnimation, array2Json, array2Json2, getFileURL } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
 export const dataDictionaryTemplate = async () => {
@@ -8,8 +8,24 @@ export const dataDictionaryTemplate = async () => {
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     const data = await (await fetch('./Confluence_Data_Dictionary.txt')).text();
     const tsvData = tsv2JsonDict(data);
-    const dictionary = tsvData.data;
+    //const dictionary = tsvData.data;
     const headers = tsvData.headers;
+    // console.log(dictionary);
+    // console.log(headers);
+
+    const dataxlsx =  await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
+    let file = await dataxlsx.arrayBuffer();
+    let workbook = XLSX.read(file);
+    console.log(workbook);
+    let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    console.log(worksheet);
+    let raw_data = XLSX.utils.sheet_to_json(worksheet, {range:3});
+    console.log(raw_data);
+    const dictionary = raw_data;
+    // let json_input_noempty = json_input.filter(obj => Object.keys(obj).length !== 0);
+    // json_list = json_list.concat(json_input_noempty);
+    // console.log(json_list);
+
     
     if(localStorage.parms){
         let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)
@@ -88,7 +104,7 @@ const addEventPageBtns = (pageSize, data, headers) => {
     });
 }
 const renderDataDictionaryFilters = (dictionary, headers) => {
-    const allVariableType = Object.values(dictionary).filter(dt => dt['Data Type']).map(dt => dt['Data Type']);
+    const allVariableType = Object.values(dictionary).filter(dt => dt['Variable type']).map(dt => dt['Variable type']);
     const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i);
     let template = '';
     template += `
@@ -162,7 +178,7 @@ const filterDataHandler = (dictionary) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
     let filteredData = dictionary;
     if(variableTypeSelection.length > 0) {
-        filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Data Type']) !== -1);
+        filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Variable type']) !== -1);
     }
     if(variableTypeSelection.length === 0) filteredData = dictionary;
     
@@ -231,7 +247,7 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                         <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
                         <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
                         <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
-                        <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
+                        <div class="col-md-2">${desc['Variable type'] ? desc['Variable type'] : ''}</div>
                     </button>
                 </h2>
                 <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">

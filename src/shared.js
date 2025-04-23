@@ -1166,6 +1166,7 @@ export const csv2Json = (csv) => {
 }
 
 export const array2Json = (array) => {
+    console.log(array)
     const keys = array.shift();
     const json = array.reduce((agg, arr) => {
         agg.push(arr.reduce((obj, item, index) => {
@@ -1176,6 +1177,16 @@ export const array2Json = (array) => {
       }, [])
     return json;
 }
+
+export function array2Json2(arr) {
+    try {
+      const jsonString = JSON.stringify(arr);
+      return jsonString;
+    } catch (error) {
+      console.error("Error converting array to JSON:", error);
+      return null;
+    }
+  }
 
 export const json2csv = (json, fields) => {
     if(!fields.includes('study')) fields.push('study');

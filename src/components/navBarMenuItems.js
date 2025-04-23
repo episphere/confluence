@@ -45,7 +45,7 @@ export const navBarMenutemplate = () => {
                     Summary Statistics
                 </a></li>
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">Data Access Process</a></li>
-                <!-- <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a></li>-->
+                <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm"> Submit Concept Form </a></li>
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Approved Confluence Concepts </a></li>
                 <!--${
                     location.origin.match(applicationURLs.prod) ? 

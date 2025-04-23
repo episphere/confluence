@@ -34,7 +34,7 @@ export const formtemplate = () => {
                               <input id="projname" name="projname" type="text" required/>
                             </div>
                             
-                            <div class="input-group">
+                            <div class="input-group form-check">
                                 <label for="amendment"> <b>Is this an amendment?</b><span class='required-label'>*</span> </label>
                                     
                                     <input id="amendmentyes" name="amendment" type="radio" value="Yes" required/>
@@ -69,7 +69,7 @@ export const formtemplate = () => {
                             <div class="container-lg">
                               <div class="row">
                                 <div class="col-12 col-md-2 col-sm-12">
-                                  <div class="form-check">
+                                  <div class="form-check mb-3">
                                     <input class="form-check-input" id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
                                     <label class="form-check-label" for="mem-aabcg"> AABCG</label>
                                   </div>
@@ -204,19 +204,31 @@ export const formtemplate = () => {
                                       <input class="form-check-input" id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk"/>
                                       <label class="form-check-label" for="consortia-bcr"> Breast Cancer Risk</label>
                                     </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
                                       <label class="form-check-label" for="sbc"> Subtype of Breast Cancer</label>
-                                      <input type="text" id="sbcin" name="sbcin" placeholder="Subtype"/>
+                                      <input type="text" class="form-control" id="sbcin" name="sbcin" placeholder="Subtype"/>
                                     </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival"/>
                                       <label class="form-check-label" for="sur"> Survival</label>
                                     </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
                                       <input class="form-check-input" id="other" name="prim-end" type="checkbox" value="Other"/>
                                       <label class="form-check-label" for="other"> Other</label>
-                                      <input id="otherinput" name="otherinput" type="text" placeholder="Other primary endpoint" />
+                                      <input id="otherinput" name="otherinput" class="form-control" type="text" placeholder="Other primary endpoint" />
                                     </div>
                                   </div>
                                 </div>  
@@ -312,7 +324,7 @@ export const formtemplate = () => {
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
                                 <label> 
                                   <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
-                                  Check all 
+                                  Select
                                 </label>
                             </div>
 
