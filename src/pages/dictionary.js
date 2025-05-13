@@ -2,6 +2,40 @@ import { addEventFilterBarToggle } from "../event.js";
 import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other, emailsAllowedToUpdateData, getFileXLSX, showAnimation, array2Json, array2Json2, getFileURL } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
+/**
+ * Checks if a row appears to be a merged header row rather than a data row
+ * @param {Object} row - The row object from the Excel sheet
+ * @returns {boolean} - True if the row appears to be a merged header row
+ */
+const isMergedRow = (row) => {
+    // Get all keys in the row
+    const keys = Object.keys(row);
+    
+    // If the row has very few columns compared to what we expect, it might be a merged row
+    if (keys.length < 3) {
+        return true;
+    }
+    
+    // Check if the row is missing essential columns that data rows should have
+    const essentialColumns = ['Variable', 'Label'];
+    const missingEssentials = essentialColumns.some(col => 
+        !keys.includes(col) || !row[col] || row[col].toString().trim() === ''
+    );
+    
+    // If missing essential columns, likely a merged header row
+    if (missingEssentials) {
+        return true;
+    }
+    
+    // Check if the first column value is very long, which often indicates a merged header
+    const firstColValue = row[keys[0]];
+    if (firstColValue && typeof firstColValue === 'string' && firstColValue.length > 50) {
+        return true;
+    }
+    
+    return false;
+};
+
 export const dataDictionaryTemplate = async () => {
     //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/Confluence_Data_Dictionary.txt')).text();
     //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
@@ -34,6 +68,16 @@ export const dataDictionaryTemplate = async () => {
         
         // Process each row in the sheet and handle Category inheritance
         sheetData.forEach(row => {
+            // Check if this row appears to have merged columns (header rows)
+            // This typically happens when a row has a long text spanning multiple columns
+            // and is missing most of the expected column values
+            const isMergedHeaderRow = isMergedRow(row);
+            
+            // Skip rows that appear to be merged header rows
+            if (isMergedHeaderRow) {
+                return;
+            }
+            
             // If Category is empty, use the last non-empty Category
             if (!row.Category || row.Category.trim() === '') {
                 row.Category = lastCategory;
