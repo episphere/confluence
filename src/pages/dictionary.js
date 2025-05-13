@@ -372,6 +372,10 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
         const filteredDictionary = filterDataHandler(data);
         prepareDictionaryForTSVDownload(filteredDictionary, 'Confluence_Dictionary');
     })
+    const downloadExcelBtn = document.getElementById('downloadOriginalExcel');
+    downloadExcelBtn.addEventListener('click', e => {
+        downloadOriginalDictionary();
+    })
 }
 
 export const updateDict = () => {
@@ -425,6 +429,44 @@ const JSONToFile = (obj, filename) => {
     URL.revokeObjectURL(url);
     //uploadFileVersion2(blob, studyDescriptions, 'application/json')
   };
+
+/**
+ * Downloads the original Excel dictionary file
+ * @returns {Promise<void>} - Triggers a file download
+ */
+const downloadOriginalDictionary = async () => {
+  try {
+    showAnimation();
+    
+    // Fetch the Excel file
+    const response = await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dictionary file: ${response.status} ${response.statusText}`);
+    }
+    
+    // Get the file as a blob
+    const blob = await response.blob();
+    
+    // Create a download link and trigger the download
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Confluence_Extended_Dictionary.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    hideAnimation();
+  } catch (error) {
+    console.error('Error downloading dictionary file:', error);
+    hideAnimation();
+    alert('Failed to download the dictionary file. Please try again later.');
+  }
+};
 
 /**
  * Prepares dictionary data for download in CSV format
