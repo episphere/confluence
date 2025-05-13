@@ -30,7 +30,7 @@ export const template = () => {
                         <h1 class="page-header">Data Access Process</h1>
                     </div>
                 </div>
-                <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
+                <div class="data-submission div-border font-size-18 black-font" style="padding-left: 1rem;">
                     <div class="mb-3">
                         The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. This page will be updated when data is available for request by the research community. Data access will be in accordance to data use agreements signed between participating studies and the Data Coordinating Centers from Consortia participating in Confluence.
                     </div>
@@ -82,7 +82,7 @@ export const templateAfterLogin = () => {
                     <h1 class="page-header">Data Access Process</h1>
                 </div>
             </div>
-            <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
+            <div class="data-submission div-border font-size-18 black-font" style="padding-left: 1rem;">
                 <div class="mb-3">
                     The Confluence Project is currently generating genotyping data and harmonizing risk factor and clinical data. This page will be updated when data is available for request by the research community. Data access will be in accordance to data use agreements signed between participating studies and the Data Coordinating Centers from Consortia participating in Confluence.
                 </div>

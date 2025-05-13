@@ -1744,7 +1744,7 @@ form {
 }
 
 .filter-sub-div {
-    max-height: 112px;
+    max-height: 200px;
 }
 
 .checkbox-consortia {
@@ -2247,6 +2247,21 @@ ul.form {
     .accordion-button::after {
         pointer-events: all;
     }
+    /* Make the parent div interactive too */
+    .accordion-button [data-value] {
+        pointer-events: all !important;
+    }
+
+    .accordion-button .col-lg-1 {
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Ensure the container has proper padding */
+    .accordion-flush .accordian-item {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 
   .pagination {
     background-color: white;
@@ -2260,7 +2275,204 @@ ul.form {
     white-space: pre-wrap;
 }
 
-/* ul {
-    padding-inline-start: 0;
-    list-style-position: inside;
-  } */
+.form-check-input:not(:checked) {
+  border-color: #555 !important; /* e.g., #0d6efd for blue */
+}
+
+.form-check-input:hover {
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.5); /* Blue glow */
+  border-color: #0d6efd !important;
+  cursor: pointer;
+}
+
+.dict-update:hover {
+  box-shadow: 0 0 8px rgba(13, 110, 253, 0.7); /* Stronger blue glow */
+  border-color: #0d6efd !important;
+  cursor: pointer;
+  transition: all 0.2s ease; /* Smooth transition effect */
+}
+
+/* Additional styles for the radical approach */
+.accordian-item {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+/* Make dropdowns more compact */
+.decision-dropdown {
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  min-width: 50px;
+  height: auto;
+}
+
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.accordion-toggle-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 1.25rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.accordion-toggle-btn:hover {
+  color: #495057;
+}
+
+.d-none {
+  display: none !important;
+}
+
+.accordion-toggle-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+/* Make accordion button more compact */
+.accordion-button.p-2 {
+  padding: 0.5rem !important;
+}
+
+/* Ensure proper alignment */
+.align-items-center {
+  align-items: center !important;
+}
+
+/* Add some spacing between items */
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.pb-2 {
+  padding-bottom: 0.5rem !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Ensure proper spacing in the row */
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.position-relative {
+  position: relative !important;
+}
+
+
+.text-right {
+  text-align: right !important;
+}
+
+/* Make sure dropdowns are visible and interactive */
+.form-select-sm {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+/* Make the dropdowns more compact */
+.form-select-sm.decision-dropdown {
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  min-width: 45px;
+}
+
+/* Apply badge colors to selected options */
+.decision-dropdown.badge-1 {
+  background-color: green;
+  color: white;
+}
+.decision-dropdown.badge-2 {
+  background-color: #fff200;
+  color: black;
+}
+.decision-dropdown.badge-3 {
+  background-color: #ffa700;
+  color: black;
+}
+.decision-dropdown.badge-4 {
+  background-color: #ff0000;
+  color: white;
+}
+.decision-dropdown.badge-5 {
+  background-color: #7700ff;
+  color: white;
+}
+.decision-dropdown.badge-777 {
+  background-color: #757575;
+  color: white;
+}
+
+/* Fix for row-24 to prevent content from being cut off */
+.row-24 {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: 0;  /* Changed from -15px */
+  margin-left: 0;   /* Changed from -15px */
+  width: 100%;      /* Ensure full width */
+  padding: 0;       /* Reset padding */
+  box-sizing: border-box;
+}
+
+/* Add padding to columns instead */
+[class^="col-24-"] {
+  padding-right: 10px;
+  padding-left: 10px;
+  box-sizing: border-box;
+}
+
+/* Define column widths for 24-column grid */
+.col-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
+.col-24-2 { flex: 0 0 8.333333%; max-width: 8.333333%; }
+.col-24-3 { flex: 0 0 12.5%; max-width: 12.5%; }
+.col-24-4 { flex: 0 0 16.666666%; max-width: 16.666666%; }
+.col-24-5 { flex: 0 0 20.833333%; max-width: 20.833333%; }
+.col-24-6 { flex: 0 0 25%; max-width: 25%; }
+.col-24-7 { flex: 0 0 29.166666%; max-width: 29.166666%; }
+.col-24-8 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+.col-24-9 { flex: 0 0 37.5%; max-width: 37.5%; }
+.col-24-10 { flex: 0 0 41.666666%; max-width: 41.666666%; }
+.col-24-11 { flex: 0 0 45.833333%; max-width: 45.833333%; }
+.col-24-12 { flex: 0 0 50%; max-width: 50%; }
+.col-24-13 { flex: 0 0 54.166666%; max-width: 54.166666%; }
+.col-24-14 { flex: 0 0 58.333333%; max-width: 58.333333%; }
+.col-24-15 { flex: 0 0 62.5%; max-width: 62.5%; }
+.col-24-16 { flex: 0 0 66.666666%; max-width: 66.666666%; }
+.col-24-17 { flex: 0 0 70.833333%; max-width: 70.833333%; }
+.col-24-18 { flex: 0 0 75%; max-width: 75%; }
+.col-24-19 { flex: 0 0 79.166666%; max-width: 79.166666%; }
+.col-24-20 { flex: 0 0 83.333333%; max-width: 83.333333%; }
+.col-24-21 { flex: 0 0 87.5%; max-width: 87.5%; }
+.col-24-22 { flex: 0 0 91.666666%; max-width: 91.666666%; }
+.col-24-23 { flex: 0 0 95.833333%; max-width: 95.833333%; }
+.col-24-24 { flex: 0 0 100%; max-width: 100%; }
+
+/* Add responsive variants if needed */
+@media (min-width: 576px) {
+  .col-sm-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
+  /* ... and so on for other sizes */
+}
+
+@media (min-width: 768px) {
+  .col-md-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
+  /* ... and so on for other sizes */
+}
+
+@media (min-width: 992px) {
+  .col-lg-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
+  /* ... and so on for other sizes */
+}
+
+@media (min-width: 1200px) {
+  .col-xl-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
+  /* ... and so on for other sizes */
+}

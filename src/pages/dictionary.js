@@ -100,7 +100,7 @@ export const dataDictionaryTemplate = async () => {
     if(localStorage.parms){
         let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)
         if (emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)){
-            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3" title="Update Dictionar Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
+            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3 dict-update" title="Update Dictionary Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
             const pageHeader = document.getElementById("pageHeader");
             pageHeader.insertAdjacentHTML("afterend", updateButton);
             updateDict();
@@ -122,7 +122,7 @@ export const dataDictionaryTemplate = async () => {
         <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
         <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-bold">Data Type:</span> All
+                <span class="font-bold black-font">Data Type:</span> All
             </div>
         </div>
         <div class="main-summary-row">
@@ -174,7 +174,6 @@ const addEventPageBtns = (pageSize, data, headers) => {
     });
 }
 const renderDataDictionaryFilters = (dictionary, headers) => {
-    // Update to use Data Type instead of Variable type for filtering
     const allDataTypes = Object.values(dictionary).filter(dt => dt['Data Type']).map(dt => dt['Data Type']);
     const uniqueTypes = allDataTypes.filter((d,i) => allDataTypes.indexOf(d) === i);
     let template = '';
@@ -184,9 +183,6 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
             <div class="form-group" margin:0px>
                 <div class="input-group">
                     <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataDictionary" aria-describedby="search-addon" />
-                    <!--<span class="input-group-text border-0 search-input">
-                        <i class="fas fa-search"></i>
-                    </span>-->
                 </div>
             </div>
         </div>
@@ -199,9 +195,9 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
                 `
                 uniqueTypes.forEach(dt => {
                     template += `
-                        <li class="filter-list-item">
-                            <input type="checkbox" data-variable-type="${dt}" id="label${dt}" class="select-variable-type" style="margin-left: 1px !important;">
-                            <label for="label${dt}" class="country-name" title="${dt}">${shortenText(dt, 60)}</label>
+                        <li class="filter-list-item form-check">
+                            <input type="checkbox" data-variable-type="${dt}" id="label${dt}" class="form-check-input select-variable-type" style="margin-left: 1px !important;">
+                            <label for="label${dt}" class="form-check-label" title="${dt}">${shortenText(dt, 60)}</label>
                         </li>
                     `
                 })
@@ -256,9 +252,9 @@ const filterDataHandler = (dictionary) => {
     
     document.getElementById('listFilters').innerHTML = `
     ${variableTypeSelection.length > 0 ? `
-        <span class="font-bold">Data Type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
+        <span class="font-bold black-font">Data Type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
     `:`
-        <span class="font-bold">Data Type:</span> All`}
+        <span class="font-bold black-font">Data Type:</span> All`}
     `;
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
