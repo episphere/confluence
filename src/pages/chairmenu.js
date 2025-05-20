@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { switchTabs, switchFiles, sortTableByColumn } from "../event.js";
+import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
 import {
   getFolderItems,
   chairsInfo,
@@ -566,7 +566,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
   if (filesInfo.length !== 0) {
     await viewFinalDecisionFiles(filesInfo);
     for (const file of filesInfo) {
-      showCommentsDCEG(file.id)
+      showCommentsDCEG(file.id, false)
       // console.log(file.id);
       // document
       //   .getElementById(`study${file.id}`)
@@ -645,7 +645,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- AABCG (col-1) -->
       <div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="AABCG Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="AABCG Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -658,7 +658,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- BCAC (col-1) -->
       <div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="BCAC Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="BCAC Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -671,7 +671,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- C-NCI (col-1) -->
       <div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="C-NCI Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="C-NCI Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -684,7 +684,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- CIMBA (col-1) -->
       <div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="CIMBA Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="CIMBA Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -697,7 +697,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- LAGENO (col-1) -->
       <div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="LAGENO Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="LAGENO Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -710,7 +710,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- MERGE (col-1) -->
       <div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE">
-        <select class="form-select form-select-sm decision-dropdown" aria-label="MERGE Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="MERGE Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -723,7 +723,7 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- TEST (col-1, hidden) -->
       <div class="col-24-2 text-center" id="TEST${fileId}" data-value="TEST" hidden>
-        <select class="form-select form-select-sm decision-dropdown" aria-label="TEST Decision">
+        <select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="TEST Decision">
           <option value="--" selected>--</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -774,24 +774,25 @@ export async function viewFinalDecisionFiles(files) {
     document.getElementById("files").innerHTML = template;
     
     // Add event listeners for the dropdowns
-    document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
-      dropdown.addEventListener('change', function() {
-        const selectedValue = this.value;
-        const parentElement = this.closest('[data-value]');
-        const consortium = parentElement.getAttribute('data-value');
-        const fileId = parentElement.id.replace(consortium, '');
+    // document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
+    //   dropdown.addEventListener('change', function() {
+    //     const selectedValue = this.value;
+    //     const parentElement = this.closest('[data-value]');
+    //     const consortium = parentElement.getAttribute('data-value');
+    //     const fileId = parentElement.id.replace(consortium, '');
         
-        console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
+    //     console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
         
-        // Remove any existing badge classes
-        this.className = 'form-select form-select-sm decision-dropdown';
+    //     // Remove any existing badge classes
+    //     this.className = 'form-select form-select-sm decision-dropdown disabled';
+    //     dropdown.setAttribute('disabled', true);
         
-        // Add styling based on selection
-        if (selectedValue !== '--') {
-          this.classList.add(`badge-${selectedValue}`);
-        }
-      });
-    });
+    //     // Add styling based on selection
+    //     if (selectedValue !== '--') {
+    //       this.classList.add(`badge-${selectedValue}`);
+    //     }
+    //   });
+    // });
     
     // Add event listeners for the custom accordion toggle buttons
     document.querySelectorAll('.accordion-toggle-btn').forEach(btn => {
@@ -1460,13 +1461,13 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
   if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0) {
     await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom);
     for (const file of filesInfoSub) {
-      showCommentsDCEG(file.id)
+      showCommentsDCEG(file.id, true)
       // document
       //   .getElementById(`study${file.id}`)
       //   .addEventListener("click", showCommentsDCEG(file.id));
     }
     for (const file of filesInfoCom) {
-      showCommentsDCEG(file.id)
+      showCommentsDCEG(file.id, true)
       // document
       //   .getElementById(`study${file.id}`)
       //   .addEventListener("click", showCommentsDCEG(file.id));
@@ -1519,34 +1520,154 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
   `;
   for (const fileInfo of filesInfoSub) {
     const fileId = fileInfo.id;
-    //console.log(fileInfo);
     let filename = fileInfo.name.slice(0,-19);
-    const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
+    const shortfilename = filename.length > 30 ? filename.substring(0, 29) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
+
     template += `
-    <div class="accordian-item" >
-      <h2 class="accordion-header" id="flush-heading${fileId}">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
-              <div class="col-lg-3 text-left"><input type="checkbox" class = "pl" id="${fileId}" name="${fileId}" value="${fileInfo.name}"><label for="${fileId}">${shortfilename}</label></div>
-              <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-              <div class="col-lg-1 text-left">Ongoing</div>
-              <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
-              <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
-              <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
-              <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
-              <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
-              <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
-              <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
-          </button>
+      <div class="accordian-item mb-2 border-bottom pb-2">
+        <!-- File info row with accordion button and dropdowns side by side -->
+        <div class="row-24 align-items-center position-relative">
+          <!-- File Name (col-3) -->
+          <div class="col-24-5 text-left">
+            ${shortfilename}
+          </div>
+          
+          <!-- Date (col-1) -->
+          <div class="col-24-4 text-left">
+            ${new Date(fileInfo.created_at).toDateString().substring(4)}
+          </div>
+          
+          <!-- Status (col-1) -->
+          <div class="col-24-2 text-left">
+            Ongoing
+          </div>
+          
+          <!-- AABCG (col-1) -->
+          <div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="AABCG Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- BCAC (col-1) -->
+          <div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="BCAC Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- C-NCI (col-1) -->
+          <div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="C-NCI Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- CIMBA (col-1) -->
+          <div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="CIMBA Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- LAGENO (col-1) -->
+          <div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="LAGENO Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- MERGE (col-1) -->
+          <div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="MERGE Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- TEST (col-1, hidden) -->
+          <div class="col-24-2 text-center" id="TEST${fileId}" data-value="TEST" hidden>
+            <select class="form-select form-select-sm decision-dropdown" aria-label="TEST Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- Accordion toggle button (positioned absolutely) -->
+          <div class="col-24-1 text-right">
+            <button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Hidden accordion header for Bootstrap's accordion functionality -->
+        <h2 class="accordion-header d-none" id="flush-heading${fileId}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}"></button>
         </h2>
-        <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}" data-bs-parent="#adminAccordian">
+        
+        <!-- Accordion content -->
+        <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}">
           <div class="accordion-body">
-            <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
-            <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Concept</div>
+              <div class="col">
+                ${fileInfo.name} 
+                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
+                  <i class="fas fa-external-link-alt"></i>
+                </button>
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Comments</div>
+              <div class="col" id='file${fileId}Comments'></div>
+            </div>
           </div>
         </div>
       </div>`;
-  }
+      }
+
   for (const fileInfo of filesInfoCom) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
@@ -1554,32 +1675,258 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
-    <div class="accordian-item" >
-      <h2 class="accordion-header" id="flush-heading${fileId}">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
-            <div class="col-lg-3 text-left"><label for="${fileId}">${shortfilename}</label></div>
-            <div class="col-lg-2 text-left">${new Date(fileInfo.created_at).toDateString().substring(4)}</div>
-            <div class="col-lg-1 text-left">Returned</div>
-            <div class="col-lg-1 text-center consTable" id="AABCG${fileId}" data-value="AABCG">--</div>
-            <div class="col-lg-1 text-center consTable" id="BCAC${fileId}" data-value="BCAC">--</div>
-            <div class="col-lg-1 text-center consTable" id="C-NCI${fileId}" data-value="C-NCI">--</div>
-            <div class="col-lg-1 text-center consTable" id="CIMBA${fileId}" data-value="CIMBA">--</div>
-            <div class="col-lg-1 text-center consTable" id="LAGENO${fileId}" data-value="LAGENO">--</div>
-            <div class="col-lg-1 text-center consTable" id="MERGE${fileId}" data-value="MERGE">--</div>
-            <div hidden class="col-lg-1 text-center consTable" id="TEST${fileId}" data-value="TEST">--</div>
-        </button>
-      </h2>
-      <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}" data-bs-parent="#adminAccordian">
-        <div class="accordion-body">
-          <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${fileInfo.name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button></div></div>
-          <div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div>
+      <div class="accordian-item mb-2 border-bottom pb-2">
+        <!-- File info row with accordion button and dropdowns side by side -->
+        <div class="row-24 align-items-center position-relative">
+          <!-- File Name (col-3) -->
+          <div class="col-24-5 text-left">
+            ${shortfilename}
+          </div>
+          
+          <!-- Date (col-1) -->
+          <div class="col-24-4 text-left">
+            ${new Date(fileInfo.created_at).toDateString().substring(4)}
+          </div>
+          
+          <!-- Status (col-1) -->
+          <div class="col-24-2 text-left">
+            Ongoing
+          </div>
+          
+          <!-- AABCG (col-1) -->
+          <div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="AABCG Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- BCAC (col-1) -->
+          <div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="BCAC Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- C-NCI (col-1) -->
+          <div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="C-NCI Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- CIMBA (col-1) -->
+          <div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="CIMBA Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- LAGENO (col-1) -->
+          <div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="LAGENO Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- MERGE (col-1) -->
+          <div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="MERGE Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- TEST (col-1, hidden) -->
+          <div class="col-24-2 text-center" id="TEST${fileId}" data-value="TEST" hidden>
+            <select class="form-select form-select-sm decision-dropdown" aria-label="TEST Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+            </select>
+          </div>
+          
+          <!-- Accordion toggle button (positioned absolutely) -->
+          <div class="col-24-1 text-right">
+            <button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
         </div>
-      </div>
-    </div>`;
-  }
+        
+        <!-- Hidden accordion header for Bootstrap's accordion functionality -->
+        <h2 class="accordion-header d-none" id="flush-heading${fileId}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}"></button>
+        </h2>
+        
+        <!-- Accordion content -->
+        <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}">
+          <div class="accordion-body">
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Concept</div>
+              <div class="col">
+                ${fileInfo.name} 
+                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
+                  <i class="fas fa-external-link-alt"></i>
+                </button>
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Comments</div>
+              <div class="col" id='file${fileId}Comments'></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      }
+
   template += `</div></div></div></div>`;
-  if (document.getElementById("files") != null)
+  if (document.getElementById("files") != null) {
     document.getElementById("files").innerHTML = template;
+
+    //  // Add event listeners for the dropdowns
+    // document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
+    //   dropdown.addEventListener('change', function() {
+    //     const selectedValue = this.value;
+    //     const parentElement = this.closest('[data-value]');
+    //     const consortium = parentElement.getAttribute('data-value');
+    //     const fileId = parentElement.id.replace(consortium, '');
+        
+    //     console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
+        
+    //     // Remove any existing badge classes
+    //     this.className = 'form-select form-select-sm decision-dropdown';
+        
+    //     // Add styling based on selection
+    //     if (selectedValue !== '--') {
+    //       this.classList.add(`badge-${selectedValue}`);
+    //     }
+    //   });
+    // });
+
+  document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
+  // Store initial value as a data attribute
+    // dropdown.setAttribute('data-previous-value', dropdown.value);
+    // console.log(dropdown.value);
+    
+    dropdown.addEventListener('change', async function() {
+      const selectedValue = this.value;
+      const previousValue = this.getAttribute('data-previous-value') || '--';
+      const parentElement = this.closest('[data-value]');
+      const consortium = parentElement.getAttribute('data-value');
+      const fileId = parentElement.id.replace(consortium, '');
+      
+      // Show confirmation dialog
+      if (!confirm(`Are you sure you want to change the ${consortium} score from ${previousValue} to ${selectedValue}?`)) {
+        // If user cancels, revert to previous value
+        this.value = previousValue;
+        return;
+      }
+
+      // const header = document.getElementById("confluenceModalHeader");
+      // const body = document.getElementById("confluenceModalBody");
+      // header.innerHTML = `<h5 class="modal-title">Changing Score for ${fileId}</h5>
+      //                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+      // let template = '<form id="changeScore"></form>';
+      // body.innerHTML = template;
+      // $("#confluenceMainModal").modal("show");
+      // let form = document.getElementById('changeScore');
+      // form.innerHTML = `Locating box file ${fileId}`
+      // form.innerHTML = `Commenting change on file ${fileId}`
+      // submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: changed by admin`;
+
+        const header = document.getElementById('confluenceModalHeader');
+        const body = document.getElementById('confluenceModalBody');
+        
+        header.innerHTML = `<h5 class="modal-title">Changing Score for ${fileId}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+
+        let template = '<form id="changeScore">';
+        template += `  <div class="form-group">
+                          <label for="scoreMessage">Comment</label>
+                          <textarea class="form-control" id="scoreMessage" rows="3">Changed by admin</textarea>
+                        </div>`
+        
+        template += '<div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update score</button></div>'
+        template += '</form>';
+        body.innerHTML = template;
+        document.getElementById('confluenceMainModal').style.display = "block";
+        $("#confluenceMainModal").modal("show");
+        addEventUpdateScore(fileId, selectedValue, consortium);
+
+
+      //await createComment(fileId, submitMessage);
+      
+      // Store the new value as previous for next change
+      this.setAttribute('data-previous-value', selectedValue);
+      
+      console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
+      
+      // Remove any existing badge classes
+      this.className = 'form-select form-select-sm decision-dropdown';
+      
+      // Add styling based on selection
+      if (selectedValue !== '--') {
+        this.classList.add(`badge-${selectedValue}`);
+      }
+    });
+  });
+    
+    // Add event listeners for the custom accordion toggle buttons
+    document.querySelectorAll('.accordion-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-bs-target');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        // Toggle the icon
+        if (isExpanded) {
+          this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+          this.setAttribute('aria-expanded', 'false');
+        } else {
+          this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
+          this.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  }
 }
 
 export const returnToChairs = () => {

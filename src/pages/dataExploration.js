@@ -85,7 +85,7 @@ export const dataSummary = (
                     JSON.parse(localStorage.parms).login
                   ) !== -1
                     ? `
-                    <div class="main-summary-row"><button id="updateSummaryStatsData" class="col-auto btn btn-primary mt-3 mb-3" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update Data</button></div>
+                    <div class="main-summary-row"><button id="updateSummaryStatsData" class="col-auto btn btn-primary mt-3 mb-3 button-glow" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update Data</button></div>
                 `
                     : ``
                 }

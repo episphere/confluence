@@ -100,7 +100,7 @@ export const dataDictionaryTemplate = async () => {
     if(localStorage.parms){
         let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)
         if (emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)){
-            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3 dict-update" title="Update Dictionary Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
+            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3 button-glow" title="Update Dictionary Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
             const pageHeader = document.getElementById("pageHeader");
             pageHeader.insertAdjacentHTML("afterend", updateButton);
             updateDict();

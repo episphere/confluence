@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, updateBoxCollaboratorTime } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, updateBoxCollaboratorTime, createComment } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -1284,6 +1284,26 @@ const addEventUpdateSummaryStatsForm = () => {
         let template = notificationTemplate(top, `<span class="successMsg">Data updated</span>`, `Data successfully updated, please reload to see updated data.`);
         document.getElementById('showNotification').innerHTML = template;
         addEventHideNotification();
+    })
+}
+
+export const addEventUpdateScore = async (fileId, selectedValue, consortium) => {
+    const form = document.getElementById('changeScore');
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        form.querySelectorAll('[type="submit"]')[0].classList.add('disabled');
+        form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Updating...';
+        const comment = document.getElementById('scoreMessage').value;
+        const submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: ${comment}`;
+        let commentReturn = await createComment(fileId, submitMessage);
+        console.log(commentReturn);
+        //form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
+        if (commentReturn.status===201) {
+            form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
+            setTimeout(() => {document.location.reload(true)}, 2000);
+        } else {
+            form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Error';
+        }
     })
 }
 

@@ -1576,7 +1576,7 @@ export async function showComments(id) {
     return;
   }
 
-export async function showCommentsDCEG(id) {
+export async function showCommentsDCEG(id, change=false) {
     const commentSection = document.getElementById(`file${id}Comments`);
     const response = await listComments(id);
     //console.log(response);
@@ -1603,12 +1603,39 @@ export async function showCommentsDCEG(id) {
         const time = comment_date.toLocaleTimeString();
         //if (comment_date > newDate) {
             newDate = comment_date;
-            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login);
+            //console.log(comment.message.substring(0,10)==="Consortium");
+            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login) || comment.message.substring(0,10)==="Consortium";
             if (ifcons){
-                const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
-                const score = comment.message[8];
+                let cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
+                let score = comment.message[8];
+                if (comment.message.substring(0,10)==="Consortium"){
+                    cons = comment.message.substring(12, comment.message.indexOf(",", 12)).trim();
+                    score = comment.message.substring(
+                        comment.message.indexOf("Rating:") + 7, 
+                        comment.message.indexOf(",", comment.message.indexOf("Rating:"))
+                        ).trim();
+                }
+                console.log(cons)
+                //let score = comment.message[8];
                 const inputScore = document.getElementById(`${cons}${id}`);
-                inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`; 
+                const selectElement = inputScore.children[0];
+                selectElement.value = `${score}`;
+
+                // Remove any existing badge classes
+                selectElement.className = 'form-select form-select-sm decision-dropdown disabled';
+                if (change==false){
+                    //inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;
+                    selectElement.setAttribute('disabled', true);
+                    selectElement.classList.add(`badge-${score}`);
+                } else {
+
+                // Add the appropriate badge class based on the score
+                if (score !== '--') {
+                    selectElement.classList.add(`badge-${score}`);
+                    selectElement.setAttribute('data-previous-value', selectElement.value);
+                }
+            }
+                //inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`; 
             }
         //}           
 

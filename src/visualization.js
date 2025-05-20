@@ -43,7 +43,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
         <div style="width: 100%;">
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genotypingChipSelection">Genotyping chip</label>
-                <select class="form-select font-size-15" id="genotypingChipSelection" data-variable='chip'>
+                <select class="form-select font-size-15 button-glow" id="genotypingChipSelection" data-variable='chip'>
                     <option selected value='all'>All Arrays</option>
                     <option value='Confluence chip'>Confluence Array</option>
                     <option value='Other chip'>Other Array</option>
@@ -51,7 +51,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="genderSelection">Sex</label>
-                <select class="form-select font-size-15" id="genderSelection" data-variable='sex'>
+                <select class="form-select font-size-15 button-glow" id="genderSelection" data-variable='sex'>
                     <option selected value='all'>All</option>
                     <option value='female'>Female</option>
                     <option value='male'>Male</option>
@@ -59,7 +59,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
-                <select class="form-select font-size-15" id="continentalRegionSelection" data-variable='cont'>
+                <select class="form-select font-size-15 button-glow" id="continentalRegionSelection" data-variable='cont'>
                     <option selected value='all'>All</option>
                 `
     for(let cont of cont_reg){
@@ -71,7 +71,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="caseControlSelection">Case-control</label>
-                <select class="form-select font-size-15" id="caseControlSelection" data-variable='caseCon'>
+                <select class="form-select font-size-15 button-glow" id="caseControlSelection" data-variable='caseCon'>
                     <option selected value='all'>All</option>
                     <option value='case'>Case</option>
                     <option value='control'>Control</option>
@@ -81,7 +81,7 @@ const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
     template += `
     <div class="form-group">
         <label class="filter-label font-size-13" for="consortiumTypeSelection">Consortium</label>
-        <select class="form-select font-size-15" id="consortiumTypeSelection">
+        <select class="form-select font-size-15 button-glow" id="consortiumTypeSelection">
             <option value='allOther'>Non-CIMBA</option>
             <option ${cimba ? 'selected': ''} value='cimba'>CIMBA</option>
         </select>

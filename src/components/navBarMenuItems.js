@@ -6,7 +6,7 @@ export const navBarMenutemplate = () => {
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
     console.log(authAdmin);
     return `
-    <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navBarOptions">
+    <ul class="navbar-nav me-auto mb-lg-0" id="navBarOptions">
         <li class="nav-item grid-elements">
             <a class="nav-link nav-menu-links white-font" rel="noopener" href="#home" title="Confluence Home" id="homePage">
                 Home

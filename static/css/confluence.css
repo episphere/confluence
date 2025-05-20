@@ -722,6 +722,13 @@ label {
     display: inline-block !important;
 }
 
+.nav-link:hover {
+    cursor: pointer;
+    background-color: #ffffff !important;
+    color: #A41652 !important;
+    border: 0px;
+}
+
 .spinner-color {
     color: #574f4f !important;
 }
@@ -2285,7 +2292,7 @@ ul.form {
   cursor: pointer;
 }
 
-.dict-update:hover {
+.button-glow:hover {
   box-shadow: 0 0 8px rgba(13, 110, 253, 0.7); /* Stronger blue glow */
   border-color: #0d6efd !important;
   cursor: pointer;
@@ -2301,10 +2308,25 @@ ul.form {
 /* Make dropdowns more compact */
 .decision-dropdown {
   padding: 2px 4px;
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
   min-width: 50px;
   height: auto;
+  text-align: center;
+  text-align-last: center; /* For Firefox */
+  font-weight: bold; /* Added for better visibility */
 }
+
+.decision-dropdown option {
+  text-align: center;
+  font-size: 1rem; /* Match the dropdown font size */
+}
+
+.form-select.decision-dropdown {
+  /* text-align: center; */
+  background-position: right 0.1rem center;
+  /* padding-right: 2rem; */
+}
+
 
 .px-1 {
   padding-left: 0.25rem;
@@ -2412,6 +2434,16 @@ ul.form {
   color: white;
 }
 
+.decision-dropdown.badge-1,
+.decision-dropdown.badge-2,
+.decision-dropdown.badge-3,
+.decision-dropdown.badge-4,
+.decision-dropdown.badge-5,
+.decision-dropdown.badge-777 {
+  text-align: center;
+  text-align-last: center;
+}
+
 /* Fix for row-24 to prevent content from being cut off */
 .row-24 {
   display: flex;
@@ -2475,4 +2507,8 @@ ul.form {
 @media (min-width: 1200px) {
   .col-xl-24-1 { flex: 0 0 4.166666%; max-width: 4.166666%; }
   /* ... and so on for other sizes */
+}
+
+.form-select:disabled {
+  background-image: none !important;
 }
