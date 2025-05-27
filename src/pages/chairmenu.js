@@ -505,9 +505,13 @@ export function viewFinalDecisionFilesColumns() {
   return `
   <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
         <div class="row-24 align-items-center position-relative">
+          
+          <!-- Selection checkbox header -->
+          <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
+
           <!-- Left side: Basic file info columns -->
           <div class="col-24-5 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-          <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+          <div class="col-24-3 text-left font-bold ws-nowrap text-wrap header-sortable">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
           <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
           
           <!-- Consortium columns -->
@@ -802,10 +806,10 @@ export async function viewFinalDecisionFiles(files) {
         
         // Toggle the icon
         if (isExpanded) {
-          this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+          this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
           this.setAttribute('aria-expanded', 'false');
         } else {
-          this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
+          this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
           this.setAttribute('aria-expanded', 'true');
         }
       });
@@ -1528,13 +1532,20 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
       <div class="accordian-item mb-2 border-bottom pb-2">
         <!-- File info row with accordion button and dropdowns side by side -->
         <div class="row-24 align-items-center position-relative">
+
+          <!-- Selection checkbox -->
+          <div class="col-24-1 text-left">
+            <input type="checkbox" class="pl" id="pl${fileId}" value="${fileInfo.name}" aria-label="Select file">
+          </div>
+
+
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
             ${shortfilename}
           </div>
           
           <!-- Date (col-1) -->
-          <div class="col-24-4 text-left">
+          <div class="col-24-3 text-left">
             ${new Date(fileInfo.created_at).toDateString().substring(4)}
           </div>
           
@@ -1918,10 +1929,10 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
         
         // Toggle the icon
         if (isExpanded) {
-          this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+          this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
           this.setAttribute('aria-expanded', 'false');
         } else {
-          this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');
+          this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
           this.setAttribute('aria-expanded', 'true');
         }
       });
