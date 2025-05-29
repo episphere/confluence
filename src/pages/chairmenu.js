@@ -1524,8 +1524,9 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
   `;
   for (const fileInfo of filesInfoSub) {
     const fileId = fileInfo.id;
-    let filename = fileInfo.name.slice(0,-19);
-    const shortfilename = filename.length > 30 ? filename.substring(0, 29) + "..." : filename;
+    let filename = fileInfo.name//.slice(0,-19);
+    console.log(filename);
+    const shortfilename = filename.length > 50 ? filename.substring(0, 49) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
 
     template += `
@@ -1535,7 +1536,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
 
           <!-- Selection checkbox -->
           <div class="col-24-1 text-left">
-            <input type="checkbox" class="pl" id="pl${fileId}" value="${fileInfo.name}" aria-label="Select file">
+            <input type="checkbox" class="pl" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
           </div>
 
 
@@ -1682,8 +1683,8 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
   for (const fileInfo of filesInfoCom) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
-    let filename = fileInfo.name.slice(0,-19);
-    const shortfilename = filename.length > 25 ? filename.substring(0, 24) + "..." : filename;
+    let filename = fileInfo.name//.slice(0,-19);
+    const shortfilename = filename.length > 30 ? filename.substring(0, 29) + "..." : filename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">

@@ -177,6 +177,7 @@ export const confluence = async () => {
                 confluenceDiv.innerHTML = dataFormTemplate();
                 dataForm();
                 formFunctions();
+                //setupFormValidation("analysisConceptForm");
                 hideAnimation();
             });
         }
@@ -378,7 +379,8 @@ const manageRouter = async () => {
         assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = dataFormTemplate();
         dataForm();  
-        formFunctions(); 
+        formFunctions();
+        //setupFormValidation("analysisConceptForm");
     }
     // else if (hash === '#upload_data_form') {
     //     const element = document.getElementById('uploaddataForm');

@@ -16,119 +16,149 @@ export const formtemplate = () => {
 
                         <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                           <section class="contact-form">
-                            <p> Please fill out the form below. This will be reviewed by the Data Access Coordination Committees (DACC) 
-                            of the consortia participating in Confluence. For more information about the data access request process 
-                            please see this description of the <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request process </a> 
-                            and the <a href="#join/description" target="_blank" rel="noopener noreferrer">individual consortia DACC guidelines</a>. 
-                            Access to data for approved concepts will only be given to investigators listed below, each of whose Institutions 
-                            will need to sign data transfer agreements with the data coordinating centers that are governing the requested data.
-                            <form>
+                          <p>
+                            Please fill out the form to request access to Confluence Project data. This form 
+                            should only be used to request access to data from two or more consortia 
+                            participating in the Confluence Project.  If you want to request access to data 
+                            from only one consortium, do not use this form and directly contact that specific 
+                            consortium.
+                            </br></br>
+
+                            Following submission of this form it will be reviewed by the Data Access Coordination 
+                            Committees (DACC) of the consortia participating in Confluence. For more information 
+                            about the data access request process please see this description of the
+                            <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request 
+                            process </a> and the <a href="#join/description" target="_blank" rel="noopener noreferrer">
+                            individual consortia DACC guidelines</a>. Access to data for 
+                            approved concepts will only be given to investigators listed on this form below, 
+                            each of whose Institutions will need to sign data transfer agreements with the 
+                            data coordinating centers that are governing the requested data.
+                            </br></br>
+
+                            Access to data will be provided on a secure, cloud-based, trusted research environment (TRE). 
+                            Approved researchers granted access to data will be responsible for paying their 
+                            costs incurred using resources on the TRE (e.g., compute costs analyzing the data). 
+                          </p>
+                            
+                            <form id="analysisConceptForm" novalidate>
 
                             <div class="input-group">
-                              <label for="date"><b>Date</b><span class='required-label'>*</span></label>
-                              <input id="date" name="date" type="date" value='${today}' required/>
+                              <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
+                              <input id="date" name="date" type="date" value='${today}' class="form-text-input" required aria-required="true" aria-describedby="date-error" />
+                              <div id="date-error" class="error-message" aria-live="polite"></div>
                             </div>
 
                             <div class="input-group">
-                              <label for="projname"><b>Title of Proposed Project</b><span class='required-label'>*</span></label>
-                              <input id="projname" name="projname" type="text" required/>
+                              <label for="projname" id="projname-label"><b>Title of Proposed Project</b><span class='required-label' aria-hidden="true">*</span></label>
+                              <input id="projname" name="projname" type="text" class="form-text-input" required aria-required="true" aria-describedby="projname-error" />
+                              <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             
                             <div class="input-group form-check">
-                                <label for="amendment"> <b>Is this an amendment?</b><span class='required-label'>*</span> </label>
-                                    
-                                    <input id="amendmentyes" name="amendment" type="radio" value="Yes" required/>
-                                        <label class="ul-container" for="amendmentyes"> Yes </label>
-                                    <input id="amendmentno" name="amendment" type="radio" value="No" required/>
-                                        <label class="ul-container" for="amendmentno"> No </label>
+                                <label for="amendment"><b>Is this an amendment?</b><span class='required-label'>*</span></label>
+                                
+                                <div class="radio-group d-flex align-items-center" style="margin-top: -5px;">
+                                    <div class="form-check form-check-inline">
+                                        <input id="amendmentyes" name="amendment" type="radio" value="Yes" class="form-check-input" style="position: relative; top: -2px;" required/>
+                                        <label class="form-check-label" for="amendmentyes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input id="amendmentno" name="amendment" type="radio" value="No" class="form-check-input" style="position: relative; top: -2px;" required/>
+                                        <label class="form-check-label" for="amendmentno">No</label>
+                                    </div>
+                                </div>
 
-                                <label for="ifamendmentyes"> <i> If yes, provide Concept Number of original form </i></label>
-                                    <input type="text" id="conNum" name="conNum" />
+                                <label for="ifamendmentyes"><i>If yes, provide Concept Number of original form</i></label>
+                                <input type="text" class="form-text-input" id="conNum" name="conNum" />
                             </div>
 
                             <div class="input-group">
                               <label for="investigators"><b>Contact Investigator(s)</b><span class='required-label'>*</span></label>
-                              <input id="investigators" name="investigators" type="text" required/>
+                              <input id="investigators" name="investigators" class="form-text-input" type="text" required/>
                             </div>
 
                             <div class="input-group">
                               <label for="institution"><b>Institution</b><span class='required-label'>*</span></label>
-                              <input id="institution" name="institution" type="text" required/>
+                              <input id="institution" name="institution" class="form-text-input" type="text" required/>
                             </div>
                             
                             <div class="input-group">
                               <label for="email"><b>Contact E-mail</b><span class='required-label'>*</span></label>
-                              <input id="email" name="email" type="text" required/>
+                              <input id="email" name="email" class="form-text-input" type="text" required/>
                             </div>
 
                             <div class="input-group">
                                 <label for="mem-con"><b>Member of Consortia or Study / Trial Group?</b><span class='required-label'>*</span></label>
                             </div>
 
-                          <div class="input-group">
-                            <div class="container-lg">
-                              <div class="row">
-                                <div class="col-12 col-md-2 col-sm-12">
-                                  <div class="form-check mb-3">
-                                    <input class="form-check-input" id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG"/>
-                                    <label class="form-check-label" for="mem-aabcg"> AABCG</label>
+                            <div class="input-group">
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-2 col-sm-12">
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-aabcg" name="mem-con" type="checkbox" value="AABCG" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-aabcg"> AABCG</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-bcac" name="mem-con" type="checkbox" value="BCAC" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-bcac"> BCAC</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-cimba" name="mem-con" type="checkbox" value="CIMBA" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-cimba"> CIMBA</label>
+                                    </div>
                                   </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" id="mem-bcac" name="mem-con" type="checkbox" value="BCAC"/>
-                                    <label class="form-check-label" for="mem-bcac"> BCAC</label>
+                                  <div class="col-12 col-md-2 col-sm-12">                                    
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-nci-dceg"> C-NCI*</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-lageno"> LAGENO</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-merge" name="mem-con" type="checkbox" value="MERGE" style="position: relative; top: -2px;"/> 
+                                      <label class="form-check-label" for="mem-merge"> MERGE</label>
+                                    </div>
                                   </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-cimba" name="mem-con" type="checkbox" value="CIMBA"/>
-                                    <label class="form-check-label" for="mem-cimba"> CIMBA</label>
+                                  <div class="col-12 col-md-2 col-sm-12">
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-trial" name="mem-trial" type="checkbox" value="Trial" style="position: relative; top: -2px;"/> 
+                                      <label class="form-check-label" for="mem-trial"> Clinical Trial Group</label>
+                                    </div>
+                                    <div class="form-check">
+                                      <input class="form-check-input" id="mem-none" name="mem-con" type="checkbox" value="None" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="mem-none"> None</label>
+                                    </div>
                                   </div>
-                                </div>
-                                <div class="col-12 col-md-2 col-sm-12">                                    
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI"/>
-                                    <label class="form-check-label" for="mem-nci-dceg"> C-NCI</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO"/>
-                                    <label class="form-check-label" for="mem-lageno"> LAGENO</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-merge" name="mem-con" type="checkbox" value="MERGE"> 
-                                    <label class="form-check-label" for="mem-merge"> MERGE</label>
-                                  </div>
-                                </div>
-                                <div class="col-12 col-md-2 col-sm-12">
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-trial" name="mem-trial" type="checkbox" value="Trial"> 
-                                    <label class="form-check-label" for="mem-trial"> Clinical Trial Group</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input"  id="mem-none" name="mem-con" type="checkbox" value="None"/>
-                                    <label class="form-check-label" for="mem-none"> None</label>
-                                  </div>
+                                    <p style="margin-bottom: 0;">*C-NCI includes studies and clinical trials participating in the Confluence Project through a direct collaboration with NCI/DCEG</p>
                                 </div>
                               </div>
                             </div>
-                            <!---<p><b>Note:</b> A fee is required to access BCAC data if you are not a BCAC member.</p>--->
-                          </div>
+
                             
                             <div class="input-group">
                               <label for="acro"><b>Confluence Study Acronym(s) for the Contact Investigator</b><span class='required-label'>*</span></label>
-                              <textarea id="acro" name="acro" rows="2" cols="65" required></textarea>
+                              <textarea id="acro" name="acro" rows="2" cols="65" class="form-text-input" required></textarea>
                             </div>
 
                             <div class="input-group">
                               <label for="otherinvest"><b>OTHER Investigators and their institutions</b><span class='required-label'>*</span></label>
-                              <textarea id="otherinvest" name="otherinvest" rows="2" cols="65" required></textarea>
+                              <textarea id="otherinvest" name="otherinvest" rows="2" cols="65" class="form-text-input" required></textarea>
                             </div>
 
                             <div class="input-group">
                                 <label for="allinvest"><b>ALL Investigators (and their institutions) who will require access to the data requested</b><span class='required-label'>*</span></label>
-                                <textarea id="allinvest" name="allinvest" rows="2" cols="65" required></textarea>
+                                <textarea id="allinvest" name="allinvest" rows="2" cols="65" class="form-text-input" required></textarea>
                                 <p><b>Note:</b> Datasets cannot be exchanged between institutions. See the data access request procedures for more information.</p>
                             </div>
 
                             <div class="input-group">
-                                <label><input id="confirmation" name="confirmation" type="checkbox" value="Yes" required/><b> Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b><span class='required-label'>*</span></label>
+                                <div class="form-check">
+                                    <input id="confirmation" name="confirmation" type="checkbox" value="Yes" class="form-check-input" style="position: relative; top: -2px;" required/>
+                                    <label class="form-check-label" for="confirmation"><b>Please confirm that ALL the named investigators have read AND agreed to be named on this proposal?</b><span class='required-label'>*</span></label>
+                                </div>
                             </div>
 
                             <div class="input-group">
@@ -140,37 +170,37 @@ export const formtemplate = () => {
                                 <div class="row">
                                   <div class="col-12 col-md-2 col-sm-12">
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG"/>
+                                      <input class="form-check-input" id="consortia-aabcg" name="data-con" type="checkbox" value="AABCG" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-aabcg"> AABCG</label>
                                     </div>
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC"/>
+                                      <input class="form-check-input" id="consortia-BCAC" name="data-con" type="checkbox" value="BCAC" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-BCAC"> BCAC</label>
                                     </div>
                                   </div>
                                   <div class="col-12 col-md-2 col-sm-12">   
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA"/>
+                                      <input class="form-check-input" id="consortia-cimba" name="data-con" type="checkbox" value="CIMBA" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-cimba"> CIMBA</label>
                                     </div>                                  
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-c-nci" name="data-con" type="checkbox" value="C-NCI"/>
+                                      <input class="form-check-input" id="consortia-c-nci" name="data-con" type="checkbox" value="C-NCI" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-c-nci"> C-NCI</label>
                                     </div>
                                     </div>
                                   <div class="col-12 col-md-2 col-sm-12">   
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-lageno" name="data-con" type="checkbox" value="LAGENO"/>
+                                      <input class="form-check-input" id="consortia-lageno" name="data-con" type="checkbox" value="LAGENO" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-lageno"> LAGENO</label>
                                     </div>
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-merge" name="data-con" type="checkbox" value="MERGE"/>
+                                      <input class="form-check-input" id="consortia-merge" name="data-con" type="checkbox" value="MERGE" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-merge"> MERGE</label>
                                     </div>
                                   </div>
                                   <div class="col-12 col-md-2 col-sm-12">   
                                     <div class="form-check">
-                                      <input class="form-check-input" id="consortia-trial" name="data-con" type="checkbox" value="Trial"/>
+                                      <input class="form-check-input" id="consortia-trial" name="data-con" type="checkbox" value="Trial" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-trial"> Clinical Trial Group</label>
                                     </div>
                                 </div>
@@ -179,17 +209,17 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                               <label for="condesc"><b>Background</b> <i> Please provide a concise description of Background</i><span class='required-label'>*</span></label>
-                              <textarea id="condesc" name="condesc" rows="6" cols="65" required></textarea>
+                              <textarea id="condesc" name="condesc" rows="6" cols="65" class="form-text-input" required></textarea>
                             </div>
 
                             <div class="input-group">
                               <label for="condescAims"><b>Aims</b> <i> Please provide a concise description of Aims</i><span class='required-label'>*</span></label>
-                              <textarea id="condescAims" name="condescAims" rows="6" cols="65" required></textarea>
+                              <textarea id="condescAims" name="condescAims" rows="6" cols="65" class="form-text-input" required></textarea>
                             </div>
 
                             <div class="input-group">
                               <label for="analdesc"><b>Description of Analysis Plan</b> <i> Please provide a concise description of your Analysis Plan</i><span class='required-label'>*</span></label>
-                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" required></textarea>
+                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
                             </div>
 
                             <div class="input-group">
@@ -201,7 +231,7 @@ export const formtemplate = () => {
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk"/>
+                                      <input class="form-check-input" id="consortia-bcr" name="prim-end" type="checkbox" value="Breast Cancer Risk" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="consortia-bcr"> Breast Cancer Risk</label>
                                     </div>
                                   </div>
@@ -209,16 +239,16 @@ export const formtemplate = () => {
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer"/>
+                                      <input class="form-check-input" id="sbc" name="prim-end" type="checkbox" value="Subtype of Breast Cancer" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="sbc"> Subtype of Breast Cancer</label>
-                                      <input type="text" class="form-control" id="sbcin" name="sbcin" placeholder="Subtype"/>
+                                      <input type="text" class="form-control form-text-input" id="sbcin" name="sbcin" placeholder="Subtype"/>
                                     </div>
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival"/>
+                                      <input class="form-check-input" id="sur" name="prim-end" type="checkbox" value="Survival" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="sur"> Survival</label>
                                     </div>
                                   </div>
@@ -226,9 +256,9 @@ export const formtemplate = () => {
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="other" name="prim-end" type="checkbox" value="Other"/>
+                                      <input class="form-check-input" id="other" name="prim-end" type="checkbox" value="Other" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="other"> Other</label>
-                                      <input id="otherinput" name="otherinput" class="form-control" type="text" placeholder="Other primary endpoint" />
+                                      <input id="otherinput" name="otherinput" class="form-control form-text-input" type="text" placeholder="Other primary endpoint" />
                                     </div>
                                   </div>
                                 </div>  
@@ -246,24 +276,30 @@ export const formtemplate = () => {
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data"/>
+                                      <input class="form-check-input" id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="genotyped"> Individual-level genotyped data</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data"/>
+                                      <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="imputed"> Individual-level imputed data</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="concept1" name="genotyping" type="checkbox" value="Concept 1 GWAS summary results" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="concept1"> Concept 1 GWAS Summary Results*</label>
                                     </div>
                                   </div>
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence"/>
+                                      <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="preconfluence"> Data generated pre-Confluence</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data"/>
+                                      <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="postconfluence"> Confluence generated data</label>
                                     </div>
-                                    <p> <br>If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
+                                    <p> If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
+
+                                    <p> *Access to concept 1 GWAS summary results will require an approved concept form until the summary results are made publicly accessible.</p>
                                     <input id="fileVar" name="fileVar" type="file">
                                   </div>
                                 </div>
@@ -271,18 +307,18 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="sex"><b>Select Sex</b></label>
+                              <label for="sex"><b>Data Requested From</b></label>
                             </div>
                             <div class="input-group">
                               <div class="container-lg">
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="females" name="sex" type="checkbox" value="females"/>
+                                      <input class="form-check-input" id="females" name="sex" type="checkbox" value="females" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="females"> Females </label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="males" name="sex" type="checkbox" value="males"/>
+                                      <input class="form-check-input" id="males" name="sex" type="checkbox" value="males" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="males"> Males</label>
                                     </div>
                                   </div>
@@ -297,14 +333,14 @@ export const formtemplate = () => {
                               <div class="container-lg">
                                 <div class="row">
                                   <div class="col-12 col-md-12 col-sm-12">
-                                    <p><i>BRCA1</i> and <i>BRCA2</i> carrier status can be made only from CIMBA, and from some MERGE participants. Carrier 
+                                    <p>Request for data on <i>BRCA1</i> and <i>BRCA2</i> carrier status can be made only from CIMBA and from some MERGE participants. Carrier 
                                     status information is not routinely collected from studies participating in AABCG, BCAC, C-NCI, or LAGENO.</p>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="BRCA1Yes" name="carStatus" type="checkbox" value="BRCA1"/>
+                                      <input class="form-check-input" id="BRCA1Yes" name="carStatus" type="checkbox" value="BRCA1" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="BRCA1Yes">BRCA1</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                      <input class="form-check-input" id="BRCA2Yes" name="carStatus" type="checkbox" value="BRCA2"/>
+                                      <input class="form-check-input" id="BRCA2Yes" name="carStatus" type="checkbox" value="BRCA2" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="BRCA2Yes">BRCA2</label>
                                     </div>
                                   </div>
@@ -313,18 +349,19 @@ export const formtemplate = () => {
                             </div>
 
                             <br>
-                            <p><u>2. PHENOTYPE DATA REQUESTED</u></p>
+                            <p style="margin-bottom: 0;"><u>2. PHENOTYPE DATA REQUESTED</u></p>
 
                             <div class="input-group">
-                                <p>All data requests will be provided access to the Confluence core variables. Please select the variable category needed for the proposed project. 
-                                All variables within the category will be provided [<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">see data dictionary</a>].
-                                The data analysis plan should describe why the variables are being requested.</p>
+                                <p style="margin-bottom: 0;">All approved data request to BCAC, C-NCI, CIMBA, LAGENO, and MERGE will be provided access to the 
+                                <a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">Confluence core variables</a>, 
+                                and all approved request to AABCG will be provided the variables: status, studyType, ageint, AgeDiagIndex, famHist, ER_status (<a href="https://nih.app.box.com/file/1876071731218" target="_blank" rel="noopener noreferrer">AABCG Data Dictionary</a>). Select 
+                                additional categories of variables that are required to accomplish the aims of the concept. The data analysis description <i>must</i> describe 
+                                why the variables are being requested otherwise the application will not be approved.
                             </div>
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
                                 <label> 
-                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" value="riskfactvarv"/>
-                                  Select
+                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" class="form-check-input" value="riskfactvarv" style="position: relative; top: -2px;"/>
                                 </label>
                             </div>
 
@@ -396,12 +433,11 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="pathvar"><b>Pathology</b></label>
                                 <label>
-                                  <input id="pathvarv" name="pathvarv" type="checkbox" value="Yes"/> 
-                                  Select
+                                  <input id="pathvarv" name="pathvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/> 
                                 </label>
                             </div>
 
-<!---                                <div class="input-group">
+                          <!---<div class="input-group">
                                   <div class="container-lg">
                                     <div class="row" id='pathlist'>
                                       <div class="col-12 col-md-3 col-sm-12">
@@ -431,12 +467,12 @@ export const formtemplate = () => {
                           <div class="input-group">
                             <label for="surtrevar"><b>Survival and Treatment</b></label>
                             <label> 
-                              <input id="surtrevarv" name="surtrevarv" type="checkbox" value="Yes"/>
-                              Select
+                              <input id="surtrevarv" name="surtrevarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
+                              (Not availale from AABCG)
                             </label>
                           </div>
 
-<!---                              <div class="input-group">
+                        <!---<div class="input-group">
                                 <div class="container-lg">
                                   <div class="row" id='surtrelist'>
                                     <div class="col-12 col-md-3 col-sm-12">
@@ -484,7 +520,8 @@ export const formtemplate = () => {
                             <div class="input-group">
                               <label for="mammvar"><b>Mammographic Density</b></label>
                               <label> 
-                                <input id="mammvarv" name="mammvarv" type="checkbox" value="Yes"/> Select
+                                <input id="mammvarv" name="mammvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
+                                (Not availale from AABCG)
                               </label>
                             </div>
 
@@ -493,16 +530,16 @@ export const formtemplate = () => {
 
                             <div class="input-group">
                               <label for="time"><b>Time Plan</b></label>
-                              <textarea id="time" name="time" rows="4" cols="65"></textarea>
+                              <textarea id="time" name="time" rows="4" cols="65" class="form-text-input"></textarea>
                             </div>
 
                             <div class="input-group">
                               <label for="anyoth"><b>Any other considerations you would like the DACCs to be aware of</b></label>
-                              <textarea id="anyoth" name="anyoth" rows="4" cols="65"></textarea>
+                              <textarea id="anyoth" name="anyoth" rows="4" cols="65" class="form-text-input"></textarea>
                             </div>
 
                             <div class="input-group">
-                            <u id="tooltip1"><a><label><input id="confirmationAuth" name="confirmationAuth" type="checkbox" value="Yes" required/> 
+                            <u id="tooltip1"><a><label><input id="confirmationAuth" name="confirmationAuth" class="form-check-input" type="checkbox" value="Yes" style="position: relative; top: -2px;" required/> 
                               <b>Please confirm that you agree to comply with Confluence authorship requirements.</b>
                               <span>It is expected that manuscripts will be co-led across multiple contributing groups and consortia. 
                               Authorship for cross-consortia manuscripts using individual-level data or unpublished summary data will be proposed by 
@@ -561,7 +598,7 @@ export const formtemplate = () => {
                     </div>
                   </div>
                   `;
-
+  // document.addEventListener('DOMContentLoaded', () => setupFormValidation('analysisConceptForm'));
   return template;
 }
 
@@ -1008,7 +1045,7 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "Select Sex: ",
+                  text: "Data Requested From: ",
                 }),
                 new docx.TextRun({
                   text: JSON.stringify(jsondata.sex, null, 1)
@@ -1250,3 +1287,40 @@ export const createHeading = (text) => {
       thematicBreak: true,
   });
 }
+
+// Add this function to your file
+// export const setupFormValidation = (formId) => {
+//   const form = document.getElementById(formId);
+//   if (!form) return;
+  
+//   form.addEventListener('submit', function(event) {
+//     let hasErrors = false;
+//     const requiredFields = this.querySelectorAll('[required]');
+    
+//     // Clear previous errors
+//     document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+//     document.querySelectorAll('.form-text-input').forEach(el => el.classList.remove('input-error'));
+    
+//     requiredFields.forEach(field => {
+//       if (!field.value.trim()) {
+//         event.preventDefault();
+//         hasErrors = true;
+//         field.classList.add('input-error');
+//         const errorId = field.id + '-error';
+//         const errorElement = document.getElementById(errorId);
+//         if (errorElement) {
+//           errorElement.textContent = 'This field is required';
+//         }
+//         field.setAttribute('aria-invalid', 'true');
+//       } else {
+//         field.setAttribute('aria-invalid', 'false');
+//       }
+//     });
+    
+//     if (hasErrors) {
+//       event.preventDefault();
+//       // Focus the first field with an error
+//       document.querySelector('.input-error').focus();
+//     }
+//   });
+// };

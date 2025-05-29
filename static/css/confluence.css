@@ -2292,6 +2292,12 @@ ul.form {
   cursor: pointer;
 }
 
+.form-text-input:hover {
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.5); /* Blue glow */
+  border-color: #0d6efd !important;
+  cursor: text;
+}
+
 .button-glow:hover {
   box-shadow: 0 0 8px rgba(13, 110, 253, 0.7); /* Stronger blue glow */
   border-color: #0d6efd !important;
@@ -2512,3 +2518,12 @@ ul.form {
 .form-select:disabled {
   background-image: none !important;
 }
+
+.input-error {
+    border: 2px solid #dc3545;
+  }
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
