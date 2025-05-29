@@ -352,9 +352,9 @@ export const formtemplate = () => {
                             <p style="margin-bottom: 0;"><u>2. PHENOTYPE DATA REQUESTED</u></p>
 
                             <div class="input-group">
-                                <p style="margin-bottom: 0;">All approved data request to BCAC, C-NCI, CIMBA, LAGENO, and MERGE will be provided access to the 
-                                <a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">Confluence core variables</a>, 
-                                and all approved request to AABCG will be provided the variables: status, studyType, ageint, AgeDiagIndex, famHist, ER_status (<a href="https://nih.app.box.com/file/1876071731218" target="_blank" rel="noopener noreferrer">AABCG Data Dictionary</a>). Select 
+                                <p style="margin-bottom: 0;">All approved data requests to BCAC, C-NCI, CIMBA, LAGENO, and MERGE will be provided access to the Confluence core variables
+                                (<a href="#data_exploration/dictionary" target="_blank" rel="noopener noreferrer">Confluence Data Dictionary</a>), 
+                                and all approved requests to AABCG will be provided the variables: status, studyType, ageint, AgeDiagIndex, famHist, ER_status (<a href="https://nih.app.box.com/file/1876071731218" target="_blank" rel="noopener noreferrer">AABCG Data Dictionary</a>). Select 
                                 additional categories of variables that are required to accomplish the aims of the concept. The data analysis description <i>must</i> describe 
                                 why the variables are being requested otherwise the application will not be approved.
                             </div>
