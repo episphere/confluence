@@ -111,7 +111,7 @@ export const formtemplate = () => {
                                   <div class="col-12 col-md-2 col-sm-12">                                    
                                     <div class="form-check">
                                       <input class="form-check-input" id="mem-nci-dceg" name="mem-con" type="checkbox" value="C-NCI" style="position: relative; top: -2px;"/>
-                                      <label class="form-check-label" for="mem-nci-dceg"> C-NCI*</label>
+                                      <label class="form-check-label" for="mem-nci-dceg"> C-NCI</label>
                                     </div>
                                     <div class="form-check">
                                       <input class="form-check-input" id="mem-lageno" name="mem-con" type="checkbox" value="LAGENO" style="position: relative; top: -2px;"/>
@@ -132,7 +132,6 @@ export const formtemplate = () => {
                                       <label class="form-check-label" for="mem-none"> None</label>
                                     </div>
                                   </div>
-                                    <p style="margin-bottom: 0;">*C-NCI includes studies and clinical trials participating in the Confluence Project through a direct collaboration with NCI/DCEG</p>
                                 </div>
                               </div>
                             </div>
