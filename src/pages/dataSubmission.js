@@ -4,35 +4,38 @@ import { uploadInStudy } from "../components/modal.js";
 export const dataSubmissionTemplate = async () => {
     const response = await getFolderItems(0);
     const studiesList = await getFile('850171303009')
+    
     let studyIDs = [];
-    if(studiesList) studyIDs = tsv2Json(studiesList).data.map(dt => dt['Folder ID'].trim());
+    if (studiesList) studyIDs = tsv2Json(studiesList).data.map(dt => dt['Folder ID'].trim());
     const studies = response.entries.filter(obj => studyIDs.includes(obj.id));
     const consortias = filterConsortiums(response.entries);
     const array = [...studies, ...consortias];
+    
     let bool = false;
-    for(let consortia of array){
-        if(bool) continue;
+    for (let consortia of array) {
+        if (bool) continue;
         const permitted = checkDataSubmissionPermissionLevel(await getCollaboration(consortia.id, `${consortia.type}s`), JSON.parse(localStorage.parms).login);
-        if(permitted) bool = true;
+        if (permitted) bool = true;
     }
-    if(array.length <= 0) {
+    if (array.length <= 0) {
         hideAnimation();
-        return `<div class="general-bg padding-bottom-1rem">
-                    <div class="container body-min-height">
-                        <div class="main-summary-row">
-                            <div class="align-left">
-                                <h1 class="page-header">Data Submitted</h1>
-                            </div>
-                        </div>
-                        <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
-                            No folder found for Data Submission
+        return `
+            <div class="general-bg padding-bottom-1rem">
+                <div class="container body-min-height">
+                    <div class="main-summary-row">
+                        <div class="align-left">
+                            <h1 class="page-header">Data Submitted</h1>
                         </div>
                     </div>
-                </div>`;
+                    <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
+                        No folder found for Data Submission
+                    </div>
+                </div>
+            </div>
+        `;
     };
     
     let template = '';
-    
     template += `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height font-size-18">
@@ -42,20 +45,19 @@ export const dataSubmissionTemplate = async () => {
                     </div>
                 </div>
                 ${bool ? `
-                <div class="row create-study">
-                    <div class="upload-in-study">
-                        <button data-toggle="modal" id="uploadDataBtn" title="Submit data" data-target="#uploadInStudy" class="btn btn-light div-border">
-                            <i class="fas fa-upload"></i> Submit data
-                        </button>
+                    <div class="row create-study">
+                        <div class="upload-in-study">
+                            <button data-toggle="modal" id="uploadDataBtn" title="Submit data" data-target="#uploadInStudy" class="btn btn-light div-border">
+                                <i class="fas fa-upload"></i> Submit data
+                            </button>
+                        </div>
                     </div>
-                </div>
-                `:``}`;
+                `:` `}`;
 
     template += await uploadInStudy('uploadInStudy');
-    
     template += '<div class="data-submission div-border white-bg"><ul class="ul-list-style first-list-item collapsible-items mb-0">';
 
-    for(let obj of array){
+    for (let obj of array) {
         const consortiaName = obj.name;
         let type = obj.type;
         let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
@@ -75,13 +77,14 @@ export const dataSubmissionTemplate = async () => {
 
 export const lazyload = (element) => {
     let spinners = document.getElementsByClassName('lazy-loading-spinner');
-    if(element) spinners = element.parentNode.querySelectorAll('.lazy-loading-spinner');
+    if (element) spinners = element.parentNode.querySelectorAll('.lazy-loading-spinner');
     Array.from(spinners).forEach(async element => {
         const id = element.dataset.id;
         const status = element.dataset.status;
-        if(status !== 'pending') return;
+        if (status !== 'pending') return;
+        
         let allEntries = (await getFolderItems(id)).entries;
-        if(allEntries.length === 0){
+        if (allEntries.length === 0){
             element.classList = ['fas fa-exclamation-circle'];
             element.title = 'Empty folder'
         }
@@ -89,22 +92,26 @@ export const lazyload = (element) => {
         element.dataset.status = 'complete';
         const entries = filterStudiesDataTypes(allEntries);
         const fileEntries = allEntries.filter(obj => obj.type === 'file');
+        
         if (entries.length > 0){
             const ul = document.createElement('ul');
             ul.classList = ['ul-list-style collapse'];
             ul.id = `toggle${id}`
 
-            for(const obj of entries){
+            for(const obj of entries) {
                 const li = document.createElement('li');
                 li.classList = ['collapsible-items'];
                 let type = obj.type;
                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                li.innerHTML = `<button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
-                                    <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.name}" data-status="pending" class="lazy-loading-spinner"></i>
-                                </button> 
-                                ${obj.name}
-                                <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>`;
+                li.innerHTML = `
+                    <button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
+                        <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.name}" data-status="pending" class="lazy-loading-spinner"></i>
+                    </button> 
+                    ${obj.name}
+                    <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>`;
                 ul.appendChild(li);
             }
 
@@ -114,18 +121,23 @@ export const lazyload = (element) => {
             element.parentNode.parentNode.appendChild(ul);
             dataSubmission(element.parentNode);
         }
-        else if(fileEntries.length > 0) {
+        else if (fileEntries.length > 0) {
             const ul = document.createElement('ul');
             ul.classList = ['ul-list-style collapse'];
             ul.id = `toggle${id}`
 
-            for(const obj of fileEntries){
+            for (const obj of fileEntries) {
                 const li = document.createElement('li');
                 li.classList = ['collapsible-items'];
-                li.innerHTML = `<a><i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i></a> 
-                                ${obj.name}
-                                <a href="https://nih.app.box.com/${obj.type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}"><i class="fas fa-external-link-alt"></i></a>
-                                `;
+                li.innerHTML = `
+                    <a>
+                        <i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i>
+                    </a> 
+                    ${obj.name}
+                    <a href="https://nih.app.box.com/${obj.type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                `;
                 ul.appendChild(li);
             }
 
@@ -141,13 +153,13 @@ export const lazyload = (element) => {
 export const dataSubmission = (element) => {
     element.addEventListener('click', e => {
         e.preventDefault();
-        if (element.getElementsByClassName('fa-folder-minus').length > 0 && element.getElementsByClassName('fa-folder-minus')[0].classList.contains('fa-folder-minus')){
+        if (element.getElementsByClassName('fa-folder-minus').length > 0 && element.getElementsByClassName('fa-folder-minus')[0].classList.contains('fa-folder-minus')) {
             element.getElementsByClassName('fa-folder-minus')[0].classList.add('fa-folder-plus');
             element.getElementsByClassName('fa-folder-minus')[0].classList.remove('fa-folder-minus');
         } else {
             element.getElementsByClassName('fa-folder-plus')[0].classList.add('fa-folder-minus');
             element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
-            if(document.getElementsByClassName('lazy-loading-spinner').length !== 0){
+            if (document.getElementsByClassName('lazy-loading-spinner').length !== 0) {
                 lazyload(element);
             }
         }
