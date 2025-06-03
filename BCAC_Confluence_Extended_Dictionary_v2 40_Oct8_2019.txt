@@ -132,7 +132,6 @@ Tumour characteristics	M2_status	M from TNM (distant metastases)	"0=M0 (No dista
 Tumour characteristics	MIndex_status	M from TNM (distant metastases) for index tumour	"0=M0 (No distant metastasis ), 1=M1 (Distant metastasis ), 8=Mx, 888=DK"	qualitative - categorical	This variable is derived from [M1_status] or [M2_status] using variable [Index]	Yes	Pathology
 ER	ER_status1	Estrogen receptor status of first tumour	"0=negative, 1=positive, 888=DK"	qualitative - categorical	Please provide coding for positive vs negative status.	Yes	Pathology
 ER	ER_status2	Estrogen receptor status of second tumour	"0=negative, 1=positive, 777=NA, 888=DK"	qualitative - categorical	Please provide coding for positive vs negative status	Yes	Pathology
-ER	ER_statusIndex	Estrogen receptor status of index tumour	"0=negative, 1=positive, 888=DK"	qualitative - categorical	This variable is derived from [ER_status1] or [ER_status2] using variable [Index]	Yes	Pathology
 PR	PR_status1	Progesteron receptor status of first tumour	"0=negative, 1=positive, 888=DK"	qualitative - categorical	Please provide coding for positive vs negative status.	Yes	Pathology
 PR	PR_status2	Progesteron receptor status of second tumour	"0=negative, 1=positive, 777=NA, 888=DK"	qualitative - categorical	Please provide coding for positive vs negative status	Yes	Pathology
 PR	PR_statusIndex	Progesteron receptor status of index tumour	"0=negative, 1=positive, 888=DK"	qualitative - categorical	This variable is derived from [PR_status1] or [PR_status2] using variable [Index]	Yes	Pathology
