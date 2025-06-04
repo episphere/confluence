@@ -2,34 +2,108 @@ import { addEventFilterBarToggle } from "../event.js";
 import { getFile, hideAnimation, shortenText, tsv2JsonDict, json2other, emailsAllowedToUpdateData, getFileXLSX, showAnimation, array2Json, array2Json2, getFileURL } from "./../shared.js";
 import { addEventToggleCollapsePanelBtn, pageSizeTemplate, dataPagination, paginationTemplate } from "./description.js";
 let previousValue = '';
+/**
+ * Checks if a row appears to be a merged header row rather than a data row
+ * @param {Object} row - The row object from the Excel sheet
+ * @returns {boolean} - True if the row appears to be a merged header row
+ */
+const isMergedRow = (row) => {
+    // Get all keys in the row
+    const keys = Object.keys(row);
+    
+    // If the row has very few columns compared to what we expect, it might be a merged row
+    if (keys.length < 3) {
+        return true;
+    }
+    
+    // Check if the row is missing essential columns that data rows should have
+    const essentialColumns = ['Variable', 'Label'];
+    const missingEssentials = essentialColumns.some(col => 
+        !keys.includes(col) || !row[col] || row[col].toString().trim() === ''
+    );
+    
+    // If missing essential columns, likely a merged header row
+    if (missingEssentials) {
+        return true;
+    }
+    
+    // Check if the first column value is very long, which often indicates a merged header
+    const firstColValue = row[keys[0]];
+    if (firstColValue && typeof firstColValue === 'string' && firstColValue.length > 50) {
+        return true;
+    }
+    
+    return false;
+};
+
 export const dataDictionaryTemplate = async () => {
     //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/Confluence_Data_Dictionary.txt')).text();
     //const data = await (await fetch('https://raw.githubusercontent.com/episphere/confluence/master/BCAC_Confluence_Extended_Dictionary_v2_replace2.txt')).text();
     //const data = await (await fetch('./BCAC_Confluence_Extended_Dictionary_v2_replace.txt')).text();
     const data = await (await fetch('./Confluence_Data_Dictionary.txt')).text();
     const tsvData = tsv2JsonDict(data);
-    const dictionary = tsvData.data;
+    //const dictionary = tsvData.data;
     const headers = tsvData.headers;
     // console.log(dictionary);
     // console.log(headers);
 
-    // const dataxlsx =  await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
-    // let file = await dataxlsx.arrayBuffer();
-    // let workbook = XLSX.read(file);
-    // console.log(workbook);
-    // let worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    // console.log(worksheet);
-    // let raw_data = XLSX.utils.sheet_to_json(worksheet, {range:3});
-    // console.log(raw_data);
-    // const dictionary = raw_data;
-
+    const dataxlsx = await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
+    let file = await dataxlsx.arrayBuffer();
+    let workbook = XLSX.read(file);
+    console.log(workbook);
+    
+    // Process all sheets in the workbook
+    const allSheetData = [];
+    let lastCategory = '';
+    
+    // Process each sheet in the workbook
+    for (const sheetName of workbook.SheetNames) {
+        // Skip any sheet that contains "T_TNM" in its name
+        if (sheetName.includes("T_TNM")) {
+            continue;
+        }
+        
+        const worksheet = workbook.Sheets[sheetName];
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, {range:3});
+        
+        // Process each row in the sheet and handle Category inheritance
+        sheetData.forEach(row => {
+            // Check if this row appears to have merged columns (header rows)
+            // This typically happens when a row has a long text spanning multiple columns
+            // and is missing most of the expected column values
+            const isMergedHeaderRow = isMergedRow(row);
+            
+            // Skip rows that appear to be merged header rows
+            if (isMergedHeaderRow) {
+                return;
+            }
+            
+            // If Category is empty, use the last non-empty Category
+            if (!row.Category || row.Category.trim() === '') {
+                row.Category = lastCategory;
+            } else {
+                lastCategory = row.Category;
+            }
+            
+            // Add Data Type column based on sheet name with title case formatting
+            row['Data Type'] = sheetName.split(/\s+/).map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            
+            allSheetData.push(row);
+        });
+    }
+    
+    const dictionary = allSheetData;
+    console.log(dictionary);
     
     if(localStorage.parms){
         let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)
         if (emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login)){
-            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3" title="Update Dictionar Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
+            let updateButton = `${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3 button-glow" title="Update Dictionary Based on File in Box to be uploaded to GitHub" id="updateDict">Update Dictionary</button>`) :''}`
             const pageHeader = document.getElementById("pageHeader");
             pageHeader.insertAdjacentHTML("afterend", updateButton);
+            updateDict();
         }
     };
     let template = `
@@ -48,7 +122,7 @@ export const dataDictionaryTemplate = async () => {
         <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
         <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
             <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
-                <span class="font-bold">Data Type:</span> All
+                <span class="font-bold black-font">Data Type:</span> All
             </div>
         </div>
         <div class="main-summary-row">
@@ -63,7 +137,6 @@ export const dataDictionaryTemplate = async () => {
     renderDataDictionary(dictionary, dictionary.length, headers);
     paginationHandler(dictionary, dictionary.length, headers);
     addEventFilterBarToggle();
-    updateDict();
     hideAnimation();
 }
 const paginationHandler = (data, pageSize, headers) => {
@@ -101,8 +174,8 @@ const addEventPageBtns = (pageSize, data, headers) => {
     });
 }
 const renderDataDictionaryFilters = (dictionary, headers) => {
-    const allVariableType = Object.values(dictionary).filter(dt => dt['Variable type']).map(dt => dt['Variable type']);
-    const uniqueType = allVariableType.filter((d,i) => allVariableType.indexOf(d) === i);
+    const allDataTypes = Object.values(dictionary).filter(dt => dt['Data Type']).map(dt => dt['Data Type']);
+    const uniqueTypes = allDataTypes.filter((d,i) => allDataTypes.indexOf(d) === i);
     let template = '';
     template += `
     <div class="main-summary-row">
@@ -110,9 +183,6 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
             <div class="form-group" margin:0px>
                 <div class="input-group">
                     <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataDictionary" aria-describedby="search-addon" />
-                    <!--<span class="input-group-text border-0 search-input">
-                        <i class="fas fa-search"></i>
-                    </span>-->
                 </div>
             </div>
         </div>
@@ -123,11 +193,11 @@ const renderDataDictionaryFilters = (dictionary, headers) => {
                 <label class="filter-label font-size-13" for="variableTypeList">Data Type</label>
                 <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="variableTypeList">
                 `
-                uniqueType.forEach(vt => {
+                uniqueTypes.forEach(dt => {
                     template += `
-                        <li class="filter-list-item">
-                            <input type="checkbox" data-variable-type="${vt}" id="label${vt}" class="select-variable-type" style="margin-left: 1px !important;">
-                            <label for="label${vt}" class="country-name" title="${vt}">${shortenText(vt, 60)}</label>
+                        <li class="filter-list-item form-check">
+                            <input type="checkbox" data-variable-type="${dt}" id="label${dt}" class="form-check-input select-variable-type" style="margin-left: 1px !important;">
+                            <label for="label${dt}" class="form-check-label" title="${dt}">${shortenText(dt, 60)}</label>
                         </li>
                     `
                 })
@@ -175,15 +245,16 @@ const filterDataHandler = (dictionary) => {
     const variableTypeSelection = Array.from(document.getElementsByClassName('select-variable-type')).filter(dt => dt.checked).map(dt => dt.dataset.variableType);
     let filteredData = dictionary;
     if(variableTypeSelection.length > 0) {
-        filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Variable type']) !== -1);
+        // Update to filter by Data Type instead of Variable type
+        filteredData = filteredData.filter(dt => variableTypeSelection.indexOf(dt['Data Type']) !== -1);
     }
     if(variableTypeSelection.length === 0) filteredData = dictionary;
     
     document.getElementById('listFilters').innerHTML = `
     ${variableTypeSelection.length > 0 ? `
-        <span class="font-bold">Data Type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
+        <span class="font-bold black-font">Data Type: </span>${variableTypeSelection[0]} ${variableTypeSelection.length > 1 ? `and <span class="other-variable-count">${variableTypeSelection.length-1} other</span>`:``}
     `:`
-        <span class="font-bold">Data Type:</span> All`}
+        <span class="font-bold black-font">Data Type:</span> All`}
     `;
     const input = document.getElementById('searchDataDictionary');
     const currentValue = input.value.trim().toLowerCase();
@@ -244,13 +315,14 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                         <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
                         <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
                         <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
-                        <div class="col-md-2">${desc['Variable type'] ? desc['Variable type'] : ''}</div>
+                        <div class="col-md-2">${desc['Data Type'] ? desc['Data Type'] : ''}</div>
                     </button>
                 </h2>
                 <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
                     <div class="accordion-body">
                         ${desc['Coding'] ? `<div class="row mb-1 m-0 white-space"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                         ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
+                        ${desc['Data Type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Data Type</div><div class="col">${desc['Data Type']}</div></div>`: ``}
                         ${desc['Comment'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold white-space">Comment</div><div class="col">${desc['Comment']}</div></div>`: ``}
                         ${desc['Confluence Variable'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Confluence Variable</div><div class="col">${desc['Confluence Variable']}</div></div>`: ``}
                     </div>
@@ -286,27 +358,19 @@ export const downloadFiles = (data, headers, fileName, studyDescription) => {
     }
     const downloadDictionaryCSV = document.getElementById('downloadDictionaryCSV');
     downloadDictionaryCSV.addEventListener('click', e => {
-        e.stopPropagation();
-        const csvContent = "data:text/csv;charset=utf-8," + json2other(data, headers).replace(/(<b>)|(<\/b>)/g, '');
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${fileName}.csv`);
-        document.body.appendChild(link);
-        link.click(); 
-        document.body.removeChild(link);
+
+        const filteredDictionary = filterDataHandler(data);
+        prepareDictionaryForCSVDownload(filteredDictionary, 'Confluence_Dictionary');
+
     })
     const downloadDictionaryTSV = document.getElementById('downloadDictionaryTSV');
     downloadDictionaryTSV.addEventListener('click', e => {
-        e.stopPropagation();
-        let tsvContent = "data:text/tsv;charset=utf-8," + json2other(data, headers, true).replace(/(<b>)|(<\/b>)/g, '');
-        const encodedUri = encodeURI(tsvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${fileName}.tsv`);
-        document.body.appendChild(link);
-        link.click(); 
-        document.body.removeChild(link);
+        const filteredDictionary = filterDataHandler(data);
+        prepareDictionaryForTSVDownload(filteredDictionary, 'Confluence_Dictionary');
+    })
+    const downloadExcelBtn = document.getElementById('downloadOriginalExcel');
+    downloadExcelBtn.addEventListener('click', e => {
+        downloadOriginalDictionary();
     })
 }
 
@@ -361,3 +425,160 @@ const JSONToFile = (obj, filename) => {
     URL.revokeObjectURL(url);
     //uploadFileVersion2(blob, studyDescriptions, 'application/json')
   };
+
+/**
+ * Downloads the original Excel dictionary file
+ * @returns {Promise<void>} - Triggers a file download
+ */
+const downloadOriginalDictionary = async () => {
+  try {
+    showAnimation();
+    
+    // Fetch the Excel file
+    const response = await fetch('./src/data/Confluence_Extended_Dictionary.xlsx');
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dictionary file: ${response.status} ${response.statusText}`);
+    }
+    
+    // Get the file as a blob
+    const blob = await response.blob();
+    
+    // Create a download link and trigger the download
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Confluence_Extended_Dictionary.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    hideAnimation();
+  } catch (error) {
+    console.error('Error downloading dictionary file:', error);
+    hideAnimation();
+    alert('Failed to download the dictionary file. Please try again later.');
+  }
+};
+
+/**
+ * Prepares dictionary data for download in CSV format
+ * @param {Array} dictionaryData - The dictionary data as an array of objects
+ * @param {string} filename - The name of the file to be downloaded (without extension)
+ * @returns {void} - Triggers a file download
+ */
+const prepareDictionaryForCSVDownload = (dictionaryData, filename = 'dictionary_export') => {
+  // Clone the data to avoid modifying the original
+  const cleanData = JSON.parse(JSON.stringify(dictionaryData));
+  
+  // Remove HTML tags from any fields (like <b> tags from search highlighting)
+  cleanData.forEach(item => {
+    Object.keys(item).forEach(key => {
+      if (typeof item[key] === 'string') {
+        item[key] = item[key].replace(/(<([^>]+)>)/gi, '');
+      }
+    });
+  });
+  
+  // Get all unique headers from the data
+  const allHeaders = new Set();
+  cleanData.forEach(item => {
+    Object.keys(item).forEach(key => {
+      allHeaders.add(key);
+    });
+  });
+  const headers = Array.from(allHeaders);
+  
+  // Create CSV header row
+  let csvContent = headers.join(',') + '\r\n';
+  
+  // Add data rows
+  cleanData.forEach(item => {
+    const row = headers.map(header => {
+      // Handle fields that might contain commas or quotes
+      const value = item[header] !== undefined ? item[header] : '';
+      const valueStr = String(value);
+      
+      // Escape quotes and wrap in quotes if needed
+      if (valueStr.includes(',') || valueStr.includes('"') || valueStr.includes('\n')) {
+        return '"' + valueStr.replace(/"/g, '""') + '"';
+      }
+      return valueStr;
+    });
+    csvContent += row.join(',') + '\r\n';
+  });
+  
+  // Create a Blob with the CSV content
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+  // Create a download link and trigger the download
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Prepares dictionary data for download in TSV format
+ * @param {Array} dictionaryData - The dictionary data as an array of objects
+ * @param {string} filename - The name of the file to be downloaded (without extension)
+ * @returns {void} - Triggers a file download
+ */
+const prepareDictionaryForTSVDownload = (dictionaryData, filename = 'dictionary_export') => {
+  // Clone the data to avoid modifying the original
+  const cleanData = JSON.parse(JSON.stringify(dictionaryData));
+  
+  // Remove HTML tags from any fields (like <b> tags from search highlighting)
+  cleanData.forEach(item => {
+    Object.keys(item).forEach(key => {
+      if (typeof item[key] === 'string') {
+        item[key] = item[key].replace(/(<([^>]+)>)/gi, '');
+      }
+    });
+  });
+  
+  // Get all unique headers from the data
+  const allHeaders = new Set();
+  cleanData.forEach(item => {
+    Object.keys(item).forEach(key => {
+      allHeaders.add(key);
+    });
+  });
+  const headers = Array.from(allHeaders);
+  
+  // Create TSV header row
+  let tsvContent = headers.join('\t') + '\r\n';
+  
+  // Add data rows
+  cleanData.forEach(item => {
+    const row = headers.map(header => {
+      // Handle fields that might contain tabs or newlines
+      const value = item[header] !== undefined ? item[header] : '';
+      const valueStr = String(value);
+      
+      // Replace tabs with spaces to maintain TSV structure
+      return valueStr.replace(/\t/g, ' ').replace(/\r?\n/g, ' ');
+    });
+    tsvContent += row.join('\t') + '\r\n';
+  });
+  
+  // Create a Blob with the TSV content
+  const blob = new Blob([tsvContent], { type: 'text/tab-separated-values;charset=utf-8;' });
+  
+  // Create a download link and trigger the download
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.tsv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

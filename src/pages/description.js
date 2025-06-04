@@ -19,6 +19,7 @@ export const renderDescription = (modified_at) => {
                                 Download <i class="fas fa-download" style="color:#000000 !important"></i>
                             </button>
                             <ul class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
+                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as excel" id="downloadOriginalExcel">Original Excel</button></li>
                                 <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button></li>
                                 <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button></li>
                             </ul>

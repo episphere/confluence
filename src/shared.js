@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
-export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov', 'sbehpour@deloitte.com']
+export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781; // 691143057533; 1238676877781;
 export const summaryStatsFileCIMBAID = 691143057533; // Temporary until CIMBA has updated data
@@ -1523,7 +1523,7 @@ export async function showCommentsDropDown(id) {
     return;
 };
 
-export async function showCommentsDCEG(id) {
+export async function showCommentsDCEG(id, change=false) {
     const commentSection = document.getElementById(`file${id}Comments`);
     const response = await listComments(id);
     // console.log(response);
@@ -1545,21 +1545,47 @@ export async function showCommentsDCEG(id) {
     //for (const user of uniqueUsers){
         // const userComments = comments.filter(element => element.created_by.login === user);
         let newDate = new Date(0);
-        for (const comment of comments) {
-            const comment_date = new Date(comment.created_at);
-            const date = comment_date.toLocaleDateString();
-            const time = comment_date.toLocaleTimeString();
-            // if (comment_date > newDate) {
-                newDate = comment_date;
-                
-                const ifcons = chairsInfo.find(element => element.email === comment.created_by.login);
-                if (ifcons) {
-                    const cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
-                    const score = comment.message[8];
-                    const inputScore = document.getElementById(`${cons}${id}`);
-                    inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`; 
+      for (const comment of comments) {
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        //if (comment_date > newDate) {
+            newDate = comment_date;
+            //console.log(comment.message.substring(0,10)==="Consortium");
+            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login) || comment.message.substring(0,10)==="Consortium";
+            if (ifcons){
+                let cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
+                let score = comment.message[8];
+                if (comment.message.substring(0,10)==="Consortium"){
+                    cons = comment.message.substring(12, comment.message.indexOf(",", 12)).trim();
+                    score = comment.message.substring(
+                        comment.message.indexOf("Rating:") + 7, 
+                        comment.message.indexOf(",", comment.message.indexOf("Rating:"))
+                        ).trim();
                 }
-            //}           
+                console.log(cons)
+                //let score = comment.message[8];
+                const inputScore = document.getElementById(`${cons}${id}`);
+                const selectElement = inputScore.children[0];
+                selectElement.value = `${score}`;
+
+                // Remove any existing badge classes
+                selectElement.className = 'form-select form-select-sm decision-dropdown disabled';
+                if (change==false){
+                    //inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;
+                    selectElement.setAttribute('disabled', true);
+                    selectElement.classList.add(`badge-${score}`);
+                } else {
+
+                // Add the appropriate badge class based on the score
+                if (score !== '--') {
+                    selectElement.classList.add(`badge-${score}`);
+                    selectElement.setAttribute('data-previous-value', selectElement.value);
+                }
+            }
+                //inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`; 
+            }
+        //}           
 
             template += `
                 <div>
