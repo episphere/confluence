@@ -2,12 +2,7 @@ import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpda
 import { addEventConsortiumSelect, getSelectedStudies } from "../visualization.js";
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from "../event.js";
 
-export const dataSummary = (
-    pageHeader,
-    showPages,
-    showUpdateButton,
-    publicAccess
-) => {
+export const dataSummary = ( pageHeader, showPages, showUpdateButton, publicAccess ) => {
     return `
         <div class="general-bg">
             <div class="container body-min-height">
@@ -65,7 +60,6 @@ export const dataSummary = (
                         }
                     </div>
                 </div>
-                
                 ${
                     showUpdateButton && localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
                         <div class="main-summary-row">
@@ -225,6 +219,7 @@ const renderMidsetFilterData = (
     ancestory.sort();
     ancestory.push("ethnicityClass_Other");
     ancestory.push("All");
+    
     template += `
         <div style="width:100%;">
             <div class="form-group" id="statusList">
@@ -239,6 +234,7 @@ const renderMidsetFilterData = (
                 <label class="filter-label font-size-13" for="ancestrySelection">Ancestry</label>
                 <select class="form-select font-size-15" id="ancestrySelection">
     `;
+    
     ancestory.forEach((anc) => {
         template += `
             <option value="${anc}" ${anc === "All" ? "selected" : ""}>
@@ -268,6 +264,7 @@ const renderMidsetFilterData = (
                     </div>
                 </li>
         `;
+        
         if (Object.keys(studies[consortium]).length !== 0) {
             innerTemplate += `<ul class="list-group collapse no-list-style custom-padding allow-overflow max-height-study-list" id="toggle${consortium.replace(/ /g,"")}">`;
             for (let study in studies[consortium]) {
@@ -291,9 +288,9 @@ const renderMidsetFilterData = (
     template += `
         </div>
     </div>
-        <div class="form-group" id="midsetVariables">
-            <label class="filter-label font-size-13" for="variableSelectionList">Variable Selection</label>
-            <ul class="remove-padding-left font-size-15" id="variableSelectionList">
+    <div class="form-group" id="midsetVariables">
+        <label class="filter-label font-size-13" for="variableSelectionList">Variable Selection</label>
+        <ul class="remove-padding-left font-size-15" id="variableSelectionList">
     `;
 
     headers.forEach((variable) => {
@@ -368,6 +365,7 @@ const filterMidsetData = (data) => {
     if (ancestry !== "All") {
         newData = newData.filter((dt) => dt[ancestry] === "1");
     }
+    
     document.getElementById("listFilters").innerHTML = `
         <span class="font-bold">Status: </span>${status.replace("status_", "")}
         <span class="vertical-line"></span>
@@ -436,19 +434,24 @@ const midset = (data, acceptedVariables) => {
                     <div id="midsetHeader"></div>
                 </th>
                 <th class="missing-column"></th>
-            </tr>`;
+            </tr>
+        `;
 
         template += `
             <tr>
                 <th class="missing-column"></th>
-            `;
+        `;
+        
         for (let variable in headerCount) {
             template += `<th class="missing-column cell-equal-width">${numberWithCommas(headerCount[variable])}</th>`;
         }
+        
         template += `<th class="missing-column"></th></tr><tr><td class="missing-column"></td>`;
+        
         for (let variable in headerCount) {
             template += `<th class="missing-column cell-equal-width">${variable.replace("_Data available", "")}</th>`;
         }
+        
         template += `
             <th class="missing-column"></th>
             <th class="missing-column">
@@ -465,7 +468,8 @@ const midset = (data, acceptedVariables) => {
                 <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='allSubjects'>
                     <i class="fas fa-question-circle cursor-pointer"></i>
                 </button>
-            </td>`;
+            </td>
+        `;
 
         const set0 = data.length;
         acceptedVariables.forEach((variable, index) => {
@@ -478,6 +482,7 @@ const midset = (data, acceptedVariables) => {
                     <td id="midsetChart" rowspan="${Object.keys(result).length + 2}"></td>
                 `;
         });
+        
         template += `
             </tr>
             <tr>
@@ -486,7 +491,8 @@ const midset = (data, acceptedVariables) => {
                     <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" data-variable='completeSet'>
                         <i class="fas fa-question-circle cursor-pointer"></i>
                     </button>
-                </td>`;
+                </td>
+        `;
         
         const set1 = setLengths(data, acceptedVariables);
         acceptedVariables.forEach((variable, index) => {
@@ -494,6 +500,7 @@ const midset = (data, acceptedVariables) => {
             if (index === acceptedVariables.length - 1)
                 template += `<td class="missing-column">${numberWithCommas(set1)}</td>`;
         });
+        
         template += "</tr>";
     
         let ignore = "";
@@ -503,6 +510,7 @@ const midset = (data, acceptedVariables) => {
             delete result[v];
         });
         delete result[ignore];
+        
         plotData = Object.values(result);
         plotData.unshift(set1);
         plotData.unshift(set0);
