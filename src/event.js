@@ -49,6 +49,7 @@ export const addEventStudyRadioBtn = () => {
 export const addEventConsortiaSelect = () => {
     const element = document.getElementById('selectConsortiaUIS');
     if (!element) return
+    
     element.addEventListener('change', async () => {
         const selectStudyUIS = document.getElementById('selectStudyUIS');
         if (!selectStudyUIS) return;
@@ -87,8 +88,8 @@ export const addEventConsortiaSelect = () => {
 
 export const addEventUploadStudyForm = () => {
     const form = document.getElementById('uploadStudyForm');
-    
     if (!form) return;
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -212,24 +213,28 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(coreData, conflictFileId, 'application/json');
     }
+    
     const response2 = await uploadFile(pathologyData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Pathology_Data.json`, pDataFolderID);
     if (response2.status === 409) {
         const conflictFileId = response2.json.context_info.conflicts.id;
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(pathologyData, conflictFileId, 'application/json');
     }
+    
     const response3 = await uploadFile(rfData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Risk_Factor_Data.json`, rfDataFolderID);
     if (response3.status === 409) {
         const conflictFileId = response3.json.context_info.conflicts.id;
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(rfData, conflictFileId, 'application/json');
     }
+    
     const response4 = await uploadFile(stData, `${fileName.slice(0, fileName.lastIndexOf('.'))}_Survival_and_Treatment_Data.json`, stDataFolderID);
     if (response4.status === 409) {
         const conflictFileId = response4.json.context_info.conflicts.id;
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading new version...`;
         await uploadFileVersion(stData, conflictFileId, 'application/json');
     }
+    
     if (location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev)) {
         // Upload Submission logs
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading QAQC report...`;
@@ -238,7 +243,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
     }
     
     location.reload();
-}
+};
 
 // const existsOrCreateNewFolder = async (dataEntries, studyId, folderName) => {
 //     const folderExists = dataEntries.filter(dt => dt.type === "folder" && dt.name === folderName);
@@ -250,7 +255,7 @@ const separateData = async (qaqcFileName, textFromFileLoaded, fileName) => {
 //         ID = folderExists[0].id;
 //     }
 //     return ID;
-// }
+// };
 
 const performQAQC = async (textFromFileLoaded, fileName) => {
     document.getElementById('uploadErrorReport').innerHTML = `
@@ -282,7 +287,7 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     const fileNameQAQC = `${fileName.substr(0, fileName.lastIndexOf('.'))}_qaqc_${new Date().toISOString()}.html`
     addEventDownloadQAQCReport(fileNameQAQC);
     addEventContinueSubmission(fileNameQAQC, textFromFileLoaded, fileName);
-}
+};
 
 const addEventDownloadQAQCReport = (fileName) => {
     const element = document.getElementById('downloadQAQCReport');
@@ -298,7 +303,7 @@ const addEventDownloadQAQCReport = (fileName) => {
         replaceBtns();
         document.getElementById('uploadInStudy').querySelectorAll('.close.modal-close-btn')[0].click();
     });
-}
+};
 
 const replaceBtns = () => {
     const element = document.getElementById('downloadQAQCReport');
@@ -320,7 +325,7 @@ const replaceBtns = () => {
     submitBtn.type = 'Submit';
 
     continueBtn.parentNode.replaceChild(submitBtn, continueBtn);
-}
+};
 
 const addEventContinueSubmission = (qaqcFileName, textFromFileLoaded, fileName) => {
     const element = document.getElementById('continueSubmission');
@@ -328,11 +333,13 @@ const addEventContinueSubmission = (qaqcFileName, textFromFileLoaded, fileName) 
         element.classList.add('btn-disbaled');
         separateData(qaqcFileName, textFromFileLoaded, fileName);
     });
-}
+};
 
 const dataForQAQC = (txt) => {
     let data = {};
+    
     if (txt.slice(0,1)=='['){txt='{'+txt+'}'}
+    
     if (txt.slice(0,1)=='{'){
         data = JSON.parse(txt);
         return data
@@ -341,7 +348,9 @@ const dataForQAQC = (txt) => {
             // if (row[0]=='    '){row='undefined   '+row}
             return row.replace(/"/g, '').split(/[,\t]/g) // split csv and tsv alike
         })
-        if (arr.slice(-1).toLocaleString()==""){arr.pop()}
+        
+        if (arr.slice(-1).toLocaleString()=="") {arr.pop()}
+        
         const labels = arr[0]
         labels.forEach((label) => {
             data[label] = []
@@ -354,9 +363,10 @@ const dataForQAQC = (txt) => {
         labels.forEach(label => {
             data[label] = numberType(data[label])
         })
+        
         return data;
     }
-}
+};
 
 const numberType = aa => { // try to fit numeric typing
     let tp='number'
@@ -365,6 +375,7 @@ const numberType = aa => { // try to fit numeric typing
             tp='string'
         }
     })
+    
     if (tp=='number') {
         aa=aa.map(a=>{
             if (a=='undefined'||a=='') {
@@ -375,13 +386,15 @@ const numberType = aa => { // try to fit numeric typing
             return a
         })
     }
+    
     return aa
-}
+};
 
 export const addEventShowAllCollaborator = () => {
     const btn1 = document.getElementById('addNewCollaborators');
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
+    
     btn2.addEventListener('click', async () => {
         if (btn2.classList.contains('active-tab')) return;
         
@@ -413,9 +426,11 @@ export const addEventShowAllCollaborator = () => {
                 if (entry.created_by) {
                     addedBy = `${entry.created_by.name}`;
                 }
+                
                 const addedAt = (new Date(entry.expires_at)).toLocaleString();
                 allEntries.push({name, email, role, status, addedBy, addedAt, id, folderName});
             });
+            
             allEntries = allEntries.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : ((b.name.toLowerCase() > a.name.toLowerCase()) ? -1 : 0));
 
             table += `
@@ -475,30 +490,32 @@ const renderCollaboratorsList = (allEntries, userPermission) => {
     renderCollaboratorListTBody(allEntries, userPermission);
     addEventSortTable(allEntries, userPermission);
     addEventExtendCollaborations();
-}
+};
 
 const renderCollaboratorListTBody = (allEntries, userPermission) => {
     let tbody = '';
     allEntries.forEach(entry => {
         const { name, email, role, addedBy, addedAt, id, folderName, status} = entry;
         const userName = JSON.parse(localStorage.parms).name
-        tbody += `<tr>
-                    <td title="${id}"><input type="checkbox" id="${id}" name="extendCollab" value="${role}" checked></td>
-                    <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
-                    <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
-                    <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
-                    <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select> ${status === 'pending' ? `(${status})` : ''}
-                    ` : `${role} ${status === 'pending' ? `(${status})` : ''} `}</td>
-                    <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
-                    <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
-                    <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
-                </tr>`
+        tbody += `
+            <tr>
+                <td title="${id}"><input type="checkbox" id="${id}" name="extendCollab" value="${role}" checked></td>
+                <td title="${name}">${name.length > 20 ? `${name.slice(0, 20)}...` : `${name}`}</td>
+                <td title="${email}">${email.length > 20 ? `${email.slice(0, 20)}...` : `${email}`}</td>
+                <td>${email !== JSON.parse(localStorage.parms).login && userPermission && updatePermissionsOptions(userPermission, role) && userName === addedBy ? `
+                <select title="Update permission" data-collaborator-id="${id}" data-previous-permission="${role}" data-collaborator-name="${name}" data-collaborator-login="${email}" class="form-control updateCollaboratorRole">${updatePermissionsOptions(userPermission, role)}</select> ${status === 'pending' ? `(${status})` : ''}
+                ` : `${role} ${status === 'pending' ? `(${status})` : ''} `}</td>
+                <td title="${addedBy}">${addedBy.length > 20 ? `${addedBy.slice(0, 20)}...` : `${addedBy}`}</td>
+                <td title="${new Date(addedAt).toLocaleString()}">${new Date(addedAt).toDateString()}</td>
+                <td>${addedBy === userName ? `<button class="removeCollaborator" title="Remove collaborator" data-collaborator-id="${id}" data-email="${email}" data-collaborator-name="${name}" data-folder-name="${folderName}"><i class="fas fa-user-minus"></i></button>` : ``}</td>
+            </tr>
+        `
     });
 
     document.getElementById('tBodyCollaboratorList').innerHTML = tbody;
     addEventRemoveCollaborator();
     addEventUpdateCollaborator();
-}
+};
 
 const addEventSortTable = (allEntries, userPermission) => {
     const elements = Array.from(document.getElementsByClassName('sort-column'));
@@ -517,7 +534,7 @@ const addEventSortTable = (allEntries, userPermission) => {
             }
         })
     })
-}
+};
 
 const addEventSearchCollaborators = (allEntries, userPermission) => {
     const search = document.getElementById('searchCollaborators');
@@ -532,29 +549,33 @@ const addEventSearchCollaborators = (allEntries, userPermission) => {
                 dt['email'] = dt['email'].replace(/(<b>)|(<\/b>)/g, '')
                 return dt;
             })
+            
             renderCollaboratorsList(filteredEntries, userPermission);
             return;
         }
+        
         filteredEntries = allEntries.filter(dt => dt.name.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue) || dt.email.toLowerCase().replace(/(<b>)|(<\/b>)/g, '').includes(searchValue));
         filteredEntries = filteredEntries.map(dt => {
             dt['name'] = dt['name'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
             dt['email'] = dt['email'].replace(/(<b>)|(<\/b>)/g, '').replace(new RegExp(searchValue, 'gi'), '<b>$&</b>');
             return dt;
         })
+        
         renderCollaboratorsList(filteredEntries, userPermission)
     })
-}
+};
 
 const updatePermissionsOptions = (userPermission, role) => {
     if ( userPermission === 'owner') return `<option ${role === 'co-owner' ? `selected` : ``} value="co-owner">co-owner</option><option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option><option ${role === 'previewer' ? `selected` : ``} value="previewer">previewer</option>`
     else if ( userPermission === 'co-owner') return `<option ${role === 'co-owner' ? `selected` : ``} value="co-owner">co-owner</option><option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option><option ${role === 'previewer' ? `selected` : ``} value="previewer">previewer</option>`
     else if ( userPermission === 'editor' && role !== 'co-owner' && role !== 'owner') return `<option ${role === 'editor' ? `selected` : ``} value="editor">editor</option><option ${role === 'viewer' ? `selected` : ``} value="viewer">viewer</option><option ${role === 'uploader' ? `selected` : ``} value="uploader">uploader</option><option ${role === 'previewer' ? `selected` : ``} value="previewer">previewer</option>`;
     else return null;
-}
+};
 
 const addEventUpdateCollaborator = () => {
     const updateCollaboratorRole = document.getElementsByClassName('updateCollaboratorRole');
     const showNotification = document.getElementById('showNotification');
+    
     Array.from(updateCollaboratorRole).forEach(element => {
         element.addEventListener('change', async () => {
             const newRole = element.value;
@@ -581,11 +602,12 @@ const addEventUpdateCollaborator = () => {
             }
         })
     })
-}
+};
 
 const addEventRemoveCollaborator = () => {
     const removeCollaborator = document.getElementsByClassName('removeCollaborator');
     const showNotification = document.getElementById('showNotification');
+    
     Array.from(removeCollaborator).forEach(element => {
         element.addEventListener('click', async () => {
             const id = element.dataset.collaboratorId;
@@ -606,27 +628,32 @@ const addEventRemoveCollaborator = () => {
             }
         });
     });
-}
+};
 
 const addEventExtendCollaborations = async () => {
     const btn = document.getElementById('extendCollaborations');
     if (!btn) return;
+    
     btn.addEventListener('click', async () => {
         const header = document.getElementById('confluenceModalHeader');
         const body = document.getElementById('confluenceModalBody');
         
-        header.innerHTML = `<h5 class="modal-title">Collaborations Updating</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+        header.innerHTML = `
+            <h5 class="modal-title">Collaborations Updating</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
         var checkboxes = document.getElementsByName('extendCollab');
         console.log(checkboxes);
         var result = [];
         const promises = []
+        
         Date.prototype.addDays = function(days) {
             var date = new Date(this.valueOf());
             date.setDate(date.getDate() + days);
             return date;
         }
         var date = new Date();
+        
         const newDate = date.addDays(90);
         const newDateString = newDate.toISOString();
         for (var i=0; i < checkboxes.length; i++) {
@@ -634,10 +661,11 @@ const addEventExtendCollaborations = async () => {
                 const promise = updateBoxCollaboratorTime(checkboxes[i].id, checkboxes[i].value, newDateString)
                     .then(response => response.json());
                 promises.push(promise);
-                //result.push(checkboxes[i].id);
-                //promises.push(checkboxes[i].value);
+                // result.push(checkboxes[i].id);
+                // promises.push(checkboxes[i].value);
             }
         }
+        
         showAnimation();
         Promise.all(promises).then(results => {
             alert("Please confirm collaborations have been updated");
@@ -645,11 +673,12 @@ const addEventExtendCollaborations = async () => {
         });
     })
 
-}
+};
 
 export const addEventUpdateAllCollaborators = async () => {
     const btn = document.getElementById('updateCollaborations');
     if (!btn) return;
+    
     btn.addEventListener('click', async () => {
         const header = document.getElementById('confluenceModalHeader');
         const body = document.getElementById('confluenceModalBody');
@@ -659,17 +688,20 @@ export const addEventUpdateAllCollaborators = async () => {
         const ID = 156698557621;
         let collabs = await getCollaboration(ID, 'folders');
         console.log(collabs);
+        
         Date.prototype.addDays = function(days) {
             var date = new Date(this.valueOf());
             date.setDate(date.getDate() + days);
             return date;
         }
         var date = new Date();
+        
         const newDate = date.addDays(360);
         const newDateString = newDate.toISOString();
         console.log(newDateString);
         const allEntries = collabs.entries;
         console.log(allEntries[0]);
+        
         let test = await updateBoxCollaboratorTime(43582145593, "editor", newDateString);
         console.log(test);
         // allEntries.forEach(entry => {
@@ -677,12 +709,14 @@ export const addEventUpdateAllCollaborators = async () => {
         //     let test = await updateBoxCollaboratorTime()
         // })
     })
-}
+};
 
 const checkPermissionLevel = (data) => {
     if (data.entries.length === 0) return null;
+    
     const login = localStorage.parms && JSON.parse(localStorage.parms).login ? JSON.parse(localStorage.parms).login : undefined;
     const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
+    
     if (array.length === 0) {
         const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);
         if (newArray.length > 0) return 'owner';
@@ -690,13 +724,15 @@ const checkPermissionLevel = (data) => {
     else {
         return array[0].role;
     }
+    
     return null;
-}
+};
 
 export const addEventAddNewCollaborator = () => {
     const btn1 = document.getElementById('addNewCollaborators');
     const btn2 = document.getElementById('listCollaborators');
     const folderToShare = document.getElementById('folderToShare');
+    
     btn1.addEventListener('click', () => {
         const ID = folderToShare.dataset.folderId;
         const name = folderToShare.dataset.folderName;
@@ -735,7 +771,7 @@ export const addEventAddNewCollaborator = () => {
 
         addEventCollaboratorForm(ID, type, name);
     });
-}
+};
 
 const addEventCollaboratorForm = (ID, type, name) => {
     const form = document.getElementById('addCollaborationForm');
@@ -753,6 +789,7 @@ const addEventCollaboratorForm = (ID, type, name) => {
                     const login = emails[index].trim();
                     const response = await addNewCollaborator(ID, type, login, role.value.toLowerCase());
                     top = top+2;
+                    
                     if (response.status === 200 || response.status === 201) {
                         template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${name} as ${role.value} successfully!`)
                     } else {
@@ -765,22 +802,25 @@ const addEventCollaboratorForm = (ID, type, name) => {
         showNotification.innerHTML = template;
         addEventHideNotification();
     });
-}
+};
 
 const addEventHideNotification = () => {
     const hideNotification = document.getElementsByClassName('hideNotification');
+    
     Array.from(hideNotification).forEach(btn => {
         btn.addEventListener('click', () => {
             btn.parentNode.parentNode.parentNode.removeChild(btn.parentNode.parentNode);
             if (top >= 2) top = top-2;
         });
+        
         setTimeout(() => { btn.dispatchEvent(new Event('click')) }, 8000);
     });
-}
+};
 
 export const addEventDataGovernanceNavBar = (bool) => {
     const dataGovernanceElement = document.getElementById('dataGovernance');
     if (!dataGovernanceElement) return;
+    
     dataGovernanceElement.addEventListener('click', async () => {
         // if (dataGovernanceElement.classList.contains('navbar-active')) return;
         showAnimation();
@@ -795,16 +835,20 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             const headerDiv = document.createElement('div');
             headerDiv.classList = ['main-summary-row'];
-            headerDiv.innerHTML = `<div class="align-left">
-                                        <h1 class="page-header">Data Governance</h1>
-                                    </div>`
+            headerDiv.innerHTML = `
+                <div class="align-left">
+                    <h1 class="page-header">Data Governance</h1>
+                </div>
+            `
 
         //     const btnDiv = document.createElement('div');
         //     btnDiv.classList = ['align-left create-project-btn'];
-        //     btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
-        //                             <i class="fas fa-project-diagram"></i> Create project
-        //                         </button>
-        //                         ${createProjectModal()}`;
+        //     btnDiv.innerHTML = `
+        //         <button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+        //             <i class="fas fa-project-diagram"></i> Create project
+        //         </button>
+        //         ${createProjectModal()}
+        //     `;
 
             const divRow = document.createElement('div');
             divRow.classList = ['main-summary-row white-bg div-border'];
@@ -826,7 +870,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             // containerDiv.appendChild(btnDiv)
             containerDiv.appendChild(divRow)
             confluenceDiv.appendChild(containerDiv);
-        //     dataGovernanceProjects();
+            // dataGovernanceProjects();
             dataGovernanceLazyLoad();
         // }
         // else {
@@ -834,10 +878,11 @@ export const addEventDataGovernanceNavBar = (bool) => {
 
             // const btnDiv = document.createElement('div');
             // btnDiv.classList = ['align-left create-project-btn'];
-            // btnDiv.innerHTML = `<button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
-            //                         <i class="fas fa-project-diagram"></i> Create project
-            //                     </button>
-            //                     ${createProjectModal()}`;
+            // btnDiv.innerHTML = `
+            //     <button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+            //         <i class="fas fa-project-diagram"></i> Create project
+            //     </button>
+            //     ${createProjectModal()}`;
             
             // const div = document.createElement('div');
             // div.classList = ['align-left'];
@@ -895,7 +940,7 @@ const addEventCreateProjectBtn = () => {
         addEventCPCSelect();
         addEventcreateProjectForm();
     });
-}
+};
 
 const addEventcreateProjectForm = () => {
     const form = document.getElementById('createProjectForm');
@@ -921,13 +966,13 @@ const addEventcreateProjectForm = () => {
                             const login = emails[index].trim();
                             const response = await addNewCollaborator(parent.id, 'folder', login, role.value.toLowerCase());
                             top = top+2;
+                            
                             if (response.status === 200 || response.status === 201) {
                                 template += notificationTemplate(top, `<span class="successMsg">Added new collaborator</span>`, `${login} added to ${projectName} as ${role.value} successfully!`);
                                 dataGovernanceProjects();
                             } else {
                                 template += notificationTemplate(top, `<span class="errorMsg">Error!</span>`, `Could not add ${login} to ${projectName} as ${role.value}, <span class="errorMsg">${(await response.json()).message}</span>!!`);
                             }
-                            
                         }
                     }
                 }        
@@ -975,7 +1020,7 @@ const addEventCPCSelect = () => {
         document.getElementById('studySelection').innerHTML = template;
         addEventCPSSelect();
     });
-}
+};
 
 const addEventCPSSelect = () => {
     const select = document.getElementById('CPSSelect');
@@ -1002,7 +1047,7 @@ const addEventCPSSelect = () => {
         document.getElementById('dataTypeSelection').innerHTML = template;
         addEventCPDTSelect();
     });
-}
+};
 
 const addEventCPDTSelect = () => {
     const select = document.getElementById('CPDTSelect');
@@ -1034,6 +1079,7 @@ export const addEventMyProjects = () => {
     const myProjects = document.getElementById('myProjects');
     myProjects.addEventListener('click', async () => {
         if (myProjects.classList.contains('navbar-active')) return;
+        
         showAnimation();
         assignNavbarActive(myProjects, 2);
         document.title = 'Confluence - My Projects';
@@ -1043,6 +1089,7 @@ export const addEventMyProjects = () => {
 
 export const addEventCopyToClipboard = () => {
     const copyFileApi = document.getElementsByClassName('copy-file-api');
+    
     Array.from(copyFileApi).forEach(elem => {
         elem.addEventListener('click', () => {
             const fileId = elem.dataset.fileId;
@@ -1062,6 +1109,7 @@ export const addEventCopyToClipboard = () => {
                     elem.innerHTML = `<i class="fas fa-check"></i>`;
                     setTimeout(()=> {elem.innerHTML = `<i class="far fa-copy">`}, 5000);
                 }
+                
                 document.body.removeChild(textArea);
             }
             else {
@@ -1087,6 +1135,7 @@ export const addEventFileStats = (element) => {
                 <span aria-hidden="true">&times;</span>
             </button>
         `;
+        
         const response = await getFileAccessStats(ID);
         console.log(response);
         document.getElementById('modalFileStatsBody').innerHTML = `
@@ -1116,6 +1165,7 @@ export const addEventFileStats = (element) => {
 
 export const addEventVariableDefinitions = () => {
     const elements = document.getElementsByClassName('variable-definition');
+    
     Array.from(elements).forEach(element => {
         element.addEventListener('click', () => {
             const variable = element.dataset.variable;
@@ -1178,8 +1228,10 @@ export const addEventVariableDefinitions = () => {
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
             
-            header.innerHTML = `<h5 class="modal-title">${variableName}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+            header.innerHTML = `
+                <h5 class="modal-title">${variableName}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            `;
             body.innerHTML = `<span>${definition}</span>`;
         });
     });
@@ -1188,6 +1240,7 @@ export const addEventVariableDefinitions = () => {
 export const addEventUpdateSummaryStatsData = () => {
     const btn = document.getElementById('updateSummaryStatsData');
     if (!btn) return;
+    
     btn.addEventListener('click', async () => {
         console.log("click");
         const header = document.getElementById('confluenceModalHeader');
@@ -1215,6 +1268,7 @@ export const addEventUpdateSummaryStatsData = () => {
 
 const addEventDataTypeRadio = () => {
     const radios = document.getElementsByName('summarydataType');
+    
     Array.from(radios).forEach(radio => {
         radio.addEventListener('click', async () => {
             const dataType = Array.from(document.getElementsByName('summarydataType')).filter(ele => ele.checked === true)[0].value;
@@ -1238,13 +1292,14 @@ const addEventDataTypeRadio = () => {
                 </button>
                 </li>`;
             });
+            
             template += `</ul>`;
 
             document.getElementById('summaryDataFolderList').innerHTML = template;
             addEventSummaryFolderSelection();
         })
     })
-}
+};
 
 const addEventSummaryFolderSelection = () => {
     const elements = document.getElementsByClassName('update-summary-stats-btn');
@@ -1254,7 +1309,7 @@ const addEventSummaryFolderSelection = () => {
             else element.classList.add('active-filter');
         })
     })
-}
+};
 
 const addEventUpdateSummaryStatsForm = () => {
     const form = document.getElementById('updateSummaryStatsForm');
@@ -1272,6 +1327,7 @@ const addEventUpdateSummaryStatsForm = () => {
         let masterArray = [];
         let publicDataObj = {};
         let allHeaders = [];
+        
         for (let id of folderIds) {
             const response = await getFolderItems(id);
             
@@ -1309,6 +1365,7 @@ const addEventUpdateSummaryStatsForm = () => {
                     if (obj['Carrier_status'] && obj['Carrier_status'] === 'BRCA2') publicDataObj[consortium].BRCA2 += parseInt(obj.statusTotal);
                 })
             }
+            
             masterArray = masterArray.concat(jsonArray);
         }
         
@@ -1350,6 +1407,7 @@ export const addEventUpdateScore = async (fileId, selectedValue, consortium) => 
         let commentReturn = await createComment(fileId, submitMessage);
         console.log(commentReturn);
         //form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
+        
         if (commentReturn.status===201) {
             form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
             setTimeout(() => {document.location.reload(true)}, 2000);
@@ -1357,12 +1415,13 @@ export const addEventUpdateScore = async (fileId, selectedValue, consortium) => 
             form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Error';
         }
     })
-}
+};
 
 export const addEventFilterBarToggle = () => {
     const button = document.getElementById('filterBarToggle');
     button.addEventListener('click', () => {
         const child = Array.from(button.childNodes)[0];
+        
         if (child.classList.contains('fa-caret-left')) {
             reSizePlots();
             child.classList.remove('fa-caret-left');
@@ -1392,6 +1451,7 @@ export const addEventMissingnessFilterBarToggle = () => {
     const button = document.getElementById('filterBarToggle');
     button.addEventListener('click', () => {
         const child = button.querySelector('.fas');
+        
         if (child.classList.contains('fa-caret-left')) {
             reSizePlots();
             child.classList.remove('fa-caret-left');
@@ -1532,16 +1592,19 @@ const filterData = (jsonData, headers) => {
         <span class="font-bold">Case-control status: </span>${caseConFilter}
         <span class="vertical-line"></span><span class="font-bold">Study: </span>${selectedStudies[0]} ${selectedStudies.length > 1 ? `and <span class="other-variable-count">${selectedStudies.length-1} other</span>`:``}
     `:``}`
+    
     renderAllCharts(finalData, headers, onlyCIMBA);
-}
+};
 
 export const addEventConsortiaFilter = (d) => {
     const checkboxs = document.getElementsByClassName('checkbox-consortia');
+    
     Array.from(checkboxs).forEach(checkbox => {
         checkbox.addEventListener('click', () => {
             const selectedConsortium = Array.from(checkboxs).filter(dt => dt.checked).map(dt => dt.dataset.consortia);
             let data = JSON.parse(JSON.stringify(d))
             delete data['dataModifiedAt'];
+            
             if (selectedConsortium.length > 0) {
                 const newData = Object.values(data).filter(dt => selectedConsortium.includes(dt.name));
                 let totalConsortia = 0, totalCases = 0, totalControls = 0, totalStudies = 0, totalBRCA1 = 0, totalBRCA2 = 0;
@@ -1553,6 +1616,7 @@ export const addEventConsortiaFilter = (d) => {
                     if (obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if (obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
+                
                 renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, true);
             }
             else {
@@ -1566,6 +1630,7 @@ export const addEventConsortiaFilter = (d) => {
                     if (obj.BRCA1) totalBRCA1 += obj.BRCA1;
                     if (obj.BRCA2) totalBRCA2 += obj.BRCA2;
                 });
+                
                 renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, true);
             }
         })
@@ -1686,6 +1751,7 @@ export const addEventConsortiaFilter = (d) => {
 
 export function switchTabs(show, hide, files) {
     console.log(show);
+    
     try {
         if (!Array.isArray(hide)) {
             return;
@@ -1769,13 +1835,14 @@ export function switchTabs(show, hide, files) {
                     //     showComments(files[0].id);
                     //   }
                     } else {
-                    boxPreview.classList.remove("d-block");
-                    boxPreview.classList.add("d-none");
-                    if (show === "completed") {
-                        if (document.getElementById("daccComment")) {
-                        document.getElementById("daccComment").style.display = "none";
+                        boxPreview.classList.remove("d-block");
+                        boxPreview.classList.add("d-none");
+                        
+                        if (show === "completed") {
+                            if (document.getElementById("daccComment")) {
+                            document.getElementById("daccComment").style.display = "none";
+                            }
                         }
-                    }
                     }
                 }
         
