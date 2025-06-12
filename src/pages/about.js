@@ -591,47 +591,47 @@ export const renderDataDescription = async () => {
                         <div class="col-3">
                             <ul class="nav nav-pills flex-column">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" id="abstractTab" data-toggle="tab" href="#abstract" role="tab" aria-controls="abstract" aria-selected="true">
+                                    <a class="nav-link active" id="abstractTab" data-bs-toggle="tab" href="#abstract" role="tab" aria-controls="abstract" aria-selected="true">
                                         Abstract
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="backgroundTab" data-toggle="tab" href="#background" role="tab" aria-controls="background" aria-selected="false">
+                                    <a class="nav-link" id="backgroundTab" data-bs-toggle="tab" href="#background" role="tab" aria-controls="background" aria-selected="false">
                                         Background
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="objectivesTab" data-toggle="tab" href="#objectives" role="tab" aria-controls="objectives" aria-selected="false">
+                                    <a class="nav-link" id="objectivesTab" data-bs-toggle="tab" href="#objectives" role="tab" aria-controls="objectives" aria-selected="false">
                                         Objectives
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="preliminaryTab" data-toggle="tab" href="#preliminary" role="tab" aria-controls="preliminary" aria-selected="false">
+                                    <a class="nav-link" id="preliminaryTab" data-bs-toggle="tab" href="#preliminary" role="tab" aria-controls="preliminary" aria-selected="false">
                                         Preliminary Data
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="approachTab" data-toggle="tab" href="#approach" role="tab" aria-controls="approach" aria-selected="false">
+                                    <a class="nav-link" id="approachTab" data-bs-toggle="tab" href="#approach" role="tab" aria-controls="approach" aria-selected="false">
                                         Approach
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="analyticTab" data-toggle="tab" href="#analytic" role="tab" aria-controls="analytic" aria-selected="false">
+                                    <a class="nav-link" id="analyticTab" data-bs-toggle="tab" href="#analytic" role="tab" aria-controls="analytic" aria-selected="false">
                                         Analytic Plan
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="projectedTab" data-toggle="tab" href="#projectedDiscoveries" role="tab" aria-controls="projected" aria-selected="false">
+                                    <a class="nav-link" id="projectedTab" data-bs-toggle="tab" href="#projectedDiscoveries" role="tab" aria-controls="projected" aria-selected="false">
                                         Projected Discoveries and Improvement in Risk Stratification
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="governanceTab" data-toggle="tab" href="#governance" role="tab" aria-controls="governance" aria-selected="false">
+                                    <a class="nav-link" id="governanceTab" data-bs-toggle="tab" href="#governance" role="tab" aria-controls="governance" aria-selected="false">
                                         Governance, Scientific Review, and Data Sharing
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="appendixTab" data-toggle="tab" href="#appendix" role="tab" aria-controls="appendix" aria-selected="false">
+                                    <a class="nav-link" id="appendixTab" data-bs-toggle="tab" href="#appendix" role="tab" aria-controls="appendix" aria-selected="false">
                                         Appendix
                                     </a>
                                 </li>
@@ -1235,7 +1235,7 @@ export const renderDataDescription = async () => {
                                         data-entity-uuid="dfcb4cc4-b466-4c48-863b-54c38e58ff72" data-langcode="en" class="embedded-entity">
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
-                                                <img src="../../static/images/Confluence-Project-Figure1.png" width="751" height="269" alt="&quot;&quot;" loading="lazy">
+                                                <img src="../../static/images/Confluence-Project-Figure1.png" width="751" height="269" alt="Figure 1 of the Confluence Project" loading="lazy">
                                             </div>
                                             <figcaption>
                                                 <div class="caption-container no-resize">
@@ -1789,7 +1789,7 @@ export const renderDataDescription = async () => {
                                         data-entity-uuid="e45fb462-e981-4812-a940-ba098d4e1415" data-langcode="en" class="embedded-entity">
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
-                                                <img src="../../static/images/Confluence-Project-Figure2.png" width="782" height="317" alt="&quot;&quot;" loading="lazy">
+                                                <img src="../../static/images/Confluence-Project-Figure2.png" width="782" height="317" alt="Figure 2 of the Confluence Project" loading="lazy">
                                             </div>
                                             <figcaption>
                                                 <div class="caption-container no-resize">
