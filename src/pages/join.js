@@ -79,7 +79,7 @@ const handleExternalLinks = () => {
             body.innerHTML = `
                 <div style="margin-bottom: 2rem;">You are now leaving the Confluence Data Platform website to access ${link.dataset.href}</div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close">
                         Cancel
                     </button>
                     <a href="${link.dataset.href}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary">
