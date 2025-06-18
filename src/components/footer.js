@@ -11,23 +11,39 @@ export const footerTemplate = () => {
                 <div class="row align-left">
                     <div class="col-md-4 zero-padding">
                         <div class="footer-heading">CONTACT INFORMATION</div>
-                        <div class="footer-body"><a class="footer-links" href="mailto:confluenceproject@nih.gov">Contact Us</a></div>
+                        <div class="footer-body">
+                            <a class="footer-links" href="mailto:confluenceproject@nih.gov">Contact Us</a>
+                        </div>
                     </div>
                     <div class="col-md-4 zero-padding">
                         <div class="footer-heading">POLICIES</div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a></div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/disclaimer" target="_blank" rel="noopener noreferrer">Disclaimer</a></div>
-                        <div class="footer-body"><a class="footer-links" href="https://www.cancer.gov/policies/foia" target="_blank" rel="noopener noreferrer">FOIA</a></div>
+                        <div class="footer-body">
+                            <a class="footer-links" href="https://www.cancer.gov/policies/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>
+                        </div>
+                        <div class="footer-body">
+                            <a class="footer-links" href="https://www.cancer.gov/policies/disclaimer" target="_blank" rel="noopener noreferrer">Disclaimer</a>
+                        </div>
+                        <div class="footer-body">
+                            <a class="footer-links" href="https://www.cancer.gov/policies/foia" target="_blank" rel="noopener noreferrer">FOIA</a>
+                        </div>
                     </div>
                 </div>
                 </br>
                 </br>
                 <div class="row">
                     <div class="col-auto footer-col">
-                        <div class="menu-item"><a class="footer-links" href="http://www.hhs.gov/">U.S. Department of Health and Human Services</a></div>
-                        <div class="menu-item"><a class="footer-links" href="http://www.nih.gov/">National Institutes of Health</a></div> 
-                        <div class="menu-item"><a class="footer-links" href="http://www.cancer.gov/">National Cancer Institute</a></div> 
-                        <div class="menu-item"><a class="footer-links" href="http://www.usa.gov/">USA.gov</a></div>
+                        <div class="menu-item">
+                            <a class="footer-links" href="http://www.hhs.gov/">U.S. Department of Health and Human Services</a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="footer-links" href="http://www.nih.gov/">National Institutes of Health</a>
+                        </div> 
+                        <div class="menu-item">
+                            <a class="footer-links" href="http://www.cancer.gov/">National Cancer Institute</a>
+                        </div> 
+                        <div class="menu-item">
+                            <a class="footer-links" href="http://www.usa.gov/">USA.gov</a>
+                        </div>
                     </div>
                 </div>
                 <div class="row footer-row">
@@ -38,4 +54,4 @@ export const footerTemplate = () => {
             </div>
         </div>
     `
-}
+};
