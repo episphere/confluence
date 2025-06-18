@@ -4,11 +4,15 @@ export const confluenceContactPage = (signedIn) => {
             <div class="container">
                 <div class="main-summary-row white-bg div-border">
                     <ul class="nav nav-pills">
-                        <li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></li>
+                        <li class="nav-item">
+                            <a class="nav-link black-font font-size-14" href="#about/overview"><strong>Overview</strong></a>
+                        </li>
                         ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>': ''}
                         ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></li>': ''}
                         ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>': ''}
-                        <li class="nav-item"><a class="nav-link black-font font-size-14 active" href="#contact"> <strong>Contacts</strong></a></li>
+                        <li class="nav-item">
+                            <a class="nav-link black-font font-size-14 active" href="#contact"> <strong>Contacts</strong></a>
+                        </li>
                     </ul>
                 </div>
                 <div class="main-summary-row">
@@ -18,19 +22,29 @@ export const confluenceContactPage = (signedIn) => {
                 </div>
                 <div class="main-summary-row confluence-resources white-bg div-border font-size-18">
                     <div class="col">
-                        <span class="text-bold">Have a question about Confluence?</span></br>
-                        <strong>Send emails to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a></br>
+                        <span class="text-bold">Have a question about Confluence?</span>
                         </br>
-                        <span class="text-bold">Confluence Project Manager</span></br>
-                        Dr. Thomas Ahearn</br>
+                        <strong>Send emails to:</strong> <a href="mailto:ConfluenceProject@nih.gov">ConfluenceProject@nih.gov</a>
+                        </br>
+                        </br>
+                        <span class="text-bold">Confluence Project Manager</span>
+                        </br>
+                        Dr. Thomas Ahearn
+                        </br>
                         Division of Cancer Epidemiology and Genetics, National Cancer Institute
-                        </br></br>
-                        <span class="text-bold">Scientific Steering Committee (SSC)</span></br>
+                        </br>
+                        </br>
+                        <span class="text-bold">Scientific Steering Committee (SSC)</span>
+                        </br>
                         <div class="row">
                             <div class="col">
-                                <table class="table table-bordered table-responsive w-100 d-block d-md-table">
+                                <table caption="Scientific Steering Committee (SSC) Members Table" class="table table-bordered table-responsive w-100 d-block d-md-table">
                                     <thead>
-                                        <tr><th>Member</th><th>Affiliation</th><th>Representing/coordinating</th></tr>
+                                        <tr>
+                                            <th>Member</th>
+                                            <th>Affiliation</th>
+                                            <th>Representing/coordinating</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
@@ -83,13 +97,11 @@ export const confluenceContactPage = (signedIn) => {
                                             <td>Division of Cancer Control and Prevention Sciences, NCI, USA</td>
                                             <td>DCCPS/NCI extramural</td>
                                         </tr>
-
                                         <tr>
-                                        <td>Gretchen Gierach</td>
-                                        <td>Division of Cancer Epidemiology and Genetics, USA</td>
-                                        <td>Project Co-Coordinator, Clinical Trials</td>
+                                            <td>Gretchen Gierach</td>
+                                            <td>Division of Cancer Epidemiology and Genetics, USA</td>
+                                            <td>Project Co-Coordinator, Clinical Trials</td>
                                         </tr>
-                                        
                                         <tr>
                                             <td>Chris Haiman</td>
                                             <td>University of South California, USA</td>
@@ -135,8 +147,6 @@ export const confluenceContactPage = (signedIn) => {
                                             <td>Vanderbilt University, USA</td>
                                             <td>AABCGS</td>
                                         </tr>
-
-
                                     </tbody>
                                 </table>
                             </div>
@@ -146,4 +156,4 @@ export const confluenceContactPage = (signedIn) => {
             </div>
         </div>
     `;
-}
+};
