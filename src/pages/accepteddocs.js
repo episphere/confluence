@@ -1,7 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn } from "../event.js";
 import { getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, /*createFolder,*/ addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, /*sendEmail,*/ getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments } from "../shared.js";
-import { accepted_data } from '../data/accepted_requests.json' with { type: 'json' };
+import accepted_data from '../data/accepted_requests.json' with { type: 'json' };
 
 export const acceptedDocs = () => {
     // const userInfo = JSON.parse(localStorage.getItem('parms'))
