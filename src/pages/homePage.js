@@ -2,6 +2,7 @@ import { getFileInfo, studyDescriptions } from "./../shared.js";
 
 export const infoDeck = () => {
     let template = '';
+    
     template += `
         <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
@@ -61,13 +62,15 @@ export const infoDeck = () => {
                 </div>
             </div>
         </div>
-    `
+    `;
+    
     document.getElementById('confluenceDiv').innerHTML = template;
-}
+};
 
 export const infoDeckAfterLoggedIn = async () => {
     const studyDescription = await getFileInfo(studyDescriptions);
     let template = '';
+    
     template += `
         <div class="secondary-bg padding-bottom-1rem">
             <div class="confluence-banner">
@@ -118,9 +121,10 @@ export const infoDeckAfterLoggedIn = async () => {
                 <div><a href="https://dceg.cancer.gov/research/cancer-types/breast-cancer/confluence-project" target="_blank" rel="noopener noreferrer">Confluence</a> is a large international project to study breast cancer genetic susceptibility in women and men of multiple ancestries, by integrating existing and new genome-wide genetic data, across several breast cancer consortia. Confluence is funded by the US National Cancer Institute (NCI), and coordinated by the <a href="https://dceg.cancer.gov/" target="_blank" rel="noopener noreferrer">Division of Cancer Epidemiology and Genetics (DCEG)</a> of NCI.</div>
             </div>
         </div>
-    `
+    `;
+    
     document.getElementById('confluenceDiv').innerHTML = template;
-}
+};
 
 const cardContents = (obj) => {
     return `
@@ -141,4 +145,4 @@ const cardContents = (obj) => {
             </div>
         </div>
     `;
-}
+};
