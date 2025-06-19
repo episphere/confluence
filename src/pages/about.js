@@ -19,8 +19,9 @@ export const aboutConfluence = (activeTab, showDescripton) => {
             </div>
         </div>
     `;
+    
     document.getElementById('confluenceDiv').innerHTML = template;
-}
+};
 
 export const renderOverView = async () => {
     let template = `
@@ -64,10 +65,11 @@ export const renderOverView = async () => {
             </div>
         </div>
     `;
+    
     document.getElementById('overview').innerHTML = template;
     const response = await fetch('https://raw.githubusercontent.com/episphere/confluence/master/publicDataSet.json');
     countPublicStatistics(await response.json(), true);
-}
+};
 
 const countPublicStatistics = (d, caseControl) => {
     const data = JSON.parse(JSON.stringify(d));
@@ -78,9 +80,8 @@ const countPublicStatistics = (d, caseControl) => {
     let totalStudies = 0;
     let totalBRCA1 = 0;
     let totalBRCA2 = 0;
-    let summary = 
-    `
-    </br>
+    let summary = `
+        </br>
         <div class="align-center">
             <div class="main-summary-row" style="margin: 0px 10px;margin-bottom:10px">
                 <div class="col-md-2" style="padding: 0px">
@@ -94,46 +95,59 @@ const countPublicStatistics = (d, caseControl) => {
                                 <option ${!caseControl ? 'selected': ''} value='cimba'>CIMBA</option>
                             </select>
                         </div>
-                    `:``}
-    `
-    if(caseControl) delete data['CIMBA'];
-    for(let key in data) {
-        if(!caseControl && key !== 'CIMBA') continue;
-        if(key === 'dataModifiedAt') continue;
+                        ` : ``
+                    }
+    `;
+    
+    if (caseControl) delete data['CIMBA'];
+    for (let key in data) {
+        if (!caseControl && key !== 'CIMBA') continue;
+        if (key === 'dataModifiedAt') continue;
+        
         ++totalConsortia;
         totalCases += data[key].cases;
         totalControls += data[key].controls;
         totalStudies += data[key].studies;
-        if(data[key].BRCA1) totalBRCA1 += data[key].BRCA1
-        if(data[key].BRCA2) totalBRCA2 += data[key].BRCA2
-        summary += `<div class="form-check font-size-16" style="margin:2px 2px;">
+        
+        if (data[key].BRCA1) totalBRCA1 += data[key].BRCA1
+        if (data[key].BRCA2) totalBRCA2 += data[key].BRCA2
+        
+        summary += `
+            <div class="form-check font-size-16" style="margin:2px 2px;">
             ${key !== 'CIMBA' ? `
                 <input type="checkbox" data-consortia="${data[key].name}" id="label${data[key].name}" class="form-check-input checkbox-consortia"/>
                     <label for="label${data[key].name}" class="form-check-label study-name" title="${data[key].name}">${data[key].name === `NCI-DCEG` ? `C-NCI`:data[key].name.length > 8 ? `${data[key].name.substr(0,8)}...`:data[key].name}</label>
-            `:``}
-            </div>`
+            ` : ``
+            }
+            </div>
+        `;
     }         
-    summary += `</div></div>
-                <div class="col-md-10 align-center" style="padding: 0px margin-right: 15px !important;">
-                    <div class="custom-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts"></div>
-                </div></div>
-                <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div></div>
-                `
+    
+    summary += `
+        </div></div>
+        <div class="col-md-10 align-center" style="padding: 0px margin-right: 15px !important;">
+            <div class="custom-border" style="margin-right: 15px; height: 100%;" id="renderDataSummaryCounts">
+        </div>
+        </div></div>
+        <div class="col data-last-modified align-left">Data last modified at - ${new Date(data['dataModifiedAt']).toLocaleString()}</div>
+        </div>
+    `;
+    
     element.innerHTML = summary;
     addEventOverviewConsortiumSelection(d);
     addEventConsortiaFilter(d)
     renderDataSummary({totalConsortia, totalStudies, totalCases, totalControls, totalBRCA1, totalBRCA2}, caseControl);
-}
+};
 
 const addEventOverviewConsortiumSelection = (data) => {
     const select = document.getElementById('overviewConsortiumSelection');
-    if(!select) return;
+    if (!select) return;
     select.addEventListener('change', () => {
         const selectedValue = select.value;
-        if(selectedValue === 'cimba') countPublicStatistics(data, false);
+        if (selectedValue === 'cimba') countPublicStatistics(data, false);
         else countPublicStatistics(data, true);
     })
-}
+};
 
 export const renderDataSummary = (obj, caseControl) => {
     document.getElementById('renderDataSummaryCounts').innerHTML = `
@@ -158,8 +172,8 @@ export const renderDataSummary = (obj, caseControl) => {
                     <span class="font-size-32">${numberWithCommas(obj.totalControls)}</span>
                 </div>
             </div>
-        `: `
-        <div class="row mt-3">
+        ` : `
+            <div class="row mt-3">
                 <div class="col">
                     <span class="font-size-22">BRCA1 Mutation Carriers</span></br>
                     <span class="font-size-32">${numberWithCommas(obj.totalBRCA1)}</span>
@@ -171,7 +185,7 @@ export const renderDataSummary = (obj, caseControl) => {
             </div>
         `}
     `
-}
+};
 
 export const renderDataDescription = async () => {
     /*   let template = `
@@ -564,7 +578,7 @@ export const renderDataDescription = async () => {
     </div>
 </div>`;*/
     let template = `
-    <div class="main-summary-row">
+        <div class="main-summary-row">
             <div class="align-left">
                 <h1 class="page-header">Confluence Project Description</h1>
             </div>
@@ -577,49 +591,57 @@ export const renderDataDescription = async () => {
                         <div class="col-3">
                             <ul class="nav nav-pills flex-column">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" id="abstractTab" data-toggle="tab" href="#abstract" role="tab"
-                                        aria-controls="abstract" aria-selected="true">Abstract</a>
+                                    <a class="nav-link active" id="abstractTab" data-bs-toggle="tab" href="#abstract" role="tab" aria-controls="abstract" aria-selected="true">
+                                        Abstract
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="backgroundTab" data-toggle="tab" href="#background" role="tab"
-                                        aria-controls="background" aria-selected="false">Background</a>
+                                    <a class="nav-link" id="backgroundTab" data-bs-toggle="tab" href="#background" role="tab" aria-controls="background" aria-selected="false">
+                                        Background
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="objectivesTab" data-toggle="tab" href="#objectives" role="tab"
-                                        aria-controls="objectives" aria-selected="false">Objectives</a>
+                                    <a class="nav-link" id="objectivesTab" data-bs-toggle="tab" href="#objectives" role="tab" aria-controls="objectives" aria-selected="false">
+                                        Objectives
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="preliminaryTab" data-toggle="tab" href="#preliminary" role="tab"
-                                        aria-controls="preliminary" aria-selected="false">Preliminary Data</a>
+                                    <a class="nav-link" id="preliminaryTab" data-bs-toggle="tab" href="#preliminary" role="tab" aria-controls="preliminary" aria-selected="false">
+                                        Preliminary Data
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="approachTab" data-toggle="tab" href="#approach" role="tab"
-                                        aria-controls="approach" aria-selected="false">Approach</a>
+                                    <a class="nav-link" id="approachTab" data-bs-toggle="tab" href="#approach" role="tab" aria-controls="approach" aria-selected="false">
+                                        Approach
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="analyticTab" data-toggle="tab" href="#analytic" role="tab"
-                                        aria-controls="analytic" aria-selected="false">Analytic Plan</a>
+                                    <a class="nav-link" id="analyticTab" data-bs-toggle="tab" href="#analytic" role="tab" aria-controls="analytic" aria-selected="false">
+                                        Analytic Plan
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="projectedTab" data-toggle="tab" href="#projectedDiscoveries" role="tab"
-                                        aria-controls="projected" aria-selected="false">Projected Discoveries and Improvement in Risk
-                                        Stratification</a>
+                                    <a class="nav-link" id="projectedTab" data-bs-toggle="tab" href="#projectedDiscoveries" role="tab" aria-controls="projected" aria-selected="false">
+                                        Projected Discoveries and Improvement in Risk Stratification
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="governanceTab" data-toggle="tab" href="#governance" role="tab"
-                                        aria-controls="governance" aria-selected="false">Governance, Scientific Review, and Data
-                                        Sharing</a>
+                                    <a class="nav-link" id="governanceTab" data-bs-toggle="tab" href="#governance" role="tab" aria-controls="governance" aria-selected="false">
+                                        Governance, Scientific Review, and Data Sharing
+                                    </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="appendixTab" data-toggle="tab" href="#appendix" role="tab"
-                                        aria-controls="appendix" aria-selected="false">Appendix</a>
+                                    <a class="nav-link" id="appendixTab" data-bs-toggle="tab" href="#appendix" role="tab" aria-controls="appendix" aria-selected="false">
+                                        Appendix
+                                    </a>
                                 </li>
                             </ul>
                         </div>
                         <div class="col-9">
                             <div class='tab-content'>
                                 <div class="tab-pane fade show active" id="abstract" role="tabpanel" aria-labelledby="abstractTab">
-                                    <p>Genome wide association studies (GWAS) have been successful in identifying over 180 common
+                                    <p>
+                                        Genome wide association studies (GWAS) have been successful in identifying over 180 common
                                         susceptibility
                                         loci for breast cancer. However, heritability analyses indicate that breast cancer is a highly
                                         polygenic
@@ -633,8 +655,10 @@ export const renderDataDescription = async () => {
                                         genetic architecture of breast cancer. This will be accomplished by the confluence of existing
                                         and
                                         new
-                                        genome-wide genotyping data to be generated through this project.</p>
-                                    <p>The specific aims of this project are: (1) to discover susceptibility loci and advance knowledge
+                                        genome-wide genotyping data to be generated through this project.
+                                    </p>
+                                    <p>
+                                        The specific aims of this project are: (1) to discover susceptibility loci and advance knowledge
                                         of
                                         etiology of breast cancer overall and by subtypes, (2) to develop polygenic risk scores and
                                         integrate
@@ -661,10 +685,12 @@ export const renderDataDescription = async () => {
                                         prognosis and treatment response, thus improving risk stratification, prevention, and clinical
                                         care
                                         of
-                                        breast cancer across ancestry groups.</p>
+                                        breast cancer across ancestry groups.
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="background" role="tabpanel" aria-labelledby="backgroundTab">
-                                    <p>Genome wide association studies (GWAS) have been successful in identifying over 180 common
+                                    <p>
+                                        Genome wide association studies (GWAS) have been successful in identifying over 180 common
                                         susceptibility
                                         loci for breast cancer through large consortia currently including ~150,000 cases (plus
                                         controls),
@@ -692,9 +718,10 @@ export const renderDataDescription = async () => {
                                         and
                                         <em>BRCA2</em> mutation carriers [9, 10]. Finally, clinical studies suggest a contribution of
                                         germline
-                                        variants to breast cancer prognosis [11-13], response to treatment and toxicities [14-31].</p>
-                
-                                    <p>Most GWAS discoveries to date have been derived from analyses of populations of European ancestry
+                                        variants to breast cancer prognosis [11-13], response to treatment and toxicities [14-31].
+                                    </p>
+                                    <p>
+                                        Most GWAS discoveries to date have been derived from analyses of populations of European ancestry
                                         in
                                         two
                                         highly successful multi-consortia efforts, the Collaborative Oncological Gene-environmental
@@ -752,9 +779,10 @@ export const renderDataDescription = async () => {
                                         similarities across populations while accounting for differences, will be critical for discovery
                                         of
                                         new
-                                        loci, as well as for fine-mapping and functional follow-up studies.</p>
-                
-                                    <p>Previous investigations have provided evidence for the possible roles of germline variation in
+                                        loci, as well as for fine-mapping and functional follow-up studies.
+                                    </p>
+                                    <p>
+                                        Previous investigations have provided evidence for the possible roles of germline variation in
                                         determining prognosis [11-13], differential responses to adjuvant therapies [14-18]; and for
                                         determining
                                         therapeutic toxicities associated with treatments such as aromatase inhibitors [18-21], taxanes
@@ -764,9 +792,10 @@ export const renderDataDescription = async () => {
                                         contribution of germline variants to these clinical outcomes. The Confluence Project will
                                         provide an
                                         unprecedented opportunity to address these clinical questions by bringing together resources and
-                                        expertise from international clinical trials and population-based studies.</p>
-                
-                                    <p>Individual variants identified by GWAS are associated with small changes in risk; however,
+                                        expertise from international clinical trials and population-based studies.
+                                    </p>
+                                    <p>
+                                        Individual variants identified by GWAS are associated with small changes in risk; however,
                                         combining
                                         information on many common variants through the development of polygenic risk scores (PRS) can
                                         identify
@@ -798,9 +827,10 @@ export const renderDataDescription = async () => {
                                         could
                                         translate into improvements in stratified prevention and screening strategies for breast cancer
                                         [42,
-                                        45-47].</p>
-                
-                                    <p>Analyses of the estimated underlying genetic architecture and effect size distribution of breast
+                                        45-47].
+                                    </p>
+                                    <p>
+                                        Analyses of the estimated underlying genetic architecture and effect size distribution of breast
                                         cancer
                                         susceptibility based on existing GWAS data indicate that this is a highly polygenic disease
                                         involving
@@ -818,9 +848,10 @@ export const renderDataDescription = async () => {
                                         ancestry
                                         backgrounds from at least 150,000 new breast cancer cases and 100,000 controls (total of at
                                         least
-                                        300,000 cases and 300,000 controls).</p>
-                
-                                    <p>The large increase in sample size and diversity of populations that will be attained through the
+                                        300,000 cases and 300,000 controls).
+                                    </p>
+                                    <p>
+                                        The large increase in sample size and diversity of populations that will be attained through the
                                         Confluence Project will enable more powerful modeling of the underlying polygenic risk of breast
                                         cancer,
                                         which along with information on linkage disequilibrium and genomic annotations, can better
@@ -834,18 +865,20 @@ export const renderDataDescription = async () => {
                                         will
                                         result in improvements in risk stratification, prevention, and clinical care of breast cancer
                                         across
-                                        ancestry groups.</p>
+                                        ancestry groups.
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="objectives" role="tabpanel" aria-labelledby="objectivesTab">
-                                    <p>The Confluence project aims to build a large research resource of at least 300,000 breast cancer
+                                    <p>
+                                        The Confluence project aims to build a large research resource of at least 300,000 breast cancer
                                         cases
                                         and 300,000 controls to conduct multi-ancestry genome-wide association studies (GWAS) of breast
                                         cancer
-                                        risk and prognosis.</p>
-                
+                                        risk and prognosis.
+                                    </p>
                                     <p><strong>Specific aims</strong>:</p>
-                
-                                    <p><strong>Aim 1</strong>: To discover susceptibility loci and advance knowledge of etiology of
+                                    <p>
+                                        <strong>Aim 1</strong>: To discover susceptibility loci and advance knowledge of etiology of
                                         breast
                                         cancer overall and by subtypes.<br><strong>Aim 2</strong>: To develop polygenic risk scores and
                                         integrate them with known risk factors for personalized risk assessment for breast cancer
@@ -853,28 +886,41 @@ export const renderDataDescription = async () => {
                                         and by
                                         subtypes.<br><strong>Aim 3</strong>: To discover loci for breast cancer prognosis, long-term
                                         survival,
-                                        response to treatment, and second breast cancer.</p>
-                
-                                    <p>In addition to the specific aims listed above, this resource will allow us to address a broad
+                                        response to treatment, and second breast cancer.
+                                    </p>
+                                    <p>
+                                        In addition to the specific aims listed above, this resource will allow us to address a broad
                                         range
                                         of
                                         scientific questions in breast cancer genetics, and will serve as the basis for further studies
                                         that
-                                        will require collection of additional data or materials, for instance:</p>
-                
+                                        will require collection of additional data or materials, for instance:
+                                    </p>
                                     <ul>
-                                        <li>Discovery of new insights into biological mechanisms underlying genetic associations through
-                                            follow-up functional laboratory-based studies.</li>
-                                        <li>Integration with genomic characterization of tumors to understand germline-somatic
+                                        <li>
+                                            Discovery of new insights into biological mechanisms underlying genetic associations through
+                                            follow-up functional laboratory-based studies.
+                                        </li>
+                                        <li>
+                                            Integration with genomic characterization of tumors to understand germline-somatic
                                             relationships.
                                         </li>
-                                        <li>Integration of validated prognostic loci or PRS in prognostication tools.</li>
-                                        <li>Genetic predisposition to second cancers (other than breast cancer).</li>
-                                        <li>Identification of genetic determinants for known or suspected risk factors and assessment of
-                                            “causal” relationships through Mendelian randomization analyses.</li>
-                                        <li>Mosaicism/clonal hematopoiesis analyses.</li>
+                                        <li>
+                                            Integration of validated prognostic loci or PRS in prognostication tools.
+                                        </li>
+                                        <li>
+                                            Genetic predisposition to second cancers (other than breast cancer).
+                                        </li>
+                                        <li>
+                                            Identification of genetic determinants for known or suspected risk factors and assessment of
+                                            “causal” relationships through Mendelian randomization analyses.
+                                        </li>
+                                        <li>
+                                            Mosaicism/clonal hematopoiesis analyses.
+                                        </li>
                                     </ul>
-                                    <p>Ongoing studies by collaborators in the Confluence project are aimed to identify and characterize
+                                    <p>
+                                        Ongoing studies by collaborators in the Confluence project are aimed to identify and characterize
                                         rare
                                         variants and highly penetrant mutations through targeted, exome and whole genome sequencing
                                         strategies,
@@ -891,9 +937,10 @@ export const renderDataDescription = async () => {
                                         comprehensive assessment of the underlying architecture of breast cancer along the continuum
                                         from
                                         high
-                                        to low risk variants.</p>
-                
-                                    <p>Findings from the Confluence project will be highly relevant for science, public health, and
+                                        to low risk variants.
+                                    </p>
+                                    <p>
+                                        Findings from the Confluence project will be highly relevant for science, public health, and
                                         clinical
                                         practice by advancing our understanding of the underlying genetic architecture of breast cancer
                                         for
@@ -904,11 +951,12 @@ export const renderDataDescription = async () => {
                                         foundation for translational studies in stratified prevention through comprehensive breast
                                         cancer
                                         risk
-                                        models.</p>
-                
+                                        models.
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="preliminary" role="tabpanel" aria-labelledby="preliminaryTab">
-                                    <p>After receiving a funding commitment from the NCI Director in September 2018, we approached
+                                    <p>
+                                        After receiving a funding commitment from the NCI Director in September 2018, we approached
                                         studies
                                         through existing GWAS consortia (BCAC, CIMBA, AABCGS, ABCC), the extramural Division of Cancer
                                         Control
@@ -936,8 +984,8 @@ export const renderDataDescription = async () => {
                                         are
                                         part of other consortia. Most female and male <em>BRCA</em> mutation carrier studies are already
                                         part of
-                                        CIMBA.</p>
-                
+                                        CIMBA.
+                                    </p>
                                     <div style="height: 1px;"></div>
                                     <figure class="table">
                                         <figcaption id="ui-id-2">Table 1: Number of breast cancer cases and controls requiring new
@@ -945,16 +993,17 @@ export const renderDataDescription = async () => {
                                         </figcaption>
                                         <div class="">
                                             <div>
-                                                <table class="table-default complex-table" style="width: 100%;"
-                                                    aria-labelledby="ui-id-2">
+                                                <table class="table-default complex-table" style="width: 100%;" aria-labelledby="ui-id-2">
                                                     <thead>
                                                         <tr>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">Group
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                Group
                                                             </th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">Breast
-                                                                Cancer
-                                                                Cases</th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">Controls
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                Breast Cancer Cases
+                                                            </th>
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                Controls
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -984,7 +1033,8 @@ export const renderDataDescription = async () => {
                                             </div>
                                         </div>
                                     </figure>
-                                    <p>In addition, we have started to contact leaders of clinical trial studies and presented this
+                                    <p>
+                                        In addition, we have started to contact leaders of clinical trial studies and presented this
                                         project
                                         at
                                         the NCI Breast Cancer Steering Committee during the San Antonio Breast Cancer Symposium in
@@ -1002,33 +1052,39 @@ export const renderDataDescription = async () => {
                                         the
                                         numbers of diverse populations. Efforts to identify studies will continue until reaching the
                                         desired
-                                        numbers, with particular emphasis on identifying understudied populations and tumor types.</p>
-                
+                                        numbers, with particular emphasis on identifying understudied populations and tumor types.
+                                    </p>
                                     <div style="height: 1px;"></div>
                                     <figure class="table">
-                                        <figcaption id="ui-id-3" style="padding-right: 0px;">Table 2: Race/ancestry distribution of
-                                            non-carrier
-                                            female breast cancer cases</figcaption>
+                                        <figcaption id="ui-id-3" style="padding-right: 0px;">
+                                            Table 2: Race/ancestry distribution of non-carrier female breast cancer cases
+                                        </figcaption>
                                         <div class="scrollable has-scroll">
                                             <div>
-                                                <table class="table-default complex-table" style="width: 100%;"
-                                                    aria-labelledby="ui-id-3">
+                                                <table class="table-default complex-table" style="width: 100%;" aria-labelledby="ui-id-3">
                                                     <thead>
                                                         <tr>
                                                             <th scope="col" style="text-align: center; vertical-align: middle;">
-                                                                Race/Ancestry
-                                                                Group</th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">New
-                                                                Genotyping
+                                                                Race/Ancestry Group
                                                             </th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">%</th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">Existing
-                                                                GWAS
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                New Genotyping
                                                             </th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">%</th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">Total
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                %
                                                             </th>
-                                                            <th scope="col" style="text-align: center; vertical-align: middle;">%</th>
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                Existing GWAS
+                                                            </th>
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                %<
+                                                            /th>
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                Total
+                                                            </th>
+                                                            <th scope="col" style="text-align: center; vertical-align: middle;">
+                                                                %
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1118,26 +1174,25 @@ export const renderDataDescription = async () => {
                                             </div>
                                         </div>
                                     </figure>
-                                    <p>We did not collect information on pathology characteristics from the cases during this planning
+                                    <p>
+                                        We did not collect information on pathology characteristics from the cases during this planning
                                         phase,
                                         but based on previous data, we expect about 70% of cases to be ER-positive and 30% ER-negative.
                                     </p>
-                
                                 </div>
                                 <div class="tab-pane fade" id="approach" role="tabpanel" aria-labelledby="approachTab">
                                     <h3>Study Population</h3>
-                
                                     <p>Studies must meet the following criteria to be eligible to participate:</p>
-                
                                     <ul>
-                                        <li>Studies of <em>in situ</em> or invasive breast cancer
-                
+                                        <li>
+                                            Studies of <em>in situ</em> or invasive breast cancer
                                             <ul>
                                                 <li>Female or Male</li>
                                                 <li>Any subtype of breast cancer</li>
                                             </ul>
                                         </li>
-                                        <li>Genome-wide genotyping data or germline DNA for genotyping, i.e.:
+                                        <li>
+                                            Genome-wide genotyping data or germline DNA for genotyping, i.e.:
                                             <ul>
                                                 <li>Existing genome-wide genotyping data, or</li>
                                                 <li>Germline DNA available for new genotyping, or</li>
@@ -1148,7 +1203,8 @@ export const renderDataDescription = async () => {
                                         <li>Ethics approval and consent for genetic studies</li>
                                         <li>Data sharing plan</li>
                                     </ul>
-                                    <p>Studies can have a wide range of study designs, including case-control studies, prospective
+                                    <p>
+                                        Studies can have a wide range of study designs, including case-control studies, prospective
                                         cohorts,
                                         clinical case series, clinical trials, or special cohorts such retrospective cohorts of
                                         <em>BRCA1/2</em>
@@ -1162,9 +1218,10 @@ export const renderDataDescription = async () => {
                                         size,
                                         understudied populations, availability of extracted high-quality DNA, high-quality data on risk
                                         factors,
-                                        tumor characteristics, treatment and clinical outcomes.</p>
-                
-                                    <p>For studies that are already participating in breast cancer GWAS consortia, they can participate
+                                        tumor characteristics, treatment and clinical outcomes.
+                                    </p>
+                                    <p>
+                                        For studies that are already participating in breast cancer GWAS consortia, they can participate
                                         in
                                         the
                                         Confluence project through an existing consortium (<strong>Figure 1</strong>). Studies not
@@ -1172,24 +1229,18 @@ export const renderDataDescription = async () => {
                                         in
                                         consortia can participate by joining an existing consortium, forming a new group/consortium, or
                                         through
-                                        a direct collaboration with DCEG, NCI.</p>
-                
-                                    <div data-embed-button="cgov_image_button"
-                                        data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
-                                        data-entity-uuid="dfcb4cc4-b466-4c48-863b-54c38e58ff72" data-langcode="en"
-                                        class="embedded-entity">
-                
-                
-                
-                
-                
+                                        a direct collaboration with DCEG, NCI.
+                                    </p>
+                                    <div data-embed-button="cgov_image_button" data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
+                                        data-entity-uuid="dfcb4cc4-b466-4c48-863b-54c38e58ff72" data-langcode="en" class="embedded-entity">
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
-                                                <img src="../../static/images/Confluence-Project-Figure1.png" width="751" height="269"
-                                                    alt="&quot;&quot;" loading="lazy"></div>
+                                                <img src="../../static/images/Confluence-Project-Figure1.png" width="751" height="269" alt="Figure 1 of the Confluence Project" loading="lazy">
+                                            </div>
                                             <figcaption>
                                                 <div class="caption-container no-resize">
-                                                    <p>Figure 1: Study participation through consortia or direct collaboration with
+                                                    <p>
+                                                        Figure 1: Study participation through consortia or direct collaboration with
                                                         DCEG/NCI
                                                     </p>
                                                 </div>
@@ -1197,17 +1248,18 @@ export const renderDataDescription = async () => {
                                         </figure>
                                     </div>
                                     <h3>Genotyping</h3>
-                
-                                    <p>Participating studies will be able to provide: 1) existing individual-level germline genotype
+                                    <p>
+                                        Participating studies will be able to provide: 1) existing individual-level germline genotype
                                         data
                                         from
                                         previously scanned samples, or 2) samples (extracted germline DNA or blood/buccal samples for
                                         extraction) not previously scanned to be genotyped through Confluence. Contribution of summary
                                         GWAS
                                         data
-                                        from studies unable to provide individual-level data will also be considered.</p>
-                
-                                    <p>New genotyping will be performed at two centers, the Cancer Genomics Research Laboratory (CGR) at
+                                        from studies unable to provide individual-level data will also be considered.
+                                    </p>
+                                    <p>
+                                        New genotyping will be performed at two centers, the Cancer Genomics Research Laboratory (CGR) at
                                         DCEG/NCI (Stephen Chanock), and Strangways Laboratory at Cambridge University (UCAM, Doug
                                         Easton).
                                         Contribution of existing genotype data from studies that have been genotyped as part of an
@@ -1221,33 +1273,36 @@ export const renderDataDescription = async () => {
                                         left-over DNA (if requested), and genotyping and return of genotype files to contributing
                                         studies.
                                         However, Confluence will not be able to cover the costs from sample retrieval, preparation and
-                                        aliquoting by individual studies.</p>
-                
+                                        aliquoting by individual studies.
+                                    </p>
                                     <h4>Existing genotyping data from scanned samples</h4>
-                
-                                    <p>We will accept existing genotype data generated from eligible study samples using Illumina or
+                                    <p>
+                                        We will accept existing genotype data generated from eligible study samples using Illumina or
                                         Affymetrix
                                         chips; however, other methodologies may be considered. The following files/information will be
-                                        requested:</p>
-                
+                                        requested:
+                                    </p>
                                     <ul>
                                         <li>Genotyping chip and manifest files</li>
-                                        <li>Genotype files: We can accept a range of data formats, including called genotype files with
-                                            documentation of clustering/QC process, or pre-QC raw genotyping files.</li>
+                                        <li>
+                                            Genotype files: We can accept a range of data formats, including called genotype files with
+                                            documentation of clustering/QC process, or pre-QC raw genotyping files.
+                                        </li>
                                         <li>Sample sheet (ID mapping)</li>
                                     </ul>
-                                    <p>For studies contributing existing genotyping data through a consortium (e.g. BCAC, CIMBA), we
+                                    <p>
+                                        For studies contributing existing genotyping data through a consortium (e.g. BCAC, CIMBA), we
                                         anticipate
                                         requesting post-QC data along with the clustering/QC steps and metrics used. For studies willing
                                         to
                                         participate in genetic mosaicism studies, analysis will necessitate access to the B-allele
                                         frequency
                                         and
-                                        Log R data from the scanned chips.</p>
-                
+                                        Log R data from the scanned chips.
+                                    </p>
                                     <h4>Genotyping chips for new genotyping</h4>
-                
-                                    <p>We will be using the Illumina Infinium Global Screening Array (GSA) with &gt;665,000 variants in
+                                    <p>
+                                        We will be using the Illumina Infinium Global Screening Array (GSA) with &gt;665,000 variants in
                                         populations of non-African ancestry, and the Multi-Ethnic Genotyping Array (MEGA) with &gt;1.3
                                         million
                                         variants in populations of African ancestry because of its improved coverage and imputation
@@ -1264,28 +1319,38 @@ export const renderDataDescription = async () => {
                                         sequencing (including CARRIERS, BRIDGES, PERSPECTIVE I&amp;I, BRA-STRAP, AABCGS and ENIGMA). In
                                         addition, we will add content to facilitate fine mapping studies, copy number variation calling,
                                         and
-                                        other questions of interest.</p>
-                
+                                        other questions of interest.
+                                    </p>
                                     <h4>Biological sample requirements</h4>
-                
-                                    <p>For germline isolation we anticipate requesting the following specimen types as a source of
+                                    <p>
+                                        For germline isolation we anticipate requesting the following specimen types as a source of
                                         germline
                                         DNA:
                                     </p>
-                
                                     <ul>
-                                        <li>300-400uL (150uL minimum) of whole blood or buffy coat</li>
-                                        <li>1mL of saliva, Oragene™ or mouthwash/oral rinses</li>
+                                        <li>
+                                            300-400uL (150uL minimum) of whole blood or buffy coat
+                                        </li>
+                                        <li>
+                                            1mL of saliva, Oragene™ or mouthwash/oral rinses
+                                        </li>
                                     </ul>
-                                    <p>Tumor or serum samples will not be accepted as a source of germline DNA.</p>
-                
-                                    <p>The anticipated DNA requirements for isolated germline DNA from blood or buccal sources are:</p>
-                
+                                    <p>
+                                        Tumor or serum samples will not be accepted as a source of germline DNA.
+                                    </p>
+                                    <p>
+                                        The anticipated DNA requirements for isolated germline DNA from blood or buccal sources are:
+                                    </p>
                                     <ul>
-                                        <li>500-1000ng if dsDNA quantitation, e.g. PicoGreen</li>
-                                        <li>1.0-1.5ug if spectrophotometric quantitation, e.g. NanoDrop</li>
+                                        <li>
+                                            500-1000ng if dsDNA quantitation, e.g. PicoGreen
+                                        </li>
+                                        <li>
+                                            1.0-1.5ug if spectrophotometric quantitation, e.g. NanoDrop
+                                        </li>
                                     </ul>
-                                    <p>The requested amounts are larger than the minimum input material for genotyping to ensure
+                                    <p>
+                                        The requested amounts are larger than the minimum input material for genotyping to ensure
                                         receiving
                                         adequate DNA for array work, anticipating large variation in quantification across different
                                         laboratories, and allowing for residual raw material to use in case of a failure. Reduction in
@@ -1296,70 +1361,63 @@ export const renderDataDescription = async () => {
                                         exome
                                         or whole genome sequencing might be accepted if native DNA is not available. Upon request,
                                         residual
-                                        material will be returned to study sites at the completion of the work.</p>
-                
+                                        material will be returned to study sites at the completion of the work.
+                                    </p>
                                     <h4>Quality Control, genotyping calling and imputation</h4>
-                
                                     <p>Standard QC procedures will involve the following steps:&nbsp;</p>
-                
                                     <ol>
                                         <li>Sample and SNP level completion rate check;</li>
                                         <li>Sample heterozygosity assessment;</li>
                                         <li>Sample duplication/assay concordance check;</li>
                                         <li>Sex verification;</li>
-                                        <li>Relatedness check (with allowances for study designs that include relatives by default, e.g.
-                                            CIMBA);
-                                        </li>
+                                        <li>Relatedness check (with allowances for study designs that include relatives by default, e.g. CIMBA);</li>
                                         <li>Ancestry and population structure assessment;&nbsp;</li>
                                         <li>Assessment on deviation from Hardy-Weinberg Proportions.</li>
                                     </ol>
-                                    <p>Both existing and newly generated genotyping data will be imputed by chip and ancestry group
+                                    <p>
+                                        Both existing and newly generated genotyping data will be imputed by chip and ancestry group
                                         using
                                         the
-                                        most appropriate reference panels available at the time of analyses.</p>
-                
+                                        most appropriate reference panels available at the time of analyses.
+                                    </p>
                                     <h4>Return of genotyping data</h4>
-                
-                                    <p>For studies contributing samples for genotyping, the genotyping files/information detailed above
+                                    <p>
+                                        For studies contributing samples for genotyping, the genotyping files/information detailed above
                                         will
                                         be
                                         returned to each participating study after QC procedures (we will consider requests for specific
                                         file
-                                        formats from studies).</p>
-                
+                                        formats from studies).
+                                    </p>
                                     <h3>Phenotype Data</h3>
-                
-                                    <p>The following <em>core phenotype data</em> will be required from all participating studies:
+                                    <p>
+                                        The following <em>core phenotype data</em> will be required from all participating studies:
                                         subject
                                         and
                                         sample IDs, age, sex, race/ancestry, family history, and ER status (index tumor). Complete core
                                         data
                                         is
-                                        not required, if it has not been collected by the study.</p>
-                
-                                    <p>In addition, we will request the following data from studies that have it available (<em>not
-                                            mandatory</em>).</p>
-                
+                                        not required, if it has not been collected by the study.
+                                    </p>
+                                    <p>
+                                        In addition, we will request the following data from studies that have it available (<em>not mandatory</em>).
+                                    </p>
                                     <h4>Risk factors</h4>
-                
                                     <ul>
                                         <li>Menstrual cycle: age menarche, menopausal status, age menopause</li>
-                                        <li>Pregnancy: number of full-term births, age at first and last full-term birth, breastfeeding
-                                        </li>
+                                        <li>Pregnancy: number of full-term births, age at first and last full-term birth, breastfeeding</li>
                                         <li>Height, weight, body mass index</li>
                                         <li>Oral contraceptives and menopausal therapy</li>
                                         <li>Alcohol consumption and cigarette smoking</li>
                                         <li>Benign breast disease and mammographic breast density</li>
                                     </ul>
                                     <h4>Pathology (first and second breast tumors)</h4>
-                
                                     <ul>
                                         <li>Behavior, morphology</li>
                                         <li>Grade, nodes, size</li>
                                         <li>ER (core variable), PR, HER2, KI67 status</li>
                                     </ul>
                                     <h4>Treatment/clinical follow up</h4>
-                
                                     <ul>
                                         <li>Treatment and toxicity information (to the extent available)</li>
                                         <li>Locoregional relapse, years to relapse, distant metastases</li>
@@ -1367,8 +1425,8 @@ export const renderDataDescription = async () => {
                                         <li>Age at diagnosis, follow-up time, vital status, cause of death for survival analyses</li>
                                     </ul>
                                     <h3>Data Management</h3>
-                
-                                    <p>For studies contributing to the Confluence project through a consortia of studies, questionnaire,
+                                    <p>
+                                        For studies contributing to the Confluence project through a consortia of studies, questionnaire,
                                         pathology and survival/treatment data, the consortia data coordinating center will be the
                                         custodians
                                         of
@@ -1388,9 +1446,10 @@ export const renderDataDescription = async () => {
                                         at
                                         DCEG/NCI and Cambridge University will be responsible for the management, QC and imputation of
                                         existing
-                                        and new genome-wide genotyping data.</p>
-                
-                                    <p>The aggregation of individual participant data on patient characteristics, treatment and follow
+                                        and new genome-wide genotyping data.
+                                    </p>
+                                    <p>
+                                        The aggregation of individual participant data on patient characteristics, treatment and follow
                                         up
                                         data
                                         on clinical outcomes and events (including toxicities) from clinical trials is a critical
@@ -1398,9 +1457,10 @@ export const renderDataDescription = async () => {
                                         for
                                         combined analyses to identify novel genetic determinants of clinical outcomes. We plan to
                                         accomplish
-                                        this by establishing collaborations with existing clinical trial collaborative groups.</p>
-                
-                                    <p>The Confluence project will cover the costs of study and data management by consortium data
+                                        this by establishing collaborations with existing clinical trial collaborative groups.
+                                    </p>
+                                    <p>
+                                        The Confluence project will cover the costs of study and data management by consortium data
                                         coordinating
                                         centers through contracts. Although the project will not cover costs from data preparation by
                                         individual
@@ -1411,21 +1471,24 @@ export const renderDataDescription = async () => {
                                         and
                                         stewardship will follow FAIR (Findability, Accessibility, Interoperability, and Reusability)
                                         principles
-                                        [48].</p>
-                
+                                        [48].
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="analytic" role="tabpanel" aria-labelledby="analyticTab">
-                                    <p>Below is a description of the analytical plan to address the main aims of the Confluence project.
+                                    <p>
+                                        Below is a description of the analytical plan to address the main aims of the Confluence project.
                                         However, it is anticipated that methodologies and functional annotations will continue to
                                         evolve,
                                         thus
-                                        we will use the most appropriate methods available at the time of analyses.</p>
-                
-                                    <h3><strong>Aim 1.</strong> To discover susceptibility loci and advance knowledge of etiology of
+                                        we will use the most appropriate methods available at the time of analyses.
+                                    </p>
+                                    <h3>
+                                        <strong>Aim 1.</strong> To discover susceptibility loci and advance knowledge of etiology of
                                         breast
-                                        cancer overall and by subtypes</h3>
-                
-                                    <p>The primary discovery analysis will involve standard single-SNP association testing across
+                                        cancer overall and by subtypes
+                                    </h3>
+                                    <p>
+                                        The primary discovery analysis will involve standard single-SNP association testing across
                                         genome-wide
                                         panel of SNPs. As we would expect heterogeneity in associations across ancestry groups and
                                         subtypes,
@@ -1444,9 +1507,10 @@ export const renderDataDescription = async () => {
                                         non-independence among related individuals and account for correlation in genotypes [53].
                                         Analyses
                                         will
-                                        be done by genotyping chip and combined using fixed-effects meta-analysis [54].</p>
-                
-                                    <p><em>Transcriptome-wide Association Study (TWAS)</em>: In addition to single-SNP association test,
+                                        be done by genotyping chip and combined using fixed-effects meta-analysis [54].
+                                    </p>
+                                    <p>
+                                        <em>Transcriptome-wide Association Study (TWAS)</em>: In addition to single-SNP association test,
                                         we
                                         plan
                                         to carry out TWAS [55] by exploiting information on quantitative trait loci associated with
@@ -1462,8 +1526,8 @@ export const renderDataDescription = async () => {
                                         analysis using the latest version of the Genotype-Tissue Expression (GTEx) and other genomic
                                         datasets.
                                     </p>
-                
-                                    <p><em>Enrichment analyses</em>: Based on the association statistics generated from GWAS, we plan to
+                                    <p>
+                                        <em>Enrichment analyses</em>: Based on the association statistics generated from GWAS, we plan to
                                         conduct
                                         enrichment analysis of association signals in relationship to functional genomic and population
                                         genetic
@@ -1473,9 +1537,10 @@ export const renderDataDescription = async () => {
                                         for
                                         correlated annotations for each other. We will carry out the analyses with respect to both broad
                                         and
-                                        cell-type specific annotations.</p>
-                
-                                    <p><em>Fine mapping and functional analyses of identified signals using functional annotation
+                                        cell-type specific annotations.
+                                    </p>
+                                    <p>
+                                        <em>Fine mapping and functional analyses of identified signals using functional annotation
                                             data</em>:
                                         We
                                         will conduct fine mapping analysis, informed with external functional data, around each locus
@@ -1486,9 +1551,10 @@ export const renderDataDescription = async () => {
                                         information,
                                         such as eQTL characteristics, to compute posterior probabilities for each SNP within a
                                         fine-mapping
-                                        region to be a causal variant.</p>
-                
-                                    <p><em>Heritability analyses for breast cancer overall and by subtype across ancestry groups</em>:
+                                        region to be a causal variant.
+                                    </p>
+                                    <p>
+                                        <em>Heritability analyses for breast cancer overall and by subtype across ancestry groups</em>:
                                         Availability of large GWAS across subtypes and multiple ancestry groups will provide us the
                                         opportunity
                                         to explore the variation in genetic architecture of breast cancer in a more powerful way than it
@@ -1511,14 +1577,16 @@ export const renderDataDescription = async () => {
                                         subtypes/ancestry groups and will allow us to explore the potential for genetic risk prediction
                                         at
                                         our
-                                        current and future studies.</p>
-                
-                                    <h3><strong>Aim 2</strong>: To develop polygenic risk scores and integrate them with known risk
+                                        current and future studies.
+                                    </p>
+                                    <h3>
+                                        <strong>Aim 2</strong>: To develop polygenic risk scores and integrate them with known risk
                                         factors
                                         for
-                                        personalized risk assessment for breast cancer overall and by subtypes</h3>
-                
-                                    <p>We plan to develop optimal PRS for predicting breast cancer across different ancestry groups and
+                                        personalized risk assessment for breast cancer overall and by subtypes
+                                    </h3>
+                                    <p>
+                                        We plan to develop optimal PRS for predicting breast cancer across different ancestry groups and
                                         subtypes. Similar to association testing, our general strategy would be to utilize state of the
                                         art
                                         methods that can borrow strength across the different groups while allowing for potential
@@ -1542,9 +1610,10 @@ export const renderDataDescription = async () => {
                                         (e.g.
                                         <em>BRCA1</em>, <em>BRCA2</em>, <em>ATM</em>, <em>CHEK2</em> or <em>PALB2</em>) are required for
                                         optimal
-                                        risk prediction in these high-risk populations.</p>
-                
-                                    <p>Genotypes will be aggregated with data on risk factors (reproductive and hormonal factors,
+                                        risk prediction in these high-risk populations.
+                                    </p>
+                                    <p>
+                                        Genotypes will be aggregated with data on risk factors (reproductive and hormonal factors,
                                         anthropometry,
                                         alcohol consumption and other lifestyle factors, family history and breast features including
                                         benign
@@ -1561,14 +1630,16 @@ export const renderDataDescription = async () => {
                                         Cohort
                                         Consortium to build risk prediction models will be used to obtain precise risk estimates of
                                         associations
-                                        for classical risk factors by breast cancer subtypes and ancestry groups.</p>
-                
-                                    <h3><strong>Aim 3</strong>: To discover loci for breast cancer prognosis, long-term survival,
+                                        for classical risk factors by breast cancer subtypes and ancestry groups.
+                                    </p>
+                                    <h3>
+                                        <strong>Aim 3</strong>: To discover loci for breast cancer prognosis, long-term survival,
                                         response
                                         to
-                                        treatment, and second breast cancer</h3>
-                
-                                    <p>Analyses for aim 3 will be limited to cases with information on clinical prognosis, treatment,
+                                        treatment, and second breast cancer
+                                    </h3>
+                                    <p>
+                                        Analyses for aim 3 will be limited to cases with information on clinical prognosis, treatment,
                                         toxicities
                                         and second breast cancers. We plan to conduct standard genome-wide survival analysis using a Cox
                                         proportional hazard model framework for breast cancer outcomes (e.g. breast cancer specific
@@ -1589,9 +1660,10 @@ export const renderDataDescription = async () => {
                                         could
                                         range from radiation exposure (e.g. fibrosis), aromatase inhibitors (e.g. musculoskeletal
                                         adverse
-                                        events) and chemotherapy (e.g. anemia, febrile neutropenia, peripheral neuropathy).</p>
-                
-                                    <p>The lead statisticians for the Confluence SSC are <em>Nilanjan Chatterjee</em>, <em>Doug
+                                        events) and chemotherapy (e.g. anemia, febrile neutropenia, peripheral neuropathy).
+                                    </p>
+                                    <p>
+                                        The lead statisticians for the Confluence SSC are <em>Nilanjan Chatterjee</em>, <em>Doug
                                             Easton</em>,
                                         <em>Antonis Antoniou</em> and <em>Pete Kraft</em>. They will provide oversight and expertise for
                                         the
@@ -1604,11 +1676,12 @@ export const renderDataDescription = async () => {
                                         be performed in collaboration across analytical teams led by different members of the SSC. Other
                                         investigators will be able to propose and lead additional analyses through the submission of
                                         study
-                                        concepts via the Confluence Data Platform (see below).</p>
+                                        concepts via the Confluence Data Platform (see below).
+                                    </p>
                                 </div>
-                
                                 <div class="tab-pane fade" id="projectedDiscoveries" role="tabpanel" aria-labeledby="projectedTab">
-                                    <p>Using GENESIS, a novel method to characterize the effect size distribution of common variants
+                                    <p>
+                                        Using GENESIS, a novel method to characterize the effect size distribution of common variants
                                         based
                                         on
                                         existing summary-level GWAS data [62], we estimated that there are over 5,000 common
@@ -1626,19 +1699,20 @@ export const renderDataDescription = async () => {
                                         variants will require much large sample sizes due to their very small effect sizes. Substantial
                                         improvements in risk stratification are also expected by the addition of improved polygenic risk
                                         scores
-                                        to breast cancer risk models [64].</p>
-                
+                                        to breast cancer risk models [64].
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="governance" role="tabpanel" aria-labelledby="governanceTab">
                                     <h3>Governance</h3>
-                
-                                    <p>The organizational structure has been designed to ensure close involvement of participating
+                                    <p>
+                                        The organizational structure has been designed to ensure close involvement of participating
                                         studies
                                         and
-                                        consortia in the governance, oversight and operations of the Confluence Project:</p>
-                
+                                        consortia in the governance, oversight and operations of the Confluence Project:
+                                    </p>
                                     <ul>
-                                        <li><em>Scientific Steering Committee (SSC)</em> co-chaired by the DCEG Deputy Director (Montse
+                                        <li>
+                                            <em>Scientific Steering Committee (SSC)</em> co-chaired by the DCEG Deputy Director (Montse
                                             Garcia-Closas) and the BCAC lead (Doug Easton) includes representatives from all
                                             participating
                                             consortia (see full membership on cover page), and other large contributing studies or
@@ -1651,22 +1725,25 @@ export const renderDataDescription = async () => {
                                             The
                                             SSC reports to the director of DCEG (Stephen Chanock), source of funding for Confluence.
                                         </li>
-                                        <li><em>External Advisory Group</em> will be formed by international experts in GWAS and
+                                        <li>
+                                            <em>External Advisory Group</em> will be formed by international experts in GWAS and
                                             advocates
                                             to
-                                            provide logistical and scientific advice to the Confluence Project.</li>
+                                            provide logistical and scientific advice to the Confluence Project.
+                                        </li>
                                     </ul>
-                                    <p>DCEG will be responsible for the overall coordination of the Confluence project, including
+                                    <p>
+                                        DCEG will be responsible for the overall coordination of the Confluence project, including
                                         management,
                                         integration and analyses by participating groups and consortia. However, each consortium will be
                                         responsible of the management and governance of data from their member studies, according to
                                         their
                                         rules
-                                        and regulations.</p>
-                
+                                        and regulations.
+                                    </p>
                                     <h3>Scientific Review of the Confluence Project</h3>
-                
-                                    <p>The Confluence Project has been reviewed by the NCI intramural review process used by all
+                                    <p>
+                                        The Confluence Project has been reviewed by the NCI intramural review process used by all
                                         projects
                                         funded
                                         by the NCI Intramural Research Program. This involves an initial internal review by the DCEG
@@ -1680,20 +1757,20 @@ export const renderDataDescription = async () => {
                                             for
                                             Clinical Sciences and Epidemiology</a> will provide external review of the progress and
                                         scientific
-                                        output of the Confluence Project.</p>
-                
+                                        output of the Confluence Project.
+                                    </p>
                                     <h3>Data Sharing Plan</h3>
-                
-                                    <p>Summary-level data from analyses performed under the Confluence project will be broadly available
+                                    <p>
+                                        Summary-level data from analyses performed under the Confluence project will be broadly available
                                         to
                                         the
                                         scientific community at the time of manuscript publication reporting the main findings from the
                                         project.
-                                        In addition, individual-level data will be accessible through two mechanisms:</p>
-                
+                                        In addition, individual-level data will be accessible through two mechanisms:
+                                    </p>
                                     <h4>A. Controlled data access through the Confluence Data Platform by eligible researchers:</h4>
-                
-                                    <p>Eligible researchers will be able to request access to individual-level data for specific
+                                    <p>
+                                        Eligible researchers will be able to request access to individual-level data for specific
                                         analyses
                                         through the <em>Confluence Data Platform</em> that will be securely hosted in a Cloud
                                         environment
@@ -1706,21 +1783,14 @@ export const renderDataDescription = async () => {
                                         multiple groups in a shared analytical space. Data will only be shared for academic research,
                                         not
                                         for
-                                        commercial use.</p>
-                
-                                    <div data-embed-button="cgov_image_button"
-                                        data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
-                                        data-entity-uuid="e45fb462-e981-4812-a940-ba098d4e1415" data-langcode="en"
-                                        class="embedded-entity">
-                
-                
-                
-                
-                
+                                        commercial use.
+                                    </p>
+                                    <div data-embed-button="cgov_image_button" data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
+                                        data-entity-uuid="e45fb462-e981-4812-a940-ba098d4e1415" data-langcode="en" class="embedded-entity">
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
-                                                <img src="../../static/images/Confluence-Project-Figure2.png" width="782" height="317"
-                                                    alt="&quot;&quot;" loading="lazy"></div>
+                                                <img src="../../static/images/Confluence-Project-Figure2.png" width="782" height="317" alt="Figure 2 of the Confluence Project" loading="lazy">
+                                            </div>
                                             <figcaption>
                                                 <div class="caption-container no-resize">
                                                     <p>Figure 2: Anticipated steps to gain access to Confluence Data</p>
@@ -1728,7 +1798,8 @@ export const renderDataDescription = async () => {
                                             </figcaption>
                                         </figure>
                                     </div>
-                                    <p>The ownership of the data will stay with the individual studies (i.e. the data/sample provider).
+                                    <p>
+                                        The ownership of the data will stay with the individual studies (i.e. the data/sample provider).
                                         For
                                         studies contributing data to the Confluence project through consortia, the custodian of the data
                                         will be
@@ -1751,37 +1822,45 @@ export const renderDataDescription = async () => {
                                         the data in the Cloud without data downloads (i.e. <em>code travels to the data</em>).
                                         Exceptions
                                         might
-                                        be possible depending on analytical requirements.</p>
-                
+                                        be possible depending on analytical requirements.
+                                    </p>
                                     <p>The anticipated process to get access to Confluence Data by eligible researchers is:</p>
-                
                                     <ul>
                                         <li>
-                                            <p>Researcher submits a study concept describing the project, including variables of
+                                            <p>
+                                                Researcher submits a study concept describing the project, including variables of
                                                 interest,
                                                 via
-                                                the Confluence Data Platform to the consortia DACCs that govern the requested data.</p>
+                                                the Confluence Data Platform to the consortia DACCs that govern the requested data.
+                                            </p>
                                         </li>
                                         <li>
-                                            <p>After approval by the relevant consortia DACCs, individual studies contributing data are
+                                            <p>
+                                                After approval by the relevant consortia DACCs, individual studies contributing data are
                                                 notified
-                                                and given a time period to opt-out their study from the approved project.</p>
+                                                and given a time period to opt-out their study from the approved project.
+                                            </p>
                                         </li>
                                         <li>
-                                            <p>After the opt-out period has elapsed, the researcher’s institution signs a DTA for the
+                                            <p>
+                                                After the opt-out period has elapsed, the researcher’s institution signs a DTA for the
                                                 study
-                                                concept with the consortium data coordinating center(s) governing the data.</p>
+                                                concept with the consortium data coordinating center(s) governing the data.
+                                            </p>
                                         </li>
                                         <li>
-                                            <p>Upon DTA signature, the data coordinating center(s) will be able to provide access of the
+                                            <p>
+                                                Upon DTA signature, the data coordinating center(s) will be able to provide access of the
                                                 approved data to researchers through the Confluence Data Platform. Requests will be
                                                 digitally
                                                 linked to specific variables so that following all required approvals access to the
                                                 requested
-                                                data from studies that do not opt-out will be “automatically” provided.</p>
+                                                data from studies that do not opt-out will be “automatically” provided.
+                                            </p>
                                         </li>
                                     </ul>
-                                    <p>DCEG will work with the consortia DACCs to develop procedures/policies that facilitate data
+                                    <p>
+                                        DCEG will work with the consortia DACCs to develop procedures/policies that facilitate data
                                         access/sharing across multiple consortia that are consistent with individual consortium data
                                         sharing
                                         policies and the <a href="https://osp.od.nih.gov/scientific-sharing/genomic-data-sharing/">NIH
@@ -1795,11 +1874,11 @@ export const renderDataDescription = async () => {
                                         considered
                                         if required analysis tools are not available on the data platform, and if data cannot be read
                                         remotely
-                                        by the analysis tools.</p>
-                
+                                        by the analysis tools.
+                                    </p>
                                     <h4>B. Public data access through an NCI-approved data archive (e.g. dbGAP, EGA):</h4>
-                
-                                    <p>In accordance to the <a
+                                    <p>
+                                        In accordance to the <a
                                             href="https://osp.od.nih.gov/scientific-sharing/genomic-data-sharing/">NIH
                                             Genomic Data Sharing policy</a>, individual–level genotyping data generated using funds from
                                         the
@@ -1816,52 +1895,46 @@ export const renderDataDescription = async () => {
                                         Genomics Data Sharing Plan Form detailing the required level of commitment on data sharing will
                                         need
                                         to
-                                        be signed by studies prior to genotyping of samples.</p>
-                
-                                    <p>This requirement <strong><em>does not apply</em></strong> to genotyping data generated using
+                                        be signed by studies prior to genotyping of samples.
+                                    </p>
+                                    <p>
+                                        This requirement <strong><em>does not apply</em></strong> to genotyping data generated using
                                         non-NIH
-                                        funding.</p>
-                
+                                        funding.
+                                    </p>
                                     <h3>Approximate Timeline</h3>
-                
-                                    <div data-embed-button="cgov_image_button"
-                                        data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
-                                        data-entity-uuid="b24a0d92-5c73-445f-8cd2-52b7360b92de" data-langcode="en"
-                                        class="embedded-entity">
-                
-                
-                
-                
+                                    <div data-embed-button="cgov_image_button" data-entity-embed-display="view_mode:media.image_display_article_full" data-entity-type="media"
+                                        data-entity-uuid="b24a0d92-5c73-445f-8cd2-52b7360b92de" data-langcode="en" class="embedded-entity">
                                         <figure class="image-full centered-set">
                                             <div class="centered-element">
-                                                <img src="../../static/images/timeline.png" height="200"
-                                                    alt="Approximate Timeline: Study Recruitment: 2018 to 2021 Sample Collection: mid 2019 – 2022 Genotyping: 2021 – 2023 Statistical Analysis &amp; Data Sharing: mid 2025 and beyond Publications: mid 2025 and beyond."
-                                                    loading="lazy"></div>
+                                                <img src="../../static/images/timeline.png" height="200" alt="Approximate Timeline: Study Recruitment: 2018 to 2021 Sample Collection: mid 2019 – 2022 Genotyping: 2021 – 2023 Statistical Analysis &amp; Data Sharing: mid 2025 and beyond Publications: mid 2025 and beyond." loading="lazy">
+                                            </div>
                                             <div class="callout-box">
                                                 <h3>Interested in participating or have questions?</h3>
-                
-                                                <p>Contact <a
-                                                        href="mailto:ConfluenceProject@mail.nih.gov">ConfluenceProject@mail.nih.gov</a>.
+                                                <p>
+                                                    Contact <a href="mailto:ConfluenceProject@mail.nih.gov">ConfluenceProject@mail.nih.gov</a>.
                                                 </p>
                                             </div>
-                
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="appendix" role="tabpanel" aria-labelledby="appendixTab">
-                                    <p><a data-entity-substitution="canonical" data-entity-type="node"
-                                            data-entity-uuid="e98708d1-59c4-4295-979f-fdfd5fa3fee6"
-                                            href="/research/cancer-types/breast-cancer/confluence-steering-committee">Confluence
+                                    <p>
+                                        <a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="e98708d1-59c4-4295-979f-fdfd5fa3fee6" href="/research/cancer-types/breast-cancer/confluence-steering-committee">
+                                            Confluence
                                             Scientific
-                                            Steering Committee</a></p>
-                
-                                    <p><a data-entity-substitution="canonical" data-entity-type="node"
-                                            data-entity-uuid="b8c0731b-8aad-4d1e-8177-f392b133852a"
-                                            href="/research/cancer-types/breast-cancer/confluence-abbreviations">Abbreviations</a></p>
-                
-                                    <p><a data-entity-substitution="canonical" data-entity-type="node"
-                                            data-entity-uuid="a5e059e6-03bc-4774-b34a-f61d41b6f182"
-                                            href="/research/cancer-types/breast-cancer/references-confluence">References</a></p>
-                
+                                            Steering Committee
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="b8c0731b-8aad-4d1e-8177-f392b133852a" href="/research/cancer-types/breast-cancer/confluence-abbreviations">
+                                            Abbreviations
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="a5e059e6-03bc-4774-b34a-f61d41b6f182" href="/research/cancer-types/breast-cancer/references-confluence">
+                                            References
+                                        </a>
+                                    </p>
                                     <p>&nbsp;</p>
                                 </div>
                             </div>
@@ -1870,8 +1943,7 @@ export const renderDataDescription = async () => {
                 </div>
             </div>
         </div>
-  
-  `
+    `;
 
     document.getElementById('overview').innerHTML = template;
 
