@@ -1447,6 +1447,44 @@ export const addEventFilterBarToggle = () => {
     })
 };
 
+export const addEventFilterNoteToggle = () => {
+    const button = document.getElementById('filterNoteToggle');
+    const noteDiv = document.getElementById('dictNote');
+    
+    button.addEventListener('click', () => {
+        const icon = button.querySelector('i');
+        
+        if (icon.classList.contains('fa-caret-up')) {
+            // Reset animation by removing and re-adding the class
+            noteDiv.classList.remove('slide-up');
+            noteDiv.classList.remove('slide-down');
+            // Force a reflow to restart the animation
+            void noteDiv.offsetWidth;
+            // Add the animation class
+            noteDiv.classList.add('slide-up');
+            
+            setTimeout(() => {
+                noteDiv.classList.add('hidden');
+            }, 100);
+            
+            icon.classList.remove('fa-caret-up');
+            icon.classList.add('fa-caret-down');
+        } else {
+            // Show the note
+            noteDiv.classList.remove('hidden');
+            noteDiv.classList.remove('slide-up');
+            // Reset animation
+            noteDiv.classList.remove('slide-down');
+            void noteDiv.offsetWidth;
+            noteDiv.classList.add('slide-down');
+            
+            icon.classList.remove('fa-caret-down');
+            icon.classList.add('fa-caret-up');
+        }
+    });
+};
+
+
 export const addEventMissingnessFilterBarToggle = () => {
     const button = document.getElementById('filterBarToggle');
     button.addEventListener('click', () => {

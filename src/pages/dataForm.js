@@ -39,14 +39,14 @@ export const formtemplate = () => {
                         </p>
                         <form id="analysisConceptForm" novalidate>
                             <div class="input-group">
-                                <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
-                                <input id="date" name="date" type="date" value='${today}' class="form-text-input" required aria-required="true" aria-describedby="date-error" />
-                                <div id="date-error" class="error-message" aria-live="polite"></div>
+                              <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
+                              <input id="date" name="date" type="date" value='${today}' class="form-text-input" aria-required="true" aria-describedby="date-error" required/>
+                              <div id="date-error" class="error-message" aria-live="polite"></div>
                             </div>
                             <div class="input-group">
-                                <label for="projname" id="projname-label"><b>Title of Proposed Project</b><span class='required-label' aria-hidden="true">*</span></label>
-                                <input id="projname" name="projname" type="text" class="form-text-input" required aria-required="true" aria-describedby="projname-error" />
-                                <div id="projname-error" class="error-message" aria-live="polite"></div>
+                              <label for="projname" id="projname-label"><b>Title of Proposed Project</b> (Max length 250 characters)<span class='required-label' aria-hidden="true">*</span></label>
+                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" required/>
+                              <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             <div class="input-group form-check">
                                 <label for="amendment"><b>Is this an amendment?</b><span class='required-label'>*</span></label>
@@ -194,10 +194,7 @@ export const formtemplate = () => {
                                 <label for="condescAims"><b>Aims</b> <i> Please provide a concise description of Aims</i><span class='required-label'>*</span></label>
                                 <textarea id="condescAims" name="condescAims" rows="6" cols="65" class="form-text-input" required></textarea>
                             </div>
-                            <div class="input-group">
-                                <label for="analdesc"><b>Description of Analysis Plan</b> <i> Please provide a concise description of your Analysis Plan</i><span class='required-label'>*</span></label>
-                                <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
-                            </div>
+
                             <div class="input-group">
                                 <label for="prim-end"><b>Primary Endpoint</b><span class='required-label'>*</span><i> (please check box)</i> </label>
                             </div>
@@ -245,37 +242,38 @@ export const formtemplate = () => {
                                 <label for="genotyping"><b>Genotyping</b></label>
                             </div>
                             <div class="input-group">
-                                <div class="container-lg">
-                                    <div class="row">
-                                        <div class="col-12 col-md-12 col-sm-12">
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data" style="position: relative; top: -2px;"/>
-                                                <label class="form-check-label" for="genotyped"> Individual-level genotyped data</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data" style="position: relative; top: -2px;"/>
-                                                <label class="form-check-label" for="imputed"> Individual-level imputed data</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="concept1" name="genotyping" type="checkbox" value="Concept 1 GWAS summary results" style="position: relative; top: -2px;"/>
-                                                <label class="form-check-label" for="concept1"> Concept 1 GWAS Summary Results*</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-12 col-sm-12">
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence" style="position: relative; top: -2px;"/>
-                                                <label class="form-check-label" for="preconfluence"> Data generated pre-Confluence</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data" style="position: relative; top: -2px;"/>
-                                                <label class="form-check-label" for="postconfluence"> Confluence generated data</label>
-                                            </div>
-                                            <p> If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
-                                            <p> *Access to concept 1 GWAS summary results will require an approved concept form until the summary results are made publicly accessible.</p>
-                                            <input id="fileVar" name="fileVar" type="file">
-                                        </div>
+                              <div class="container-lg">
+                                <div class="row">
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="genotyped" name="genotyping" type="checkbox" value="Individual-level genotyped data" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="genotyped"> Individual-level genotyped data</label>
                                     </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="imputed" name="genotyping" type="checkbox" value="Individual-level imputed data" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="imputed"> Individual-level imputed data</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="concept1" name="genotyping" type="checkbox" value="Concept 1 GWAS summary results" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="concept1"> Concept 1 GWAS Summary Results*</label>
+                                    </div>
+                                  </div>
+                                  <div class="col-12 col-md-12 col-sm-12">
+                                    <!--<div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="preconfluence"> Data generated pre-Confluence</label>
+                                    </div>-->
+                                    <!--<div class="form-check form-check-inline">
+                                      <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data" style="position: relative; top: -2px;"/>
+                                      <label class="form-check-label" for="postconfluence"> Confluence generated data</label>
+                                    </div>-->
+                                    <!---<p> If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>--->
+
+                                    <p> *Access to concept 1 GWAS summary results will require an approved concept form until the summary results are made publicly accessible.</p>
+                                    <!---<input id="fileVar" name="fileVar" type="file">--->
+                                  </div>
                                 </div>
+                              </div>
                             </div>
                             <div class="input-group">
                                 <label for="sex"><b>Data Requested From</b></label>
@@ -329,7 +327,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
                                 <label> 
-                                    <input id="riskfactvarv" name="riskfactvarv" type="checkbox" class="form-check-input" value="riskfactvarv" style="position: relative; top: -2px;"/>
+                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
                                 </label>
                             </div>
                             <!--<div class="input-group">
@@ -426,16 +424,18 @@ export const formtemplate = () => {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>--->
-                            <div class="input-group">
-                                <label for="surtrevar"><b>Survival and Treatment</b></label>
-                                <label> 
-                                    <input id="surtrevarv" name="surtrevarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
-                                    (Not availale from AABCG)
-                                </label>
-                            </div>
-                            <!---<div class="input-group">
+                                  </div>
+                                </div> --->
+
+                          <div class="input-group">
+                            <label for="surtrevar"><b>Survival and Treatment</b></label>
+                            <label> 
+                              <input id="surtrevarv" name="surtrevarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
+                              (Not available from AABCG)
+                            </label>
+                          </div>
+
+                        <!---<div class="input-group">
                                 <div class="container-lg">
                                     <div class="row" id='surtrelist'>
                                         <div class="col-12 col-md-3 col-sm-12">
@@ -480,14 +480,20 @@ export const formtemplate = () => {
                                 </div>
                             </div>--->
                             <div class="input-group">
-                                <label for="mammvar"><b>Mammographic Density</b></label>
-                                <label> 
-                                    <input id="mammvarv" name="mammvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
-                                    (Not availale from AABCG)
-                                </label>
+                              <label for="mammvar"><b>Mammographic Density</b></label>
+                              <label> 
+                                <input id="mammvarv" name="mammvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
+                                (Only available from BCAC)
+                              </label>
                             </div>
                             <br>
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
+
+                            <div class="input-group">
+                              <label for="analdesc"><b>Concept Analysis Plans</b> <i>  Please provide a concise description of your analysis plan. The analysis plan should be consistent with the data that is being requested.</i><span class='required-label'>*</span></label>
+                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
+                            </div>
+
                             <div class="input-group">
                                 <label for="time"><b>Time Plan</b></label>
                                 <textarea id="time" name="time" rows="4" cols="65" class="form-text-input"></textarea>
@@ -531,7 +537,7 @@ export const formtemplate = () => {
                                 <span class='required-label'>*</span></label>
                             </div>
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 
-                                <span class="buttonsubmit__text"> Send Form & Download</span>
+                              <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
                             </button>
                             <!---<button type="button" id="downloadWord" class="buttonsubmit"> 
                                 <span class="buttonsubmit__text"> Download Word </span>
@@ -582,26 +588,26 @@ export const formFunctions = () => {
 };
 
 export const dataForm = async () => {
-    async function handleFormSubmit(eventtest) {
-        const btn = document.activeElement;
-        btn.classList.toggle("buttonsubmit--loading");
-        btn.disabled = true;
-        eventtest.preventDefault();
-        const form = document.querySelector(".contact-form form");
-        const data = new FormData(form);
-        const jsondata = Object.fromEntries(data.entries());
-        jsondata.memcon = data.getAll("mem-con");
-        jsondata.datacon = data.getAll("data-con");
-        jsondata.primend = data.getAll("prim-end");
-        jsondata.genotyping = data.getAll("genotyping");
-        jsondata.riskfactvar = data.getAll("riskfactvar");
-        jsondata.carStatus = data.getAll("carStatus");
-        jsondata.sex = data.getAll("sex");
-        jsondata.condescsplit = jsondata.condesc.split('\n');
-        jsondata.aimssplit = jsondata.condescAims.split('\n');
-        jsondata.descsplit = jsondata.analdesc.split('\n');
-        jsondata.timesplit = jsondata.time.split('\n');
-        jsondata.anyothsplit = jsondata.anyoth.split('\n');
+  async function handleFormSubmit(eventtest) {
+    const btn = document.activeElement;
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = true;
+    eventtest.preventDefault();
+    const form = document.querySelector(".contact-form form");
+    const data = new FormData(form);
+    const jsondata = Object.fromEntries(data.entries());
+    jsondata.memcon = data.getAll("mem-con");
+    jsondata.datacon = data.getAll("data-con");
+    jsondata.primend = data.getAll("prim-end");
+    jsondata.genotyping = data.getAll("genotyping");
+    //jsondata.riskfactvar = data.getAll("riskfactvar");
+    jsondata.carStatus = data.getAll("carStatus");
+    jsondata.sex = data.getAll("sex");
+    jsondata.condescsplit = jsondata.condesc.split('\n');
+    jsondata.aimssplit = jsondata.condescAims.split('\n');
+    jsondata.descsplit = jsondata.analdesc.split('\n');
+    jsondata.timesplit = jsondata.time.split('\n');
+    jsondata.anyothsplit = jsondata.anyoth.split('\n');
 
         // Added for testing
         // console.log(jsondata);
@@ -626,279 +632,274 @@ export const dataForm = async () => {
         const timeRun = jsondata.timesplit.map(line=>new docx.TextRun({break:1,text:line}));
         const anyothRun = jsondata.anyothsplit.map(line=>new docx.TextRun({break:1,text:line}));
 
-        const doc = new docx.Document({
-            styles: {
-                default: {
-                    heading1: {
-                        run: {
-                            size: 22,
-                            bold: true,
-                            color: "#000000",
-                            font: "Verdana",
-                        },
-                    },
-                    heading2: {
-                        run: {
-                            size: 18,
-                            bold: true,
-                            color: "#000000",
-                            font: "Verdana",
-                        },
-                    },
-                },
-                paragraphStyles: [{
-                    id: "longinput",
-                    name: "Long Input",
-                    basedOn: "Normal",
-                    paragraph: {
-                        font: "Verdana",
-                        size: 18,
-                    },
-                    run: {
-                        font: "Verdana",
-                        size: 18,
-                    },
-                }],
+    const doc = new docx.Document({
+      styles: {
+        default: {
+          heading1: {
+            run: {
+              size: 22,
+              bold: true,
+              color: "#000000",
+              font: "Verdana",
             },
-            sections: [
-                {
-                    properties: {},
-                    headers: {
-                        default: new docx.Header({
-                            children: [
-                                new docx.Paragraph({
-                                    text: "Confluence Project Analysis Proposal",
-                                    heading: docx.HeadingLevel.HEADING_1,
-                                    alignment: docx.AlignmentType.CENTER
-                                }),
-                            ],
-                        }),
-                    },
-                    children: [
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Date: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.date,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150,
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Project Title: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.projname,
-                                    bold: false
-                                }),
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Is this an amendment: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.amendment,
-                                    bold: false
-                                }),
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Amendment: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.conNum,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            },
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Contact Investigator(s): "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.investigators,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150,
-                            },
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Institution(s): "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.institution,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            },
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Contact Email: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.email,
-                                    bold: false,
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Member of Consortia or Study / Trial Group? "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.memcon, null, 1).replace("[", "").replace("]", "").replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Confluence Study Acronym(s) for the Contact Investigator: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.acro,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "OTHER Investigators and their institutions: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.otherinvest,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "ALL Investigators (and Institutions) who require access: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.allinvest,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Consortia data being requested: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.datacon, null, 1).replace("[", "").replace("]", "").replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Concept Background: "
-                                }),
-                            ],
-                            spacing: {
-                                after: 0
-                            }
-                        }),
-                        
-                        new docx.Paragraph({
-                            style: "longinput",
-                            children: condescRun,
-                            spacing: {
-                                after: 150
-                            }
-                        }),
+          },
+          heading2: {
+            run: {
+              size: 18,
+              bold: true,
+              color: "#000000",
+              font: "Verdana",
+            },
+          },
+        },
+        paragraphStyles: [ 
+          {
+            id: "longinput",
+            name: "Long Input",
+            basedOn: "Normal",
+            paragraph: {
+              font: "Verdana",
+              size: 18,
+            },
+            run: {
+              font: "Verdana",
+              size: 18,
+          },
+          },
+        ],
+      },
+      sections: [
+        {
+          properties: {},
+          headers: {
+            default: new docx.Header({
+              children: [
+                new docx.Paragraph({
+                  text: "Confluence Project Analysis Proposal",
+                  heading: docx.HeadingLevel.HEADING_1,
+                  alignment: docx.AlignmentType.CENTER,
+                }),
+              ],
+            }),
+          },
+          children: [
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Date: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.date,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Project Title: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.projname,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Is this an amendment: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.amendment,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Amendment: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.conNum,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Contact Investigator(s): ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.investigators,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Institution(s): ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.institution,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Contact Email: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.email,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Member of Consortia or Study / Trial Group? ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.memcon, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Confluence Study Acronym(s) for the Contact Investigator: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.acro,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "OTHER Investigators and their institutions: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.otherinvest,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "ALL Investigators (and Institutions) who require access: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.allinvest,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Consortia or Study / Trial Group data being requested: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.datacon, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Concept Background: ",
+                }),
+              ],
+              spacing: {
+                after: 0,
+              },
+            }),
+
+            new docx.Paragraph({
+              style: "longinput",
+              children: condescRun,
+              spacing: {
+                after: 150,
+              }}),
 
                         new docx.Paragraph({
                             heading: docx.HeadingLevel.HEADING_2,
@@ -942,203 +943,209 @@ export const dataForm = async () => {
                             style: "longinput"
                         }),
 
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Primary Endpoint: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.primend, null, 1)
-                                        .replace("[", "")
-                                        .replace("]", "")
-                                        .replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Subtype of Breast Cancer: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.sbcin,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Other Primary Endpoint: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.otherinput,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Genotyping: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.genotyping, null, 1)
-                                        .replace("[", "")
-                                        .replace("]", "")
-                                        .replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Data Requested From: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.sex, null, 1)
-                                        .replace("[", "")
-                                        .replace("]", "")
-                                        .replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Carrier Status requested: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.carStatus, null, 1)
-                                        .replace("[", "")
-                                        .replace("]", "")
-                                        .replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Risk Factor Variables: "
-                                }),
-                                new docx.TextRun({
-                                    text: JSON.stringify(jsondata.riskfactvar, null, 1)
-                                        .replace("[", "")
-                                        .replace("]", "")
-                                        .replace(/"/g, ''),
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Pathology Variables: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.pathvarv,
-                                    bold: false
-                                }),
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Survival and Treatment Variables: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.surtrevarv,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Mammographic Density Variable: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.mammvarv,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-            
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Time Plan: "
-                                })
-                            ],
-                            spacing: {
-                                after: 0
-                            }
-                        }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Primary Endpoint: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.primend, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Subtype of Breast Cancer: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.sbcin,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Other Primary Endpoint: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.otherinput,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Genotyping: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.genotyping, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Data Requested From: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.sex, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Carrier Status requested: ",
+                }),
+                new docx.TextRun({
+                  text: JSON.stringify(jsondata.carStatus, null, 1)
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(/"/g, ''),
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            // new docx.Paragraph({
+            //   heading: docx.HeadingLevel.HEADING_2,
+            //   alignment: docx.AlignmentType.START,
+            //   children: [
+            //     new docx.TextRun({
+            //       text: "Risk Factor Variables: ",
+            //     }),
+            //     new docx.TextRun({
+            //       text: JSON.stringify(jsondata.riskfactvar, null, 1)
+            //         .replace("[", "")
+            //         .replace("]", "")
+            //         .replace(/"/g, ''),
+            //       bold: false,
+            //     }),
+            //   ],
+            //   spacing: {
+            //     after: 150,
+            //   },
+            // }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Risk Factor Variables: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.riskfactvarv,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Pathology Variables: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.pathvarv,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Survival and Treatment Variables: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.surtrevarv,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Mammographic Density Variable: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.mammvarv,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Time Plan: ",
+                }),
+              ],
+              spacing: {
+                after: 0,
+              },
+            }),
 
                         new docx.Paragraph({
                             children: timeRun,
@@ -1169,78 +1176,73 @@ export const dataForm = async () => {
                             style: "longinput"
                         }),
 
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Confluence authorship requirements: "
-                                }),
-                                new docx.TextRun({
-                                    text: jsondata.confirmationAuth,
-                                    bold: false
-                                })
-                            ],
-                            spacing: {
-                                after: 150
-                            }
-                        }),
-                    ],
-                },
-            ],
-        });
-    
-        let user = JSON.parse(localStorage.parms).login.split('@')[0];
-        const date = new Date();
-        const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-        let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
-        
-        await docx.Packer.toBlob(doc).then(async (blob, btn) => {
-            // let response = await uploadWordFile(blob, filename, submitterFolder);
-            let response = {'status': 201};
-            console.log(response);
-            
-            if (response.status === 401) {
-                document.getElementById("modalBody").innerHTML = `<p>Error detected, please upload again.</p>`;
-                $("#popUpModal").modal("show");
-                btn.classList.toggle("buttonsubmit--loading");
-                btn.disabled = false;
-            } else if (response.status === 409) {
-                document.getElementById("modalBody").innerHTML = `<p>Conflict detected, please upload again.</p>`;
-                $("#popUpModal").modal("show");
-                btn.classList.toggle("buttonsubmit--loading");
-                btn.disabled = false;
-            } else {
-                // let fileid = response.entries[0].id;
-                let fileid = "testing";
-                // let metaData = addMetaData(fileid, jsondata.datacon);
-                const downloadLink = URL.createObjectURL(blob);
-                
-                let a = document.createElement("a");
-                a.href = downloadLink;
-                a.download = filename;
-                
-                document.getElementById("modalBody").innerHTML = `
-                    <p>File was successfully uploaded.</p>
-                    <p>Document ID: ${fileid}</p>
-                `;
-                $("#popUpModal").modal("show");
-                a.click();
-                
-                let popup = document.getElementById('popUpModal');
-                let btns = popup.querySelectorAll('button');
-                for (let button of btns) {
-                    button.addEventListener('click', function () {
-                        location.reload();
-                    })
-                }
-            }
-        })
-    }
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({
+                  text: "Confluence authorship requirements: ",
+                }),
+                new docx.TextRun({
+                  text: jsondata.confirmationAuth,
+                  bold: false,
+                }),
+              ],
+              spacing: {
+                after: 150,
+              },
+            }),
+          ],
+        },
+      ],
+    });
+    let user = JSON.parse(localStorage.parms).login.split('@')[0];
+    const date = new Date();
+    const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+    let filename = jsondata.projname + '_' + today + '.docx';
+    await docx.Packer.toBlob(doc).then(async (blob, btn) => {
+      let response = await uploadWordFile(blob, filename, submitterFolder);
+      //let response = {'status': 201};
+      console.log(response);
+      if (response.status === 401) {
+        document.getElementById("modalBody").innerHTML = `
+            <p>Error detected, please upload again.</p>`;
+        $("#popUpModal").modal("show");
+        btn.classList.toggle("buttonsubmit--loading");
+        btn.disabled = false;
+      } else if (response.status === 409){
+        document.getElementById("modalBody").innerHTML = `
+        <p>Conflict detected, please upload again.</p>`;
+        $("#popUpModal").modal("show");
+        btn.classList.toggle("buttonsubmit--loading");
+        btn.disabled = false;
+      } else {
+      let fileid = response.entries[0].id;
+      //let fileid = "testing";
+      //let metaData = await addMetaData(fileid, jsondata.datacon);
+      const downloadLink = URL.createObjectURL(blob);
+      let a = document.createElement("a");
+      a.href = downloadLink;
+      a.download = filename;
+      document.getElementById("modalBody").innerHTML = `
+           <p>File was successfully uploaded.</p>
+           <p>Document ID: ${fileid}</p>`;
+      $("#popUpModal").modal("show");
+      a.click();
+      let popup = document.getElementById('popUpModal');
+      let btns = popup.querySelectorAll('button');
+      for (let button of btns) {
+        button.addEventListener('click', function () {
+          location.reload();
+         })
+        }
+      }
+    })
+  }
 
-    const form = document.querySelector(".contact-form");
-    form.addEventListener("submit", handleFormSubmit);
-};
+  const form = await document.querySelector(".contact-form");
+  form.addEventListener("submit", handleFormSubmit);
+}
 
 export const uploaddataFormTemplate = () => {
     let template = ` 

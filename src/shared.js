@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
-export const emailsAllowedToUpdateData = ['kopchickbp@nih.gov', 'ahearntu@nih.gov', 'ajayiat@nih.gov']
+export const emailsAllowedToUpdateData = ['ahearntu@nih.gov', 'kopchickbp@nih.gov', 'ajayiat@nih.gov']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781; // 691143057533; 1238676877781;
 export const summaryStatsFileCIMBAID = 691143057533; // Temporary until CIMBA has updated data
