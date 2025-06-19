@@ -6,7 +6,7 @@ let previousValue = '';
 export const renderDescription = (modified_at) => {
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
     let template = `
-    <div class="main-summary-row">
+        <div class="main-summary-row">
             <div class="row align-left w-100 m-0">
                 <h1 class="col page-header pl-0 pt-2">Learn about Confluence</h1>
                 ${authAdmin ? (`<button type="button" class="col-auto btn btn-primary mt-3 mb-3" title="Update Study Descriptions Based on Files in Box" id="updateDesc">Update Descriptions</button>`) :''}
@@ -19,9 +19,15 @@ export const renderDescription = (modified_at) => {
                                 Download <i class="fas fa-download" style="color:#000000 !important"></i>
                             </button>
                             <ul class="dropdown-menu navbar-dropdown" aria-labelledby="downloadDictionary">
-                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as excel" id="downloadOriginalExcel">Original Excel</button></li>
-                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button></li>
-                                <li><button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button></li>
+                                <li>
+                                    <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as excel" id="downloadOriginalExcel">Original Excel</button>
+                                </li>
+                                <li>
+                                    <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as csv" id="downloadDictionaryCSV">CSV</button>
+                                </li>
+                                <li>
+                                    <button class="transparent-btn dropdown-item dropdown-menu-links" title="Download dictionary as tsv" id="downloadDictionaryTSV">TSV</button>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -63,56 +69,57 @@ export const renderDescription = (modified_at) => {
             </div>
         </div>
     `;
+    
     document.getElementById('overview').innerHTML = template;
     getDescription();
     updateDesc();
-}
+};
 
 const getDescription = async () => {
     const data = await getFile(studyDescriptions);//1072836692276);//761599566277)//1077912734937;1673495829037
-    //const datatest = await getFile(1673495829037);
-   // const tsv2json = tsv2Json(data);
-    //console.log(tsv2json);
+    // const datatest = await getFile(1673495829037);
+    // const tsv2json = tsv2Json(data);
     const json = JSON.parse(data);
     const headers = getAllKeys(json);
     console.log(json);
     console.log(headers);
-    //console.log(tsv2json);
-    //const tsv2json = csv2Json(data);
-    //const json = tsv2json.data;
-    //console.log(json);
-    //console.log(json);
-    //const headers = tsv2json.headers;
+    // const tsv2json = csv2Json(data);
+    // const json = tsv2json.data;
+    // const headers = tsv2json.headers;
     let newJsons = {};
     let prevAcronym = '';
+    
     json.forEach(obj => {
-        if(obj['Consortium']) obj['Consortium'] = obj['Consortium'].trim();
-        if(obj['Study Acronym']) obj['Study Acronym'] = obj['Study Acronym'].trim();
+        if (obj['Consortium']) obj['Consortium'] = obj['Consortium'].trim();
+        if (obj['Study Acronym']) obj['Study Acronym'] = obj['Study Acronym'].trim();
+        
         const consortium = obj['Consortium'] ? obj['Consortium'] : undefined;
         const studyAcronym = obj['Study Acronym'] ? obj['Study Acronym'] : undefined;
-        if(studyAcronym && newJsons[`${consortium}${studyAcronym}`] === undefined) newJsons[`${consortium}${studyAcronym}`] = {}
-        if(studyAcronym) {
+        
+        if (studyAcronym && newJsons[`${consortium}${studyAcronym}`] === undefined) newJsons[`${consortium}${studyAcronym}`] = {}
+        if (studyAcronym) {
             prevAcronym = `${consortium}${studyAcronym}`;
             newJsons[`${consortium}${studyAcronym}`] = obj;
-            if(newJsons[`${consortium}${studyAcronym}`].pis === undefined) newJsons[`${consortium}${studyAcronym}`].pis = [];
-            newJsons[`${consortium}${studyAcronym}`].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
-            delete newJsons[`${consortium}${studyAcronym}`]['PI']
-            delete newJsons[`${consortium}${studyAcronym}`]['PI_Email']
+            if (newJsons[`${consortium}${studyAcronym}`].pis === undefined) newJsons[`${consortium}${studyAcronym}`].pis = [];
+            newJsons[`${consortium}${studyAcronym}`].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']});
+            delete newJsons[`${consortium}${studyAcronym}`]['PI'];
+            delete newJsons[`${consortium}${studyAcronym}`]['PI_Email'];
         }
         else {
-            newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']})
+            newJsons[prevAcronym].pis.push({PI: obj['PI'], PI_Email: obj['PI_Email']});
         }
     });
     
     const allCountries = [];
     Object.values(newJsons).forEach(dt => {
-        if(dt['Country'] === undefined) return;
+        if (dt['Country'] === undefined) return;
         dt['Country'].split(/,|;/).forEach(ctr => {
             ctr.split(' and ').forEach(c => {
-                if(c.trim()) allCountries.push(c.trim())
+                if (c.trim()) allCountries.push(c.trim())
             });
         })
     });
+    
     const allStudyDesigns = Object.values(newJsons).filter(dt => dt['Study design'] !== undefined).map(dt => dt['Study design']);
     const allConsortium = Object.values(newJsons).map(dt => dt['Consortium']);
     
@@ -133,16 +140,18 @@ const getDescription = async () => {
                 <div class="form-group" margin:0px>
                     <label class="filter-label font-size-13" for="consortiumList">Consortium</label>
                     <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="consortiumList">
-                    `
-                    uniqueConsortium.forEach(consortium => {
-                        filterTemplate += `
-                            <li class="filter-list-item">
-                                <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="select-consortium" style="margin-left: 1px !important;">
-                                <label for="label${consortium}" class="country-name" title="${consortium}">${consortium === 'NCI' ? 'C-NCI':shortenText(consortium, 15)}</label>
-                            </li>
-                        `
-                    })
-        filterTemplate +=`
+    `;
+                    
+    uniqueConsortium.forEach(consortium => {
+        filterTemplate += `
+            <li class="filter-list-item">
+                <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="select-consortium" style="margin-left: 1px !important;">
+                <label for="label${consortium}" class="country-name" title="${consortium}">${consortium === 'NCI' ? 'C-NCI':shortenText(consortium, 15)}</label>
+            </li>
+        `;
+    });
+        
+    filterTemplate += `
                     </ul>
                 </div>
             </div>
@@ -152,16 +161,18 @@ const getDescription = async () => {
                 <div class="form-group" margin:0px>
                     <label class="filter-label font-size-13" for="studyDesignList">Study Design</label>
                     <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="studyDesignList">
-                    `
-                    uniqueStudyDesign.forEach(sd => {
-                        filterTemplate += `
-                            <li class="filter-list-item">
-                                <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="select-study-design" style="margin-left: 1px !important;">
-                                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 25)}</label>
-                            </li>
-                        `
-                    })
-        filterTemplate +=`
+    `;
+                    
+    uniqueStudyDesign.forEach(sd => {
+        filterTemplate += `
+            <li class="filter-list-item">
+                <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="select-study-design" style="margin-left: 1px !important;">
+                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 25)}</label>
+            </li>
+        `;
+    });
+        
+    filterTemplate += `
                     </ul>
                 </div>
             </div>
@@ -171,32 +182,37 @@ const getDescription = async () => {
                 <div class="form-group" margin:0px>
                     <label class="filter-label font-size-13" for="countriesList">Country</label>
                     <ul class="remove-padding-left font-size-15 filter-sub-div allow-overflow" id="countriesList">
-                        `
-        countries.forEach(country => {
-            filterTemplate += `
-                <li class="filter-list-item">
-                    <input type="checkbox" data-country="${country}" id="label${country}" class="select-country" style="margin-left: 1px !important;">
-                    <label for="label${country}" class="country-name" title="${country}">${shortenText(country, 15)}</label>
-                </li>
-            `
-        })
-        filterTemplate +=`
+    `;
+        
+    countries.forEach(country => {
+        filterTemplate += `
+            <li class="filter-list-item">
+                <input type="checkbox" data-country="${country}" id="label${country}" class="select-country" style="margin-left: 1px !important;">
+                <label for="label${country}" class="country-name" title="${country}">${shortenText(country, 15)}</label>
+            </li>
+        `;
+    });
+        
+    filterTemplate += `
                     </ul>
                 </div>
             </div>
         </div>
     `;
+    
     document.getElementById('filterDataCatalogue').innerHTML = filterTemplate;
     const descriptions = Object.values(newJsons);
     document.getElementById('searchContainer').innerHTML = `
-    <div class="input-group">
-        <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
-    </div>
+        <div class="input-group">
+            <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search min. 3 characters" aria-label="Search" id="searchDataCatalog" aria-describedby="search-addon" />
+        </div>
     `;
+    
     addEventFilterDataCatalogue(descriptions, headers);
     downloadFiles(descriptions, headers, 'study_description', true);
     renderStudyDescription(descriptions, descriptions.length, headers);
     paginationHandler(descriptions, descriptions.length, headers);
+    
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, defaultPageSize);
     addEventPageSizeSelection(descriptions, headers);
     addEventFilterBarToggle();
@@ -204,66 +220,82 @@ const getDescription = async () => {
 
 const renderStudyDescription = (descriptions, pageSize, headers) => {
     let template = '';
-    //console.log(descriptions);
-    if(descriptions.length > 0) {
+    
+    if (descriptions.length > 0) {
         template = `
-        <div class="row pt-3 pb-3 m-0 align-left div-sticky">
-            <div class="col-lg-12">
-                <div class="row ps-lg-3 pe-lg-5">
-                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-4 font-bold ws-nowrap fs-5">Study <button class="transparent-btn sort-column" data-column-name="Study Name"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-2 font-bold ws-nowrap fs-5">Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button></div>
-                </div>
-            </div>
-        </div>
-        <div class="row m-0 align-left allow-overflow w-100">
-            <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">`
-        descriptions.forEach((desc, index) => {
-            //console.log(desc);
-            if(index > pageSize ) return
-            template += `
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
-                        <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
-                        <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'] : ''}</div>
-                        <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
-                        <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
-                        <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
-                    </button>
-                </h2>
-                <div id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
-                    <div class="accordion-body">
-                        ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
-                        ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
-                        ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
-                        ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
-                        ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
-                        ${desc['Description of Ascertainment Process or details of study design male participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design male participants']}</div></div>`: ``}
-                        ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
-                        ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
-                        ${desc['Description of Ascertainment Process or details of study design female participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design female participants']}</div></div>`: ``}
-                    `
-                    if(desc['pis'].length > 0) {
-                        desc['pis'].forEach(info => {
-                            template += `<div class="row"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
-                        })
-                    }
-                    template +=`
+            <div class="row pt-3 pb-3 m-0 align-left div-sticky">
+                <div class="col-lg-12">
+                    <div class="row ps-lg-3 pe-lg-5">
+                        <div class="col-lg-2 font-bold ws-nowrap fs-5">
+                            Consortium <button class="transparent-btn sort-column" data-column-name="Consortium"><i class="fas fa-sort"></i></button>
+                        </div>
+                        <div class="col-lg-4 font-bold ws-nowrap fs-5">
+                            Study <button class="transparent-btn sort-column" data-column-name="Study Name"><i class="fas fa-sort"></i></button>
+                        </div>
+                        <div class="col-lg-2 font-bold ws-nowrap fs-5">
+                            Acronym <button class="transparent-btn sort-column" data-column-name="Study Acronym"><i class="fas fa-sort"></i></button>
+                        </div>
+                        <div class="col-lg-2 font-bold ws-nowrap fs-5">
+                            Design <button class="transparent-btn sort-column" data-column-name="Study design"><i class="fas fa-sort"></i></button>
+                        </div>
+                        <div class="col-lg-2 font-bold ws-nowrap fs-5">
+                            Country <button class="transparent-btn sort-column" data-column-name="Country"><i class="fas fa-sort"></i></button>
+                        </div>
                     </div>
                 </div>
-            </div>`
+            </div>
+            <div class="row m-0 align-left allow-overflow w-100">
+                <div class="accordion accordion-flush col-md-12" id="dictionaryAccordian">
+        `;
+        
+        descriptions.forEach((desc, index) => {
+            if (index > pageSize ) return
+            
+            template += `
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
+                            <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
+                            <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'] : ''}</div>
+                            <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
+                            <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
+                            <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
+                        </button>
+                    </h2>
+                    <div id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+                        <div class="accordion-body">
+                            ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
+                            ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
+                            ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
+                            ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
+                            ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
+                            ${desc['Description of Ascertainment Process or details of study design male participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design male participants']}</div></div>`: ``}
+                            ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
+                            ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
+                            ${desc['Description of Ascertainment Process or details of study design female participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design female participants']}</div></div>`: ``}
+            `;
+            
+            if (desc['pis'].length > 0) {
+                desc['pis'].forEach(info => {
+                    template += `<div class="row"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
+                })
+            }
+                        
+            template += `
+                        </div>
+                    </div>
+                </div>
+            `;
         });
     }
     else {
-        template += 'Data not found!'
+        template += 'Data not found!';
     }
+    
     document.getElementById('descriptionBody').innerHTML = template;
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(descriptions, pageSize, headers);
-}
+};
 
 const addEventSortColumn = (descriptions, pageSize, headers) => {
     const btns = document.getElementsByClassName('sort-column');
@@ -272,9 +304,9 @@ const addEventSortColumn = (descriptions, pageSize, headers) => {
             const columnName = btn.dataset.columnName;
             descriptions = descriptions.sort((a, b) => (a[columnName] > b[columnName]) ? 1 : ((b[columnName] > a[columnName]) ? -1 : 0))
             renderStudyDescription(descriptions, pageSize, headers)
-        })
-    })
-}
+        });
+    });
+};
 
 const addEventFilterDataCatalogue = (descriptions, headers) => {
     const consortiumTypeSelection = document.getElementsByClassName('select-consortium');
@@ -297,17 +329,18 @@ const addEventFilterDataCatalogue = (descriptions, headers) => {
             filterDataBasedOnSelection(descriptions, headers);
         });
     });
+    
     const input = document.getElementById('searchDataCatalog');
     input.addEventListener('input', () => {
         filterDataBasedOnSelection(descriptions, headers);
-    })
-}
+    });
+};
 
 export const addEventToggleCollapsePanelBtn = () => {
     const btns = document.getElementsByClassName('collapse-panel-btn');
     Array.from(btns).forEach(btn => {
         btn.addEventListener('click', () => {
-            if(btn.querySelector('.fas.fa-2x').classList.contains('fa-caret-down')) {
+            if (btn.querySelector('.fas.fa-2x').classList.contains('fa-caret-down')) {
                 btn.querySelector('.fas.fa-2x').classList.remove('fa-caret-down')
                 btn.querySelector('.fas.fa-2x').classList.add('fa-caret-up')
             }
@@ -315,9 +348,9 @@ export const addEventToggleCollapsePanelBtn = () => {
                 btn.querySelector('.fas.fa-2x').classList.remove('fa-caret-up')
                 btn.querySelector('.fas.fa-2x').classList.add('fa-caret-down')
             }
-        })
-    })
-}
+        });
+    });
+};
 
 const filterDataBasedOnSelection = (descriptions, headers) => {
     const consortiumSelected = Array.from(document.getElementsByClassName('select-consortium')).filter(dt => dt.checked).map(dt => dt.dataset.consortium);
@@ -326,21 +359,23 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
     
     let filteredData = descriptions
 
-    if(consortiumSelected.length > 0) {
+    if (consortiumSelected.length > 0) {
         filteredData = filteredData.filter(dt => consortiumSelected.indexOf(dt['Consortium']) !== -1);
     }
 
-    if(studyDesignSelected.length > 0) {
+    if (studyDesignSelected.length > 0) {
         filteredData = filteredData.filter(dt => studyDesignSelected.indexOf(dt['Study design']) !== -1);
     }
-    if(countrySelected.length > 0) {
+    
+    if (countrySelected.length > 0) {
         filteredData = filteredData.filter(dt => {
             let found = false
             countrySelected.forEach(ctr => {
-                if(dt['Country'] === undefined) return;
-                if(found) return
-                if(dt['Country'].match(new RegExp(ctr, 'ig'))) found = true;
+                if (dt['Country'] === undefined) return;
+                if (found) return
+                if (dt['Country'].match(new RegExp(ctr, 'ig'))) found = true;
             })
+            
             if(found) return dt;
         });
     }
@@ -363,40 +398,42 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
         `: `
             <span class="font-bold">Country:</span> All
         `}
-    `
+    `;
     
-    if(countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
+    if (countrySelected.length === 0 && consortiumSelected.length === 0 && studyDesignSelected.length === 0) filteredData = descriptions
     
     const input = document.getElementById('searchDataCatalog');
     const currentValue = input.value.trim().toLowerCase();
     
-    if(currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+    if (currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
         document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, defaultPageSize);
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value, headers);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value, headers);
         addEventPageSizeSelection(filteredData, headers);
         return;
     }
+    
     previousValue = currentValue;
+    
     let searchedData = JSON.parse(JSON.stringify(filteredData));
     searchedData = searchedData.filter(dt => {
         let found = false;
-        if(typeof dt['Country'] !== 'undefined' && dt['Country'] && dt['Country'].toLowerCase().includes(currentValue)) found = true;
-        if(typeof dt['Study Acronym'] !== 'undefined' && dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
-        if(typeof dt['Study Name'] !== 'undefined' && dt['Study Name'].toLowerCase().includes(currentValue)) found = true;
-        if(typeof dt['Study design'] !== 'undefined' && dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
+        if (typeof dt['Country'] !== 'undefined' && dt['Country'] && dt['Country'].toLowerCase().includes(currentValue)) found = true;
+        if (typeof dt['Study Acronym'] !== 'undefined' && dt['Study Acronym'].toLowerCase().includes(currentValue)) found = true;
+        if (typeof dt['Study Name'] !== 'undefined' && dt['Study Name'].toLowerCase().includes(currentValue)) found = true;
+        if (typeof dt['Study design'] !== 'undefined' && dt['Study design'] && dt['Study design'].toLowerCase().includes(currentValue)) found = true;
         dt['pis'].forEach(element => {
-            if(typeof element['PI'] !== 'undefined' && element['PI'] && element['PI'].toLowerCase().includes(currentValue)) found = true;
+            if (typeof element['PI'] !== 'undefined' && element['PI'] && element['PI'].toLowerCase().includes(currentValue)) found = true;
         });
-        if(found) return dt;
+        if (found) return dt;
     })
     searchedData = searchedData.map(dt => {
-        if(dt['Country']) dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        if(dt['Study Acronym']) dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        if(dt['Study design']) dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        if(dt['Study Name']) dt['Study Name'] = dt['Study Name'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
-        if(dt['pis']) dt['pis'].forEach(element => {
-            if(element['PI']) element['PI'] = element['PI'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if (dt['Country']) dt['Country'] = dt['Country'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if (dt['Study Acronym']) dt['Study Acronym'] = dt['Study Acronym'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if (dt['Study design']) dt['Study design'] = dt['Study design'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if (dt['Study Name']) dt['Study Name'] = dt['Study Name'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
+        if (dt['pis']) dt['pis'].forEach(element => {
+            if (element['PI']) element['PI'] = element['PI'].replace(new RegExp(currentValue, 'gi'), '<b>$&</b>');
         });
         return dt;
     })
@@ -405,24 +442,26 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value, headers);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value, headers);
     addEventPageSizeSelection(searchedData, headers);
-}
+};
 
 const paginationHandler = (data, pageSize, headers) => {
     const dataLength = data.length;
     const pages = Math.ceil(dataLength/pageSize);
     const array = [];
 
-    for(let i = 0; i< pages; i++){
+    for (let i = 0; i< pages; i++) {
         array.push(i+1);
     }
+    
     document.getElementById('pagesContainer').innerHTML = paginationTemplate(array);
     addEventPageBtns(pageSize, data, headers);
-}
+};
 
 export const pageSizeTemplate = (array, startPageSize) => {
     const contentSize = Math.ceil(array.length / defaultPageSize) * defaultPageSize;
     let pageSizes = [];
-    for(let i = startPageSize; i <= contentSize; i += defaultPageSize) {
+    
+    for (let i = startPageSize; i <= contentSize; i += defaultPageSize) {
         if (array.length > i){
             pageSizes.push(i)
         }
@@ -430,14 +469,17 @@ export const pageSizeTemplate = (array, startPageSize) => {
             pageSizes.push(array.length);
         }
     }
+    
     pageSizes.reverse();
-    let template = `
-    <select class="form-select" id="pageSizeSelector">`
+    
+    let template = `<select class="form-select" id="pageSizeSelector">`;
+    
     pageSizes.forEach(size => {
-        template += `<option value="${size}">${size}</option>`
+        template += `<option value="${size}">${size}</option>`;
     })
-    template += `</select>
-    `;
+    
+    template += `</select>`;
+    
     return template;
 };
 
@@ -448,48 +490,61 @@ const addEventPageSizeSelection = (data, headers) => {
         renderStudyDescription(data, value, headers)
         paginationHandler(data, value, headers)
     })
-}
+};
 
 export const paginationTemplate = (array) => {
     let template = `
         <nav aria-label="Page navigation example">
-            <ul class="pagination m-0">`
+            <ul class="pagination m-0">
+    `;
     
     array.forEach((a,i) => {
-        if(i === 0){
-            template += `<li class="page-item">
-                            <button class="page-link" id="previousPage" data-previous="1" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">Previous</span>
-                            </button>
-                        </li>`
-        }
-        template += `<li class="page-item"><button class="page-link ${i === 0 ? 'active-page':''}" data-page=${a}>${a}</button></li>`;
-
-        if(i === (array.length - 1)){
+        if (i === 0) {
             template += `
+                <li class="page-item">
+                    <button class="page-link" id="previousPage" data-previous="1" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                </li>
+            `;
+        }
+        
+        template += `
             <li class="page-item">
-                <button class="page-link" id="nextPage" data-next="1" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Next</span>
-                </button>
-            </li>`
+                <button class="page-link ${i === 0 ? 'active-page':''}" data-page=${a}>${a}</button>
+            </li>
+        `;
+
+        if (i === (array.length - 1)) {
+            template += `
+                <li class="page-item">
+                    <button class="page-link" id="nextPage" data-next="1" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </button>
+                </li>
+            `;
         }
     });
+    
     template += `
             </ul>
         </nav>
     `;
+    
     return template;
-}
+};
 
 export const dataPagination = (start, end, data) => {
     const paginatedData = [];
-    for(let i=start; i<end; i++){
-        if(data[i]) paginatedData.push(data[i]);
+    
+    for (let i=start; i<end; i++) {
+        if (data[i]) paginatedData.push(data[i]);
     }
+    
     return paginatedData;
-}
+};
 
 const addEventPageBtns = (pageSize, data, headers) => {
     const elements = document.getElementsByClassName('page-link');
@@ -497,31 +552,35 @@ const addEventPageBtns = (pageSize, data, headers) => {
         element.addEventListener('click', () => {
             let previous = parseInt(element.dataset.previous);
             let next = parseInt(element.dataset.next);
-            if(previous && !isNaN(previous) && previous === 1) previous = document.querySelectorAll('[data-page]').length + 1;
-            if(next && !isNaN(next) && next === document.querySelectorAll('[data-page]').length) next = 0;
-            const pageNumber = !isNaN(previous) ? previous - 1 : !isNaN(next) ? next + 1 : element.dataset.page;
-            if(pageNumber < 1 || pageNumber > Math.ceil(data.length/pageSize)) return;
+            if (previous && !isNaN(previous) && previous === 1) previous = document.querySelectorAll('[data-page]').length + 1;
+            if (next && !isNaN(next) && next === document.querySelectorAll('[data-page]').length) next = 0;
             
-            if(!element.classList.contains('active-page')){
+            const pageNumber = !isNaN(previous) ? previous - 1 : !isNaN(next) ? next + 1 : element.dataset.page;
+            if (pageNumber < 1 || pageNumber > Math.ceil(data.length/pageSize)) return;
+            
+            if (!element.classList.contains('active-page')) {
                 let start = (pageNumber - 1) * pageSize;
                 let end = pageNumber * pageSize;
                 document.getElementById('previousPage').dataset.previous = pageNumber;
                 document.getElementById('nextPage').dataset.next = pageNumber;
+                
                 renderStudyDescription(dataPagination(start,end,data), document.getElementById('pageSizeSelector').value, headers);
                 Array.from(elements).forEach(ele => ele.classList.remove('active-page'));
                 document.querySelector(`button[data-page="${pageNumber}"]`).classList.add('active-page');
             }
         })
     });
-}
+};
 
 export const updateDesc = () => {
     const updateDescButton = document.getElementById('updateDesc');
     updateDescButton.addEventListener('click', async e => {
         showAnimation();
+        
         const descFolders = await getFolderItems(276763770481);
         let filearrayDesc = descFolders.entries;
         let json_list = [];
+        
         for (let obj of filearrayDesc) {
             let data = await getFileXLSX(obj.id);
             let file = await data.arrayBuffer();
@@ -535,30 +594,33 @@ export const updateDesc = () => {
             json_list = json_list.concat(json_input_noempty);
             console.log(json_list);
         }
+        
         JSONToFile(json_list, 'studyDescriptions');
         hideAnimation();
     })
-}
+};
 
 const JSONToFile = (obj, filename) => {
     const blob = new Blob([JSON.stringify(obj, null, 2)], {
-      type: 'application/json',
+        type: 'application/json',
     });
+    
     //const url = URL.createObjectURL(blob);
     //const a = document.createElement('a');
     //a.href = url;
     //a.download = `${filename}.json`;
     //a.click();
     //URL.revokeObjectURL(url);
+    
     uploadFileVersion2(blob, studyDescriptions, 'application/json')
-  };
+};
 
-  const getAllKeys = (arr) => {
+const getAllKeys = (arr) => {
     const allKeys = new Set();
-  
+
     arr.forEach((obj) => {
-      Object.keys(obj).forEach((key) => allKeys.add(key));
+        Object.keys(obj).forEach((key) => allKeys.add(key));
     });
-  
+
     return Array.from(allKeys);
-  };
+};
