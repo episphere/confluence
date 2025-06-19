@@ -419,7 +419,7 @@ const midset = (data, acceptedVariables) => {
     }
     
     if (data.length > 0) {
-        template += '<table class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
+        template += '<table caption="Table Display" class="table table-hover table-borderless missingness-table table-striped"><thead class="midset-table-header">';
         const headerCount = computeHeader(data, acceptedVariables);
         headerData = headerCount;
         const result = computeSets(data, acceptedVariables);
