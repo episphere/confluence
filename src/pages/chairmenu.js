@@ -51,9 +51,14 @@ export function renderFilePreviewDropdown(files, tab) {
             <br>
             <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
       for (const file of files) {
+        const fileId = file.id;
+        //console.log(fileInfo);
+        let filename = file.name//.slice(0,-19);
+        let lastUnderscoreIndex = filename.lastIndexOf('_');
+        let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
         template += `
-            <option value='${file.id}'>
-            ${file.name.slice(0,-19)}</option>`;
+            <option value='${fileId}'>
+            ${titlename}</option>`;
       }
       template += `
             </select>
@@ -285,7 +290,6 @@ export const generateChairMenuFiles = async () => {
     commentSubmit();
     downloadAll('recommendation', filesIncompleted)
     downloadAll('conceptNeedingClarification', filesClaraIncompleted)
-    console.log(filesIncompleted);
     if (!!filesIncompleted.length) {
       showPreview(filesIncompleted[0].id);
       switchFiles("recommendation");
@@ -624,8 +628,11 @@ export async function viewFinalDecisionFiles(files) {
   `;
   for (const fileInfo of files) {
     const fileId = fileInfo.id;
-    let filename = fileInfo.name.slice(0,-19);
-    const shortfilename = filename.length > 30 ? filename.substring(0, 29) + "..." : filename;
+    //console.log(fileInfo);
+    let filename = fileInfo.name//.slice(0,-19);
+    let lastUnderscoreIndex = filename.lastIndexOf('_');
+    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
     
     template += `
@@ -634,7 +641,7 @@ export async function viewFinalDecisionFiles(files) {
     <div class="row-24 align-items-center position-relative">
       <!-- File Name (col-3) -->
       <div class="col-24-5 text-left">
-        ${shortfilename}
+        ${shorttitlename}
       </div>
       
       <!-- Date (col-1) -->
@@ -757,7 +764,7 @@ export async function viewFinalDecisionFiles(files) {
         <div class="row mb-1 m-0">
           <div class="col-md-2 pl-2 font-bold">Concept</div>
           <div class="col">
-            ${fileInfo.name} 
+            ${filename} 
             <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
               <i class="fas fa-external-link-alt"></i>
             </button>
@@ -1518,15 +1525,25 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
 }
 
 export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
+  console.log(filesInfoSub)
+  console.log(filesInfoCom)
   let template = `
     <div class="row m-0 align-left allow-overflow w-100">
       <div class="accordion accordion-flush col-md-12" id="adminAccordian">
   `;
   for (const fileInfo of filesInfoSub) {
+    // const fileId = fileInfo.id;
+    // let filename = fileInfo.name//.slice(0,-19);
+    // console.log(filename);
+    // const shortfilename = filename.length > 50 ? filename.substring(0, 49) + "..." : filename;
+    // let completion_date = await getChairApprovalDate(fileId);
+
     const fileId = fileInfo.id;
+    //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
-    console.log(filename);
-    const shortfilename = filename.length > 50 ? filename.substring(0, 49) + "..." : filename;
+    let lastUnderscoreIndex = filename.lastIndexOf('_');
+    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
 
     template += `
@@ -1542,7 +1559,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
 
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
-            ${shortfilename}
+            ${shorttitlename}
           </div>
           
           <!-- Date (col-1) -->
@@ -1665,7 +1682,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
             <div class="row mb-1 m-0">
               <div class="col-md-2 pl-2 font-bold">Concept</div>
               <div class="col">
-                ${fileInfo.name} 
+                ${filename} 
                 <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
                   <i class="fas fa-external-link-alt"></i>
                 </button>
@@ -1684,7 +1701,9 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     const fileId = fileInfo.id;
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
-    const shortfilename = filename.length > 30 ? filename.substring(0, 29) + "..." : filename;
+    let lastUnderscoreIndex = filename.lastIndexOf('_');
+    let titlename = filename.substring(0, lastUnderscoreIndex); 
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
@@ -1692,7 +1711,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
         <div class="row-24 align-items-center position-relative">
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
-            ${shortfilename}
+            ${shorttitlename}
           </div>
           
           <!-- Date (col-1) -->
@@ -1815,7 +1834,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
             <div class="row mb-1 m-0">
               <div class="col-md-2 pl-2 font-bold">Concept</div>
               <div class="col">
-                ${fileInfo.name} 
+                ${filename} 
                 <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
                   <i class="fas fa-external-link-alt"></i>
                 </button>

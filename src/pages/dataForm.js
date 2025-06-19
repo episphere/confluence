@@ -40,17 +40,17 @@ export const formtemplate = () => {
                             costs incurred using resources on the TRE (e.g., compute costs analyzing the data). 
                           </p>
                             
-                            <form id="analysisConceptForm" novalidate>
+                            <form id="analysisConceptForm">
 
                             <div class="input-group">
                               <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
-                              <input id="date" name="date" type="date" value='${today}' class="form-text-input" required aria-required="true" aria-describedby="date-error" />
+                              <input id="date" name="date" type="date" value='${today}' class="form-text-input" aria-required="true" aria-describedby="date-error" required/>
                               <div id="date-error" class="error-message" aria-live="polite"></div>
                             </div>
 
                             <div class="input-group">
-                              <label for="projname" id="projname-label"><b>Title of Proposed Project</b><span class='required-label' aria-hidden="true">*</span></label>
-                              <input id="projname" name="projname" type="text" class="form-text-input" required aria-required="true" aria-describedby="projname-error" />
+                              <label for="projname" id="projname-label"><b>Title of Proposed Project</b> (Max length 250 characters)<span class='required-label' aria-hidden="true">*</span></label>
+                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" required/>
                               <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             
@@ -217,11 +217,6 @@ export const formtemplate = () => {
                             </div>
 
                             <div class="input-group">
-                              <label for="analdesc"><b>Description of Analysis Plan</b> <i> Please provide a concise description of your Analysis Plan</i><span class='required-label'>*</span></label>
-                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
-                            </div>
-
-                            <div class="input-group">
                               <label for="prim-end"><b>Primary Endpoint</b><span class='required-label'>*</span><i> (please check box)</i> </label>
                             </div>
 
@@ -288,18 +283,18 @@ export const formtemplate = () => {
                                     </div>
                                   </div>
                                   <div class="col-12 col-md-12 col-sm-12">
-                                    <div class="form-check form-check-inline">
+                                    <!--<div class="form-check form-check-inline">
                                       <input class="form-check-input" id="preconfluence" name="genotyping" type="checkbox" value="Data generated pre-Confluence" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="preconfluence"> Data generated pre-Confluence</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
+                                    </div>-->
+                                    <!--<div class="form-check form-check-inline">
                                       <input class="form-check-input" id="postconfluence" name="genotyping" type="checkbox" value="Confluence generated data" style="position: relative; top: -2px;"/>
                                       <label class="form-check-label" for="postconfluence"> Confluence generated data</label>
-                                    </div>
-                                    <p> If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>
+                                    </div>-->
+                                    <!---<p> If specific variants are being requested, please complete and attach the following manifest (download the manifest template here). Please use build 38 to denote variants.</p>--->
 
                                     <p> *Access to concept 1 GWAS summary results will require an approved concept form until the summary results are made publicly accessible.</p>
-                                    <input id="fileVar" name="fileVar" type="file">
+                                    <!---<input id="fileVar" name="fileVar" type="file">--->
                                   </div>
                                 </div>
                               </div>
@@ -360,7 +355,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <label for="riskfactvar"><b>Risk Factor</b></label>
                                 <label> 
-                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" class="form-check-input" value="riskfactvarv" style="position: relative; top: -2px;"/>
+                                  <input id="riskfactvarv" name="riskfactvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
                                 </label>
                             </div>
 
@@ -467,7 +462,7 @@ export const formtemplate = () => {
                             <label for="surtrevar"><b>Survival and Treatment</b></label>
                             <label> 
                               <input id="surtrevarv" name="surtrevarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
-                              (Not availale from AABCG)
+                              (Not available from AABCG)
                             </label>
                           </div>
 
@@ -520,12 +515,17 @@ export const formtemplate = () => {
                               <label for="mammvar"><b>Mammographic Density</b></label>
                               <label> 
                                 <input id="mammvarv" name="mammvarv" type="checkbox" class="form-check-input" value="Yes" style="position: relative; top: -2px;"/>
-                                (Not availale from AABCG)
+                                (Only available from BCAC)
                               </label>
                             </div>
 
                             <br>
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
+
+                            <div class="input-group">
+                              <label for="analdesc"><b>Concept Analysis Plans</b> <i>  Please provide a concise description of your analysis plan. The analysis plan should be consistent with the data that is being requested.</i><span class='required-label'>*</span></label>
+                              <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
+                            </div>
 
                             <div class="input-group">
                               <label for="time"><b>Time Plan</b></label>
@@ -565,7 +565,7 @@ export const formtemplate = () => {
                             </div>
                             
                             <button type="submit" id="submitFormButton" class="buttonsubmit"> 
-                              <span class="buttonsubmit__text"> Send Form & Download</span>
+                              <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
                             </button>
                             <!---<button type="button" id="downloadWord" class="buttonsubmit"> 
                               <span class="buttonsubmit__text"> Download Word </span>--->
@@ -619,7 +619,6 @@ export const formFunctions = () => {
 }
 
 export const dataForm = async () => {
-
   async function handleFormSubmit(eventtest) {
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
@@ -632,7 +631,7 @@ export const dataForm = async () => {
     jsondata.datacon = data.getAll("data-con");
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
-    jsondata.riskfactvar = data.getAll("riskfactvar");
+    //jsondata.riskfactvar = data.getAll("riskfactvar");
     jsondata.carStatus = data.getAll("carStatus");
     jsondata.sex = data.getAll("sex");
     jsondata.condescsplit = jsondata.condesc.split('\n');
@@ -899,7 +898,7 @@ export const dataForm = async () => {
               alignment: docx.AlignmentType.START,
               children: [
                 new docx.TextRun({
-                  text: "Consortia data being requested: ",
+                  text: "Consortia or Study / Trial Group data being requested: ",
                 }),
                 new docx.TextRun({
                   text: JSON.stringify(jsondata.datacon, null, 1)
@@ -1077,6 +1076,25 @@ export const dataForm = async () => {
                 after: 150,
               },
             }),
+            // new docx.Paragraph({
+            //   heading: docx.HeadingLevel.HEADING_2,
+            //   alignment: docx.AlignmentType.START,
+            //   children: [
+            //     new docx.TextRun({
+            //       text: "Risk Factor Variables: ",
+            //     }),
+            //     new docx.TextRun({
+            //       text: JSON.stringify(jsondata.riskfactvar, null, 1)
+            //         .replace("[", "")
+            //         .replace("]", "")
+            //         .replace(/"/g, ''),
+            //       bold: false,
+            //     }),
+            //   ],
+            //   spacing: {
+            //     after: 150,
+            //   },
+            // }),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1085,10 +1103,7 @@ export const dataForm = async () => {
                   text: "Risk Factor Variables: ",
                 }),
                 new docx.TextRun({
-                  text: JSON.stringify(jsondata.riskfactvar, null, 1)
-                    .replace("[", "")
-                    .replace("]", "")
-                    .replace(/"/g, ''),
+                  text: jsondata.riskfactvarv,
                   bold: false,
                 }),
               ],
@@ -1203,10 +1218,10 @@ export const dataForm = async () => {
     let user = JSON.parse(localStorage.parms).login.split('@')[0];
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-    let filename = jsondata.projname + '_' + user + '_' + today + '_' + Date.now() + '.docx';
+    let filename = jsondata.projname + '_' + today + '.docx';
     await docx.Packer.toBlob(doc).then(async (blob, btn) => {
-      //let response = await uploadWordFile(blob, filename, submitterFolder);
-      let response = {'status': 201};
+      let response = await uploadWordFile(blob, filename, submitterFolder);
+      //let response = {'status': 201};
       console.log(response);
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
@@ -1221,9 +1236,9 @@ export const dataForm = async () => {
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
       } else {
-      //let fileid = response.entries[0].id;
-      let fileid = "testing";
-      //let metaData = addMetaData(fileid, jsondata.datacon);
+      let fileid = response.entries[0].id;
+      //let fileid = "testing";
+      //let metaData = await addMetaData(fileid, jsondata.datacon);
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
@@ -1244,7 +1259,7 @@ export const dataForm = async () => {
     })
   }
 
-  const form = document.querySelector(".contact-form");
+  const form = await document.querySelector(".contact-form");
   form.addEventListener("submit", handleFormSubmit);
 }
 
