@@ -142,7 +142,7 @@ export const formtemplate = () => {
                                 </div>
                             </div>
                             <div class="input-group">
-                                <label for="data-con"><b>Consortia or Study / Trial Group data being requested</b><span class='required-label'>*</span> <i>(please check all boxes that apply)</i></label>
+                                <label for="data-con"><b>Consortia or Study / Trial Group data being requested</b><span class='required-label'>*</span> <i>(please check all boxes that apply)</i> Click  <a href="#join/overview" target="__blank" rel="noopener noreferrer">here</a> for a description of the consortia.</label>
                             </div>
                             <div class="input-group">
                                 <div class="container-lg">
@@ -186,6 +186,14 @@ export const formtemplate = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="input-group">
+                                <div class="form-check">
+                                    <input id="cost" name="cost" type="checkbox" value="Yes" class="form-check-input" style="position: relative; top: -2px;" required/>
+                                    <label class="form-check-label" for="cost"><b>Please acknowledge, researchers that are approved to access data shared with the Confluence Project on a cloud-based, TRE are responsible for paying the compute and data storage costs from using the TRE resources.</b><span class='required-label'>*</span></label>
+                                </div>
+                            </div>  
+
                             <div class="input-group">
                                 <label for="condesc"><b>Background</b> <i> Please provide a concise description of Background</i><span class='required-label'>*</span></label>
                                 <textarea id="condesc" name="condesc" rows="6" cols="65" class="form-text-input" required></textarea>
@@ -536,9 +544,14 @@ export const formtemplate = () => {
                                 </u>
                                 <span class='required-label'>*</span></label>
                             </div>
-                            <button type="submit" id="submitFormButton" class="buttonsubmit"> 
-                              <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
-                            </button>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red"> 
+                                  <span class="buttonsubmit__text"> Download Form</span>
+                                </button>
+                                <button type="submit" id="submitFormButton" class="col-auto btn btn-red mt-3 mb-3 button-glow-red"> 
+                                  <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
+                                </button>
+                            </div>
                             <!---<button type="button" id="downloadWord" class="buttonsubmit"> 
                                 <span class="buttonsubmit__text"> Download Word </span>
                             </button>--->

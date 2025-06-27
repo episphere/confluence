@@ -1551,6 +1551,10 @@ form {
     background-color: #0053AD !important;
 }
 
+.btn-red {
+    background-color: #A41652 !important;
+}
+
 .links-border-right {
     border-right: 0.5px solid #000000;
 }
@@ -2343,6 +2347,13 @@ ul.form {
 .button-glow:hover {
   box-shadow: 0 0 8px rgba(13, 110, 253, 0.7); /* Stronger blue glow */
   border-color: #0d6efd !important;
+  cursor: pointer;
+  transition: all 0.2s ease; /* Smooth transition effect */
+}
+
+.button-glow-red:hover {
+  box-shadow: 0 0 8px #ac1853; /* Stronger blue glow */
+  border-color: #A41652 !important;
   cursor: pointer;
   transition: all 0.2s ease; /* Smooth transition effect */
 }
