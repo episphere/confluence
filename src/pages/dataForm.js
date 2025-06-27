@@ -37,7 +37,7 @@ export const formtemplate = () => {
                             Approved researchers granted access to data will be responsible for paying their 
                             costs incurred using resources on the TRE (e.g., compute costs analyzing the data). 
                         </p>
-                        <form id="analysisConceptForm" novalidate>
+                        <form id="analysisConceptForm">
                             <div class="input-group">
                               <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
                               <input id="date" name="date" type="date" value='${today}' class="form-text-input" aria-required="true" aria-describedby="date-error" required/>
@@ -545,10 +545,10 @@ export const formtemplate = () => {
                                 <span class='required-label'>*</span></label>
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button type="submit" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red"> 
+                                <button type="button" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download your current form responses to word document."> 
                                   <span class="buttonsubmit__text"> Download Form</span>
                                 </button>
-                                <button type="submit" id="submitFormButton" class="col-auto btn btn-red mt-3 mb-3 button-glow-red"> 
+                                <button type="submit" id="submitFormButton" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Submit your form for review."> 
                                   <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
                                 </button>
                             </div>
@@ -565,7 +565,7 @@ export const formtemplate = () => {
                                 </div>
                                 <div class="modal-body" id='modalBody'></div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
@@ -601,6 +601,43 @@ export const formFunctions = () => {
 };
 
 export const dataForm = async () => {
+  
+  async function handleFormSubmit2(eventtest) {
+    const btn = document.activeElement;
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = true;
+    eventtest.preventDefault();
+    const form = document.querySelector(".contact-form form");
+    const data = new FormData(form);
+    const jsondata = Object.fromEntries(data.entries());
+    jsondata.memcon = data.getAll("mem-con");
+    jsondata.datacon = data.getAll("data-con");
+    jsondata.primend = data.getAll("prim-end");
+    jsondata.genotyping = data.getAll("genotyping");
+    //jsondata.riskfactvar = data.getAll("riskfactvar");
+    jsondata.carStatus = data.getAll("carStatus");
+    jsondata.sex = data.getAll("sex");
+    jsondata.condescsplit = jsondata.condesc.split('\n');
+    jsondata.aimssplit = jsondata.condescAims.split('\n');
+    jsondata.descsplit = jsondata.analdesc.split('\n');
+    jsondata.timesplit = jsondata.time.split('\n');
+    jsondata.anyothsplit = jsondata.anyoth.split('\n');
+
+        // Added for testing
+        // console.log(jsondata);
+        // const downloadJSON = document.getElementById("downloadJSON");
+        // let blob = new Blob([JSON.stringify(jsondata)], {type: "application/json",});
+        // const downloadLink = URL.createObjectURL(blob);
+        // let filename = jsondata.projname;
+        // let a = document.createElement("a");
+        // a.href = downloadLink;
+        // a.download = filename;
+        // a.click();
+        
+    await generateWord(jsondata, btn, false);
+    btn.classList.toggle("buttonsubmit--loading");
+    btn.disabled = false;
+  }
   async function handleFormSubmit(eventtest) {
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
@@ -633,12 +670,12 @@ export const dataForm = async () => {
         // a.download = filename;
         // a.click();
         
-        await generateWord(jsondata);
+        await generateWord(jsondata, btn, true);
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
     }
 
-    async function generateWord(jsondata) {
+    async function generateWord(jsondata, button, uploadReady=false) {
         const condescRun = jsondata.condescsplit.map(line=>new docx.TextRun({break:1,text:line}));
         const aimsRun = jsondata.aimssplit.map(line=>new docx.TextRun({break:1,text:line}));
         const descRun = jsondata.descsplit.map(line=>new docx.TextRun({break:1,text:line}));
@@ -1213,7 +1250,12 @@ export const dataForm = async () => {
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     let filename = jsondata.projname + '_' + today + '.docx';
-    await docx.Packer.toBlob(doc).then(async (blob, btn) => {
+    let fileid = 'Not Generated'
+    let btn = button;
+    console.log(btn);
+    await docx.Packer.toBlob(doc).then(async (blob) => {
+      console.log(btn);
+      if (uploadReady) {
       let response = await uploadWordFile(blob, filename, submitterFolder);
       //let response = {'status': 201};
       console.log(response);
@@ -1221,40 +1263,56 @@ export const dataForm = async () => {
         document.getElementById("modalBody").innerHTML = `
             <p>Error detected, please upload again.</p>`;
         $("#popUpModal").modal("show");
-        btn.classList.toggle("buttonsubmit--loading");
-        btn.disabled = false;
+        // let popup = document.getElementById('popUpModal');
+        // let btns = popup.querySelectorAll('button');
+        // for (let button of btns) {
+        //       button.addEventListener('click', function () {
+        //       btn.classList.toggle("buttonsubmit--loading");
+        //       btn.disabled = false;
+        //     })
+        //   }
       } else if (response.status === 409){
         document.getElementById("modalBody").innerHTML = `
         <p>Conflict detected, please upload again.</p>`;
         $("#popUpModal").modal("show");
-        btn.classList.toggle("buttonsubmit--loading");
-        btn.disabled = false;
+        // let popup = document.getElementById('popUpModal');
+        // let btns = popup.querySelectorAll('button');
+        // for (let button of btns) {
+        //       button.addEventListener('click', function () {
+        //       btn.classList.toggle("buttonsubmit--loading");
+        //       btn.disabled = false;
+        //     })
+        //   }
       } else {
-      let fileid = response.entries[0].id;
-      //let fileid = "testing";
-      //let metaData = await addMetaData(fileid, jsondata.datacon);
+        fileid = response.entries[0].id;
+        document.getElementById("modalBody").innerHTML = `
+            <p>File was successfully uploaded.</p>
+            <p>Document ID: ${fileid}</p>`;
+            $("#popUpModal").modal("show");
+            let popup = document.getElementById('popUpModal');
+            let btns = popup.querySelectorAll('button');
+            for (let button of btns) {
+              button.addEventListener('click', function () {
+              location.reload();
+            })
+            }
+      }}
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
       a.download = filename;
-      document.getElementById("modalBody").innerHTML = `
-           <p>File was successfully uploaded.</p>
-           <p>Document ID: ${fileid}</p>`;
-      $("#popUpModal").modal("show");
       a.click();
-      let popup = document.getElementById('popUpModal');
-      let btns = popup.querySelectorAll('button');
-      for (let button of btns) {
-        button.addEventListener('click', function () {
-          location.reload();
-         })
-        }
       }
-    })
+    )
   }
 
   const form = await document.querySelector(".contact-form");
   form.addEventListener("submit", handleFormSubmit);
+  
+  const downloadBtn = document.getElementById("downloadForm");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", handleFormSubmit2);
+  }
 }
 
 export const uploaddataFormTemplate = () => {
