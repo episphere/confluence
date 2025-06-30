@@ -1,4 +1,4 @@
-import { submitterFolder, uploadWordFile, addMetaData} from "../shared.js"
+import { submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile} from "../shared.js"
 // import * as docx from "docx";
 
 export const formtemplate = () => {
@@ -7,9 +7,14 @@ export const formtemplate = () => {
     let template = ` 
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
-                <div class="main-summary-row">
+                <div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="align-left">
                         <h1 class="page-header">Analysis Concept Form</h1>
+                    </div>
+                    <div class="align-right">
+                      <button type="button" id="downloadWordForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download a word version of the Analysis Concept Form."> 
+                        <span class="buttonsubmit__text">Download Blank Form</span>
+                      </button>
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
@@ -545,8 +550,8 @@ export const formtemplate = () => {
                                 <span class='required-label'>*</span></label>
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button type="button" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download your current form responses to word document."> 
-                                  <span class="buttonsubmit__text"> Download Form</span>
+                                <button type="button" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download the form with your current responses to a word document."> 
+                                  <span class="buttonsubmit__text">Download Form with Inputs</span>
                                 </button>
                                 <button type="submit" id="submitFormButton" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Submit your form for review."> 
                                   <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
@@ -601,7 +606,13 @@ export const formFunctions = () => {
 };
 
 export const dataForm = async () => {
-  
+  async function handleFormSubmit3() {
+    console.log("Button Clicked to Download");
+    let formFile = await downloadFile(conceptForm);
+    let a = document.createElement("a");
+    a.href = formFile.url;
+    a.click();
+  }
   async function handleFormSubmit2(eventtest) {
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
@@ -1312,6 +1323,11 @@ export const dataForm = async () => {
   const downloadBtn = document.getElementById("downloadForm");
   if (downloadBtn) {
     downloadBtn.addEventListener("click", handleFormSubmit2);
+  }
+
+  const downloadBtn2 = document.getElementById("downloadWordForm");
+  if (downloadBtn2) {
+    downloadBtn2.addEventListener("click", handleFormSubmit3);
   }
 }
 

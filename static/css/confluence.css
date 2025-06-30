@@ -2015,8 +2015,8 @@ form {
   .contact-form button {
     display: block;
     position: relative;
-    margin: 0.5rem 1rem 0;
-    padding: 0 1rem 0.125rem;
+    margin: 0.5rem 0rem 0;
+    padding: .5rem 1rem .5rem;
     background-color: var(--color-gray-medium);
     border: 0;
     color: var(--color-lightest);
@@ -2024,7 +2024,7 @@ form {
     font-size: 100%;
     letter-spacing: 0.05em;
     line-height: 1.5;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     transition: 150ms all linear;
   }
   

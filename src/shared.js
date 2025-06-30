@@ -15,6 +15,7 @@ export const archivedFolder = 198962088100;
 export const returnToSubmitterFolder = 200908340220;
 export const completedFolder = 200926990513;
 export const DACCmembers = 1221222994319;
+export const conceptForm = 1154394600696;
 
 export const chairsInfo = [
     {id: 'user_1', email:"ahearntu@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
@@ -129,6 +130,32 @@ export const getFile = async (id) => {
         }
         else if (r.status === 200) {
             return r.text();
+        }
+        else {
+            hideAnimation();
+            console.error(r);
+        }
+    }
+    catch (err) {
+        if ((await refreshToken()) === true) return await getFile(id);
+    }
+};
+
+export const downloadFile = async (id) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let r = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
+            method:'GET',
+            headers:{
+                Authorization:"Bearer "+access_token
+            }
+        });
+        
+        if (r.status === 401) {
+            if ((await refreshToken()) === true) return await getFile(id);
+        }
+        else if (r.status === 200) {
+            return r;
         }
         else {
             hideAnimation();
