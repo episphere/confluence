@@ -46,7 +46,7 @@ export const confluenceResources = () => {
                     The CIMBA was formed by a collaborative group of researchers working on genetic modifiers of cancer risk in BRCA1 and BRCA2 mutation carriers. The aim of CIMBA is to provide sufficient sample sizes to allow large scale studies in order to evaluate reliably the effects of genetic modifiers.
                 </div>
                 <div class="consortia-desc">
-                    <a href="mailto:nick.orr@qub.ac.uk" target="_blank" rel="noopener noreferrer">Male Breast Cancer Genetics Consortium</a> (MERGE) </br>
+                    Male Breast Cancer Genetics Consortium (MERGE) </br>
                     The MERGE is a GWAS of male breast cancer cases and similar number of controls.
                 </div>
                 <div class="consortia-desc">
@@ -95,7 +95,7 @@ export const confluenceResourcesDes = () => {
     let template = `
         <div class="main-summary-row">
             <div class="align-left">
-                <h1 class="page-header">Participating Consortium</h1>
+                <h1 class="page-header">Participating DACCs</h1>
             </div>
         </div>
         <div class="main-summary-row white-bg div-border">
@@ -139,7 +139,7 @@ export const confluenceResourcesDes = () => {
                             <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
                         </tr>
                         <tr>
-                            <td><a href="mailto:nick.orr@qub.ac.uk">Male Breast Cancer Genetics Consortium</a> (MERGE)</td>
+                            <td>Male Breast Cancer Genetics Consortium (MERGE)</td>
                             <!--<td>Nick Orr (Queen's University Belfast)</td>
                             <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>-->
                             <td style="text-align: center"><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
