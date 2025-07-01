@@ -1860,6 +1860,25 @@ export const renderDataDescription = async () => {
                                         </li>
                                     </ul>
                                     <p>
+                                        The participating DACCs will review submitted concepts three times a year, according to the following 4-month submission windows:
+                                    </p>
+                                    <ul>
+                                        <li>
+                                            <p>
+                                                July 1 to October 31
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                November 1 to February 28
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                March 1 to June 30
+                                            </p>
+                                        </li>
+                                    <p>
                                         DCEG will work with the consortia DACCs to develop procedures/policies that facilitate data
                                         access/sharing across multiple consortia that are consistent with individual consortium data
                                         sharing

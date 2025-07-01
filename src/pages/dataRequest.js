@@ -43,6 +43,14 @@ export const template = () => {
                             <li> Upon DTA signatures, the  data coordinating center(s) will be able to provide access to the approved data.</li>
                         </ul>
                     </div>
+                    <div class="row m-0">The participating DACCs will review submitted concepts three times a year, according to the following 4-month submission windows:</div>
+                    <div class="row px-5">
+                        <ul>
+                            <li> July 1 - October 31</li>
+                            <li> November 1 - February 28</li>
+                            <li> March 1 - June 30</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,6 +77,14 @@ export const templateAfterLogin = () => {
                             <li> After approval by the relevant consortia DACCs, individual studies contributing data will be notified and given a time period to determine if their study will participate in the approved project. </li>
                             <li> After this period has elapsed, the researcher's institution will sign a data transfer agreement (DTA) for the study concept with each of the relevant consortium data coordinating center(s) governing the data. </li>
                             <li> Upon DTA signatures, the  data coordinating center(s) will be able to provide access to the approved data.</li>
+                        </ul>
+                    </div>
+                    <div class="row m-0">The participating DACCs will review submitted concepts three times a year, according to the following 4-month submission windows:</div>
+                    <div class="row px-5">
+                        <ul>
+                            <li> July 1 - October 31</li>
+                            <li> November 1 - February 28</li>
+                            <li> March 1 - June 30</li>
                         </ul>
                     </div>
                 </div>
