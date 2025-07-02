@@ -407,6 +407,7 @@ export const getFileVersions = async (id) => {
 
 export const storeAccessToken = async () => {
     let parms = searchParms();
+    console.log(parms);
     if (parms.code) {
         // Exchange code for authorization token
         let clt = { }
@@ -414,7 +415,7 @@ export const storeAccessToken = async () => {
         else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
         else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
         else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
-        
+        console.log(clt);
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
         const response = await fetch(url, {
@@ -424,7 +425,7 @@ export const storeAccessToken = async () => {
             method:'POST',
             body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
         });
-        
+        console.log(response);
         if (response.status && response.status === 200) {
             localStorage.parms = JSON.stringify(await response.json());
             window.history.replaceState({},'', './#home');
