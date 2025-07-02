@@ -412,8 +412,8 @@ export const storeAccessToken = async () => {
         let clt = { }
         if (location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
         else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
-        else if (location.origin.indexOf(applicationURLs.stage) !== -1) clt = config.iniAppStage
-        else if (location.origin.indexOf(applicationURLs.prod) !== -1) clt = config.iniAppProd;
+        else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
+        else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
         
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
@@ -452,8 +452,8 @@ export const refreshToken = async () => {
     let clt = { }
     if (location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
     else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
-    else if (location.origin.indexOf(applicationURLs.stage) !== -1) clt = config.iniAppStage
-    else if (location.origin.indexOf(applicationURLs.prod) !== -1) clt = config.iniAppProd;
+    else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
+    else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
     const response = await fetch(`https://api.box.com/oauth2/token/`, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
