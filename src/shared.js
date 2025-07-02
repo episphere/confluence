@@ -405,43 +405,96 @@ export const getFileVersions = async (id) => {
     }
 };
 
+// export const storeAccessToken = async () => {
+//     let parms = searchParms();
+//     if (parms.code) {
+//         // Exchange code for authorization token
+//         let clt = { }
+//         if (location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
+//         else if (applicationURLs.dev.indexOf(location.origin) !== -1) clt = config.iniAppStage;
+//         else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
+//         else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
+//         document.getElementById('confluenceDiv').innerHTML = '';
+//         let url = `https://api.box.com/oauth2/token/`;
+//         const response = await fetch(url, {
+//             headers: {
+//                 'Content-Type': 'application/x-www-form-urlencoded'
+//             },
+//             method:'POST',
+//             body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+//         });
+//         console.log(response);
+//         if (response.status && response.status === 200) {
+//             localStorage.parms = JSON.stringify(await response.json());
+//             window.history.replaceState({},'', './#home');
+//             confluence();
+//             document.getElementById('loginBoxAppDev').hidden = true;
+//             document.getElementById('loginBoxAppStage').hidden = true;
+//             document.getElementById('loginBoxAppEpisphere').hidden = true;
+//             document.getElementById('loginBoxAppProd').hidden = true;
+//         }
+//     } else {
+//         if (localStorage.parms) {
+//             confluence.parms=JSON.parse(localStorage.parms)
+//             if (confluence.parms.access_token === undefined) {
+//                 localStorage.clear();
+//                 alert('access token not found, please contact system administrator');
+//             }
+//         }
+//     }
+// };
+
 export const storeAccessToken = async () => {
-    let parms = searchParms();
-    if (parms.code) {
-        // Exchange code for authorization token
-        let clt = { }
-        if (location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
-        else if (applicationURLs.dev.indexOf(location.origin) !== -1) clt = config.iniAppStage;
-        else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
-        else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
-        document.getElementById('confluenceDiv').innerHTML = '';
-        let url = `https://api.box.com/oauth2/token/`;
-        const response = await fetch(url, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            method:'POST',
-            body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
-        });
-        console.log(response);
-        if (response.status && response.status === 200) {
-            localStorage.parms = JSON.stringify(await response.json());
-            window.history.replaceState({},'', './#home');
-            confluence();
-            document.getElementById('loginBoxAppDev').hidden = true;
-            document.getElementById('loginBoxAppStage').hidden = true;
-            document.getElementById('loginBoxAppEpisphere').hidden = true;
-            document.getElementById('loginBoxAppProd').hidden = true;
-        }
-    } else {
-        if (localStorage.parms) {
-            confluence.parms=JSON.parse(localStorage.parms)
-            if (confluence.parms.access_token === undefined) {
-                localStorage.clear();
-                alert('access token not found, please contact system administrator');
-            }
-        }
+  let parms = searchParms();
+  if (parms.code) {
+    //exchange code for authorization token
+    let clt = {};
+    if (location.origin.indexOf("episphere") !== -1) clt = config.iniAppDev;
+    else if (location.origin.indexOf("localhost") !== -1) clt = config.iniAppLocal;
+    else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
+    else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
+    document.getElementById("confluenceDiv").innerHTML = "";
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("grant_type", "authorization_code");
+    urlencoded.append("client_id", clt.client_id);
+    urlencoded.append("client_secret", clt.server_id);
+    urlencoded.append("code", parms.code);
+
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      "https://api.box.com/oauth2/token",
+      requestOptions
+    );
+    if (response.status === 400) {
+      window.history.replaceState({}, "", "./#home");
     }
+    if (response.status && response.status === 200) {
+      localStorage.parms = JSON.stringify(await response.json());
+      window.history.replaceState({}, "", "./#home");
+      confluence();
+      document.getElementById("loginBoxAppDev").hidden = true;
+      document.getElementById("loginBoxAppStage").hidden = true;
+      document.getElementById("loginBoxAppEpisphere").hidden = true;
+      document.getElementById("loginBoxAppProd").hidden = true;
+    }
+  } else {
+    if (localStorage.parms) {
+      confluence.parms = JSON.parse(localStorage.parms);
+      if (confluence.parms.access_token === undefined) {
+        localStorage.clear();
+        alert("access token not found, please contact system administrator");
+      }
+    }
+  }
 };
 
 export const refreshToken = async () => {
