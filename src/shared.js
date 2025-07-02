@@ -412,7 +412,7 @@ export const storeAccessToken = async () => {
         // Exchange code for authorization token
         let clt = { }
         if (location.origin.indexOf('localhost') !== -1) clt = config.iniAppLocal;
-        else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
+        else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppStage;
         else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
         else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
         console.log(clt);
