@@ -34,7 +34,7 @@ export const confluenceResources = () => {
                     The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                 </div>
                 <div class="consortia-desc">
-                    <a href="mailto:wei.zheng@vanderbilt.edu" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium </a> (AABCG)</br>
+                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium </a> (AABCG)</br>
                     The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                 </div>
                 <div class="consortia-desc">
@@ -115,7 +115,7 @@ export const confluenceResourcesDes = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td><a>African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
+                            <td><a href="https://aabcg.app.vumc.org/" class="external-url" data-href="https://aabcg.app.vumc.org/" data-toggle="modal" data-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
                             <!--<td>Wei Zheng (Vanderbilt University Medical Center)</td>
                             <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>-->
                             <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
