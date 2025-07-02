@@ -407,7 +407,6 @@ export const getFileVersions = async (id) => {
 
 export const storeAccessToken = async () => {
     let parms = searchParms();
-    console.log(parms);
     if (parms.code) {
         // Exchange code for authorization token
         let clt = { }
@@ -415,7 +414,6 @@ export const storeAccessToken = async () => {
         else if (applicationURLs.dev.indexOf(location.origin) !== -1) clt = config.iniAppStage;
         else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
         else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
-        console.log(clt);
         document.getElementById('confluenceDiv').innerHTML = '';
         let url = `https://api.box.com/oauth2/token/`;
         const response = await fetch(url, {
