@@ -1308,7 +1308,7 @@ export const handleRangeRequests = async () => {
 export const applicationURLs = {
     'dev': 'https://episphere.github.io',
     'stage': 'https://epidataplatforms-stage.cancer.gov/confluence',
-    'prod': 'https://confluence.cancer.gov',
+    'prod': 'https://epidataplatforms.cancer.gov/confluence',
     'local': 'http://localhost'
 };
 

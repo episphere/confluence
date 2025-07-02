@@ -48,8 +48,10 @@ export const confluence = async () => {
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         const loginBoxAppStage = document.getElementById('loginBoxAppStage');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
-        if (location.origin.match(applicationURLs.stage)) loginBoxAppStage.hidden = false;
-        if (location.origin.match(applicationURLs.prod)) loginBoxAppProd.hidden = false;
+        // if (location.origin.match(applicationURLs.stage)) loginBoxAppStage.hidden = false;
+        // if (location.origin.match(applicationURLs.prod)) loginBoxAppProd.hidden = false;
+        if (applicationURLs.stage.includes(location.origin)) loginBoxAppStage.hidden = false;
+        if (applicationURLs.prod.includes(location.origin)) loginBoxAppProd.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppEpisphere.hidden = false;
         storeAccessToken();
         manageRouter();
@@ -68,7 +70,7 @@ export const confluence = async () => {
         navBarOptions.innerHTML = navBarMenutemplate();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
-        const dataSubmissionElement = document.getElementById('dataSubmission');
+        // const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataSummarySubsetElement = document.getElementById('dataSummarySubset');
         const dataDictionaryElement = document.getElementById('dataDictionary');
@@ -81,21 +83,21 @@ export const confluence = async () => {
         const authTableElement = document.getElementById('authTable');
         const acceptedFormsElement = document.getElementById('acceptedForms');
 
-        if (dataSubmissionElement) {
-            dataSubmissionElement.addEventListener('click', async () => {
-                if (dataSubmissionElement.classList.contains('navbar-active')) return;
+        // if (dataSubmissionElement) {
+        //     dataSubmissionElement.addEventListener('click', async () => {
+        //         if (dataSubmissionElement.classList.contains('navbar-active')) return;
                 
-                showAnimation();
-                assignNavbarActive(dataSubmissionElement, 2);
-                document.title = 'Confluence - Data Submit';
-                confluenceDiv.innerHTML = await dataSubmissionTemplate();
-                lazyload();
-                addEventStudyRadioBtn();
-                addEventConsortiaSelect();
-                addEventUploadStudyForm();
-                hideAnimation();
-            });
-        }
+        //         showAnimation();
+        //         assignNavbarActive(dataSubmissionElement, 2);
+        //         document.title = 'Confluence - Data Submit';
+        //         confluenceDiv.innerHTML = await dataSubmissionTemplate();
+        //         lazyload();
+        //         addEventStudyRadioBtn();
+        //         addEventConsortiaSelect();
+        //         addEventUploadStudyForm();
+        //         hideAnimation();
+        //     });
+        // }
         if (dataSummaryElement) {
             dataSummaryElement.addEventListener('click', () => {
                 if (dataSummaryElement.classList.contains('navbar-active')) return;
