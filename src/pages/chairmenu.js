@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json } from "../shared.js";
+import { getCollaboration, getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
@@ -1404,11 +1404,16 @@ export const authTableTemplate = () => {
     let template = `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
-                <div class="main-summary-row">
-                    <div class="align-left">
-                        <h1 class="page-header">Admin Table View</h1>
-                    </div>  
-                </div>
+              <div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class="align-left">
+                      <h1 class="page-header">Admin Table View</h1>
+                  </div>
+                  <div class="align-right">
+                      <button type="submit" id="submitID" class="buttonsubmit" onclick="this.classList.toggle('buttonsubmit--loading')"> 
+                        <span class="buttonsubmit__text"> Update Users </span>
+                      </button>
+                  </div>
+              </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
                     <div class="tab-content" id="selectedTab">
                         <div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab">
@@ -2200,4 +2205,465 @@ export const copyComments = async (comments, fileId) => {
             await createComment(fileId, submitMessage);
         }
     }
+};
+
+export const testingDataGov = async () => {
+  console.log("testingDataLoaded")
+  const testform = document.getElementById("submitID");
+  testform.addEventListener("click", function(e) {
+    e.preventDefault();
+    dataGovTest();
+  });
+};
+
+export const dataGovTest = async () => {
+  console.log("testing data gov test function");
+  ///
+  const responseData = csv2Json(await getFile(1932355916952)); // Get summary level data
+  const lastModified = (await getFileInfo(1932355916952)).modified_at;
+  console.log(responseData.headers);
+  console.log(responseData.data);
+  console.log(lastModified);
+  const getCollaborators_Metadata = await getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders');
+  const getCollaborators_Events = await getCollaboration(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folders');
+  const getCollaborators_Upload = await getCollaboration(submitterFolder, 'folders');
+
+  console.log(getCollaborators_Events.entries);
+  console.log(getCollaborators_Metadata.entries);
+  console.log(getCollaborators_Upload.entries);
+
+  const emailsInMetadata = getCollaborators_Metadata.entries.map(collab => collab.accessible_by.login);
+  const emailsInEventsdata = getCollaborators_Events.entries.map(collab => collab.accessible_by.login);
+  const emailsInUploaddata = getCollaborators_Upload.entries.map(collab => collab.accessible_by.login);
+
+  const allEmails = responseData.data.map(user => user.Email);
+
+  // Metadata
+  const includedEmailsMetadata = allEmails.filter(email => emailsInMetadata.includes(email));
+  const notIncludedEmailsMetadata = allEmails.filter(email => !emailsInMetadata.includes(email));
+
+  // Events
+  const includedEmailsEvents = allEmails.filter(email => emailsInEventsdata.includes(email));
+  const notIncludedEmailsEvents = allEmails.filter(email => !emailsInEventsdata.includes(email));
+
+  // Upload
+  const includedEmailsUpload = allEmails.filter(email => emailsInUploaddata.includes(email));
+  const notIncludedEmailsUpload = allEmails.filter(email => !emailsInUploaddata.includes(email));
+
+  console.log('Metadata - Included:', includedEmailsMetadata);
+  console.log('Metadata - Not included:', notIncludedEmailsMetadata);
+  console.log('Events - Included:', includedEmailsEvents);
+  console.log('Events - Not included:', notIncludedEmailsEvents);
+  console.log('Upload - Included:', includedEmailsUpload);
+  console.log('Upload - Not included:', notIncludedEmailsUpload);
+
+  // Show modal and add missing collaborators
+  let successfulUpdate = '';
+  let issueCount = 0;
+  const header = document.getElementById("confluenceModalHeader");
+  const body = document.getElementById("confluenceModalBody");
+  header.innerHTML = `
+      <h5 class="modal-title">Confirm Adding Collaborators</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  `;
+
+  let confirmationList = '<p><strong>The following users will be added:</strong></p>';
+  for (const email of notIncludedEmailsMetadata) {
+    confirmationList += `<p>User: ${email}, Folder: Metadata, Permission: viewer</p>`;
+  }
+  for (const email of notIncludedEmailsEvents) {
+    confirmationList += `<p>User: ${email}, Folder: Events, Permission: viewer</p>`;
+  }
+  for (const email of notIncludedEmailsUpload) {
+    confirmationList += `<p>User: ${email}, Folder: Upload, Permission: uploader</p>`;
+  }
+
+  body.innerHTML = `
+    ${confirmationList}
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmAddCollaborators">OK - Add Collaborators</button>
+    </div>
+  `;
+
+  $("#confluenceMainModal").modal("show");
+
+// Add event listener for confirmation
+document.getElementById("confirmAddCollaborators").addEventListener("click", async () => {
+  body.innerHTML = '<div id="collaboratorList"><p>Adding collaborators...</p></div>';
+  const listElement = document.getElementById("collaboratorList");
+  
+  // Add delay function and rate limiting
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let requestCount = 0;
+  
+  // Add missing collaborators with rate limiting
+  for (const email of notIncludedEmailsMetadata) {
+    if (requestCount >= 50) {
+      listElement.innerHTML += `<p>Rate limit reached, waiting 60 seconds...</p>`;
+      await delay(60000);
+      requestCount = 0;
+    }
+    listElement.innerHTML += `<p>Adding User: ${email}, Folder: Metadata, Permission: viewer</p>`;
+    successfulUpdate = await addNewCollaborator(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folder', email, 'viewer');
+    requestCount++;
+    if (successfulUpdate.status == '200') {
+      listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Metadata, Permission: viewer</p>`;
+    } else {
+      listElement.innerHTML += `<p><span style="color: red;">Failed</span>: ${email}, Folder: Metadata, Permission: viewer</p>`;
+      issueCount += 1;
+    }
+  }
+  
+  for (const email of notIncludedEmailsEvents) {
+    if (requestCount >= 50) {
+      listElement.innerHTML += `<p>Rate limit reached, waiting 60 seconds...</p>`;
+      await delay(60000);
+      requestCount = 0;
+    }
+    listElement.innerHTML += `<p>Adding User: ${email}, Folder: Events, Permission: viewer</p>`;
+    successfulUpdate = await addNewCollaborator(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folder', email, 'viewer');
+    requestCount++;
+    if (successfulUpdate.status == '200') {
+      listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Events, Permission: viewer</p>`;
+    } else {
+      listElement.innerHTML += `<p><span style="color: red;">Failed</span>: ${email}, Folder: Events, Permission: viewer</p>`;
+      issueCount += 1;
+    }
+  }
+  
+  for (const email of notIncludedEmailsUpload) {
+    if (requestCount >= 50) {
+      listElement.innerHTML += `<p>Rate limit reached, waiting 60 seconds...</p>`;
+      await delay(60000);
+      requestCount = 0;
+    }
+    listElement.innerHTML += `<p>Adding User: ${email}, Folder: Upload, Permission: uploader</p>`;
+    successfulUpdate = await addNewCollaborator(submitterFolder, 'folder', email, 'uploader');
+    requestCount++;
+    if (successfulUpdate.status == '200') {
+      listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Upload, Permission: uploader</p>`;
+    } else {
+      listElement.innerHTML += `<p><span style="color: red;">Failed</span>: ${email}, Folder: Upload, Permission: uploader</p>`;
+      issueCount += 1;
+    }
+  }
+  
+  console.log(issueCount);
+  if (issueCount > 0) {
+    listElement.innerHTML += `<p><strong>${issueCount} issues detected. Please review list or try again.</strong></p>`;
+  } else {
+    listElement.innerHTML += '<p><strong>All collaborators added successfully!</strong></p>';
+  }
+});
+
+
+
+  ///
+  document.getElementById("submitID").classList.toggle('buttonsubmit--loading');
+  // let val = '0';
+  // if(document.getElementById('folderID')) {
+  //   val = document.getElementById('folderID').value
+  // } else {
+  //   val = dataPlatformDataFolder;
+  // }
+  // console.log(val);
+  // const array = await getFolderInfo(val); //DCEG: 196554876811 BCRP: 145995765326, Confluence: 137304373658
+  // if (!array) {
+  //   document.getElementById("submitID").classList.toggle('buttonsubmit--loading');
+  //   alert("Error: Please input a valid folder ID and check that you have the necessary permissions to access it.");
+  //   return false;
+  // }
+
+  // let template =
+  //   '<div class="card-body data-governance"><ul class="ul-list-style first-list-item collapsible-items p-0 m-0">';
+  // const ID = array.id;
+  // const consortiaName = array.name;
+  // let type = array.type;
+  // let liClass = type === "folder" ? "collapsible consortia-folder" : "";
+  // let title = type === "folder" ? "Expand / Collapse" : "";
+  // template += `<li class="collapsible-items">
+  //           <button class="${liClass}" data-toggle="collapse" href="#toggle${ID}">
+  //               <i title="${title}" data-type="${type}" data-id="${ID}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
+  //           </button> ${consortiaName}
+  //       </li>
+  //       `;
+  // template += `</ul></div></div>`;
+  // document.getElementById("folderInput").innerHTML = template;
+  // dataGovernanceLazyLoad();
+  // dataGovernanceCollaboration();
+  // document.getElementById("submitID").classList.toggle('buttonsubmit--loading');
+  // return false;
+}
+export const dataGovernanceProjects = async () => {
+  console.log("Event Clicked");
+  const response = await getFolderItems(0);
+  console.log(response);
+  const projectArray = filterProjects(response.entries);
+  console.log(projectArray);
+  const div = document.getElementById("dataGovernanceProjects");
+  let template = "";
+  let checker = false;
+  for (let obj = 0; obj < projectArray.length; obj++) {
+    if (checker === false) {
+      const bool = checkMyPermissionLevel(
+        await getCollaboration(
+          projectArray[obj].id,
+          `${projectArray[obj].type}s`
+        ),
+        JSON.parse(localStorage.parms).login
+      );
+      if (bool === true) checker = true;
+    }
+  }
+  if (checker === true) {
+    for (let obj = 0; obj < projectArray.length; obj++) {
+      const bool = checkMyPermissionLevel(
+        await getCollaboration(
+          projectArray[obj].id,
+          `${projectArray[obj].type}s`
+        ),
+        JSON.parse(localStorage.parms).login
+      );
+      if (obj === 0)
+        template += `<div class="card" style="border: 0px;"><div class="card-header">
+                                            <label class="dataSummary-label">Project(s)</label>
+                                        </div> 
+                                        <div class="card-body data-governance">
+                                            <ul class="ul-list-style first-list-item">`;
+      if (bool === true) {
+        const projectName = projectArray[obj].name;
+        let type = projectArray[obj].type;
+        let liClass = type === "folder" ? "collapsible consortia-folder" : "";
+        let title = type === "folder" ? "Expand / Collapse" : "";
+        template += `
+                <li class="collapsible-items">
+                    <button class="${liClass}" data-toggle="collapse" href="#toggle${projectArray[obj].id}">
+                        <i title="${title}" data-folder-name="${projectName}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
+                    </button> ${projectName}
+                </li>
+                `;
+      }
+      if (obj === projectArray.length - 1) template += `</ul></div></div>`;
+    }
+  }
+  div.innerHTML = template;
+
+  dataGovernanceLazyLoad();
+};
+export const dataGovernanceLazyLoad = (element) => {
+  let spinners = document.getElementsByClassName("lazy-loading-spinner");
+  if (element)
+    spinners = element.parentNode.querySelectorAll(".lazy-loading-spinner");
+  console.log(spinners);
+  Array.from(spinners).forEach(async (element) => {
+    const id = element.dataset.id;
+    const status = element.dataset.status;
+    const folderName = element.dataset.folderName;
+    const type = element.dataset.type;
+    if (type && JSON.parse(localStorage.parms).login && id !== "0") {
+      const bool = await checkMyPermissionLevel(await getCollaboration(id, `${type}s`), JSON.parse(localStorage.parms).login, id, type);
+      if (bool === true) {
+        const button = document.createElement("button");
+        button.dataset.dismiss = "modal";
+        button.dataset.toggle = "modal";
+        button.dataset.target = "#modalShareFolder";
+        button.classList = ["share-folder"];
+        button.dataset.permissionType = "restrict";
+        button.dataset.folderId = id;
+        button.title = "Manage collaboration";
+        button.dataset.folderName = folderName;
+        button.dataset.objectType = type;
+        button.innerHTML = `<i class="fas fa-share"></i>`;
+        element.parentNode.parentNode.appendChild(button);
+        shareData(button);
+      } else {
+        element.dataset.sharable = "no";
+      }
+    }
+    if (status !== "pending") return;
+    let allEntries = (await getFolderItems(id)).entries;
+    if (allEntries.length === 0) {
+      element.classList = ["fas fa-exclamation-circle"];
+      element.title = "Empty folder";
+    }
+    allEntries = allEntries.filter((dt) => dt.name !== "Study Documents");
+    element.dataset.status = "complete";
+    const entries = filterStudiesDataTypes(allEntries);
+    const fileEntries = allEntries.filter((obj) => obj.type === "file");
+
+    if (entries.length > 0) {
+      const ul = document.createElement("ul");
+      ul.classList = ["ul-list-style collapse"];
+      ul.id = `toggle${id}`;
+
+      for (const obj of entries) {
+        const li = document.createElement("li");
+        li.classList = ["collapsible-items"];
+        let type = obj.type;
+        let liClass = type === "folder" ? "collapsible consortia-folder" : "";
+        let title = type === "folder" ? "Expand / Collapse" : "";
+        li.innerHTML = `<button class="${liClass}" data-toggle="collapse" href="#toggle${
+          obj.id
+        }">
+                    <i title="${title}" data-folder-name="${
+          obj.name
+        }" data-id="${obj.id}" ${
+          element.dataset.sharable && element.dataset.sharable === "no"
+            ? `data-sharable = "no"`
+            : ``
+        } data-status="pending" class="lazy-loading-spinner"></i>
+                </button> ${obj.name}`;
+
+        if (!element.dataset.sharable) {
+          const button = document.createElement("button");
+          button.dataset.dismiss = "modal";
+          button.dataset.toggle = "modal";
+          button.dataset.target = "#modalShareFolder";
+          button.classList = ["share-folder"];
+          button.dataset.folderId = obj.id;
+          button.dataset.folderName = obj.name;
+          button.dataset.objectType = type;
+          button.title = "Manage collaboration";
+          button.innerHTML = `<i class="fas fa-share"></i>`;
+          li.appendChild(button);
+          shareData(button);
+        }
+        ul.appendChild(li);
+      }
+
+      element.classList.remove("lazy-loading-spinner");
+      element.classList.add("fas");
+      element.classList.add("fa-folder-plus");
+      element.parentNode.parentNode.appendChild(ul);
+      eventsDataSubmissions(element.parentNode);
+    } else if (fileEntries.length > 0) {
+      const ul = document.createElement("ul");
+      ul.classList = ["ul-list-style collapse"];
+      ul.id = `toggle${id}`;
+
+      for (const obj of fileEntries) {
+        const li = document.createElement("li");
+        li.classList = ["collapsible-items"];
+        li.innerHTML = `<a>
+                        <i title="file" data-folder-name="${
+                          obj.name
+                        }" data-id="${obj.id}" data-status="pending"${
+          element.dataset.sharable && element.dataset.sharable === "no"
+            ? `data-sharable = "no"`
+            : ``
+        } class="fas fa-file-alt"></i>
+                        </a> <span title="${obj.name}">${
+          obj.name.length > 20 ? `${obj.name.slice(0, 20)}...` : `${obj.name}`
+        }</span>
+                    `;
+
+        if (!element.dataset.sharable) {
+          const button1 = document.createElement("button");
+          button1.dataset.toggle = "modal";
+          button1.dataset.target = "#modalShareFolder";
+          button1.classList = ["share-folder"];
+          button1.dataset.folderId = obj.id;
+          button1.dataset.folderName = obj.name;
+          button1.dataset.objectType = obj.type;
+          button1.title = "Manage collaboration";
+          button1.innerHTML = `<i class="fas fa-share"></i>`;
+          li.appendChild(button1);
+          shareData(button1);
+
+          const button2 = document.createElement("button");
+          button2.dataset.toggle = "modal";
+          button2.dataset.target = "#modalFileAccessStats";
+          button2.classList = ["file-access-stats"];
+          button2.dataset.fileId = obj.id;
+          button2.dataset.fileName = obj.name;
+          button2.dataset.objectType = obj.type;
+          button2.title = "File access stats";
+          button2.innerHTML = `<i class="fas fa-info-circle"></i>`;
+          li.appendChild(button2);
+          addEventFileStats(button2);
+        }
+        ul.appendChild(li);
+      }
+
+      element.classList.remove("lazy-loading-spinner");
+      element.classList.add("fas");
+      element.classList.add("fa-folder-plus");
+      element.parentNode.parentNode.appendChild(ul);
+      eventsDataSubmissions(element.parentNode);
+    }
+  });
+};
+export const eventsDataSubmissions = (element) => {
+  element.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (
+      element.getElementsByClassName("fa-folder-minus").length > 0 &&
+      element
+        .getElementsByClassName("fa-folder-minus")[0]
+        .classList.contains("fa-folder-minus")
+    ) {
+      element
+        .getElementsByClassName("fa-folder-minus")[0]
+        .classList.add("fa-folder-plus");
+      element
+        .getElementsByClassName("fa-folder-minus")[0]
+        .classList.remove("fa-folder-minus");
+    } else {
+      element
+        .getElementsByClassName("fa-folder-plus")[0]
+        .classList.add("fa-folder-minus");
+      element
+        .getElementsByClassName("fa-folder-plus")[0]
+        .classList.remove("fa-folder-plus");
+      if (
+        document.getElementsByClassName("lazy-loading-spinner").length !== 0
+      ) {
+        dataGovernanceLazyLoad(element);
+      }
+    }
+  });
+};
+
+export const dataGovernanceCollaboration = () => {
+  let consortiaFolder = document.getElementsByClassName("consortia-folder");
+  Array.from(consortiaFolder).forEach((element) => {
+    element.dispatchEvent(new Event("click"));
+  });
+};
+
+export const shareData = (element) => {
+  const btn1 = document.getElementById("addNewCollaborators");
+  const folderToShare = document.getElementById("folderToShare");
+  addEventAddNewCollaborator();
+  addEventShowAllCollaborator();
+  addEventShowExtCollaborator();
+  element.addEventListener("click", () => {
+    folderToShare.dataset.folderId = element.dataset.folderId;
+    folderToShare.dataset.folderName = element.dataset.folderName;
+    folderToShare.dataset.objectType = element.dataset.objectType;
+    btn1.dispatchEvent(new Event("click"));
+  });
+};
+
+export const addFields = (id, bool) => {
+  let template = "";
+  template += `
+    <div class="form-group col-lg-9">
+        <textarea id="shareFolderEmail${id}" required class="form-control" placeholder="Enter comma separated email addresses" require  rows="2"></textarea>
+    </div>
+    <div class="form-group col-lg-3">
+    <select class="form-control" required id="folderRole${id}">
+        <option value=""> -- Select role -- </option>
+    `;
+
+  if (bool) template += `<option value="viewer">Viewer</option>`;
+  else {
+    for (let key in boxRoles) {
+      template += `<option value="${key}">${key}</option>`;
+    }
+  }
+
+  template += `</select></div>`;
+  return template;
 };

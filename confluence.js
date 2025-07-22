@@ -3,7 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate, templateAfterLogin as dataRequestTemplateAfterLogin} from './src/pages/dataRequest.js';
-import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
+import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, testingDataGov } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions } from './src/shared.js';
@@ -233,6 +233,8 @@ export const confluence = async () => {
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
+                authTableTemplate();
+                testingDataGov();
             });
         }
         if (acceptedFormsElement) {
@@ -446,6 +448,7 @@ const manageRouter = async () => {
         assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = AuthTableTemplate();
         generateAuthTableFiles();
+        testingDataGov();
     }
     else if (hash === '#accepted_forms') {
         const element = document.getElementById('acceptedForms');
