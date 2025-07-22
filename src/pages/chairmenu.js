@@ -2322,7 +2322,7 @@ document.getElementById("confirmAddCollaborators").addEventListener("click", asy
       requestCount = 0;
     }
     listElement.innerHTML += `<p>Adding User: ${email}, Folder: Events, Permission: viewer</p>`;
-    successfulUpdate = await addNewCollaborator(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folder', email, 'viewer');
+    successfulUpdate = await addNewCollaborator(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folder', email, 'previewer');
     requestCount++;
     if (successfulUpdate.status == '200') {
       listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Events, Permission: viewer</p>`;
