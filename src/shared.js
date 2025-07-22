@@ -16,6 +16,9 @@ export const returnToSubmitterFolder = 200908340220;
 export const completedFolder = 200926990513;
 export const DACCmembers = 1221222994319;
 export const conceptForm = 1154394600696;
+export const boxUpdateFile = 1221222994319;
+export const Confluence_Data_Platform_Events_Page_Shared_with_Investigators = 155546882525;
+export const Confluence_Data_Platform_Metadata_Shared_with_Investigators = 137304373658;
 
 export const chairsInfo = [
     {id: 'user_1', email:"ahearntu@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
