@@ -50,7 +50,7 @@ export const confluenceResources = () => {
                     The MERGE is a GWAS of male breast cancer cases and similar number of controls.
                 </div>
                 <div class="consortia-desc">
-                    Studies not part of a breast cancer consortia are participating through a direct collaboration with the National Cancer Institute, Division of Cancer Epidemiology and Genetics.
+                    Studies not part of a breast cancer consortia are participating through a direct collaboration with the National Cancer Institute, Division of Cancer Epidemiology and Genetics (C-NCI).
                 </div>
                 <div class="consortia-desc">
                     For more information:</br>
@@ -124,7 +124,7 @@ export const confluenceResourcesDes = () => {
                             <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
                             <!--<td>Roger Milne (Cancer Council Victoria)</td>
                             <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>-->
-                            <td style="text-align: center">TBD</td>
+                            <td style="text-align: center">Not Available</td>
                         </tr>
                         <tr>
                             <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
