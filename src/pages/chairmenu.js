@@ -2232,9 +2232,26 @@ export const dataGovTest = async () => {
   console.log(getCollaborators_Metadata.entries);
   console.log(getCollaborators_Upload.entries);
 
-  const emailsInMetadata = getCollaborators_Metadata.entries.map(collab => collab.accessible_by.login);
-  const emailsInEventsdata = getCollaborators_Events.entries.map(collab => collab.accessible_by.login);
-  const emailsInUploaddata = getCollaborators_Upload.entries.map(collab => collab.accessible_by.login);
+  const emailsInMetadata = getCollaborators_Metadata.entries.map(collab => {
+    if (collab.accessible_by) return collab.accessible_by.login;
+    if (collab.invite_email) return collab.invite_email;
+    console.error('Error: Both accessible_by and invite_email are null for:', collab);
+    return null;
+  }).filter(email => email !== null);
+  
+  const emailsInEventsdata = getCollaborators_Events.entries.map(collab => {
+    if (collab.accessible_by) return collab.accessible_by.login;
+    if (collab.invite_email) return collab.invite_email;
+    console.error('Error: Both accessible_by and invite_email are null for:', collab);
+    return null;
+  }).filter(email => email !== null);
+  
+  const emailsInUploaddata = getCollaborators_Upload.entries.map(collab => {
+    if (collab.accessible_by) return collab.accessible_by.login;
+    if (collab.invite_email) return collab.invite_email;
+    console.error('Error: Both accessible_by and invite_email are null for:', collab);
+    return null;
+  }).filter(email => email !== null);
 
   const allEmails = responseData.data.map(user => user.Email);
 
@@ -2267,29 +2284,37 @@ export const dataGovTest = async () => {
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
   `;
 
-  let confirmationList = '<p><strong>The following users will be added:</strong></p>';
-  for (const email of notIncludedEmailsMetadata) {
-    confirmationList += `<p>User: ${email}, Folder: Metadata, Permission: viewer</p>`;
-  }
-  for (const email of notIncludedEmailsEvents) {
-    confirmationList += `<p>User: ${email}, Folder: Events, Permission: viewer</p>`;
-  }
-  for (const email of notIncludedEmailsUpload) {
-    confirmationList += `<p>User: ${email}, Folder: Upload, Permission: uploader</p>`;
+  const hasUsersToAdd = notIncludedEmailsMetadata.length > 0 || notIncludedEmailsEvents.length > 0 || notIncludedEmailsUpload.length > 0;
+  
+  let confirmationList;
+  if (hasUsersToAdd) {
+    confirmationList = '<p><strong>The following users will be added:</strong></p>';
+    for (const email of notIncludedEmailsMetadata) {
+      confirmationList += `<p>User: ${email}, Folder: Metadata, Permission: viewer</p>`;
+    }
+    for (const email of notIncludedEmailsEvents) {
+      confirmationList += `<p>User: ${email}, Folder: Events, Permission: viewer</p>`;
+    }
+    for (const email of notIncludedEmailsUpload) {
+      confirmationList += `<p>User: ${email}, Folder: Upload, Permission: uploader</p>`;
+    }
+  } else {
+    confirmationList = '<p>No users to be added</p>';
   }
 
   body.innerHTML = `
     ${confirmationList}
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="confirmAddCollaborators">OK - Add Collaborators</button>
+      <button type="button" class="btn btn-primary" id="confirmAddCollaborators" ${!hasUsersToAdd ? 'disabled' : ''}>OK - Add Collaborators</button>
     </div>
   `;
 
   $("#confluenceMainModal").modal("show");
 
 // Add event listener for confirmation
-document.getElementById("confirmAddCollaborators").addEventListener("click", async () => {
+if (hasUsersToAdd) {
+  document.getElementById("confirmAddCollaborators").addEventListener("click", async () => {
   body.innerHTML = '<div id="collaboratorList"><p>Adding collaborators...</p></div>';
   const listElement = document.getElementById("collaboratorList");
   
@@ -2321,13 +2346,13 @@ document.getElementById("confirmAddCollaborators").addEventListener("click", asy
       await delay(60000);
       requestCount = 0;
     }
-    listElement.innerHTML += `<p>Adding User: ${email}, Folder: Events, Permission: viewer</p>`;
+    listElement.innerHTML += `<p>Adding User: ${email}, Folder: Events, Permission: previewer</p>`;
     successfulUpdate = await addNewCollaborator(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folder', email, 'previewer');
     requestCount++;
     if (successfulUpdate.status == '200') {
-      listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Events, Permission: viewer</p>`;
+      listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${email}, Folder: Events, Permission: previewer</p>`;
     } else {
-      listElement.innerHTML += `<p><span style="color: red;">Failed</span>: ${email}, Folder: Events, Permission: viewer</p>`;
+      listElement.innerHTML += `<p><span style="color: red;">Failed</span>: ${email}, Folder: Events, Permission: previewer</p>`;
       issueCount += 1;
     }
   }
@@ -2355,7 +2380,8 @@ document.getElementById("confirmAddCollaborators").addEventListener("click", asy
   } else {
     listElement.innerHTML += '<p><strong>All collaborators added successfully!</strong></p>';
   }
-});
+  });
+}
 
 
 
