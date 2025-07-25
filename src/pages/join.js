@@ -36,7 +36,7 @@ export const confluenceResources = () => {
                     The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                 </div>
                 <div class="consortia-desc">
-                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer">African-ancestry Breast Cancer Genetic Consortium </a> (AABCG)</br>
+                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://aabcg.app.vumc.org" data-toggle="modal" data-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
                     The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                 </div>
                 <div class="consortia-desc">
