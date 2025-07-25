@@ -1172,7 +1172,7 @@ export const addEventVariableDefinitions = () => {
             let variableName = '';
             let definition = '';
             
-            if (variable === 'studyDesign') {
+            if (variable.toLowerCase() === 'studydesign') {
                 variableName = 'Study design'; 
                 definition = "Study type classified as ‘population based’ or ‘non-population based’";
             }
@@ -1278,6 +1278,7 @@ const addEventDataTypeRadio = () => {
             let summaryFolder = [];
             if (dataType === 'summary') {
                 summaryFolder = response.entries.filter(dt => dt.type === 'folder' && /_summary_statistics/i.test(dt.name) === true);
+                console.log(summaryFolder);
             }
             else {
                 summaryFolder = response.entries.filter(dt => dt.type === 'folder' && /_missingness_statistics/i.test(dt.name) === true);
@@ -1332,8 +1333,16 @@ const addEventUpdateSummaryStatsForm = () => {
             const response = await getFolderItems(id);
             
             let file = [];
-            if (dataType === 'summary') file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics.csv/i.test(dt.name) === true);
-            else file = response.entries.filter(dt => dt.type === 'file' && /_missingness_statistics.csv/i.test(dt.name) === true);
+            if (dataType === 'summary') {
+                if (response.entries.filter(dt => dt.type === 'folder')) {
+                    let folder = response.entries.filter(dt => dt.type === 'folder' && dt.name.includes("Continental"))
+                    console.log(folder);
+                    const response2 = await getFolderItems(folder[0].id);
+                    file = response2.entries.filter(dt => dt.type === 'file');
+                } else {
+                    file = response.entries.filter(dt => dt.type === 'file' && /_summary_statistics.csv/i.test(dt.name) === true);
+                }
+            } else file = response.entries.filter(dt => dt.type === 'file' && /_missingness_statistics.csv/i.test(dt.name) === true);
             if (file.length === 0) return;
             
             form.querySelectorAll('[type="submit"]')[0].innerHTML = `Processing ${file[0].name}...`;
@@ -1359,10 +1368,10 @@ const addEventUpdateSummaryStatsForm = () => {
                         uniqueStudies.push(obj.study);
                         publicDataObj[consortium].studies += 1;
                     }
-                    if (obj.status === 'case') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
-                    if (obj.status === 'control') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
-                    if (obj['Carrier_status'] && obj['Carrier_status'] === 'BRCA1') publicDataObj[consortium].BRCA1 += parseInt(obj.statusTotal);
-                    if (obj['Carrier_status'] && obj['Carrier_status'] === 'BRCA2') publicDataObj[consortium].BRCA2 += parseInt(obj.statusTotal);
+                    if (obj.status === 'case' && obj.statusTotal !== '') publicDataObj[consortium].cases += parseInt(obj.statusTotal);
+                    if (obj.status === 'control' && obj.statusTotal !== '') publicDataObj[consortium].controls += parseInt(obj.statusTotal);
+                    if (obj['Carrier_status'] && obj['Carrier_status'] === 'BRCA1' && obj.statusTotal !== '') publicDataObj[consortium].BRCA1 += parseInt(obj.statusTotal);
+                    if (obj['Carrier_status'] && obj['Carrier_status'] === 'BRCA2' && obj.statusTotal !== '') publicDataObj[consortium].BRCA2 += parseInt(obj.statusTotal);
                 })
             }
             

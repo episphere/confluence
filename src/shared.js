@@ -1172,7 +1172,7 @@ export const csvJSON = (csv) => {
     }
 
     for (let obj of result) {
-        obj.total = parseInt(obj['statusTotal']);
+        obj.total = obj['statusTotal'] === '' ? 0 : parseInt(obj['statusTotal']);
     }
 
     for (var k=0; k<result.length; k++) {
@@ -1240,6 +1240,7 @@ export const csv2Json = (csv) => {
         for (let j = 0; j<headers.length; j++) {
             if (currentline[j]) {
                 let value = headers[j];
+                if (value === 'StudyDesign') value = 'studyDesign';
                 obj[value] = currentline[j];
             }
         }

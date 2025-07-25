@@ -14,10 +14,7 @@ const chartLabels = {
 export const getFileContent = async () => {
     const {jsonData, headers} = csvJSON(await getFile(summaryStatsFileId)); // Get summary level data
     const lastModified = (await getFileInfo(summaryStatsFileId)).modified_at;
-    const dataCIMBA = csvJSON(await getFile(summaryStatsFileCIMBAID));
-    const jsonDataCIMBA = dataCIMBA.jsonData;
-    const headersCIMBA = dataCIMBA.headers;
-    
+
     document.getElementById('dataLastModified').innerHTML = `Data last modified at - ${new Date(lastModified).toLocaleString()}`;
     hideAnimation();
     
@@ -27,15 +24,15 @@ export const getFileContent = async () => {
     };
     
     renderAllCharts(jsonData, headers);
-    allFilters(jsonData, headers, jsonDataCIMBA, headersCIMBA, false);
+    allFilters(jsonData, headers, false);
 };
 
-const allFilters = (jsonData, headers, jsonDataCIMBA, headersCIMBA, cimba) => {
+const allFilters = (jsonData, headers, cimba) => {
     document.getElementById('allFilters').innerHTML = '';
     const div1 = document.createElement('div')
     div1.classList = ['row gender-select'];
 
-    jsonData = jsonData.concat(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
+    //jsonData = jsonData.concat(jsonDataCIMBA.filter(dt => dt.consortium === 'CIMBA'));
 
     let obj = aggegrateData(jsonData);
     let cont_reg = getUniqueConsortium(jsonData, 'continental_region');
@@ -218,7 +215,8 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     if (onlyCIMBA) {
         renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
         renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
-        generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow1');
+        renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
+        generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
         renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
         renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
     } else {
@@ -537,7 +535,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
             y: valueCount,
             type: 'bar',
             marker:{
-                color: ['#BF1B61', '#cb4880', '#d876a0','#e5a3bf', '#BF1B61', '#cb4880', '#d876a0','#e5a3bf']
+                color: getColors(allLabels.length)
             },
         }
     ];
