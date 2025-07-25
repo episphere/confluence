@@ -1,3 +1,5 @@
+import {addEventPreviewFile} from "./events.js"
+
 export const participatingConfluence = (activeTab, showDescripton) => {
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
@@ -68,6 +70,7 @@ const handleExternalLinks = () => {
     const externalLinks = document.querySelectorAll('.external-url');
     externalLinks.forEach(link => {
         link.addEventListener('click', (e) => {
+            e.preventDefault();
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
             
@@ -87,6 +90,8 @@ const handleExternalLinks = () => {
                     </a>
                 </div>
             `;
+            
+            $("#confluenceMainModal").modal("show");
         })
     });
 };
@@ -101,7 +106,7 @@ export const confluenceResourcesDes = () => {
         <div class="main-summary-row white-bg div-border">
             <div class="font-size-18 align-left modal-body">
                 The following Data Access Coordinating Committees (DACCs) provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
-                participating in Confluence is described in the <a href="https://nih.box.com/s/6d7ghyutf592zxplwvkgmlh42eicwa90" target="_blank" rel="noopener noreferrer">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</a>
+                participating in Confluence is described in the: <button class="btn preview-file" data-file-id="1079250442743" data-toggle="modal" data-target="#confluencePreviewerModal" style="background: none; border: none; color: #0d6efd; text-decoration: underline; padding: 0; font: inherit; cursor: pointer; vertical-align: baseline; display: inline;">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</button>
             </div>
             <div class="table-responsive text-start modal-body">
                 <table class="table table-striped table-hover">
@@ -116,39 +121,27 @@ export const confluenceResourcesDes = () => {
                     <tbody>
                         <tr>
                             <td><a href="https://aabcg.app.vumc.org/" class="external-url" data-href="https://aabcg.app.vumc.org/" data-toggle="modal" data-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
-                            <!--<td>Wei Zheng (Vanderbilt University Medical Center)</td>
-                            <td><a href="mailto:wei.zheng@vumc.org">wei.zheng@vumc.org</a></td>-->
-                            <td style="text-align: center"><a href="https://nih.box.com/s/h8i1u9gtkyq458mh4bsx49wj23sff75v" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104917145" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
                             <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
-                            <!--<td>Roger Milne (Cancer Council Victoria)</td>
-                            <td><a href="mailto:roger.milne@cancervic.org.au">roger.milne@cancervic.org.au</a></td>-->
                             <td style="text-align: center">Not Available</td>
                         </tr>
                         <tr>
                             <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
-                            <!--<td>Georgia Chenevix-Trench (QIMR Berghofer Medical Research Institute)</td>
-                            <td><a href="mailto:georgia.trench@qimrberghofer.edu.au">georgia.trench@qimrberghofer.edu.au</a></td>-->
-                            <td style="text-align: center"><a href="https://nih.box.com/s/5etp13wd3x0kudpf846ubljk3hl2n4pm" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104914745" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                             <tr>
                             <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
-                            <!--<td>Laura Fejerman (University of California, Davis)</td>
-                            <td><a href="mailto:lfejerman@ucdavis.edu">lfejerman@ucdavis.edu</a></td>-->
-                            <td style="text-align: center"><a href="https://nih.box.com/s/hctiub6qf9ptheagqh0j00iesm8onq6y" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104919545" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
                             <td>Male Breast Cancer Genetics Consortium (MERGE)</td>
-                            <!--<td>Nick Orr (Queen's University Belfast)</td>
-                            <td><a href="mailto:nick.orr@qub.ac.uk">nick.orr@qub.ac.uk</a></td>-->
-                            <td style="text-align: center"><a href="https://nih.box.com/s/xkcxyievmnt21b69okrr9nckt4py6xwy" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104912345" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
                             <td>Confluence National Cancer Institute Studies (C-NCI)</td>
-                            <!--<td>Dezheng Huo (The University of Chicago)</td>
-                            <td><a href="mailto:dhuo@bsd.uchicago.edu">dhuo@bsd.uchicago.edu</a></td>-->
-                            <td style="text-align: center"><a href="https://nih.box.com/s/h3ytm45ztzof8jmf4wkpfilzd9oyppd2" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt join"></i></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104924345" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -158,5 +151,6 @@ export const confluenceResourcesDes = () => {
     
     document.getElementById('overview').innerHTML = template;
     handleExternalLinks();
+    addEventPreviewFile();
     //hideAnimation();
 };

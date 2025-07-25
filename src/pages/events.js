@@ -241,7 +241,7 @@ export const eventsBody = async () => {
 //     addEventToggleCollapsePanelBtn();
 // };
 
-const addEventPreviewFile = () => {
+export const addEventPreviewFile = () => {
     const btns = Array.from(document.querySelectorAll('.preview-file'));
     btns.forEach(btn => {
         btn.addEventListener('click', () => {
