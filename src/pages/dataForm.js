@@ -28,7 +28,7 @@ export const formtemplate = () => {
                             </br></br>
 
                             Following submission of this form it will be reviewed by the Data Access Coordination 
-                            Committees (DACC) of the consortia participating in Confluence. For more information 
+                            Committees (DACC) of the consortia participating in the Confluence Project. For more information 
                             about the data access request process please see this description of the
                             <a href="#data_access" target="_blank" rel="noopener noreferrer">data access request 
                             process </a> and the <a href="#join/description" target="_blank" rel="noopener noreferrer">
@@ -54,7 +54,7 @@ export const formtemplate = () => {
                               <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             <div class="input-group form-check">
-                                <label for="amendment"><b>Is this an amendment?</b><span class='required-label'>*</span></label>
+                                <label for="amendment"><b>Is this an amendment to an approved Concept?</b><span class='required-label'>*</span></label>
                                 <div class="radio-group d-flex align-items-center" style="margin-top: -5px;">
                                     <div class="form-check form-check-inline">
                                         <input id="amendmentyes" name="amendment" type="radio" value="Yes" class="form-check-input" style="position: relative; top: -2px;" required/>
@@ -65,7 +65,7 @@ export const formtemplate = () => {
                                         <label class="form-check-label" for="amendmentno">No</label>
                                     </div>
                                 </div>
-                                <label for="ifamendmentyes"><i>If yes, provide Concept Number of original form</i></label>
+                                <label for="ifamendmentyes"><i>If yes, provide Concept Number of original form; please make a clear statement in the form below what the amendement is:</i></label>
                                 <input type="text" class="form-text-input" id="conNum" name="conNum" />
                             </div>
                             <div class="input-group">
@@ -81,7 +81,7 @@ export const formtemplate = () => {
                                 <input id="email" name="email" class="form-text-input" type="text" required/>
                             </div>
                             <div class="input-group">
-                                <label for="mem-con"><b>Member of Consortia or Study / Trial Group?</b><span class='required-label'>*</span></label>
+                                <label for="mem-con"><b>Member of Consortium?</b><span class='required-label'>*</span></label>
                             </div>
                             <div class="input-group">
                                 <div class="container-lg">
@@ -195,7 +195,7 @@ export const formtemplate = () => {
                             <div class="input-group">
                                 <div class="form-check">
                                     <input id="cost" name="cost" type="checkbox" value="Yes" class="form-check-input" style="position: relative; top: -2px;" required/>
-                                    <label class="form-check-label" for="cost"><b>Please acknowledge, researchers that are approved to access data shared with the Confluence Project on a cloud-based, TRE are responsible for paying the compute and data storage costs from using the TRE resources.</b><span class='required-label'>*</span></label>
+                                    <label class="form-check-label" for="cost"><b>Please acknowledge, researchers that are approved to access data shared with the Confluence Project on a cloud-based, trusted research environment (TRE) are responsible for paying the compute and data storage costs from using the TRE resources.</b><span class='required-label'>*</span></label>
                                 </div>
                             </div>  
 
@@ -516,37 +516,32 @@ export const formtemplate = () => {
                                 <textarea id="anyoth" name="anyoth" rows="4" cols="65" class="form-text-input"></textarea>
                             </div>
                             <div class="input-group">
+                              <label>
                                 <u id="tooltip1">
                                     <a>
-                                        <label>
                                             <input id="confirmationAuth" name="confirmationAuth" class="form-check-input" type="checkbox" value="Yes" style="position: relative; top: -2px;" required/> 
                                             <b>Please confirm that you agree to comply with Confluence authorship requirements.</b>
                                             <span>
-                                                It is expected that manuscripts will be co-led across multiple contributing groups and consortia. 
-                                                Authorship for cross-consortia manuscripts using individual-level data or unpublished summary data will be proposed by 
-                                                lead investigators at the time of concept submission to the DACCs, who will need to approve the proposed authorship. 
-                                                It is anticipated that Recipient will propose authorships in the form of one of these alternatives:
+                                                It is expected that manuscripts will be co-led across multiple contributing groups and consortia. Authorship of manuscripts using individual-level data or unpublished summary data can chose from one of the following two authorship options:
+                                                </br></br>
                                                 <ul>
                                                     <li>
-                                                        Group(s) authorship with each group/consortium listed in the authorship byline. Contributions of the writing group 
-                                                        and other authors will be noted in the contributions section of the manuscript. Authors will be PubMed searchable.
+                                                        Group authorship with each group/consortium, but no individual people, listed in the authorship byline. Contributions of the writing group and other authors will be noted in the 
+                                                        contributions section of the manuscript. All authors will be PubMed searchable.
                                                     </li>
                                                 </ul>
                                                 <p class="indent"> or </p>
                                                 <ul>
                                                     <li>
-                                                        Named authors including co-first and co-last positions when appropriate. It is expected that manuscripts with named 
-                                                        authors will include 2-4 authors per study, plus other contributors to data generation and analyses.
+                                                        Named authors where it is expected that the manuscript’s authorship byline will include 2-4 individually named author per study, plus other contributors to data generation and analyses. 
                                                     </li>
                                                 </ul>
-                                                A “hybrid authorship model” that includes some named authors in the author byline that are PubMed searchable, 
-                                                while other authors are not listed in the author byline and are not PubMed searchable will not be acceptable. 
-                                                The corresponding author of the manuscript is responsible for contacting journals of interest to learn about their 
-                                                authorship guidelines early in the process of writing the manuscript to confirm the journal's guidelines are 
-                                                compatible with the preferred authorship of the Confluence writing group.
+                                                A “hybrid authorship model” that includes some individually named authors in the author byline, while other authors are included as Group Authors or are otherwise not listed in the author 
+                                                byline will not be acceptable. The corresponding author of the manuscript is responsible for contacting journals of interest to determine their authorship guidelines early in the process 
+                                                of writing the manuscript to confirm the journal's guidelines are compatible with the proposed authorship model.
                                             </span>
-                                    </a>
-                                </u>
+                                      </a>
+                                  </u>
                                 <span class='required-label'>*</span></label>
                             </div>
                             <div style="display: flex; gap: 10px;">
