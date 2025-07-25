@@ -120,9 +120,6 @@ export const dataDictionaryTemplate = async () => {
         <div class="col-xl-10 padding-right-zero padding-left-1 position-relative" id="summaryStatsCharts">
             <button id="filterBarToggle" title="Toggle Filter"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
             <div class="main-summary-row pl-2" style="min-height: 10px;">
-                <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="dictNote">
-                    Data shared with the Confluence Project from the BCAC, C-NCI, CIMBA, LAGENO, and MERGE consortia have been harmonized to the Confluence Project data dictionary. To view AABCG data that is shared with the Confluence Project, <a href="https://nih.app.box.com/file/1876071731218" target="_blank" rel="noopener noreferrer"> click here</a>.
-                </div>
                 <button id="filterNoteToggle" title="Toggle Dictionary Note"><i class="position-absolute fas fa-2x fa-caret-up"></i></button>
             </div>
             <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
