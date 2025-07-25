@@ -81,7 +81,7 @@ export const formtemplate = () => {
                                 <input id="email" name="email" class="form-text-input" type="text" required/>
                             </div>
                             <div class="input-group">
-                                <label for="mem-con"><b>Member of Consortium?</b><span class='required-label'>*</span></label>
+                                <label for="mem-con"><b>Member of Consortia or Study / Trial Group?</b><span class='required-label'>*</span></label>
                             </div>
                             <div class="input-group">
                                 <div class="container-lg">
@@ -182,12 +182,12 @@ export const formtemplate = () => {
                                                 <label class="form-check-label" for="consortia-merge"> MERGE</label>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-md-2 col-sm-12">   
+                                        <!--<div class="col-12 col-md-2 col-sm-12">   
                                             <div class="form-check">
                                                 <input class="form-check-input" id="consortia-trial" name="data-con" type="checkbox" value="Trial" style="position: relative; top: -2px;"/>
                                                 <label class="form-check-label" for="consortia-trial"> Clinical Trial Group</label>
                                             </div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
