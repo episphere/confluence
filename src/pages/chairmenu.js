@@ -2303,7 +2303,9 @@ export const dataGovTest = async () => {
   }
 
   body.innerHTML = `
-    ${confirmationList}
+    <div style="height: ${Math.floor(window.innerHeight * 2/3)}px; overflow-y: auto; padding-right: 15px;">
+      ${confirmationList}
+    </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       <button type="button" class="btn btn-primary" id="confirmAddCollaborators" ${!hasUsersToAdd ? 'disabled' : ''}>OK - Add Collaborators</button>
