@@ -2221,39 +2221,51 @@ export const dataGovTest = async () => {
   ///
   const responseData = csv2Json(await getFile(1932355916952)); // Get summary level data
   const lastModified = (await getFileInfo(1932355916952)).modified_at;
-  console.log(responseData.headers);
-  console.log(responseData.data);
-  console.log(lastModified);
-  const getCollaborators_Metadata = await getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders');
-  const getCollaborators_Events = await getCollaboration(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folders');
-  const getCollaborators_Upload = await getCollaboration(submitterFolder, 'folders');
 
-  console.log(getCollaborators_Events.entries);
-  console.log(getCollaborators_Metadata.entries);
-  console.log(getCollaborators_Upload.entries);
+  const getCollaborators_Metadata = await getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders', 1000);
+  const getCollaborators_Events = await getCollaboration(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folders', 1000);
+  const getCollaborators_Upload = await getCollaboration(submitterFolder, 'folders', 1000);
+
+  console.log(getCollaborators_Metadata);
+
+  // Check for specific email
+  const targetEmail = 'wkc15@columbia.edu';
+  const foundCollab = getCollaborators_Metadata.entries.find((collab, index) => {
+    const email = collab.invite_email || (collab.accessible_by && collab.accessible_by.login);
+    if (email === targetEmail) {
+      console.log(`Found ${targetEmail} at position ${index}:`, collab);
+      return true;
+    }
+    return false;
+  });
+  
+  if (!foundCollab) {
+    console.log(`${targetEmail} not found in getCollaborators_Metadata`);
+  }
 
   const emailsInMetadata = getCollaborators_Metadata.entries.map(collab => {
-    if (collab.accessible_by) return collab.accessible_by.login;
-    if (collab.invite_email) return collab.invite_email;
+    if (collab.accessible_by) return collab.accessible_by.login.toLowerCase();
+    if (collab.invite_email) return collab.invite_email.toLowerCase();
     console.error('Error: Both accessible_by and invite_email are null for:', collab);
     return null;
   }).filter(email => email !== null);
   
   const emailsInEventsdata = getCollaborators_Events.entries.map(collab => {
-    if (collab.accessible_by) return collab.accessible_by.login;
-    if (collab.invite_email) return collab.invite_email;
+    if (collab.accessible_by) return collab.accessible_by.login.toLowerCase();
+    if (collab.invite_email) return collab.invite_email.toLowerCase();
     console.error('Error: Both accessible_by and invite_email are null for:', collab);
     return null;
   }).filter(email => email !== null);
   
   const emailsInUploaddata = getCollaborators_Upload.entries.map(collab => {
-    if (collab.accessible_by) return collab.accessible_by.login;
-    if (collab.invite_email) return collab.invite_email;
+    if (collab.accessible_by) return collab.accessible_by.login.toLowerCase();
+    if (collab.invite_email) return collab.invite_email.toLowerCase();
     console.error('Error: Both accessible_by and invite_email are null for:', collab);
     return null;
   }).filter(email => email !== null);
 
-  const allEmails = responseData.data.map(user => user.Email);
+  const allEmails = responseData.data.map(user => user.Email.toLowerCase());
+  console.log(allEmails);
 
   // Metadata
   const includedEmailsMetadata = allEmails.filter(email => emailsInMetadata.includes(email));

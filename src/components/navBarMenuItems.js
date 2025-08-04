@@ -1,9 +1,9 @@
-import { applicationURLs, chairsInfo, emailsAllowedToUpdateData } from './../shared.js';
+import { applicationURLs, chairsInfo, emailsAllowedToUpdateData, getFile } from './../shared.js';
 
 export const navBarMenutemplate = () => {
     let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
-    console.log(authAdmin);
+
     return `
         <ul class="navbar-nav me-auto mb-lg-0" id="navBarOptions">
             <li class="nav-item grid-elements">

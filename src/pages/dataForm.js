@@ -1,4 +1,4 @@
-import { submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile} from "../shared.js"
+import { submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel} from "../shared.js"
 // import * as docx from "docx";
 
 export const formtemplate = () => {
@@ -19,6 +19,9 @@ export const formtemplate = () => {
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                     <section class="contact-form">
+                        <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px;">
+                            User does not have permissions to upload form. Please contact administrator for access.
+                        </div>
                         <p>
                             Please fill out the form to request access to Confluence Project data. This form 
                             should only be used to request access to data from two or more consortia 
@@ -1324,6 +1327,41 @@ export const dataForm = async () => {
   if (downloadBtn2) {
     downloadBtn2.addEventListener("click", handleFormSubmit3);
   }
+
+  // Check user permissions for submitterFolder
+  const checkUserPermissions = async () => {
+    try {
+      let bool = false;
+      const permitted = checkDataSubmissionPermissionLevel(await getCollaboration(submitterFolder, 'folders'), JSON.parse(localStorage.parms).login);
+      console.log(permitted);
+      if (permitted) bool = true;
+      
+      const submitButton = document.getElementById("submitFormButton");
+      const permissionBanner = document.getElementById("permissionBanner");
+      if (!bool) {
+        submitButton.disabled = true;
+        submitButton.style.opacity = '0.5';
+        permissionBanner.style.display = 'block';
+        submitButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("You currently do not have permission to upload, please contact the administrator for access.");
+        });
+      }
+    } catch (error) {
+      console.error('Permission check failed:', error);
+        const submitButton = document.getElementById("submitFormButton");
+        const permissionBanner = document.getElementById("permissionBanner");
+        submitButton.disabled = true;
+        submitButton.style.opacity = '0.5';
+        permissionBanner.style.display = 'block';
+        submitButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("You currently do not have permission to upload, please contact the administrator for access.");
+        });
+    }
+  };
+
+  await checkUserPermissions();
 }
 
 export const uploaddataFormTemplate = () => {

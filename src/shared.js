@@ -740,17 +740,17 @@ export const uploadFileVersion2 = async (data, fileId, type) => {
     }
 };
 
-export const getCollaboration = async (id, type) => {
+export const getCollaboration = async (id, type, limit = 1000) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
-        const response = await fetch(`https://api.box.com/2.0/${type}/${id}/collaborations`, {
+        const response = await fetch(`https://api.box.com/2.0/${type}/${id}/collaborations?limit=${limit}&status=pending,accepted&fields=type,id,created_by,created_at,modified_at,expires_at,status,accessible_by,invite_email,role,acknowledged_at,item`, {
             headers:{
                 Authorization:"Bearer "+access_token
             }
         });
         
         if (response.status === 401) {
-            if((await refreshToken()) === true) return await getCollaboration(id, type);
+            if((await refreshToken()) === true) return await getCollaboration(id, type, limit);
         }
         if (response.status === 200) {
             return response.json();
@@ -760,7 +760,7 @@ export const getCollaboration = async (id, type) => {
         }
     }
     catch (err) {
-        if ((await refreshToken()) === true) return await getCollaboration(id, type);
+        if ((await refreshToken()) === true) return await getCollaboration(id, type, limit);
     }
 };
 
@@ -1060,14 +1060,16 @@ export const checkMyPermissionLevel = async (data, login, id, type) => {
 };
 
 export const checkDataSubmissionPermissionLevel = (data, login) => {
-    if (data.entries.length === 0) return true;
+    console.log(data);
+    console.log(login)
+    if (data.entries.length === 0) return false;
     
     const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);
     if (array.length === 0) {
         const newArray = data.entries.filter(d => d.created_by && d.created_by.login === login);
         if (newArray.length > 0) return true;
     }
-    else if (array[0].role === 'editor' || array[0].role === 'co-owner' || array[0].role === 'uploader') {
+    else if (array[0].role === 'owner' || array[0].role === 'editor' || array[0].role === 'co-owner' || array[0].role === 'uploader' || array[0].role === 'previewer uploader' || array[0].role === 'viewer uploader') {
         return true;
     }
     
