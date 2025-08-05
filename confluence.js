@@ -6,7 +6,7 @@ import { template as dataRequestTemplate, templateAfterLogin as dataRequestTempl
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, testingDataGov } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -66,6 +66,16 @@ export const confluence = async () => {
             const lclStr = JSON.parse(localStorage.parms);
             localStorage.parms = JSON.stringify({...lclStr, ...response});
         }
+
+        try {
+            const permittedToUpload = checkDataSubmissionPermissionLevel(await getCollaboration(submitterFolder, 'folders'), JSON.parse(localStorage.parms).login);
+            localStorage.uploadAccessGranted = permittedToUpload ? 'true' : 'false';
+        } catch (error) {
+            console.log("Don't have access");
+            localStorage.uploadAccessGranted = 'false';
+        }
+
+        let accessToUpload = localStorage.uploadAccessGranted === 'true';
         
         navBarOptions.innerHTML = navBarMenutemplate();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
@@ -314,6 +324,7 @@ const manageRouter = async () => {
     document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     
     if (localStorage.parms !== undefined) return;
+    let accessToUpload = localStorage.uploadAccessGranted === 'true';
     
     const hash = decodeURIComponent(window.location.hash);
     
@@ -336,7 +347,8 @@ const manageRouter = async () => {
         
         document.title = 'Confluence - Overview';
         assignNavbarActive(element, 2);
-        aboutConfluence('overview');
+        const fileInfo = await getFileInfo(studyDescriptions);
+        aboutConfluence('description', fileInfo ? true : false, accessToUpload);
         renderOverView();
     }
     else if (hash === '#about/description') {
@@ -347,8 +359,7 @@ const manageRouter = async () => {
         document.title = 'Confluence - Study Description';
         assignNavbarActive(element, 1);
         const fileInfo = await getFileInfo(studyDescriptions);
-        console.log(fileInfo);
-        aboutConfluence('description', fileInfo ? true : false);
+        aboutConfluence('description', fileInfo ? true : false, accessToUpload);
         renderDescription(fileInfo['content_modified_at'])
         renderOverView();
     }
@@ -362,7 +373,8 @@ const manageRouter = async () => {
         assignNavbarActive(element, 1);
         // const fileInfo = await getFileInfo(761599566277);
         // console.log(fileInfo);
-        aboutConfluence('confluence');
+        const fileInfo = await getFileInfo(studyDescriptions);
+        aboutConfluence('description', fileInfo ? true : false, accessToUpload);
         renderDataDescription();
         // renderOverView();
         // console.log("everything passed"); - Commenting out as this was used for debugging - JD
@@ -374,7 +386,7 @@ const manageRouter = async () => {
         
         document.title = 'Confluence - Resources';
         assignNavbarActive(element,2);
-        participatingConfluence('overview', false);
+        participatingConfluence('overview', false, accessToUpload);
         confluenceResources();
         hideAnimation();
     }
@@ -385,7 +397,7 @@ const manageRouter = async () => {
         
         document.title = 'Confluence - Resources Description';
         assignNavbarActive(element,2);
-        participatingConfluence('description', false);
+        participatingConfluence('description', false, accessToUpload);
         confluenceResourcesDes();
         hideAnimation();
     }
@@ -396,7 +408,7 @@ const manageRouter = async () => {
         
         document.title = 'Confluence - Contact';
         assignNavbarActive(element,2);
-        confluenceDiv.innerHTML = confluenceContactPage(false);
+        confluenceDiv.innerHTML = confluenceContactPage(false, accessToUpload);
     }
     else if (hash === '#data_access') {
         const element = document.getElementById('dataRequest');
@@ -485,6 +497,7 @@ const manageRouter = async () => {
 const manageHash = async () => {
     document.querySelector("[role='contentinfo']").innerHTML = footerTemplate();
     if (localStorage.parms === undefined) return;
+    let accessToUpload = localStorage.uploadAccessGranted === 'true';
     const hash = decodeURIComponent(window.location.hash);
     
     if (!document.getElementById('navBarBtn').classList.contains('collapsed') && document.getElementById('navbarToggler').classList.contains('show')) document.getElementById('navBarBtn').click();
@@ -570,7 +583,7 @@ const manageHash = async () => {
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Overview';
         const fileInfo = await getFileInfo(studyDescriptions);
-        aboutConfluence('overview', fileInfo ? true : false);
+        aboutConfluence('overview', fileInfo ? true : false, accessToUpload);
         renderOverView();
         hideAnimation();
     }
@@ -589,7 +602,7 @@ const manageHash = async () => {
             hideAnimation();
             return;
         }
-        aboutConfluence('description', fileInfo ? true : false);
+        aboutConfluence('description', fileInfo ? true : false, accessToUpload);
         renderDescription(fileInfo['content_modified_at']);
         hideAnimation();
     }
@@ -608,7 +621,7 @@ const manageHash = async () => {
             hideAnimation();
             return;
         }
-        aboutConfluence('confluence', fileInfo ? true : false);
+        aboutConfluence('confluence', fileInfo ? true : false, accessToUpload);
         renderDataDescription();
         hideAnimation();
     }
@@ -619,7 +632,7 @@ const manageHash = async () => {
         
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Resources';
-        participatingConfluence('overview', true);
+        participatingConfluence('overview', true, accessToUpload);
         confluenceResources();
         hideAnimation();
     }
@@ -637,7 +650,7 @@ const manageHash = async () => {
         //     'Public Site'
         // };
         document.title = 'Confluence - Resources Description';
-        participatingConfluence('description', true);
+        participatingConfluence('description', true, accessToUpload);
         confluenceResourcesDes();
         hideAnimation();
     }
@@ -648,7 +661,8 @@ const manageHash = async () => {
         
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Contact';
-        confluenceDiv.innerHTML = confluenceContactPage(true);
+        confluenceDiv.innerHTML = confluenceContactPage(true, accessToUpload);
+        console.log(accessToUpload);
         hideAnimation();
     }
     else if (hash === '#events/meetings') {

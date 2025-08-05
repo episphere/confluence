@@ -1060,8 +1060,6 @@ export const checkMyPermissionLevel = async (data, login, id, type) => {
 };
 
 export const checkDataSubmissionPermissionLevel = (data, login) => {
-    console.log(data);
-    console.log(login)
     if (data.entries.length === 0) return false;
     
     const array = data.entries.filter(d => d.accessible_by && d.accessible_by.login === login);

@@ -2,6 +2,8 @@ import { getFile, hideAnimation, csv2Json, numberWithCommas, emailsAllowedToUpda
 import { addEventConsortiumSelect, getSelectedStudies } from "../visualization.js";
 import { addEventVariableDefinitions, addEventFilterBarToggle, addEventMissingnessFilterBarToggle } from "../event.js";
 
+let accessToUpload = localStorage.uploadAccessGranted === 'true';
+
 export const dataSummary = ( pageHeader, showPages, showUpdateButton, publicAccess ) => {
     return `
         <div class="general-bg">
@@ -17,11 +19,14 @@ export const dataSummary = ( pageHeader, showPages, showUpdateButton, publicAcce
                                         &nbsp;<strong>Dictionary</strong>
                                     </a>
                                 </li>
+                            ${accessToUpload ? (` 
                                 <li class="nav-item">
                                     <a class="nav-link active black-font font-size-14" href="#data_exploration/summary">
                                         <strong>Summary Statistics</strong>
                                     </a>
                                 </li>
+                                `) : ``
+                            }
                                 <!--${
                                     location.origin.match(applicationURLs.prod) ? `` : `
                                         <li class="nav-item">

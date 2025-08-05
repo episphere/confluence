@@ -3,6 +3,7 @@ import { applicationURLs, chairsInfo, emailsAllowedToUpdateData, getFile } from 
 export const navBarMenutemplate = () => {
     let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
+    let accessToUpload = localStorage.uploadAccessGranted === 'true';
 
     return `
         <ul class="navbar-nav me-auto mb-lg-0" id="navBarOptions">
@@ -17,21 +18,32 @@ export const navBarMenutemplate = () => {
                 </a>
                 <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/overview" id="aboutConfluence">Learn about Confluence</a></li>
+                    ${
+                        accessToUpload ? (` 
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/description" id="aboutConfluenceDes">Description of Studies</a></li>
-                    <!--<li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#about/confluence" id="aboutConfluenceCon">Description of Confluence</a></li>-->
+                    `) : ``
+                    }
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/overview" id="resourcesConfluence">Participating Consortium</a></li>
-                    <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/description" id="resourcesConfluenceDes">Participating DACCs</a></li>
+                    ${
+                        accessToUpload ? (` 
+                            <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#join/description" id="resourcesConfluenceDes">Participating DACCs</a></li>
+                        `) : ``
+                    }
                     <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#contact" id="contactConfluence">Contact</a></li>
                 </ul>
             </li>
-            <li class="nav-item dropdown grid-elements">
-                <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown2" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Events
-                </a>
-                <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#events/meetings" id="events">Meetings</a></li>
-                </ul>
-            </li>
+            ${
+                        accessToUpload ? (` 
+                <li class="nav-item dropdown grid-elements">
+                    <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown2" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Events
+                    </a>
+                    <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#events/meetings" id="events">Meetings</a></li>
+                    </ul>
+                </li>
+            `) : ``
+            }
             <li class="nav-item dropdown grid-elements">
                 <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown3" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Data
@@ -42,21 +54,29 @@ export const navBarMenutemplate = () => {
                             Dictionary
                         </a>
                     </li>
+                    ${
+                        accessToUpload ? (` 
                     <li>
                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links pl-4" href="#data_exploration/summary" title="Summary Statistics" id="dataSummary">
                             Summary Statistics
                         </a>
                     </li>
+                    `) : ``
+                    }
                     <li>
                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_access" title="Data Access" id="dataRequest">
                             Data Access Process
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm">
-                            Submit Concept Form
-                        </a>
-                    </li>
+                    ${
+                        accessToUpload ? (` 
+                        <li>
+                            <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_form" title="Data Form" id="dataForm">
+                                Submit Concept Form
+                            </a>
+                        </li>
+                        `) : ``
+                    }
                     <li>
                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms">
                             Approved Confluence Concepts

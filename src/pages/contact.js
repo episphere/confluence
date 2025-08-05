@@ -1,4 +1,5 @@
-export const confluenceContactPage = (signedIn) => {
+ export const confluenceContactPage = (signedIn, accessToUpload) => {
+    console.log(signedIn, accessToUpload);
     return `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
@@ -7,9 +8,9 @@ export const confluenceContactPage = (signedIn) => {
                         <li class="nav-item">
                             <a class="nav-link black-font font-size-14" href="#about/overview"><strong>Overview</strong></a>
                         </li>
-                        ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>': ''}
+                        ${signedIn & accessToUpload ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>': ''}
                         ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></li>': ''}
-                        ${signedIn ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>': ''}
+                        ${signedIn & accessToUpload ? '<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>': ''}
                         <li class="nav-item">
                             <a class="nav-link black-font font-size-14 active" href="#contact"> <strong>Contacts</strong></a>
                         </li>
