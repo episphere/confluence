@@ -51,6 +51,7 @@ export const template = () => {
                             <li> March 1 - June 30</li>
                         </ul>
                     </div>
+                    <div class="row m-0">Currently, only Confluence collaborators can submit proposals to request access to Confluence Project data. Researchers outside of the Confluence Project will be able to submit study proposals around the time of publication of the first paper.</div>
                 </div>
             </div>
         </div>
@@ -87,6 +88,7 @@ export const templateAfterLogin = () => {
                             <li> March 1 - June 30</li>
                         </ul>
                     </div>
+                    <div class="row m-0">Currently, only Confluence collaborators can submit proposals to request access to Confluence Project data. Researchers outside of the Confluence Project will be able to submit study proposals around the time of publication of the first paper.</div>
                 </div>
             </div>
         </div>

@@ -67,7 +67,7 @@ export const infoDeck = () => {
     document.getElementById('confluenceDiv').innerHTML = template;
 };
 
-export const infoDeckAfterLoggedIn = async () => {
+export const infoDeckAfterLoggedIn = async (accessToUpload) => {
     const studyDescription = await getFileInfo(studyDescriptions);
     let template = '';
     
@@ -87,7 +87,7 @@ export const infoDeckAfterLoggedIn = async () => {
                 <div class="row" id="infoDeck" style="min-height: 200px;">`
                     if (studyDescription) template += cardContents({header: 'Study Description', button: 'Study description', href: '#about/description', icon: 'fa-file-alt', explanation: 'View descriptions of participating studies.'})
                     template += cardContents({header: 'Data Dictionary', button: 'Data dictionary', href: '#data_exploration/dictionary', icon: 'fa-database', explanation: 'View variables from participating studies.'})
-                    template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses.'})
+                   if (accessToUpload) template += cardContents({header: 'Explore Data', button: 'Explore Data', href: '#data_exploration/summary', icon: 'fa-chart-bar', explanation: 'Explore summary-level data to plan analyses.'})
                     template += cardContents({header: 'Data Access', button: 'Data Access', href: '#data_access', icon: 'fa-handshake', explanation: 'The Confluence Project is currently generating new genotyping data and harmonizing existing data across participating studies.'})
                     template += `
                 </div>

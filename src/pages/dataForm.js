@@ -19,7 +19,7 @@ export const formtemplate = () => {
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
                     <section class="contact-form">
-                        <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px;">
+                        <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px; font-size: 18px; text-align: center;">
                             User does not have permissions to upload form. Please contact administrator for access.
                         </div>
                         <p>

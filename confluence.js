@@ -72,6 +72,8 @@ export const confluence = async () => {
             localStorage.uploadAccessGranted = permittedToUpload ? 'true' : 'false';
         } catch (error) {
             console.log("Don't have access");
+            const permissionBanner = document.getElementById("permissionBanner");
+            permissionBanner.style.display = 'block';
             localStorage.uploadAccessGranted = 'false';
         }
 
@@ -572,7 +574,7 @@ const manageHash = async () => {
         
         assignNavbarActive(element);
         document.title = 'Confluence Data Platform';
-        infoDeckAfterLoggedIn();
+        infoDeckAfterLoggedIn(accessToUpload);
         hideAnimation();
     }
     else if (hash === '#about/overview') {
