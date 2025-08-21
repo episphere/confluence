@@ -350,7 +350,7 @@ const manageRouter = async () => {
         document.title = 'Confluence - Overview';
         assignNavbarActive(element, 2);
         const fileInfo = await getFileInfo(studyDescriptions);
-        aboutConfluence('description', fileInfo ? true : false, accessToUpload);
+        aboutConfluence('overview', fileInfo ? true : false, accessToUpload);
         renderOverView();
     }
     else if (hash === '#about/description') {
@@ -385,10 +385,11 @@ const manageRouter = async () => {
         const element = document.getElementById('resourcesConfluence');
         if (!element) return;
         // if (element.classList.contains('navbar-active')) return;
-        
+        const fileInfo = await getFileInfo(studyDescriptions);
         document.title = 'Confluence - Resources';
         assignNavbarActive(element,2);
-        participatingConfluence('overview', false, accessToUpload);
+        aboutConfluence('consortium', fileInfo ? true : false, accessToUpload);
+        //participatingConfluence('overview', false, accessToUpload);
         confluenceResources();
         hideAnimation();
     }

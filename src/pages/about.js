@@ -2,6 +2,7 @@ import { addEventConsortiaFilter } from "../event.js";
 import { getPublicFile, numberWithCommas, publicDataFileId } from "./../shared.js";
 
 export const aboutConfluence = (activeTab, showDescripton, accessToUpload) => {
+    console.log(activeTab);
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">
@@ -9,7 +10,7 @@ export const aboutConfluence = (activeTab, showDescripton, accessToUpload) => {
                     <ul class="nav nav-pills">
                         <li class="nav-item"><a class="nav-link ${activeTab === 'overview' ? 'active': ''} black-font font-size-14" href="#about/overview"><strong>Overview</strong></a></li>
                         ${showDescripton & accessToUpload ? `<li class="nav-item"><a class="nav-link ${activeTab === 'description' ? 'active': ''} black-font font-size-14" href="#about/description"> <strong>Description of Studies</strong></a></li>`:``}
-                        <li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/overview"><strong>Consortium</strong></a></li>
+                        <li class="nav-item"><a class="nav-link black-font font-size-14 ${activeTab === 'consortium' ? 'active': ''}" href="#join/overview"><strong>Consortium</strong></a></li>
                         ${showDescripton & accessToUpload ? `<li class="nav-item"><a class="nav-link black-font font-size-14" href="#join/description"> <strong>DACCs</strong></a></li>`:``}
                         <li class="nav-item"><a class="nav-link black-font font-size-14" href="#contact"> <strong>Contacts</strong></a></li>
                         <!--<button class="sub-menu-btn"><a class="nav-link ${activeTab === 'confluence' ? 'active': ''} black-font font-size-14" href="#about/confluence"> <strong>Description of Confluence</strong></a></button>-->

@@ -2226,7 +2226,9 @@ export const dataGovTest = async () => {
   const getCollaborators_Events = await getCollaboration(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folders', 1000);
   const getCollaborators_Upload = await getCollaboration(submitterFolder, 'folders', 1000);
 
-  console.log(getCollaborators_Metadata);
+  const pendingMetadataCollaborators = getCollaborators_Metadata.entries.filter(collab => collab.status === 'pending');
+  console.log('Pending Metadata Collaborators:', pendingMetadataCollaborators);
+  //console.log(pendingMetadataCollaborators);
 
   // Check for specific email
   const targetEmail = 'wkc15@columbia.edu';
