@@ -305,7 +305,8 @@ const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
@@ -348,7 +349,8 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
@@ -401,7 +403,8 @@ const renderERChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
@@ -447,7 +450,8 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, xarray, chartRow
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
@@ -475,6 +479,16 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     for (let studyDesign of allLabels) {
         valueCount.push(jsonData.filter(dt => {if(dt[parameter] === studyDesign) return dt}).map(dt => dt['total']).reduce((a,b) => a+b));
     }
+    // Check if values exist in variables.BCAC[parameter] and replace if they do
+    if (variables.BCAC[parameter]) {
+        allLabels = allLabels.map(label => {
+            // If label is a key in the object (like '1', '2', etc.), return the corresponding value
+            if (variables.BCAC[parameter][label]) {
+                return variables.BCAC[parameter][label];
+            }
+            return label;
+        });
+    }
     
     const data = [
         {
@@ -491,7 +505,8 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}, type:'category'},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});
@@ -544,7 +559,8 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
         xaxis: {fixedrange: true, automargin: true, tickangle: 45, tickfont: {size : plotTextSize}},
         yaxis: {title:`Count`, fixedrange: true, tickformat:',d', tickfont: {size : plotTextSize}},
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 20, b: 80, l: 60 }
     };
     
     Plotly.newPlot(`${id}`, data, layout, {responsive: true, displayModeBar: false});

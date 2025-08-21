@@ -4,6 +4,10 @@ export const variables = {
             'label': 'Carrier status'
         },
         studyDesign: {
+            1: 'Clinic',
+            2: 'Population',
+            3: 'Community',
+            4: 'due to Triple Negative status',
             'label': 'Study design'
         },
         contrType: {
