@@ -4,7 +4,7 @@ import { confluence } from '../confluence.js';
 export const emailsAllowedToUpdateData = ['ahearntu@nih.gov', 'kopchickbp@nih.gov', 'ajayiat@nih.gov']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781; // 691143057533; 1238676877781;
-export const summaryStatsFileCIMBAID = 691143057533; // Temporary until CIMBA has updated data
+export const summaryStatsFileCIMBAID = 1549080386291; //691143057533; // Temporary until CIMBA has updated data
 // export const summaryStatsFileId = 795642281498;
 export const missingnessStatsFileId = 653087731560;
 export const studyDescriptions = 1673495829037;
