@@ -1,7 +1,36 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn } from "../event.js";
 import { getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, /*createFolder,*/ addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, /*sendEmail,*/ getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments } from "../shared.js";
-import accepted_data from '../data/accepted_requests.json' with { type: 'json' };
+
+// Function to read Excel file
+async function readExcelFile() {
+    try {
+        if (typeof XLSX === 'undefined') {
+            throw new Error('XLSX library not loaded');
+        }
+        
+        const response = await fetch('./src/data/accepted_requests.xlsx');
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        
+        return {
+            name: "Accepted Data Requests",
+            last_update: new Date().toLocaleDateString(),
+            files: jsonData.map(row => ({
+                title: row.title || row.Title || '',
+                contact: row.contact || row.Contact || '',
+                box_id: row.box_id || row['Box ID'] || '',
+                accepted_group: row.accepted_group || row['Accepted Group'] || ''
+            }))
+        };
+    } catch (error) {
+        console.error('Error reading Excel file:', error);
+        return { name: "Accepted Data Requests", last_update: "", files: [] };
+    }
+}
 
 export const acceptedDocs = () => {
     // const userInfo = JSON.parse(localStorage.getItem('parms'))
@@ -33,6 +62,7 @@ export const acceptedDocs = () => {
 };
 
 export const acceptedDocsView = async () => {
+    const accepted_data = await readExcelFile();
     console.log(accepted_data.files);
     //const allFiles = await getFolderItems(acceptedFolder);
     
