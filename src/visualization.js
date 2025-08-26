@@ -214,11 +214,10 @@ export const renderAllCharts = (data, headers, onlyCIMBA) => {
     
     if (onlyCIMBA) {
         renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
-        renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
+        renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow1');
         renderEthnicityBarChart(finalData, 'continental_region', 'dataSummaryVizChart5', 'dataSummaryVizLabel5', 'chartRow1');
         generateBarChart('ageInt', 'dataSummaryVizChart3', 'dataSummaryVizLabel3', finalData, 'chartRow2');
         renderERChart(finalData, 'ER_statusIndex', 'dataSummaryVizChart4', 'dataSummaryVizLabel4', headers, 'chartRow2');
-        renderStatusBarChart(finalData, 'Status_Carrier', 'dataSummaryVizChart6', 'dataSummaryVizLabel6', ['case-BRCA1', 'control-BRCA1', 'case-BRCA2', 'control-BRCA2'], 'chartRow2');
     } else {
         renderStudyDesignBarChart(finalData, 'studyDesign', 'dataSummaryVizChart7', 'dataSummaryVizLabel7', 'chartRow1');
         renderStatusBarChart(finalData, 'status', 'dataSummaryVizChart2', 'dataSummaryVizLabel2', ['case', 'control'], 'chartRow1');
@@ -288,7 +287,7 @@ export const getSelectedStudies = () => {
 
 const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
@@ -315,7 +314,7 @@ const generateBarChart = (parameter, id, labelID, jsonData, chartRow) => {
 
 const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     document.getElementById(id).innerHTML = '';
@@ -360,7 +359,7 @@ const generateBarSingleSelect = (parameter, id, labelID, jsonData, headers, char
 
 const renderERChart = (jsonData, parameter, id, labelID, headers, chartRow) => {
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     let pieLabel = ''
@@ -428,7 +427,7 @@ const renderStatusBarChart = (jsonData, parameter, id, labelID, xarray, chartRow
     }
     
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
 
@@ -467,7 +466,7 @@ const renderStudyDesignBarChart = (jsonData, parameter, id, labelID, chartRow) =
     }
 
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
@@ -532,7 +531,7 @@ const renderEthnicityBarChart = (jsonData, parameter, id, labelID, chartRow) => 
     }
     
     const div = document.createElement('div');
-    div.classList = ['col-4 pl-2 padding-right-zero mb-3'];
+    div.classList = ['col-lg-4 col-12 pl-2 padding-right-zero mb-3'];
     div.innerHTML = dataVisulizationCards({cardHeaderId: labelID, cardBodyId: id});
     document.getElementById(chartRow).appendChild(div);
     
