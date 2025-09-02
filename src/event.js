@@ -1568,17 +1568,42 @@ export const addEventSummaryStatsFilterForm = (jsonData, headers) => {
             filterData(jsonData, headers)
         })
     });
+    
+    // Add event listeners for continental region checkboxes
+    const contMenu = document.getElementById('continentalRegionMenu');
+    if (contMenu) {
+        const contCheckboxes = contMenu.querySelectorAll('input[type="checkbox"]');
+        contCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                filterData(jsonData, headers);
+            });
+        });
+    }
 };
 
 const filterData = (jsonData, headers) => {
     const gender = document.getElementById('genderSelection').value;
     const chip = document.getElementById('genotypingChipSelection').value;
-    const cont = document.getElementById('continentalRegionSelection').value;
     const caseCon = document.getElementById('caseControlSelection').value;
     const genderFilter = Array.from(document.getElementById('genderSelection').options).filter(op => op.selected)[0].textContent;
     const chipFilter = Array.from(document.getElementById('genotypingChipSelection').options).filter(op => op.selected)[0].textContent;
-    const contFilter = Array.from(document.getElementById('continentalRegionSelection').options).filter(op => op.selected)[0].textContent;
     const caseConFilter = Array.from(document.getElementById('caseControlSelection').options).filter(op => op.selected)[0].textContent;
+    
+    // Handle continental region dropdown
+    const contMenu = document.getElementById('continentalRegionMenu');
+    const contAllCheckbox = document.getElementById('cont-all');
+    let selectedContRegions = [];
+    let contFilter = 'All';
+    
+    if (contMenu && contAllCheckbox) {
+        if (!contAllCheckbox.checked) {
+            const selectedRegions = Array.from(contMenu.querySelectorAll('input[type="checkbox"]:checked:not(#cont-all)'));
+            if (selectedRegions.length > 0) {
+                selectedContRegions = selectedRegions.map(cb => cb.value);
+                contFilter = selectedRegions.map(cb => cb.nextElementSibling.textContent).join(', ');
+            }
+        }
+    }
     let finalData = jsonData;
     let onlyCIMBA = false;
     
@@ -1619,8 +1644,8 @@ const filterData = (jsonData, headers) => {
     if (chip !== 'all') {
         finalData = finalData.filter(dt => dt['chip'] === chip);
     }
-    if (cont !== 'all') {
-        finalData = finalData.filter(dt => dt['continental_region'] === cont);
+    if (selectedContRegions.length > 0) {
+        finalData = finalData.filter(dt => selectedContRegions.includes(dt['continental_region']));
     }
     if (caseCon !== 'all') {
         finalData = finalData.filter(dt => dt['status'] === caseCon);

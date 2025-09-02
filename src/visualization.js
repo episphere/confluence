@@ -58,17 +58,27 @@ const allFilters = (jsonData, headers, cimba) => {
                 </select>
             </div>
             <div class="form-group">
-                <label class="filter-label font-size-13" for="continentalRegionSelection">Continental Region</label>
-                <select class="form-select font-size-15 button-glow" id="continentalRegionSelection" data-variable='cont'>
-                    <option selected value='all'>All</option>
+                <label class="filter-label font-size-13">Continental Region</label>
+                <div class="dropdown">
+                    <button class="form-select font-size-15 button-glow" type="button" id="continentalRegionSelection" data-variable='cont' style="text-align: left; background: white; border: 1px solid #ced4da;">
+                        All
+                    </button>
+                    <div class="dropdown-menu" id="continentalRegionMenu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto;">
+                        <div class="dropdown-item" style="padding: 8px 12px;">
+                            <input type="checkbox" id="cont-all" value="all" checked> <label for="cont-all">All</label>
+                        </div>
     `
     
     for (let cont of cont_reg) {
-        template += `<option value='${cont}'>${cont}</option>`
+        template += `
+                        <div class="dropdown-item" style="padding: 8px 12px;">
+                            <input type="checkbox" id="cont-${cont.replace(/\s+/g, '-')}" value="${cont}" data-variable="cont"> <label for="cont-${cont.replace(/\s+/g, '-')}">${cont}</label>
+                        </div>`
     }
     
     template += `
-                </select>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label class="filter-label font-size-13" for="caseControlSelection">Case-control</label>
@@ -136,8 +146,9 @@ const allFilters = (jsonData, headers, cimba) => {
     div1.innerHTML = template;
     
     document.getElementById('allFilters').appendChild(div1);
-    addEventSummaryStatsFilterForm(jsonData, headers);
     addEventConsortiumSelect();
+    addContinentalRegionDropdownEvents();
+    addEventSummaryStatsFilterForm(jsonData, headers);
 };
 
 const aggegrateData = (jsonData) => {
@@ -160,6 +171,88 @@ const aggegrateData = (jsonData) => {
     });
     
     return obj;
+};
+
+const addContinentalRegionDropdownEvents = () => {
+    const dropdown = document.getElementById('continentalRegionSelection');
+    const menu = document.getElementById('continentalRegionMenu');
+    const allCheckbox = document.getElementById('cont-all');
+    
+    if (!dropdown || !menu || !allCheckbox) return;
+    
+    // Initialize dropdown text
+    const updateDropdownText = () => {
+        const selected = Array.from(menu.querySelectorAll('input[type="checkbox"]:checked:not(#cont-all)')).map(cb => cb.nextElementSibling.textContent);
+        if (selected.length === 0 || allCheckbox.checked) {
+            dropdown.innerHTML = 'All';
+        } else if (selected.length >= 3) {
+            dropdown.innerHTML = `${selected.length} Selected`;
+        } else {
+            dropdown.innerHTML = selected.join(', ');
+        }
+    };
+    
+    // Call initially to set up text
+    updateDropdownText();
+    
+    // Add form-select background image for dropdown arrow
+    dropdown.style.backgroundImage = 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\'%3e%3cpath fill=\'none\' stroke=\'%23343a40\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'m1 6 6 6 6-6\'/%3e%3c/svg%3e")';
+    dropdown.style.backgroundRepeat = 'no-repeat';
+    dropdown.style.backgroundPosition = 'right 0.75rem center';
+    dropdown.style.backgroundSize = '16px 12px';
+    dropdown.style.paddingRight = '2.25rem';
+    
+    dropdown.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+    
+    let isUpdating = false;
+    
+    allCheckbox.addEventListener('change', () => {
+        if (isUpdating) return;
+        isUpdating = true;
+        const checkboxes = menu.querySelectorAll('input[type="checkbox"]:not(#cont-all)');
+        checkboxes.forEach(cb => cb.checked = allCheckbox.checked);
+        updateDropdownText();
+        isUpdating = false;
+    });
+    
+    const checkboxes = menu.querySelectorAll('input[type="checkbox"]:not(#cont-all)');
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            if (isUpdating) return;
+            if (cb.checked) {
+                // If any specific region is selected, uncheck All
+                allCheckbox.checked = false;
+            } else {
+                // If no specific regions are selected, check All
+                const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                if (!anyChecked) {
+                    allCheckbox.checked = true;
+                }
+            }
+            updateDropdownText();
+        });
+    });
+
+};
+
+export const getSelectedContinentalRegions = () => {
+    const menu = document.getElementById('continentalRegionMenu');
+    const allCheckbox = document.getElementById('cont-all');
+    
+    if (!menu || !allCheckbox) return ['all'];
+    
+    if (allCheckbox.checked) return ['all'];
+    
+    const selected = Array.from(menu.querySelectorAll('input[type="checkbox"]:checked:not(#cont-all)')).map(cb => cb.value);
+    return selected.length > 0 ? selected : ['all'];
 };
 
 export const addEventConsortiumSelect = () => {
