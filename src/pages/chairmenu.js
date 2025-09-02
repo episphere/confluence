@@ -656,7 +656,7 @@ export async function viewFinalDecisionFiles(files) {
     <div class="row-24 align-items-center position-relative">
       <!-- File Name (col-3) -->
       <div class="col-24-5 text-left">
-        ${shorttitlename}
+        <p title="${titlename}">${shorttitlename}</p>
       </div>
       
       <!-- Date (col-1) -->
@@ -1602,7 +1602,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
 
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
-            ${shorttitlename}
+            <p title="${titlename}">${shorttitlename}</p>
           </div>
           
           <!-- Date (col-1) -->
@@ -1754,7 +1754,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
         <div class="row-24 align-items-center position-relative">
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
-            ${shorttitlename}
+            <p title="${titlename}">${shorttitlename}</p>
           </div>
           
           <!-- Date (col-1) -->
