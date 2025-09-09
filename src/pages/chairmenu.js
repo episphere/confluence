@@ -1585,7 +1585,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
+    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
 
@@ -1741,13 +1741,22 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
       }
 
   for (const fileInfo of filesInfoCom) {
+    // const fileId = fileInfo.id;
+    // //console.log(fileInfo);
+    // let filename = fileInfo.name//.slice(0,-19);
+    // let lastUnderscoreIndex = filename.lastIndexOf('_');
+    // let titlename = filename.substring(0, lastUnderscoreIndex); 
+    // const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+    // let completion_date = await getChairApprovalDate(fileId);
+    
     const fileId = fileInfo.id;
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = filename.substring(0, lastUnderscoreIndex); 
+    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
+
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
         <!-- File info row with accordion button and dropdowns side by side -->
