@@ -643,6 +643,7 @@ export async function viewFinalDecisionFiles(files) {
   `;
   for (const fileInfo of files) {
     const fileId = fileInfo.id;
+    console.log(fileInfo.parent.id);
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
@@ -666,7 +667,13 @@ export async function viewFinalDecisionFiles(files) {
       
       <!-- Status (col-1) -->
       <div class="col-24-2 text-left">
-        Ongoing
+            ${
+              fileInfo.parent.id == completedFolder
+                ? '<h6 class="badge badge-pill bg-success">Complete</h6>'
+                : fileInfo.parent.id == deniedFolder
+                ? '<h6 class="badge badge-pill bg-danger">Denied</h6>'
+                : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'
+            }
       </div>
       
       <!-- AABCG (col-1) -->
@@ -1612,7 +1619,13 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
           
           <!-- Status (col-1) -->
           <div class="col-24-2 text-left">
-            Ongoing
+            ${
+              fileInfo.parent.id == completedFolder
+                ? '<h6 class="badge badge-pill bg-success">Complete</h6>'
+                : fileInfo.parent.id == deniedFolder
+                ? '<h6 class="badge badge-pill bg-danger">Denied</h6>'
+                : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'
+            }
           </div>
           
           <!-- AABCG (col-1) -->
@@ -1750,6 +1763,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     // let completion_date = await getChairApprovalDate(fileId);
 
     const fileId = fileInfo.id;
+    console.log(fileInfo.parent.id);
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
@@ -1773,7 +1787,13 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
           
           <!-- Status (col-1) -->
           <div class="col-24-2 text-left">
-            Ongoing
+            ${
+              fileInfo.parent.id == completedFolder
+                ? '<h6 class="badge badge-pill bg-success">Complete</h6>'
+                : fileInfo.parent.id == deniedFolder
+                ? '<h6 class="badge badge-pill bg-danger">Denied</h6>'
+                : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'
+            }
           </div>
           
           <!-- AABCG (col-1) -->
