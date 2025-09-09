@@ -1748,12 +1748,12 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     // let titlename = filename.substring(0, lastUnderscoreIndex); 
     // const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     // let completion_date = await getChairApprovalDate(fileId);
-    
+
     const fileId = fileInfo.id;
     //console.log(fileInfo);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
+    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
 
