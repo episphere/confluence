@@ -40,6 +40,27 @@ export const messagesForChair = {
     user_7: 'TEST DACC Chair'
 };
 
+// Extract text from Word document
+export const readDocFile = async (id) => { 
+    const access_token = JSON.parse(localStorage.parms).access_token;
+    
+    const response = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
+        headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const JSZip = (await import('https://cdn.skypack.dev/jszip')).default;
+    const zip = await JSZip.loadAsync(arrayBuffer);
+    const doc = await zip.file('word/document.xml').async('text');
+    
+    // Extract text from XML
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(doc, 'text/xml');
+    const textNodes = xmlDoc.getElementsByTagName('w:t');
+    
+    return Array.from(textNodes).map(node => node.textContent).join(' ');
+}
+
 export const getFolderItems = async (id) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
