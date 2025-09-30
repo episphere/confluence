@@ -2216,7 +2216,13 @@ ul.form {
     color: white;
 }
 .badge-777 {
-    background-color: #757575;
+    background-color: #595858;
+    font-weight: bold;
+    color: white;
+}
+
+.badge-NA {
+    background-color: #a2a2a2;
     font-weight: bold;
     color: white;
 }
@@ -2489,7 +2495,11 @@ ul.form {
   color: white;
 }
 .decision-dropdown.badge-777 {
-  background-color: #757575;
+  background-color: #595858;
+  color: white;
+}
+.decision-dropdown.badge-NA {
+  background-color: #a2a2a2;
   color: white;
 }
 
@@ -2498,7 +2508,8 @@ ul.form {
 .decision-dropdown.badge-3,
 .decision-dropdown.badge-4,
 .decision-dropdown.badge-5,
-.decision-dropdown.badge-777 {
+.decision-dropdown.badge-777,
+.decision-dropdown.badge-NA {
   text-align: center;
   text-align-last: center;
 }

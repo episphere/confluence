@@ -214,6 +214,7 @@ export const generateChairMenuFiles = async () => {
                             <option value = "3"> 3 - Approved, but data release will be delayed </option>
                             <option value = "4"> 4 - Not approved </option>
                             <option value = "5"> 5 - Decision requires clarification</option>
+                            <option value = "NA"> NA - Not Applicable</option>
                         </select>
                     </div>
                     </br>
@@ -562,6 +563,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
                                 <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
                                 <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                 <h6 class="badge badge-pill badge-777">777</h6>: Duplicate
+                                <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable
                             </span>
                         </div>
                     </div>
@@ -687,6 +689,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -700,6 +703,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -713,6 +717,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -726,6 +731,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -739,6 +745,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -752,6 +759,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -765,6 +773,7 @@ export async function viewFinalDecisionFiles(files) {
           <option value="4">4</option>
           <option value="5">5</option>
           <option value="777">777</option>
+          <option value="NA">NA</option>
         </select>
       </div>
       
@@ -1490,6 +1499,7 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
                                     <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
                                     <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
                                     <h6 class="badge badge-pill badge-777">777</h6>: Duplicate
+                                    <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable
                                 </span>
                             </div>
                         </div>
@@ -1639,6 +1649,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1652,6 +1663,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1665,6 +1677,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1678,6 +1691,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1691,6 +1705,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1704,6 +1719,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1717,6 +1733,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1807,6 +1824,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1820,6 +1838,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1833,6 +1852,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1846,6 +1866,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1859,6 +1880,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1872,6 +1894,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -1885,6 +1908,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="777">777</option>
+              <option value="NA">NA</option>
             </select>
           </div>
           
@@ -2467,6 +2491,7 @@ if (hasUsersToAdd) {
   // document.getElementById("submitID").classList.toggle('buttonsubmit--loading');
   // return false;
 }
+
 export const dataGovernanceProjects = async () => {
   console.log("Event Clicked");
   const response = await getFolderItems(0);
