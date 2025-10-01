@@ -2254,14 +2254,14 @@ ul.form {
 #tooltip1 a:hover span { display: inline-block; position: absolute; width: 800px; background: #ffffff; height: 375px; left: 10px; top: -375px; color: #000000; padding: 0 5px; z-index: 1; border-style: groove;}
 
 .nci-shutdown-banner {
-    background: #bb0e3d;
+    background: #d4e7f2;
     padding: 15px;
   }
 
   .nci-shutdown-banner__body {
     max-width: 1024px;
     margin: 0 auto;
-    color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     font-size: 17px;
     line-height: 1.6;
     position: relative;
@@ -2277,7 +2277,7 @@ ul.form {
     top: 0;
     left: 0;
     background: none;
-    background-color: #ffffff;
+    background-color: #000000;
     -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMSAxNWgtMnYtMmgydjJ6bTAtNGgtMlY3aDJ2NnoiLz48L3N2Zz4=) no-repeat center/contain;
     mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMSAxNWgtMnYtMmgydjJ6bTAtNGgtMlY3aDJ2NnoiLz48L3N2Zz4=) no-repeat center/contain;
   }
@@ -2286,10 +2286,10 @@ ul.form {
     font-size: 18px;
     margin: 0;
   }
-  .nci-shutdown-banner__body a, 
+  /* .nci-shutdown-banner__body a, 
   .nci-shutdown-banner__body a:visited {
     color: white;
-  }
+  } */
 
   .accordion {
 	--bs-accordion-active-bg: rgb(255, 236, 239);
