@@ -87,6 +87,36 @@ export const getFolderItems = async (id) => {
     }
 };
 
+export const getAllFilesRecursive = async (folderId) => {
+    const allFiles = [];
+    const items = await getFolderItems(folderId);
+    //console.log(items);
+    
+    for (const item of items.entries) {
+        if (item.type === 'file') {
+            allFiles.push(item);
+        } else if (item.type === 'folder') {
+            const subFiles = await getAllFilesRecursive(item.id);
+            allFiles.push(...subFiles);
+        }
+    }
+    //console.log(allFiles);
+    return allFiles;
+};
+
+export const extractContactInvestigators = (text) => {
+    const startPattern = "Contact Investigator(s):";
+    const endPattern = "Institution(s)";
+    
+    const startIndex = text.indexOf(startPattern);
+    if (startIndex === -1) return "";
+    
+    const endIndex = text.indexOf(endPattern, startIndex);
+    if (endIndex === -1) return "";
+    
+    return text.substring(startIndex + startPattern.length, endIndex).trim();
+}
+
 export const getFileRange = async (id, start, end) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     const response = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
@@ -1273,7 +1303,7 @@ export const csv2Json = (csv) => {
 };
 
 export const array2Json = (array) => {
-    console.log(array)
+    // console.log(array)
     const keys = array.shift();
     const json = array.reduce((agg, arr) => {
         agg.push(arr.reduce((obj, item, index) => {

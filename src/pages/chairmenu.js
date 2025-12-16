@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { readDocFile, getCollaboration, getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
+import { readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab) {
     let template = "";
@@ -62,12 +62,13 @@ export const generateChairMenuFiles = async () => {
     
     if (!userChairItem) return null;
     
-    const responseChair = await getFolderItems(userChairItem.boxIdNew);
-    const responseClara = await getFolderItems(userChairItem.boxIdClara);
-    const allFiles = await getFolderItems(submitterFolder);
-    let filearrayChair = responseChair.entries;
-    let filearrayClara = responseClara.entries;
-    let filearrayAllFiles = allFiles.entries;
+    const filearrayChair = await getAllFilesRecursive(userChairItem.boxIdNew);
+    const filearrayClara = await getAllFilesRecursive(userChairItem.boxIdClara);
+    const filearrayAllFiles = await getAllFilesRecursive(submitterFolder);
+    // let filearrayChair = responseChair.entries;
+    // let filearrayClara = responseClara.entries;
+    // let filearrayAllFiles = allFiles.entries;
+    console.log(filearrayAllFiles);
 
     let test = await getFile(DACCmembers);
     const { data, headers } = csv2Json(test);
@@ -399,7 +400,7 @@ export const commentSubmit = async () => {
             
             let fileinfo = await getFileInfo(fileId);
             let filename = fileinfo.name;
-            let allFiles = await getFolderItems(submitterFolder);
+            let allFiles = await getAllFilesRecursive(submitterFolder);
             let entries = allFiles.entries;
             console.log(filename);
             console.log(entries);
@@ -647,7 +648,8 @@ export async function viewFinalDecisionFiles(files) {
     const fileId = fileInfo.id;
     console.log(fileInfo);
     let test = await readDocFile(fileId);
-    console.log(test);
+    let contacts = extractContactInvestigators(test);
+    console.log(contacts);
     let filename = fileInfo.name//.slice(0,-19);
     let lastUnderscoreIndex = filename.lastIndexOf('_');
     let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
@@ -801,6 +803,10 @@ export async function viewFinalDecisionFiles(files) {
               <i class="fas fa-external-link-alt"></i>
             </button>
           </div>
+        </div>
+        <div class="row mb-1 m-0">
+            <div class="col-md-2 pl-2 font-bold">Investigator(s)</div>
+            <div class="col">${contacts}}</div>
         </div>
         <div class="row mb-1 m-0">
           <div class="col-md-2 pl-2 font-bold">Comments</div>
@@ -1455,10 +1461,11 @@ export const authTableTemplate = () => {
 };
 
 export const generateAuthTableFiles = async () => {
-    const allFilessub = await getFolderItems(submitterFolder);
-    const allFilescom = await getFolderItems(completedFolder);
-    let filearrayAllFilesSub = allFilessub.entries;
-    let filearrayAllFilesCom = allFilescom.entries;
+    let filearrayAllFilesSub = await getAllFilesRecursive(submitterFolder);
+    let filearrayAllFilesCom = await getAllFilesRecursive(completedFolder);
+    //let filearrayAllFilesSub = allFilessub.entries;
+    //let filearrayAllFilesCom = allFilescom.entries;
+    console.log(filearrayAllFilesSub);
 
     // document.getElementById("authTableView").innerHTML = template;
     await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
@@ -1493,7 +1500,7 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
                         <div class="main-summary-row">
                             <div class="col-xl-12 pl-1 pr-0">
                                 <span class="font-size-10">
-                                    <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted 
+                                    <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted
                                     <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
                                     <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
                                     <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
@@ -1606,6 +1613,10 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     let completion_date = await getChairApprovalDate(fileId);
+
+    let test = await readDocFile(fileId);
+    let contacts = extractContactInvestigators(test);
+    console.log(contacts);
 
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
@@ -1761,6 +1772,10 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
                   <i class="fas fa-external-link-alt"></i>
                 </button>
               </div>
+            </div>
+            <div class="row mb-1 m-0">
+                <div class="col-md-2 pl-2 font-bold">Investigator(s)</div>
+                <div class="col">${contacts}</div>
             </div>
             <div class="row mb-1 m-0">
               <div class="col-md-2 pl-2 font-bold">Comments</div>
@@ -2081,7 +2096,7 @@ export const returnToChairs = () => {
                             return object.consortium === cons;
                         });
                         
-                        let newBoxFiles = await getFolderItems(info.boxIdNew);
+                        let newBoxFiles = await getAllFilesRecursive(info.boxIdNew);
                         console.log(newBoxFiles);
                         var itemFound = false;
                         
@@ -2097,7 +2112,7 @@ export const returnToChairs = () => {
                         }
                         
                         if (!itemFound) {
-                            let claraBoxFiles = await getFolderItems(info.boxIdClara);
+                            let claraBoxFiles = await getAllFilesRecursive(info.boxIdClara);
                             console.log(claraBoxFiles);
                             for (let item of claraBoxFiles.entries) {
                                 if (item.name === checkbox.value) {
@@ -2161,7 +2176,7 @@ export const returnToSubmitter = () => {
                 let fileSelected = await getFileInfo(checkbox.id);
                 let fileName = fileSelected.name;
                 let userFound = fileSelected.created_by.login;
-                let submittedItems = await getFolderItems(returnToSubmitterFolder);
+                let submittedItems = await getAllFilesRecursive(returnToSubmitterFolder);
                 let folderID = "none";
                 
                 for (let item of submittedItems.entries) {
@@ -2203,7 +2218,7 @@ export const returnToSubmitter = () => {
                     let fileFound = false;
                     console.log(info.boxIdNew);
                     
-                    let files = await getFolderItems(info.boxIdNew);
+                    let files = await getAllFilesRecursive(info.boxIdNew);
                     for (let file of files.entries) {
                         console.log(file);
                         
@@ -2216,7 +2231,7 @@ export const returnToSubmitter = () => {
                         }
                     }
                     if (!fileFound) {
-                        files = await getFolderItems(info.boxIdClara);
+                        files = await getAllFilesRecursive(info.boxIdClara);
                         for (let file of files.entries) {
                             console.log(file);
                             if (file.name === fileName) {
@@ -2579,7 +2594,7 @@ export const dataGovernanceLazyLoad = (element) => {
       }
     }
     if (status !== "pending") return;
-    let allEntries = (await getFolderItems(id)).entries;
+    let allEntries = (await getAllFilesRecursive(id)).entries;
     if (allEntries.length === 0) {
       element.classList = ["fas fa-exclamation-circle"];
       element.title = "Empty folder";
