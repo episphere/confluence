@@ -5,6 +5,7 @@ import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, 
 import { myProjectsTemplate } from './pages/myProjects.js';
 import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 import { showPreview } from "./components/boxPreview.js";
+import { addResponseInputs } from './pages/dataSubmission.js';
 
 let top = 0;
 export const addEventStudyRadioBtn = () => {
@@ -1822,8 +1823,6 @@ export const addEventConsortiaFilter = (d) => {
 //   };
 
 export function switchTabs(show, hide, files) {
-    console.log(show);
-    
     try {
         if (!Array.isArray(hide)) {
             return;
@@ -1876,36 +1875,12 @@ export function switchTabs(show, hide, files) {
                     }
                     if (show === "recommendation") {
                         document.getElementById("finalChairDecision").style.display ="block";
-                        // document.getElementById("finalChairDecision").style.display ="none";
-                        // document.getElementById("daccOverride").style.display = "none";
                         document.getElementById("fileComments").style.display = "none";
-                        // document.getElementById('fileComments').innerHTML = listComments(files[0].id);
                     }
                     if (show === "conceptNeedingClarification") {
-                        // document.getElementById("sendtodaccButton").style.display ="none";
-                        // document.getElementById("fileComments").style.display = "block";
                         document.getElementById("finalChairDecision").style.display ="block";
-                        // document.getElementById("daccOverride").style.display = "block";
                         document.getElementById("fileComments").style.display = "block";
                     }
-                    //   if (show === "daccCompleted") {
-                    //     document.getElementById("sendtodaccButton").style.display ="none";
-                    //     document.getElementById("daccOverride").style.display = "none";
-                    //     document.getElementById("fileComments").style.display = "block";
-                    //     document.getElementById("finalChairDecision").style.display ="block";
-                    //     document.getElementById("fileComments").style.display = "block";
-                    //   }
-                    //   if (show === "dacctoBeCompleted") {
-                    //     document.getElementById("daccComment").style.display = "block";
-                    //   }
-                    //   if (show === "completed") {
-                    //     document.getElementById("daccComment").style.display = "none";
-                    //   }
-                    //   if (show === "daccReview") {
-                    //     document.getElementById("boxFilePreview").classList.add("col-8");
-                    //     document.getElementById("daccComment").style.display = "block";
-                    //     showComments(files[0].id);
-                    //   }
                     } else {
                         boxPreview.classList.remove("d-block");
                         boxPreview.classList.add("d-none");
@@ -1917,7 +1892,6 @@ export function switchTabs(show, hide, files) {
                         }
                     }
                 }
-        
                 for (const tab of hide) {
                     document.getElementById(tab + "Tab").classList.remove("active");
                     document.getElementById(tab + "Tab").parentElement.classList.remove("active");
@@ -1936,6 +1910,50 @@ export function switchTabs(show, hide, files) {
         return;
     }
 };
+
+export function switchTabsDataSubmission(show, hide, files) {
+    try {
+        if (!Array.isArray(hide) || !Array.isArray(files)) return;
+        
+        document.getElementById(show + "Tab").addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            for (const tab of hide) {
+                document.getElementById(tab + "Tab").classList.remove("active");
+                document.getElementById(tab + "Tab").parentElement.classList.remove("active");
+                document.getElementById(tab).classList.remove("show", "active");
+            }
+            
+            document.getElementById(show + "Tab").classList.add("active");
+            document.getElementById(show + "Tab").parentElement.classList.add("active");
+            document.getElementById(show).classList.add("show", "active");
+            
+            // Display files for this tab
+            if (files.length > 0) {
+                const filePreview = document.getElementById("filePreview");
+                if (filePreview) {
+                    filePreview.classList.remove("d-none");
+                    filePreview.classList.add("d-block");
+                }
+                
+                // Set up file switching for this tab
+                const selectedFile = document.getElementById(show + "selectedDoc").value || files[0].id;
+                document.getElementById(show + "selectedDoc").value = selectedFile;
+                showPreview(selectedFile);
+                showComments(selectedFile);
+                
+                // Add response inputs only for needinput tab
+                if (show === 'needinput') {
+                    setTimeout(() => {
+                        addResponseInputs();
+                    }, 300);
+                }
+            }
+        });
+    } catch (err) {
+        return;
+    }
+}
 
 export function switchFiles(tab) {
     document

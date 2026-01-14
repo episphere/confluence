@@ -1430,8 +1430,8 @@ export const filePreviewer = (fileId, divId) => {
 export async function showComments(id) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
-  
     let comments = JSON.parse(response).entries;
+    console.log(comments);
     if (comments.length === 0) {
         const dropdownSection = document.getElementById(`fileComments`);
         dropdownSection.innerHTML = `
@@ -1460,7 +1460,7 @@ export async function showComments(id) {
             const time = comment_date.toLocaleTimeString();
             
             template += `
-                <div>
+                <div class='comment'>
                     <div class='row'>
                         <div class='col-8 p-0'>
                             <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
@@ -1497,7 +1497,7 @@ export async function showComments(id) {
                 const date = comment_date.toLocaleDateString();
                 const time = comment_date.toLocaleTimeString();
                 template += `
-                    <div>
+                    <div class='comment'>
                         <div class='row'>
                             <div class='col-8 p-0'>
                                 <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>

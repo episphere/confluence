@@ -131,12 +131,12 @@ export const navBarMenutemplate = () => {
                                     </li>`
                                 ) : ''
                             }
-                            <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Accepted Data Requests </a>-->
-                            <!--<li>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
-                                    Submitted
-                                </a>
-                            </li>-->
+                            <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Accepted Data Requests </a>
+                                <li class="grid-elements">
+                                    <a class="nav-link nav-menu-links white-font" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
+                                        Submitted
+                                    </a>
+                                </li>-->
                             <!--<li>
                                 <div id="governanceNav" class="grid-elements"></div>
                             </li>-->
@@ -144,6 +144,11 @@ export const navBarMenutemplate = () => {
                     </li>
                 `) :''
             }
+            <li class="grid-elements">
+                <a class="nav-link nav-menu-links white-font" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
+                    Submitted Concepts
+                </a>
+            </li>
             <li class="grid-elements">
                 <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
                     Report issue

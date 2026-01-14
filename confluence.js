@@ -1,6 +1,6 @@
 import { navBarMenutemplate } from './src/components/navBarMenuItems.js';
 import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
-import { dataSubmissionTemplate, lazyload } from './src/pages/dataSubmission.js';
+import { dataSubmissionTemplate, dataSubmissionForm} from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate, templateAfterLogin as dataRequestTemplateAfterLogin} from './src/pages/dataRequest.js';
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, testingDataGov } from './src/pages/chairmenu.js';
@@ -82,7 +82,7 @@ export const confluence = async () => {
         navBarOptions.innerHTML = navBarMenutemplate();
         document.getElementById('logOutBtn').addEventListener('click', logOut);
 
-        // const dataSubmissionElement = document.getElementById('dataSubmission');
+        const dataSubmissionElement = document.getElementById('dataSubmission');
         const dataSummaryElement = document.getElementById('dataSummary');
         const dataSummarySubsetElement = document.getElementById('dataSummarySubset');
         const dataDictionaryElement = document.getElementById('dataDictionary');
@@ -95,21 +95,17 @@ export const confluence = async () => {
         const authTableElement = document.getElementById('authTable');
         const acceptedFormsElement = document.getElementById('acceptedForms');
 
-        // if (dataSubmissionElement) {
-        //     dataSubmissionElement.addEventListener('click', async () => {
-        //         if (dataSubmissionElement.classList.contains('navbar-active')) return;
-                
-        //         showAnimation();
-        //         assignNavbarActive(dataSubmissionElement, 2);
-        //         document.title = 'Confluence - Data Submit';
-        //         confluenceDiv.innerHTML = await dataSubmissionTemplate();
-        //         lazyload();
-        //         addEventStudyRadioBtn();
-        //         addEventConsortiaSelect();
-        //         addEventUploadStudyForm();
-        //         hideAnimation();
-        //     });
-        // }
+        if (dataSubmissionElement) {
+            dataSubmissionElement.addEventListener('click', async () => {
+                if (dataSubmissionElement.classList.contains('navbar-active')) return; 
+                showAnimation();
+                assignNavbarActive(dataSubmissionElement);
+                document.title = 'Confluence - Data Submit';
+                confluenceDiv.innerHTML = dataSubmissionTemplate();
+                await dataSubmissionForm();
+                hideAnimation();
+            });
+        }
         if (dataSummaryElement) {
             dataSummaryElement.addEventListener('click', () => {
                 if (dataSummaryElement.classList.contains('navbar-active')) return;

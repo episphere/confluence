@@ -2,13 +2,16 @@ import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
 import { readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
 
-export function renderFilePreviewDropdown(files, tab) {
+export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
     
     if (!Array.isArray(files)) { return template; }
     if (files.length != 0) {
+        if (!hideDownloadAll) {
+            template += `
+        <button style="margin-right: 10px; float: right" id='${tab}-download-all' class='btn btn-dark'>Download All</button>`;
+        }
         template += `
-        <button style="margin-right: 10px; float: right" id='${tab}-download-all' class='btn btn-dark'>Download All</button>
         <div class='card-body p-0'>
           <div class='card-title col-5'>
             <label for='${tab}selectedDoc'>
