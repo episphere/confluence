@@ -1700,7 +1700,7 @@ export async function showCommentsDCEG(id, change=false) {
                             ).trim();
                     }
                     
-                    console.log(cons)
+                    //console.log(cons)
                 
                     // let score = comment.message[8];
                     const inputScore = document.getElementById(`${cons}${id}`);

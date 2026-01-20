@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
+import { showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -71,7 +71,7 @@ export const generateChairMenuFiles = async () => {
     // let filearrayChair = responseChair.entries;
     // let filearrayClara = responseClara.entries;
     // let filearrayAllFiles = allFiles.entries;
-    console.log(filearrayAllFiles);
+    // console.log(filearrayAllFiles);
 
     let test = await getFile(DACCmembers);
     const { data, headers } = csv2Json(test);
@@ -79,36 +79,67 @@ export const generateChairMenuFiles = async () => {
     const daccEmails = data.filter(item => item['DACC']==consortium).map(dt => dt['Email']).splice(1);
 
     const filesIncompleted = [];
-    for (let obj of filearrayChair) {
-        let tasks = await getTaskList(obj.id);
+    console.log("1");
+    
+    // Process filearrayChair in parallel
+    const chairTaskPromises = filearrayChair.map(async (obj) => {
+        const tasks = await getTaskList(obj.id);
+        const incompleteItems = [];
+        
         if (tasks.entries.length != 0) {
             for (let items of tasks.entries) {
                 for (let itemtasks of items.task_assignment_collection.entries) {
                     if (itemtasks.status === 'incomplete') {
-                        if (filesIncompleted.findIndex(element => element.id === itemtasks.item.id) === -1) {
-                            filesIncompleted.push(itemtasks.item);
-                        }
+                        incompleteItems.push(itemtasks.item);
                     }
                 }
             }
         }
-    }
+        return incompleteItems;
+    });
+    
+    const chairResults = await Promise.all(chairTaskPromises);
+    
+    // Flatten results and remove duplicates
+    chairResults.forEach(items => {
+        items.forEach(item => {
+            if (filesIncompleted.findIndex(element => element.id === item.id) === -1) {
+                filesIncompleted.push(item);
+            }
+        });
+    });
+
+    console.log("2");
 
     const filesClaraIncompleted = [];
-    for (let obj of filearrayClara) {
-        let tasks = await getTaskList(obj.id);
+    
+    // Process filearrayClara in parallel
+    const claraTaskPromises = filearrayClara.map(async (obj) => {
+        const tasks = await getTaskList(obj.id);
+        const incompleteItems = [];
+        
         if (tasks.entries.length != 0) {
             for (let items of tasks.entries) {
                 for (let itemtasks of items.task_assignment_collection.entries) {
                     if (itemtasks.status === 'incomplete') {
-                        if (filesClaraIncompleted.findIndex(element => element.id === itemtasks.item.id) === -1) {
-                            filesClaraIncompleted.push(itemtasks.item);
-                        }
+                        incompleteItems.push(itemtasks.item);
                     }
                 }
             }
         }
-    }
+        return incompleteItems;
+    });
+    
+    const claraResults = await Promise.all(claraTaskPromises);
+    
+    // Flatten results and remove duplicates
+    claraResults.forEach(items => {
+        items.forEach(item => {
+            if (filesClaraIncompleted.findIndex(element => element.id === item.id) === -1) {
+                filesClaraIncompleted.push(item);
+            }
+        });
+    });
     // console.log(filesIncompleted);
 
     const message = messagesForChair[userChairItem.id];
@@ -187,7 +218,7 @@ export const generateChairMenuFiles = async () => {
 
     template += `
         <div class='tab-pane fade' id='daccDecision' role='tabpanel' aria-labeledby='daccDecisionTab'>
-            daccDecisionTab tab  content 
+        Loading...
         </div>
     `;
     
@@ -647,17 +678,28 @@ export async function viewFinalDecisionFiles(files) {
     <div class="row m-0 align-left allow-overflow w-100">
       <div class="accordion accordion-flush col-md-12 px-0" id="daccAccordian">
   `;
-  for (const fileInfo of files) {
+  
+  // Process all files in parallel
+  const filePromises = files.map(async (fileInfo) => {
     const fileId = fileInfo.id;
-    console.log(fileInfo);
-    let test = await readDocFile(fileId);
-    let contacts = extractContactInvestigators(test);
-    console.log(contacts);
-    let filename = fileInfo.name//.slice(0,-19);
-    let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
+    const [docContent, completion_date] = await Promise.all([
+      readDocFile(fileId),
+      getChairApprovalDate(fileId)
+    ]);
+    
+    const contacts = extractContactInvestigators(docContent);
+    const filename = fileInfo.name;
+    const lastUnderscoreIndex = filename.lastIndexOf('_');
+    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    let completion_date = await getChairApprovalDate(fileId);
+    
+    return { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date };
+  });
+  
+  const processedFiles = await Promise.all(filePromises);
+  
+  // Build template with processed data
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date } of processedFiles) {
     
     template += `
   <div class="accordian-item mb-2 border-bottom pb-2">
@@ -1468,7 +1510,7 @@ export const generateAuthTableFiles = async () => {
     let filearrayAllFilesCom = await getAllFilesRecursive(completedFolder);
     //let filearrayAllFilesSub = allFilessub.entries;
     //let filearrayAllFilesCom = allFilescom.entries;
-    console.log(filearrayAllFilesSub);
+    //console.log(filearrayAllFilesSub);
 
     // document.getElementById("authTableView").innerHTML = template;
     await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
@@ -1596,30 +1638,48 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
 };
 
 export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
-  console.log(filesInfoSub)
-  console.log(filesInfoCom)
   let template = `
     <div class="row m-0 align-left allow-overflow w-100">
       <div class="accordion accordion-flush col-md-12" id="adminAccordian">
   `;
-  for (const fileInfo of filesInfoSub) {
-    // const fileId = fileInfo.id;
-    // let filename = fileInfo.name//.slice(0,-19);
-    // console.log(filename);
-    // const shortfilename = filename.length > 50 ? filename.substring(0, 49) + "..." : filename;
-    // let completion_date = await getChairApprovalDate(fileId);
-
+  
+  // Process filesInfoSub in parallel
+  const subFilePromises = filesInfoSub.map(async (fileInfo) => {
     const fileId = fileInfo.id;
-    //console.log(fileInfo);
-    let filename = fileInfo.name//.slice(0,-19);
-    let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
+    const [docContent, completion_date] = await Promise.all([
+      readDocFile(fileId),
+      getChairApprovalDate(fileId)
+    ]);
+    
+    const contacts = extractContactInvestigators(docContent);
+    const filename = fileInfo.name;
+    const lastUnderscoreIndex = filename.lastIndexOf('_');
+    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    let completion_date = await getChairApprovalDate(fileId);
-
-    let test = await readDocFile(fileId);
-    let contacts = extractContactInvestigators(test);
-    console.log(contacts);
+    
+    return { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isSubmitted: true };
+  });
+  
+  // Process filesInfoCom in parallel
+  const comFilePromises = filesInfoCom.map(async (fileInfo) => {
+    const fileId = fileInfo.id;
+    const completion_date = await getChairApprovalDate(fileId);
+    
+    const filename = fileInfo.name;
+    const lastUnderscoreIndex = filename.lastIndexOf('_');
+    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+    
+    return { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, isSubmitted: false };
+  });
+  
+  const [processedSubFiles, processedComFiles] = await Promise.all([
+    Promise.all(subFilePromises),
+    Promise.all(comFilePromises)
+  ]);
+  
+  // Build template with processed data
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isSubmitted } of processedSubFiles) {
 
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
@@ -1789,23 +1849,8 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
       </div>`;
       }
 
-  for (const fileInfo of filesInfoCom) {
-    // const fileId = fileInfo.id;
-    // //console.log(fileInfo);
-    // let filename = fileInfo.name//.slice(0,-19);
-    // let lastUnderscoreIndex = filename.lastIndexOf('_');
-    // let titlename = filename.substring(0, lastUnderscoreIndex); 
-    // const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    // let completion_date = await getChairApprovalDate(fileId);
-
-    const fileId = fileInfo.id;
-    console.log(fileInfo.parent.id);
-    //console.log(fileInfo);
-    let filename = fileInfo.name//.slice(0,-19);
-    let lastUnderscoreIndex = filename.lastIndexOf('_');
-    let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
-    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    let completion_date = await getChairApprovalDate(fileId);
+  for (const { fileInfo, fileId, filename, titlename, shorttitlename, completion_date } of processedComFiles) {
+    //console.log(fileInfo.parent.id);
 
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
@@ -2280,7 +2325,7 @@ export const copyComments = async (comments, fileId) => {
 };
 
 export const testingDataGov = async () => {
-  console.log("testingDataLoaded")
+  //console.log("testingDataLoaded")
   const testform = document.getElementById("submitID");
   testform.addEventListener("click", function(e) {
     e.preventDefault();
