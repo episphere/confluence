@@ -119,7 +119,8 @@ export const navBarMenutemplate = () => {
                                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#chair_menu" title="Chair Menu" id="chairMenu">
                                             DACC Chair Menu
                                         </a>
-                                    </li>`
+                                    </li>
+                                                            <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#events/DACC" id="DACCevents">DACC Meetings</a></li>`
                                 ) : ''
                             }
                             ${

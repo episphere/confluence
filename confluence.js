@@ -16,7 +16,7 @@ import { confluenceContactPage } from './src/pages/contact.js';
 import { footerTemplate } from './src/components/footer.js';
 import { renderDescription } from './src/pages/description.js';
 import { dataDictionaryTemplate } from './src/pages/dictionary.js';
-import { confluenceEventsPage, eventsBody } from './src/pages/events.js';
+import { confluenceEventsPage, eventsBody, eventsDACC } from './src/pages/events.js';
 import { acceptedDocs, acceptedDocsView } from './src/pages/accepteddocs.js';
 
 export const confluence = async () => {
@@ -674,6 +674,18 @@ const manageHash = async () => {
         showAnimation();
         confluenceDiv.innerHTML = confluenceEventsPage();
         await eventsBody()
+        hideAnimation();
+    }
+    else if (hash === '#events/DACC') {
+        const element = document.getElementById('DACCevents');
+        if (!element) return;
+        if (element.classList.contains('navbar-active')) return;
+        
+        assignNavbarActive(element, 2);
+        document.title = 'Confluence - DACC Meetings';
+        showAnimation();
+        confluenceDiv.innerHTML = confluenceEventsPage();
+        await eventsDACC()
         hideAnimation();
     }
     else window.location.hash = '#home';

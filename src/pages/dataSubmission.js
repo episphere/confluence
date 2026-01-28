@@ -1,4 +1,4 @@
-import { showComments, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments } from "../shared.js";
+import { showComments, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 import { renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
 import { showPreview } from "../components/boxPreview.js";
@@ -275,49 +275,90 @@ export const setupDownloadComments = (entries) => {
 
 export const downloadCommentsAsWord = async (fileId) => {
     try {
-        const response = await listComments(fileId);
-        const comments = JSON.parse(response).entries;
+        const [commentsResponse, originalFileResponse] = await Promise.all([
+            listComments(fileId),
+            downloadFile(fileId)
+        ]);
         
-        let docContent = `<html><head><meta charset="utf-8"><title>Comments for Response</title></head><body>`;
-        docContent += `<h1>Comments Requiring Response</h1>`;
-        docContent += `<p><strong>File ID:</strong> ${fileId}</p>`;
-        docContent += `<hr>`;
+        const comments = JSON.parse(commentsResponse).entries;
+        const originalBlob = await originalFileResponse.blob();
+        
+        // Read Word document using docx library
+        const arrayBuffer = await originalBlob.arrayBuffer();
+        let originalContent = '';
+        
+        try {
+            if (window.mammoth) {
+                const result = await window.mammoth.convertToHtml({arrayBuffer: arrayBuffer});
+                originalContent = result.value;
+            } else {
+                throw new Error('Mammoth.js not available');
+            }
+        } catch (docxError) {
+            console.warn('Could not parse as Word document:', docxError);
+            originalContent = '<p>Could not extract Word document content. Please refer to the original file.</p>';
+        }
+        
+        // Create merged document
+        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title>
+        <style>
+        body { font-family: 'Times New Roman', serif; font-size: 12pt; }
+        h1 { font-size: 14pt; }
+        h2 { font-size: 13pt; }
+        h3 { font-size: 12pt; }
+        p, div { font-size: 12pt; }
+        </style>
+        </head><body>`;
+        
+        // Add original document content
+        mergedContent += `<div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;">`;
+        mergedContent += `<h1>Original Document</h1>`;
+        mergedContent += `<div style="line-height: 1.6;">${originalContent}</div>`;
+        mergedContent += `</div>`;
+        
+        // Add comments section
+        mergedContent += `<div>`;
+        mergedContent += `<h1>Comments Requiring Response</h1>`;
+        mergedContent += `<p><strong>File ID:</strong> ${fileId}</p>`;
         
         if (comments.length === 0) {
-            docContent += `<p>No comments found.</p>`;
+            mergedContent += `<p>No comments found.</p>`;
         } else {
             comments.forEach((comment, index) => {
                 const commentDate = new Date(comment.created_at);
                 const date = commentDate.toLocaleDateString();
                 const time = commentDate.toLocaleTimeString();
                 
-                docContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px;">`;
-                docContent += `<h3>Comment ${index + 1}</h3>`;
-                docContent += `<p><strong>From:</strong> ${comment.created_by.name}</p>`;
-                docContent += `<p><strong>Date:</strong> ${date} at ${time}</p>`;
-                docContent += `<p><strong>Comment:</strong></p>`;
-                docContent += `<div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div>`;
-                docContent += `<p><strong>Your Response:</strong></p>`;
-                docContent += `<div style="border: 1px solid #ddd; min-height: 100px; padding: 10px; background-color: white;"></div>`;
-                docContent += `</div>`;
+                mergedContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; page-break-inside: avoid;">`;
+                mergedContent += `<h3>Comment ${index + 1}</h3>`;
+                mergedContent += `<p><strong>From:</strong> ${comment.created_by.name}</p>`;
+                mergedContent += `<p><strong>Date:</strong> ${date} at ${time}</p>`;
+                mergedContent += `<p><strong>Comment:</strong></p>`;
+                mergedContent += `<div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div>`;
+                mergedContent += `<p><strong>Your Response:</strong></p>`;
+                mergedContent += `<div style="border: 1px solid #ddd; min-height: 100px; padding: 10px; background-color: white;"></div>`;
+                mergedContent += `</div>`;
             });
         }
         
-        docContent += `</body></html>`;
+        mergedContent += `</div></body></html>`;
         
-        const blob = new Blob([docContent], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `comments-response-${fileId}.doc`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // Download single merged file
+        const mergedBlob = new Blob([mergedContent], { type: 'application/msword' });
+        const mergedUrl = URL.createObjectURL(mergedBlob);
+        const mergedLink = document.createElement('a');
+        mergedLink.href = mergedUrl;
+        mergedLink.download = `document-with-comments-${fileId}.doc`;
+        document.body.appendChild(mergedLink);
+        mergedLink.click();
+        document.body.removeChild(mergedLink);
+        URL.revokeObjectURL(mergedUrl);
+        
+        alert('Single document with original content and comments has been downloaded.');
         
     } catch (error) {
-        console.error('Error downloading comments:', error);
-        alert('Error downloading comments. Please try again.');
+        console.error('Error downloading merged document:', error);
+        alert('Error downloading document. Please try again.');
     }
 };
 
