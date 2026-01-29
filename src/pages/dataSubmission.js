@@ -20,7 +20,7 @@ export const getReturnedConcepts = async () => {
         );
         
         if (userFolder) {
-            return await getAllFilesRecursive(userFolder.id);
+            return await categorizeFilesByFolderStructure(userFolder.id);
         }
     } catch {
         // No access to Return_to_Submitter, check root folder
@@ -30,11 +30,44 @@ export const getReturnedConcepts = async () => {
         );
         
         if (returnFolder) {
-            return await getAllFilesRecursive(returnFolder.id);
+            return await categorizeFilesByFolderStructure(returnFolder.id);
         }
     }
     
-    return { entries: [] };
+    return { needinput: [], accepted: [], declined: [] };
+};
+
+export const categorizeFilesByFolderStructure = async (rootFolderId) => {
+    const categorized = {
+        needinput: [],
+        accepted: [],
+        declined: []
+    };
+    
+    const rootItems = await getFolderItems(rootFolderId);
+    console.log('Root Items:', rootItems);
+    for (const item of rootItems.entries) {
+        console.log(item);
+        if (item.type === 'folder') {
+            const folderName = item.name.toLowerCase();
+            console.log(folderName);
+            const folderFiles = await getAllFilesRecursive(item.id);
+            
+            if (folderName.includes('requiring input')) {
+                console.log("requires input");
+                categorized.needinput.push(...folderFiles);
+            } else if (folderName.includes('accepted')) {
+                console.log("Accepted");
+                categorized.accepted.push(...folderFiles);
+            } else if (folderName.includes('denied') || folderName.includes('rejected')) {
+                console.log("Denied/Rejected");
+                categorized.declined.push(...folderFiles);
+            }
+        }
+    }
+    
+    console.log(categorized);
+    return categorized;
 };
 
 export const showCommentsInPane = (fileId, tabName = '') => {
@@ -111,29 +144,31 @@ export const showPreviewInPane = (fileId) => {
 };
 
 export const switchFilesWithResponse = (tab) => {
-    document.getElementById(`${tab}selectedDoc`).addEventListener("change", (e) => {
-        const file_id = e.target.value;
-        showPreviewInPane(file_id);
-        showComments(file_id);
-        
-        // Add response inputs if on needinput tab
-        if (tab === 'needinput') {
-            setTimeout(() => {
-                addResponseInputs();
-            }, 300);
-        }
-    });
+    const element = document.getElementById(`${tab}selectedDoc`);
+    if (element) {
+        element.addEventListener("change", (e) => {
+            const file_id = e.target.value;
+            showPreviewInPane(file_id);
+            showComments(file_id);
+            
+            // Add response inputs if on needinput tab
+            if (tab === 'needinput') {
+                setTimeout(() => {
+                    addResponseInputs();
+                }, 300);
+            }
+        });
+    }
 };
 
 export const dataSubmissionForm = async () => {
-    const response = await getReturnedConcepts();
-    console.log('Returned Concepts:', response);
+    const categorizedEntries = await getReturnedConcepts();
+    console.log('Categorized Entries:', categorizedEntries);
 
-    let entries = response//.entries.map(item => item.id);
-
+    const totalFiles = categorizedEntries.needinput.length + categorizedEntries.accepted.length + categorizedEntries.declined.length;
     let message = JSON.parse(localStorage.parms).name + "'s Concepts Returned";
     
-    if (response.length <= 0) {
+    if (totalFiles <= 0) {
         hideAnimation();
         return `
             <div class="general-bg padding-bottom-1rem">
@@ -163,17 +198,17 @@ export const dataSubmissionForm = async () => {
                         <ul class='nav nav-tabs mb-3' role='tablist'>
                             <li class='nav-item active' role='presentation'>
                                 <a class='nav-link' id='needinputTab' href='#needinput' data-mdb-toggle="tab" role='tab' aria-controls='needinput' aria-selected='true'>
-                                    Concepts Requiring Input
+                                    Concepts Requiring Input (${categorizedEntries.needinput.length})
                                 </a>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <a class='nav-link' id='acceptedTab' href='#accepted' data-mdb-toggle="tab" role='tab' aria-controls='accepted' aria-selected='true'>
-                                    Concepts Accepted
+                                    Concepts Accepted (${categorizedEntries.accepted.length})
                                 </a>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <a class='nav-link' id='declinedTab' href='#declined' data-mdb-toggle="tab" role='tab' aria-controls='declined' aria-selected='true'>
-                                    Concepts Rejected
+                                    Concepts Rejected (${categorizedEntries.declined.length})
                                 </a>
                             </li>
                         </ul>
@@ -185,23 +220,23 @@ export const dataSubmissionForm = async () => {
                 <button id='downloadCommentsBtn' class='btn btn-secondary mb-3' style='float: right; margin-right: 10px;'>Download Comments for Offline Response</button>
         `;
         
-        template += renderFilePreviewDropdown(entries, "needinput", true);
+        template += renderFilePreviewDropdown(categorizedEntries.needinput, "needinput", true);
     
         template += `
             <div class='tab-pane fade' id='accepted' role='tabpanel' aria-labeledby='acceptedTab'>
         `;
         
-        template += renderFilePreviewDropdown(entries, "accepted", true);
+        template += renderFilePreviewDropdown(categorizedEntries.accepted, "accepted", true);
     
         template += `
             <div class='tab-pane fade' id='declined' role='tabpanel' aria-labeledby='declinedTab'>
         `;
 
-        template += renderFilePreviewDropdown(entries, "declined", true);
+        template += renderFilePreviewDropdown(categorizedEntries.declined, "declined", true);
         
         template += `<div id='filePreview'>`;
 
-        if (entries.length !== 0) {
+        if (totalFiles !== 0) {
             template += `
                 <div class='row'>
                     <div id='boxFilePreview' class="col-8 preview-container"></div>
@@ -215,16 +250,11 @@ export const dataSubmissionForm = async () => {
         </div>
         `;
     document.getElementById("dataSubmissionFileView").innerHTML = template;
-    //viewFinalDecisionFilesTemplate(entries);
 
-    // commentSubmit();
-    
-    // downloadAll('recommendation', entries)
-    // downloadAll('conceptNeedingClarification', entries)
-    console.log(entries);
-    if (!!entries.length) {
-        showPreviewInPane(entries[0].id);
-        showComments(entries[0].id);
+    console.log(categorizedEntries);
+    if (categorizedEntries.needinput.length > 0) {
+        showPreviewInPane(categorizedEntries.needinput[0].id);
+        showComments(categorizedEntries.needinput[0].id);
         setTimeout(() => {
             addResponseInputs(); // Add response inputs for initial load
         }, 300);
@@ -238,17 +268,17 @@ export const dataSubmissionForm = async () => {
     switchTabsDataSubmission(
         "needinput",
         ["accepted", 'declined'],
-        entries
+        categorizedEntries.needinput
     );
     switchTabsDataSubmission(
         "accepted",
         ["needinput", 'declined'],
-        entries
+        categorizedEntries.accepted
     );
     switchTabsDataSubmission(
         "declined",
         ["needinput", 'accepted'],
-        entries
+        categorizedEntries.declined
     );
     
     // Set up file switching for all tabs
@@ -256,10 +286,11 @@ export const dataSubmissionForm = async () => {
     switchFilesWithResponse("declined");
 
     // Set up download comments functionality
-    setupDownloadComments(entries);
+    setupDownloadComments(categorizedEntries.needinput);
 
     document.getElementById("needinputTab").click();
-};
+    document.getElementById("needinputselectedDoc").children[0].selected = true;
+    };
 
 export const setupDownloadComments = (entries) => {
     const downloadBtn = document.getElementById('downloadCommentsBtn');

@@ -435,7 +435,7 @@ export const commentSubmit = async () => {
             let fileinfo = await getFileInfo(fileId);
             let filename = fileinfo.name;
             let allFiles = await getAllFilesRecursive(submitterFolder);
-            let entries = allFiles.entries;
+            let entries = allFiles;
             console.log(filename);
             console.log(entries);
             
