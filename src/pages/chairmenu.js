@@ -312,7 +312,7 @@ export const generateChairMenuFiles = async () => {
     // document.getElementById("selectedTab").innerHTML = template;
     document.getElementById("chairFileView").innerHTML = template;
     viewFinalDecisionFilesTemplate(filearrayAllFiles);
-    commentSubmit();
+    commentSubmit(consortium);
     
     downloadAll('recommendation', filesIncompleted)
     downloadAll('conceptNeedingClarification', filesClaraIncompleted)
@@ -412,7 +412,7 @@ export const chairMenuTemplate = () => {
     // return template;
 };
 
-export const commentSubmit = async () => {
+export const commentSubmit = async (consortium) => {
     let submitComment = async (e) => {
         e.preventDefault();
         
@@ -436,20 +436,24 @@ export const commentSubmit = async () => {
             let filename = fileinfo.name;
             let allFiles = await getAllFilesRecursive(submitterFolder);
             let entries = allFiles;
-            console.log(filename);
-            console.log(entries);
             
             let allFileMatch = entries.find(element => element.name === filename);
             let tasklist = await getTaskList(fileId);
-            console.log(tasklist);
             
             let grade = e.target[1].value;
             let comment = e.target[0].value;
-            let message = "Rating: " + grade + "\nComment: " + comment;
+            //let message = "Consortium: " + consortium + ", Rating: " + grade + "\nComment: " + comment;
+            let message = `Consortium: ${consortium}, Rating: ${grade}, Comment: ${comment}`;
             console.log(message);
             
             await createComment(fileId, message);
-            await createComment(allFileMatch.id, message);
+            if (allFileMatch && allFileMatch.id) {
+                await createComment(allFileMatch.id, message);
+            } else {
+                alert('Error detected: Parent file cannot be found');
+                btn.disabled = false;
+                return;
+            }
             if (grade === "5" || grade === "2"){
                 let clariFolder = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).boxIdClara;
                 await moveFile(fileId, clariFolder)
