@@ -2107,7 +2107,7 @@ form {
     background-color: #A41652 !important;
     border: none;
     outline: none;
-    border-radius: 2px;
+    border-radius: 0.375rem;
     cursor: pointer;
 }
 .buttonsubmit:active {
@@ -2242,6 +2242,46 @@ ul.form {
 
 .form-check {
     margin: 5px 0 0 0
+}
+
+.admin-checkbox {
+    width: 12px !important;
+    height: 12px !important;
+    transform: scale(1.2);
+    accent-color: #dc3545;
+}
+
+.admin-checkbox:checked {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.responsive-text {
+    font-size: 1rem;
+}
+
+@media (max-width: 1200px) {
+    .responsive-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .responsive-text {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .responsive-text {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .responsive-text {
+        font-size: 0.7rem;
+    }
 }
 
 .nav-pills .nav-link.active {

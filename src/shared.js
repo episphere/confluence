@@ -1436,7 +1436,7 @@ export async function showComments(id) {
         const dropdownSection = document.getElementById(`fileComments`);
         dropdownSection.innerHTML = `
             <div class='comments'>
-                Comments
+                <b>Comments</b>
                 <div class='text-left'>
                     No comments to show.
                 </div>
@@ -1448,7 +1448,7 @@ export async function showComments(id) {
     
     let template = `
         <div class='comments'>
-        Comments
+        <b>Comments</b>
         <div class='container-fluid'>
     `;
     const user = JSON.parse(localStorage.parms).login;

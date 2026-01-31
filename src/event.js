@@ -1875,7 +1875,7 @@ export function switchTabs(show, hide, files) {
                     }
                     if (show === "recommendation") {
                         document.getElementById("finalChairDecision").style.display ="block";
-                        document.getElementById("fileComments").style.display = "none";
+                        document.getElementById("fileComments").style.display = "block";
                     }
                     if (show === "conceptNeedingClarification") {
                         document.getElementById("finalChairDecision").style.display ="block";

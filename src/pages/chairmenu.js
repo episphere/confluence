@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators } from "../shared.js";
+import { showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -58,6 +58,73 @@ const getCurrentUserAuth = () => {
     let authChair = chairsInfo.find(({ email }) => email === userEmail);
     return authChair ? authChair : null;
 }
+
+export const showPreviewInPane = (fileId) => {
+    showPreview(fileId, 'boxFilePreview');
+    setTimeout(() => {
+        const previewContainer = document.getElementById('boxFilePreview');
+        if (previewContainer) {
+            // Check if screen is large (lg breakpoint is 992px)
+            if (window.innerWidth >= 992) {
+                previewContainer.style.maxWidth = '66.666667%';
+                previewContainer.style.flex = '0 0 66.666667%';
+            } else {
+                previewContainer.style.maxWidth = '100%';
+                previewContainer.style.flex = '0 0 100%';
+            }
+        }
+    }, 100);
+};
+
+export const showCommentsInPane = (fileId) => {
+    const commentsContainer = document.getElementById('fileComments');
+    if (commentsContainer) {
+        // Store the finalChairDecision form before modifying content
+        const finalDecisionForm = commentsContainer.querySelector('#finalChairDecision');
+        let formHTML = '';
+        if (finalDecisionForm) {
+            formHTML = finalDecisionForm.outerHTML;
+        }
+        
+        const existingComments = commentsContainer.querySelector('.comments-section');
+        if (existingComments) {
+            existingComments.remove();
+        }
+        
+        const commentsDiv = document.createElement('div');
+        commentsDiv.className = 'comments-section';
+        commentsContainer.insertBefore(commentsDiv, commentsContainer.firstChild);
+        
+        showComments(fileId);
+        setTimeout(() => {
+            const defaultComments = document.querySelector('[id*="Comments"]');
+            if (defaultComments && defaultComments.id !== 'fileComments') {
+                commentsDiv.innerHTML = defaultComments.innerHTML;
+                defaultComments.innerHTML = '';
+                // Ensure comments are visible
+                commentsDiv.style.display = 'block';
+                const hiddenElements = commentsDiv.querySelectorAll('[style*="display: none"]');
+                hiddenElements.forEach(el => el.style.display = 'block');
+            }
+            
+            // Restore the finalChairDecision form if it was removed
+            if (formHTML && !commentsContainer.querySelector('#finalChairDecision')) {
+                commentsContainer.insertAdjacentHTML('beforeend', formHTML);
+            }
+        }, 100);
+    }
+};
+
+export const switchFilesWithComments = (tab) => {
+    const element = document.getElementById(`${tab}selectedDoc`);
+    if (element) {
+        element.addEventListener("change", (e) => {
+            const file_id = e.target.value;
+            showPreviewInPane(file_id);
+            showCommentsInPane(file_id);
+        });
+    }
+};
 
 export const generateChairMenuFiles = async () => {
     const userChairItem = getCurrentUserAuth();
@@ -181,12 +248,12 @@ export const generateChairMenuFiles = async () => {
                     <ul class='nav nav-tabs mb-3' role='tablist'>
                         <li class='nav-item active' role='presentation'>
                             <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'>
-                                New Concepts for Review
+                                New Concepts for Review (${filesIncompleted.length})
                             </a>
                         </li>
                         <li class='nav-item' role='presentation'>
                             <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>
-                                Concepts Requiring Clarifications
+                                Concepts Requiring Clarifications (${filesClaraIncompleted.length})
                             </a>
                         </li>
                         <li class='nav-item' role='presentation'>
@@ -230,33 +297,36 @@ export const generateChairMenuFiles = async () => {
     if (filesIncompleted.length !== 0 || filesClaraIncompleted.length !== 0) {
         template += `
             <div class='row'>
-                <div id='boxFilePreview' class="col-8 preview-container"></div>
-                <div id='fileComments' class='col-4 mt-2'></div>
-            </div>
-            </br>
-            <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#f6f6f6; display:none">
-                <form>
-                    <label for="message">Enter Message for submitter</label>
-                    <div class='text-muted small'>Submitter will only see the below comment after final decision is made. </div>
-                    <div class="input-group">
-                        <textarea id="message" name="message" rows="6" cols="65"></textarea>
+                <div id='boxFilePreview' class="col-lg-8 col-12 preview-container"></div>
+                <div id='sidePanel' class='col-lg-4 col-12 mt-2' style='display: block;'>
+                    <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;">
+                        <form>
+                            <label for="message"><b>Enter Message for submitter</b></label>
+                            <div class='text-muted small'>Submitter will only see the below comment after final decision is made.</div>
+                            <div class="input-group">
+                                <textarea id="message" name="message" rows="4" class="form-control"></textarea>
+                            </div>
+                            <div class='mt-2'>
+                                <label for="grade">Select recommendation:</label>
+                                <select name="grade" id="grade2" class="form-select" aria-label="Select Document to Review">
+                                    <option value = "1"> 1 - Approved as submitted</option>
+                                    <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
+                                    <option value = "3"> 3 - Approved, but data release will be delayed </option>
+                                    <option value = "4"> 4 - Not approved </option>
+                                    <option value = "5"> 5 - Decision requires clarification</option>
+                                    <option value = "NA"> NA - Not Applicable</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="buttonsubmit mt-2" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
+                                <span class="buttonsubmit__text"> Submit </span>
+                            </button>
+                            <div id="commentWarning" class="text-danger small mt-1" style="display: none;">A comment is required with this score.</div>
+                        </form>
                     </div>
-                    <div class='col-5'>
-                        <label for="grade">Select recommendation: </label>
-                        <select name="grade" id="grade2" class="form-select" aria-label="Select Document to Review">
-                            <option value = "1"> 1 - Approved as submitted</option>
-                            <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
-                            <option value = "3"> 3 - Approved, but data release will be delayed </option>
-                            <option value = "4"> 4 - Not approved </option>
-                            <option value = "5"> 5 - Decision requires clarification</option>
-                            <option value = "NA"> NA - Not Applicable</option>
-                        </select>
-                    </div>
-                    </br>
-                    <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
-                        <span class="buttonsubmit__text"> Submit </span>
-                    </button>
-                </form>
+                    <div style="height: 20px; border-bottom: 2px solid #e9ecef; margin: 20px 0;"></div>
+                    <div id='fileComments' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;"></div>
+
+                </div>
             </div>
         `;
     }
@@ -266,77 +336,77 @@ export const generateChairMenuFiles = async () => {
     </div>
     `;
     
-    // template += `
-    //     <div class='tab-pane fade' id='daccDecision' role='tabpanel' aria-labeledby='daccDecision'>
-    //         daccDecisionTab tab  content
-    //     </div>
-    //     <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>Send Email to DACC</a>
-    // `;
-    
-    // // TODO: For Concept Needing Clarification Tab
-    // template += `<div class='tab-pane fade' id='conceptNeedingClarification' role='tabpanel' aria-labeledby='conceptNeedingClarification'>`;
-    // template += renderFilePreviewDropdown(filesClaraIncompleted, "conceptNeedingClarification");
-    // template += `<div id='filePreview'>`;
-    // if (filesClaraIncompleted.length !== 0) {
-    //     template += `
-    //         <div class='row'>
-    //             <div id='boxFileClaraPreview' class="col-12 preview-container"></div>
-    //         </div>
-    //         <div id='finalClaraDecision' class="card-body submit-comment-conceptNeedingClarification" style="background-color:#f6f6f6;">
-    //             <form>
-    //                 <label for="message">Enter Message for submitter or the DACC</label>
-    //                 <div class='text-muted small'>Submitter will only see the below comment after approve or deny. </div>
-    //                 <label for="grade">Select recommendation: </label>
-    //                 <select name="grade" id="grade2"></option>
-    //                     <option value = "1"> 1 - Approved as submitted</option>
-    //                     <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
-    //                     <option value = "3"> 3 - Approved, but data release will be delayed </option>
-    //                     <option value = "4"> 4 - Not approved </option>
-    //                     <option value = "5"> 5 - Decision pending clarification of several issues</option>
-    //                     <option value = "777"> 777 - Duplicate Proposal</option>
-    //                 </select>
-    //                 <br>
-    //                 <div class="input-group">
-    //                     <textarea id="message" name="message" rows="6" cols="65"></textarea>
-    //                 </div>
-    //                 <button type="submit" class="buttonsubmit" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
-    //                     <span class="buttonsubmit__text"> Submit </span>
-    //                 </button>
-    //             </form>
-    //         </div>
-    //     `;
-    // }
-    
-    // template += `</div></div>`;
-    
-    // document.getElementById("selectedTab").innerHTML = template;
     document.getElementById("chairFileView").innerHTML = template;
     viewFinalDecisionFilesTemplate(filearrayAllFiles);
     commentSubmit(consortium);
+    
+    // Add form validation for finalChairDecision
+    setTimeout(() => {
+        const messageTextarea = document.getElementById('message');
+        const gradeSelect = document.getElementById('grade2');
+        const submitButton = document.querySelector('#finalChairDecision button[type="submit"]');
+        
+        if (messageTextarea && gradeSelect && submitButton) {
+            const warningDiv = document.getElementById('commentWarning');
+            
+            const validateForm = () => {
+                const grade = gradeSelect.value;
+                const message = messageTextarea.value.trim();
+                
+                if (grade !== '1' && message === '') {
+                    submitButton.disabled = true;
+                    submitButton.style.opacity = '0.5';
+                    warningDiv.style.display = 'block';
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                    warningDiv.style.display = 'none';
+                }
+            };
+            
+            messageTextarea.addEventListener('input', validateForm);
+            gradeSelect.addEventListener('change', validateForm);
+            validateForm(); // Initial check
+        }
+    }, 300);
+    
+    // Add resize listener for responsive preview container
+    const handleResize = () => {
+        const previewContainer = document.getElementById('boxFilePreview');
+        if (previewContainer) {
+            if (window.innerWidth >= 992) {
+                previewContainer.style.maxWidth = '66.666667%';
+                previewContainer.style.flex = '0 0 66.666667%';
+            } else {
+                previewContainer.style.maxWidth = '100%';
+                previewContainer.style.flex = '0 0 100%';
+            }
+        }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call once to set initial state
     
     downloadAll('recommendation', filesIncompleted)
     downloadAll('conceptNeedingClarification', filesClaraIncompleted)
     console.log(filesIncompleted);
     if (!!filesIncompleted.length) {
-        showPreview(filesIncompleted[0].id);
-        switchFiles("recommendation");
+        showPreviewInPane(filesIncompleted[0].id);
+        // Don't call showCommentsInPane initially to preserve the form
+        showCommentsInPane(filesIncompleted[0].id);
+        switchFilesWithComments("recommendation");
         document.getElementById("recommendationselectedDoc").children[0].selected = true;
+        // Ensure finalChairDecision is always visible
+        setTimeout(() => {
+            const finalDecisionForm = document.getElementById('finalChairDecision');
+            if (finalDecisionForm) {
+                finalDecisionForm.style.display = 'block';
+            }
+        }, 200);
     } else {
         document.getElementById("filePreview").classList.remove("d-block");
         document.getElementById("filePreview").classList.add("d-None");
     }
 
-    // if (!!filesClaraIncompleted.length) {
-    //     console.log({filesClaraIncompleted});
-    //     showPreview(filesClaraIncompleted[0].id, 'boxFileClaraPreview');
-    //     switchFiles("conceptNeedingClarification", 'boxFileClaraPreview');
-    //     document.getElementById("conceptNeedingClarification").children[0].selected = true;
-    //     commentSubmit('conceptNeedingClarification');
-    // } else {
-    //     document.getElementById("filePreview").classList.remove("d-block");
-    //     document.getElementById("filePreview").classList.add("d-none");
-    // }
-    
     switchTabs(
         "recommendation",
         ["daccDecision", 'conceptNeedingClarification'],
@@ -558,18 +628,18 @@ export function viewFinalDecisionFilesColumns() {
             <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
 
             <!-- Left side: Basic file info columns -->
-            <div class="col-24-5 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-3 text-left font-bold ws-nowrap text-wrap header-sortable">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-5 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-3 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
             
             <!-- Consortium columns -->
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
-            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable" hidden>TEST <button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text" hidden>TEST <button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
             
             <!-- Empty space for the accordion toggle button -->
             <div class="col-24-1"></div>
@@ -711,12 +781,12 @@ export async function viewFinalDecisionFiles(files) {
     <div class="row-24 align-items-center position-relative">
       <!-- File Name (col-3) -->
       <div class="col-24-5 text-left">
-        <p title="${titlename}">${shorttitlename}</p>
+        <span class="responsive-text" title="${titlename}">${shorttitlename}</span>
       </div>
       
       <!-- Date (col-1) -->
       <div class="col-24-4 text-left">
-        ${new Date(fileInfo.created_at).toDateString().substring(4)}
+        <span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span>
       </div>
       
       <!-- Status (col-1) -->
@@ -848,8 +918,8 @@ export async function viewFinalDecisionFiles(files) {
           <div class="col-md-2 pl-2 font-bold">Concept</div>
           <div class="col">
             ${filename} 
-            <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
-              <i class="fas fa-external-link-alt"></i>
+            <button class="btn btn-lg custom-btn preview-file preview-file-inline" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal" style="vertical-align: baseline; padding: 2px 6px; margin-left: 8px; line-height: 1;">
+              <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
             </button>
           </div>
         </div>
@@ -1484,6 +1554,9 @@ export const authTableTemplate = () => {
                       <button type="submit" id="submitID" class="buttonsubmit" onclick="this.classList.toggle('buttonsubmit--loading')"> 
                         <span class="buttonsubmit__text"> Update Users </span>
                       </button>
+                      <button type="button" id="renameFilesBtn" class="buttonsubmit" style="margin-left: 10px;"> 
+                        <span class="buttonsubmit__text"> Rename Files </span>
+                      </button>
                   </div>
               </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
@@ -1522,6 +1595,7 @@ export const generateAuthTableFiles = async () => {
     // commentSubmit();
     returnToChairs();
     returnToSubmitter();
+    addRenameFilesEvent(filearrayAllFilesSub);
     hideAnimation();
 };
 
@@ -1580,6 +1654,30 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
     
     if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0) {
         await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom);
+        
+        // Add checkbox change listeners to enable/disable buttons
+        const updateButtonStates = () => {
+            const anyChecked = document.querySelectorAll('.pl:checked').length > 0;
+            const returnSubmitterBtn = document.getElementById('returnSubmitter');
+            const returnChairsBtn = document.getElementById('returnChairs');
+            
+            if (returnSubmitterBtn) {
+                returnSubmitterBtn.disabled = !anyChecked;
+                returnSubmitterBtn.style.opacity = anyChecked ? '1' : '0.5';
+            }
+            if (returnChairsBtn) {
+                returnChairsBtn.disabled = !anyChecked;
+                returnChairsBtn.style.opacity = anyChecked ? '1' : '0.5';
+            }
+        };
+        
+        // Initial state - disable buttons
+        updateButtonStates();
+        
+        // Add event listeners to all checkboxes
+        document.querySelectorAll('.pl').forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonStates);
+        });
         
         for (const file of filesInfoSub) {
             showCommentsDCEG(file.id, true)
@@ -1692,18 +1790,18 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
 
           <!-- Selection checkbox -->
           <div class="col-24-1 text-left">
-            <input type="checkbox" class="pl" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
+            <input type="checkbox" class="pl admin-checkbox" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
           </div>
 
 
           <!-- File Name (col-3) -->
           <div class="col-24-5 text-left">
-            <p title="${titlename}">${shorttitlename}</p>
+            <span class="responsive-text" title="${titlename}">${shorttitlename}</span>
           </div>
           
           <!-- Date (col-1) -->
           <div class="col-24-3 text-left">
-            ${new Date(fileInfo.created_at).toDateString().substring(4)}
+            <span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span>
           </div>
           
           <!-- Status (col-1) -->
@@ -1835,8 +1933,8 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <div class="col-md-2 pl-2 font-bold">Concept</div>
               <div class="col">
                 ${filename} 
-                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
-                  <i class="fas fa-external-link-alt"></i>
+                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal" style="vertical-align: baseline; padding: 2px 6px; margin-left: 8px; line-height: 1;">
+                  <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
                 </button>
               </div>
             </div>
@@ -1999,8 +2097,8 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
               <div class="col-md-2 pl-2 font-bold">Concept</div>
               <div class="col">
                 ${filename} 
-                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal">
-                  <i class="fas fa-external-link-alt"></i>
+                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal" style="vertical-align: baseline; padding: 2px 6px; margin-left: 8px; line-height: 1;">
+                  <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
                 </button>
               </div>
             </div>
@@ -2139,53 +2237,101 @@ export const returnToChairs = () => {
         console.log("return to chairs selected");
         var inputsChecked = document.querySelectorAll('.pl');
         
-        for (var checkbox of inputsChecked) {
-            if (checkbox.checked) {
-                for (var checkedCons of checkbox.parentElement.parentElement.getElementsByClassName("consTable")) {
-                    if (checkedCons.innerHTML != '--') {
-                        let cons = checkedCons.getAttribute('data-value');
-                        const info = chairsInfo.find(object => {
-                            return object.consortium === cons;
-                        });
+        if (inputsChecked.length === 0 || !Array.from(inputsChecked).some(cb => cb.checked)) {
+            alert('Please select at least one file to return.');
+            return;
+        }
+        
+        // Show chair selection popup
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        
+        header.innerHTML = `
+            <h5 class="modal-title">Select Chairs to Return Files To</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+        
+        let template = `
+            <form id="chairSelectionForm">
+                <div class="form-group mb-3">
+                    <h6>Select which chairs to return the files to:</h6>
+        `;
+        
+        chairsInfo.forEach(chair => {
+            template += `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="${chair.consortium}" id="chair_${chair.consortium}">
+                    <label class="form-check-label" for="chair_${chair.consortium}">
+                        ${chair.consortium}
+                    </label>
+                </div>
+            `;
+        });
+        
+        template += `
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Return to Selected Chairs</button>
+                </div>
+            </form>
+        `;
+        
+        body.innerHTML = template;
+        $("#confluenceMainModal").modal("show");
+        
+        // Handle form submission
+        document.getElementById('chairSelectionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedChairs = Array.from(document.querySelectorAll('#chairSelectionForm input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedChairs.length === 0) {
+                alert('Please select at least one chair.');
+                return;
+            }
+            
+            $("#confluenceMainModal").modal("hide");
+            
+            // Process the return for selected chairs
+            for (var checkbox of inputsChecked) {
+                if (checkbox.checked) {
+                    for (const selectedConsortium of selectedChairs) {
+                        const info = chairsInfo.find(object => object.consortium === selectedConsortium);
                         
                         let newBoxFiles = await getAllFilesRecursive(info.boxIdNew);
-                        console.log(newBoxFiles);
                         var itemFound = false;
                         
-                        for (let item of newBoxFiles.entries) {
+                        for (let item of newBoxFiles) {
                             if (item.name === checkbox.value) {
                                 let createTask = await createCompleteTask(item.id, "Returning to complete your review");
-                                console.log(createTask);
                                 let assignedTask = await assignTask(createTask.id, info.email);
-                                console.log(assignedTask);
-                                console.log("Found " + item.name);
+                                console.log("Found " + item.name + " in " + selectedConsortium);
                                 itemFound = true;
+                                break;
                             }
                         }
                         
                         if (!itemFound) {
                             let claraBoxFiles = await getAllFilesRecursive(info.boxIdClara);
-                            console.log(claraBoxFiles);
-                            for (let item of claraBoxFiles.entries) {
+                            for (let item of claraBoxFiles) {
                                 if (item.name === checkbox.value) {
                                     let createTask = await createCompleteTask(item.id, "Returning to complete your review");
-                                    console.log(createTask);
                                     let assignedTask = await assignTask(createTask.id, info.email);
-                                    console.log(assignedTask);
-                                    console.log("Found " + item.name);
+                                    console.log("Found " + item.name + " in " + selectedConsortium + " Clara folder");
                                     itemFound = true;
+                                    break;
                                 }
                             }
-                        } else {
-                            console.log("item not found");
                         }
                     }
                 }
             }
-        }
-        
-        btn.classList.toggle("buttonsubmit--loading");
-        document.location.reload(true);
+            
+            btn.classList.toggle("buttonsubmit--loading");
+            document.location.reload(true);
+        });
     }
     
     const returnChairsButton = document.querySelector(`#returnChairs`);
@@ -2808,6 +2954,137 @@ export const shareData = (element) => {
     folderToShare.dataset.objectType = element.dataset.objectType;
     btn1.dispatchEvent(new Event("click"));
   });
+};
+
+export const addRenameFilesEvent = (files) => {
+    const renameBtn = document.getElementById('renameFilesBtn');
+    if (renameBtn) {
+        renameBtn.addEventListener('click', () => {
+            showRenameFilesPopup(files);
+        });
+    }
+};
+
+export const showRenameFilesPopup = (files) => {
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    
+    header.innerHTML = `
+        <h5 class="modal-title">Rename Files with Round Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    `;
+    
+    let template = `
+        <form id="renameFilesForm">
+            <div class="form-group mb-3">
+                <label for="roundNumber">Enter Round Number (X):</label>
+                <input type="text" class="form-control" id="roundNumber" placeholder="e.g., 01" required>
+            </div>
+            <div class="form-group mb-3">
+                <h6>Files to be renamed:</h6>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+    `;
+    
+    files.forEach((file, index) => {
+        const currentTitle = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+        const extension = file.name.split('.').pop(); // Get extension
+        const newTitle = `${currentTitle}_RX_${String(index + 1).padStart(3, '0')}.${extension}`;
+        template += `
+            <div class="mb-2">
+                <strong>Current:</strong> ${file.name}<br>
+                <strong>New:</strong> <span id="preview${index}">${newTitle}</span>
+            </div>
+            <hr>
+        `;
+    });
+    
+    template += `
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Confirm Rename</button>
+            </div>
+        </form>
+    `;
+    
+    body.innerHTML = template;
+    $("#confluenceMainModal").modal("show");
+    
+    // Update preview when round number changes
+    const roundInput = document.getElementById('roundNumber');
+    roundInput.addEventListener('input', (e) => {
+        const roundValue = e.target.value || 'X';
+        files.forEach((file, index) => {
+            const currentTitle = file.name.replace(/\.[^/.]+$/, "");
+            const extension = file.name.split('.').pop();
+            const newTitle = `${currentTitle}_R${roundValue}_${String(index + 1).padStart(3, '0')}.${extension}`;
+            document.getElementById(`preview${index}`).textContent = newTitle;
+        });
+    });
+    
+    // Handle form submission
+    document.getElementById('renameFilesForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const roundNumber = document.getElementById('roundNumber').value;
+        if (!roundNumber) {
+            alert('Please enter a round number');
+            return;
+        }
+        await renameFilesWithRound(files, roundNumber);
+        $("#confluenceMainModal").modal("hide");
+    });
+};
+
+export const renameFilesWithRound = async (files, roundNumber) => {
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    
+    header.innerHTML = `
+        <h5 class="modal-title">Renaming Files...</h5>
+    `;
+    
+    body.innerHTML = '<div id="renameProgress"><p>Starting file rename process...</p></div>';
+    $("#confluenceMainModal").modal("show");
+    
+    const progressDiv = document.getElementById('renameProgress');
+    
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const currentTitle = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+            const extension = file.name.split('.').pop(); // Get extension
+            const newFileName = `${currentTitle}_R${roundNumber}_${String(i + 1).padStart(3, '0')}.${extension}`;
+            
+            progressDiv.innerHTML += `<p>Renaming: ${file.name} → ${newFileName}</p>`;
+            
+            // Rename file in submitter folder
+            await boxUpdateFile(file.id, { name: newFileName });
+            progressDiv.innerHTML += `<p style="color: green;">✓ Renamed in submitter folder: ${newFileName}</p>`;
+            
+            // Search and rename in each chair's folders
+            for (const chair of chairsInfo) {
+                const chairFolders = [chair.boxIdNew, chair.boxIdClara, chair.boxIdComplete];
+                
+                for (const folderId of chairFolders) {
+                    const chairFiles = await getAllFilesRecursive(folderId);
+                    const matchingFile = chairFiles.find(chairFile => chairFile.name === file.name);
+                    
+                    if (matchingFile) {
+                        await boxUpdateFile(matchingFile.id, { name: newFileName });
+                        progressDiv.innerHTML += `<p style="color: blue;">✓ Renamed in ${chair.consortium} folder: ${newFileName}</p>`;
+                    }
+                }
+            }
+        }
+        
+        progressDiv.innerHTML += '<p><strong>All files renamed successfully!</strong></p>';
+        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">Close & Refresh</button></div>';
+        
+    } catch (error) {
+        progressDiv.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>';
+    }
 };
 
 export const addFields = (id, bool) => {

@@ -251,7 +251,6 @@ export const dataSubmissionForm = async () => {
         `;
     document.getElementById("dataSubmissionFileView").innerHTML = template;
 
-    console.log(categorizedEntries);
     if (categorizedEntries.needinput.length > 0) {
         showPreviewInPane(categorizedEntries.needinput[0].id);
         showComments(categorizedEntries.needinput[0].id);
