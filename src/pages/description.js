@@ -145,8 +145,8 @@ const getDescription = async () => {
     uniqueConsortium.forEach(consortium => {
         filterTemplate += `
             <li class="filter-list-item">
-                <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="select-consortium" style="margin-left: 1px !important;">
-                <label for="label${consortium}" class="country-name" title="${consortium}">${consortium === 'NCI' ? 'C-NCI':shortenText(consortium, 15)}</label>
+                <input type="checkbox" data-consortium="${consortium}" id="label${consortium}" class="form-check-input select-consortium" style="margin-left: 1px !important;">
+                <label for="label${consortium}" class="form-check-label country-name" title="${consortium}">${consortium === 'NCI' ? 'C-NCI':shortenText(consortium, 15)}</label>
             </li>
         `;
     });
@@ -166,8 +166,8 @@ const getDescription = async () => {
     uniqueStudyDesign.forEach(sd => {
         filterTemplate += `
             <li class="filter-list-item">
-                <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="select-study-design" style="margin-left: 1px !important;">
-                <label for="label${sd}" class="country-name" title="${sd}">${shortenText(sd, 25)}</label>
+                <input type="checkbox" data-study-design="${sd}" id="label${sd}" class="form-check-input select-study-design" style="margin-left: 1px !important;">
+                <label for="label${sd}" class="form-check-label country-name" title="${sd}">${shortenText(sd, 25)}</label>
             </li>
         `;
     });
@@ -187,8 +187,8 @@ const getDescription = async () => {
     countries.forEach(country => {
         filterTemplate += `
             <li class="filter-list-item">
-                <input type="checkbox" data-country="${country}" id="label${country}" class="select-country" style="margin-left: 1px !important;">
-                <label for="label${country}" class="country-name" title="${country}">${shortenText(country, 15)}</label>
+                <input type="checkbox" data-country="${country}" id="label${country}" class="form-check-input select-country" style="margin-left: 1px !important;">
+                <label for="label${country}" class="form-check-label country-name" title="${country}">${shortenText(country, 15)}</label>
             </li>
         `;
     });
