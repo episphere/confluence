@@ -252,32 +252,32 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
             if (index > pageSize ) return
             
             template += `
-                <div class="accordion-item">
+                <div class="accordion-item" style="transition: all 0.3s ease;">
                     <h2 class="accordion-header" id="flush-headingOne">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}">
-                            <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'] : ''}</div>
-                            <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'] : ''}</div>
-                            <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'] : ''}</div>
-                            <div class="col-md-2">${desc['Study design'] ? desc['Study design'] : ''}</div>
-                            <div class="col-md-2">${desc['Country'] ? desc['Country'] : ''}</div>
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}">
+                            <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2">${desc['Study design'] ? desc['Study design'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2">${desc['Country'] ? desc['Country'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
                         </button>
                     </h2>
-                    <div id="heading${desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '')}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
-                        <div class="accordion-body">
-                            ${desc['Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition']}</div></div>`: ``}
-                            ${desc['Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition']}</div></div>`: ``}
-                            ${desc['References'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References']}</div></div>`: ``}
-                            ${desc['Male Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition']}</div></div>`: ``}
-                            ${desc['Male Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition']}</div></div>`: ``}
-                            ${desc['Description of Ascertainment Process or details of study design male participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Male Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design male participants']}</div></div>`: ``}
-                            ${desc['Female Case definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition']}</div></div>`: ``}
-                            ${desc['Female Control definition'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition']}</div></div>`: ``}
-                            ${desc['Description of Ascertainment Process or details of study design female participants'] ? `<div class="row mb-1"><div class="col-md-2 font-bold">Ascertainment Process for Female Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design female participants']}</div></div>`: ``}
+                    <div id="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
+                        <div class="accordion-body" style="box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 3px solid #A41652;">
+                            ${desc['Case definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Control definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['References'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Male Case definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Male Case definition</div><div class="col">${desc['Male Case definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Male Control definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Male Control definition</div><div class="col">${desc['Male Control definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Description of Ascertainment Process or details of study design male participants'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Ascertainment Process for Male Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design male participants'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Female Case definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Female Case definition</div><div class="col">${desc['Female Case definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Female Control definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Female Control definition</div><div class="col">${desc['Female Control definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
+                            ${desc['Description of Ascertainment Process or details of study design female participants'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Ascertainment Process for Female Participants</div><div class="col">${desc['Description of Ascertainment Process or details of study design female participants'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
             `;
             
             if (desc['pis'].length > 0) {
                 desc['pis'].forEach(info => {
-                    template += `<div class="row"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
+                    template += `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">PI</div><div class="col">${info['PI']} (<a href="mailto:${info['PI_Email']}">${info['PI_Email']}</a>)</div></div>`
                 })
             }
                         
@@ -287,6 +287,11 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                 </div>
             `;
         });
+        
+        template += `
+                </div>
+            </div>
+        `;
     }
     else {
         template += 'Data not found!';

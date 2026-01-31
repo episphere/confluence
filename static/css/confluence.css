@@ -2635,3 +2635,11 @@ ul.form {
 abbr {
   text-decoration: none;
 }
+
+.accordion-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.15rem #ac18537c;
+}
+.accordion-button:hover {
+    background-color: #e9ecef;
+}
