@@ -100,22 +100,52 @@ export const addResponseInputs = () => {
         setTimeout(() => {
             // Find all comment divs and add one response input per comment
             const commentDivs = commentsContainer.querySelectorAll('.comment');
+            let responsesAdded = 0;
             
             commentDivs.forEach((commentDiv) => {
                 // Check if response input already exists
                 if (!commentDiv.querySelector('.response-input-container')) {
-                    const responseInput = document.createElement('div');
-                    responseInput.className = 'response-input-container';
-                    responseInput.innerHTML = `
-                        <div class="mt-2 p-2 border-top">
-                            <small class="text-muted">Response:</small>
-                            <textarea class="form-control mt-1" placeholder="Type your response..." rows="2"></textarea>
-                            <button class="btn btn-sm btn-primary mt-1">Submit Response</button>
-                        </div>
-                    `;
-                    commentDiv.appendChild(responseInput);
+                    // Get comment text to check rating
+                    const commentText = commentDiv.textContent || commentDiv.innerText;
+                    const ratingMatch = commentText.match(/Rating:\s*(\w+)/i);
+                    const rating = ratingMatch ? ratingMatch[1] : null;
+                    
+                    // Add response box unless rating is specifically "1" or "NA"
+                    const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
+                    
+                    if (shouldAddResponse) {
+                        const responseInput = document.createElement('div');
+                        responseInput.className = 'response-input-container';
+                        responseInput.innerHTML = `
+                            <div class="mt-2 p-3 border rounded" style="background-color: #f1f3f4; border-left: 4px solid #007bff;">
+                                <small class="text-muted font-weight-bold">Your Response to the above comment:</small>
+                                <textarea class="form-control mt-2 comment-response" placeholder="Type your response..." rows="2"></textarea>
+                            </div>
+                            <hr class="mt-3">
+                        `;
+                        commentDiv.appendChild(responseInput);
+                        responsesAdded++;
+                    } else {
+                        // Add separator line after comments without response boxes
+                        const separator = document.createElement('hr');
+                        separator.className = 'mt-3';
+                        commentDiv.appendChild(separator);
+                    }
                 }
             });
+            
+            // Add single submit button at the bottom if there are response boxes
+            if (responsesAdded > 0 && !document.getElementById('submitResponsesContainer').querySelector('.submit-all-responses')) {
+                const submitButton = document.createElement('div');
+                submitButton.className = 'submit-all-responses text-center';
+                submitButton.innerHTML = `<button class="btn btn-primary">Submit All Responses</button>`;
+                document.getElementById('submitResponsesContainer').appendChild(submitButton);
+            }
+            
+            // Hide existing separator lines between comments and response boxes
+            const style = document.createElement('style');
+            style.textContent = '.comment hr:not(.mt-3) { display: none; }';
+            document.head.appendChild(style);
             
             // If no comments found, add a general response area
             if (commentDivs.length === 0) {
@@ -212,6 +242,25 @@ export const dataSubmissionForm = async () => {
                                 </a>
                             </li>
                         </ul>
+                        <div class="row">
+                            <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
+                                <div class="div-border white-bg align-left p-2">
+                                    <div class="main-summary-row">
+                                        <div class="col-xl-12 pl-1 pr-0">
+                                            <span class="font-size-10">
+                                                <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted 
+                                                <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
+                                                <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
+                                                <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
+                                                <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
+                                                <h6 class="badge badge-pill badge-777">777</h6>: Duplicate
+                                                <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="tab-content" id="selectedTab">
         `;
     
@@ -240,7 +289,10 @@ export const dataSubmissionForm = async () => {
             template += `
                 <div class='row'>
                     <div id='boxFilePreview' class="col-8 preview-container"></div>
-                    <div id='fileComments' class='col-4 mt-2'></div>
+                    <div class='col-4 mt-2'>
+                        <div id='fileComments' style='max-height: 990px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px;'></div>
+                        <div id='submitResponsesContainer' class='mt-2'></div>
+                    </div>
                 </div>
             `;
         }
@@ -279,6 +331,26 @@ export const dataSubmissionForm = async () => {
         ["needinput", 'accepted'],
         categorizedEntries.declined
     );
+    
+    // Clear preview and comments when switching to empty tabs
+    document.getElementById('needinputTab').addEventListener('click', () => {
+        if (categorizedEntries.needinput.length === 0) {
+            document.getElementById('boxFilePreview').innerHTML = '';
+            document.getElementById('fileComments').innerHTML = '';
+        }
+    });
+    document.getElementById('acceptedTab').addEventListener('click', () => {
+        if (categorizedEntries.accepted.length === 0) {
+            document.getElementById('boxFilePreview').innerHTML = '';
+            document.getElementById('fileComments').innerHTML = '';
+        }
+    });
+    document.getElementById('declinedTab').addEventListener('click', () => {
+        if (categorizedEntries.declined.length === 0) {
+            document.getElementById('boxFilePreview').innerHTML = '';
+            document.getElementById('fileComments').innerHTML = '';
+        }
+    });
     
     // Set up file switching for all tabs
     switchFilesWithResponse("accepted");
