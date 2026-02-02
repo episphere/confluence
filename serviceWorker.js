@@ -38,7 +38,7 @@ registerRoute(
 );
 
 workbox.precaching.precacheAndRoute([
-        {url: 'index.html', revision: 'v2.2.1'},
-        {url: 'confluence.js', revision:'v2.2.1'}
+        {url: 'index.html', revision: 'v2.2.2'},
+        {url: 'confluence.js', revision:'v2.2.2'}
     ]
 );

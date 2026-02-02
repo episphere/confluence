@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 import { logOut } from "./manageAuthentication.js";
 import { confluence } from '../confluence.js';
-export const emailsAllowedToUpdateData = ['ahearntu@nih.gov', 'kopchickbp@nih.gov', 'ajayiat@nih.gov']
+export const emailsAllowedToUpdateData = ['ahearntu@nih.gov', 'kopchickbp@nih.gov', 'kraftp2@nih.gov']
 export const publicDataFileId = 697309514903;
 export const summaryStatsFileId = 1238676877781; // 691143057533; 1238676877781;
 export const summaryStatsFileCIMBAID = 1549080386291; //691143057533; // Temporary until CIMBA has updated data
@@ -21,7 +21,7 @@ export const Confluence_Data_Platform_Events_Page_Shared_with_Investigators = 15
 export const Confluence_Data_Platform_Metadata_Shared_with_Investigators = 137304373658;
 
 export const chairsInfo = [
-    {id: 'user_1', email:"ahearntu@nih.gov", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
+    {id: 'user_1', email:"wei.zheng@vumc.org", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
     {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146, boxIdNew: 199271619056,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:[]}, 
     {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:[]}, 
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
