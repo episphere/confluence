@@ -1683,13 +1683,11 @@ export async function showCommentsDCEG(id, change=false) {
             const comment_date = new Date(comment.created_at);
             const date = comment_date.toLocaleDateString();
             const time = comment_date.toLocaleTimeString();
-            // if (comment_date > newDate) {
-                newDate = comment_date;
-                // console.log(comment.message.substring(0,10)==="Consortium");
-                const ifcons = chairsInfo.find(element => element.email === comment.created_by.login) || comment.message.substring(0,10)==="Consortium";
+            newDate = comment_date;
+            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login) || comment.message.substring(0,10)==="Consortium";
             
                 if (ifcons) {
-                    let cons = chairsInfo.find(element => element.email === comment.created_by.login).consortium;
+                    let cons = chairsInfo.find(element => element.email === comment.created_by.login)?.consortium || "";
                     let score = comment.message[8];
                     
                     if (comment.message.substring(0,10)==="Consortium"){
