@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments } from "../shared.js";
+import { showCommentsSub, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -77,51 +77,25 @@ export const showPreviewInPane = (fileId) => {
 };
 
 export const showCommentsInPane = (fileId) => {
-    const commentsContainer = document.getElementById('fileComments');
-    if (commentsContainer) {
-        // Store the finalChairDecision form before modifying content
-        const finalDecisionForm = commentsContainer.querySelector('#finalChairDecision');
-        let formHTML = '';
-        if (finalDecisionForm) {
-            formHTML = finalDecisionForm.outerHTML;
-        }
-        
-        const existingComments = commentsContainer.querySelector('.comments-section');
-        if (existingComments) {
-            existingComments.remove();
-        }
-        
-        const commentsDiv = document.createElement('div');
-        commentsDiv.className = 'comments-section';
-        commentsContainer.insertBefore(commentsDiv, commentsContainer.firstChild);
-        
-        showComments(fileId);
-        setTimeout(() => {
-            const defaultComments = document.querySelector('[id*="Comments"]');
-            if (defaultComments && defaultComments.id !== 'fileComments') {
-                commentsDiv.innerHTML = defaultComments.innerHTML;
-                defaultComments.innerHTML = '';
-                // Ensure comments are visible
-                commentsDiv.style.display = 'block';
-                const hiddenElements = commentsDiv.querySelectorAll('[style*="display: none"]');
-                hiddenElements.forEach(el => el.style.display = 'block');
-            }
-            
-            // Restore the finalChairDecision form if it was removed
-            if (formHTML && !commentsContainer.querySelector('#finalChairDecision')) {
-                commentsContainer.insertAdjacentHTML('beforeend', formHTML);
-            }
-        }, 100);
-    }
+    showComments(fileId);
 };
 
-export const switchFilesWithComments = (tab) => {
+export const switchFilesWithComments = (tab, files = []) => {
     const element = document.getElementById(`${tab}selectedDoc`);
     if (element) {
         element.addEventListener("change", (e) => {
             const file_id = e.target.value;
             showPreviewInPane(file_id);
-            showCommentsInPane(file_id);
+            
+            // Check if this file has response comments
+            const file = files.find(f => f.id === file_id);
+            if (file && file.responseComments) {
+                showCommentsWithResponses(file_id, file.responseComments);
+            } else if (tab === 'conceptNeedingClarification') {
+                showCommentsSub(file_id);
+            } else {
+                showComments(file_id);
+            }
         });
     }
 };
@@ -251,6 +225,19 @@ export const generateChairMenuFiles = async () => {
             }
         });
     });
+    
+    // Check for matching files in returnToSubmitterFolder and fetch response comments
+    const returnFolderFiles = await getAllFilesRecursive(returnToSubmitterFolder);
+    for (const claraFile of filesClaraIncompleted) {
+        const matchingFile = returnFolderFiles.find(f => f.name === claraFile.name);
+        console.log(matchingFile)
+        if (matchingFile) {
+            const commentsResponse = await listComments(matchingFile.id);
+            const comments = JSON.parse(commentsResponse).entries;
+            claraFile.responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
+            console.log(claraFile.responseComments);
+        }
+    }
     // console.log(filesIncompleted);
 
     const message = messagesForChair[userChairItem.id];
@@ -437,7 +424,7 @@ export const generateChairMenuFiles = async () => {
         showPreviewInPane(filesIncompleted[0].id);
         // Don't call showCommentsInPane initially to preserve the form
         showCommentsInPane(filesIncompleted[0].id);
-        switchFilesWithComments("recommendation");
+        switchFilesWithComments("recommendation", filesIncompleted);
         document.getElementById("recommendationselectedDoc").children[0].selected = true;
         // Ensure finalChairDecision is always visible
         setTimeout(() => {
@@ -446,6 +433,15 @@ export const generateChairMenuFiles = async () => {
                 finalDecisionForm.style.display = 'block';
             }
         }, 200);
+    } else if (!!filesClaraIncompleted.length) {
+        showPreviewInPane(filesClaraIncompleted[0].id);
+        if (filesClaraIncompleted[0].responseComments) {
+            showCommentsWithResponses(filesClaraIncompleted[0].id, filesClaraIncompleted[0].responseComments);
+        } else {
+            showCommentsSub(filesClaraIncompleted[0].id);
+        }
+        switchFilesWithComments("conceptNeedingClarification", filesClaraIncompleted);
+        document.getElementById("conceptNeedingClarificationTab").click();
     } else {
         document.getElementById("filePreview").classList.remove("d-block");
         document.getElementById("filePreview").classList.add("d-None");
@@ -645,24 +641,6 @@ const isElementLoaded = async selector => {
   
   return document.querySelector(selector);
 }
-
-// export function viewFinalDecisionFilesColumns() {
-//   return `
-//   <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
-//         <div class="row">
-//           <div class="col-3 text-left font-bold ws-nowrap text-wrap header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-2 text-left font-bold ws-nowrap text-wrap header-sortable">Submission Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
-//           <div class="col-1 text-left font-bold ws-nowrap text-wrap header-sortable" hidden>TEST <button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
-//         </div>
-//   </div>`;
-// };
 
 export function viewFinalDecisionFilesColumns() {
     return `
@@ -1074,15 +1052,35 @@ export const authTableTemplate = () => {
     return template;
 };
 
+export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
+    const requiringInputFiles = [];
+    const userFolders = await getFolderItems(returnToSubmitterFolderId);
+    
+    for (const userFolder of userFolders.entries) {
+        if (userFolder.type === 'folder') {
+            const subfolders = await getFolderItems(userFolder.id);
+            for (const subfolder of subfolders.entries) {
+                if (subfolder.name === 'Requiring Input' && subfolder.type === 'folder') {
+                    const files = await getAllFilesRecursive(subfolder.id);
+                    requiringInputFiles.push(...files);
+                }
+            }
+        }
+    }
+    
+    return requiringInputFiles;
+};
+
 export const generateAuthTableFiles = async () => {
     let filearrayAllFilesSub = await getAllFilesRecursive(submitterFolder);
     let filearrayAllFilesCom = await getAllFilesRecursive(completedFolder);
+    let filearrayAllFilesRes = await getRequiringInputFiles(returnToSubmitterFolder);
     //let filearrayAllFilesSub = allFilessub.entries;
     //let filearrayAllFilesCom = allFilescom.entries;
     //console.log(filearrayAllFilesSub);
 
     // document.getElementById("authTableView").innerHTML = template;
-    await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom);
+    await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom, filearrayAllFilesRes);
     
     // commentSubmit();
     returnToChairs();
@@ -1091,10 +1089,11 @@ export const generateAuthTableFiles = async () => {
     hideAnimation();
 };
 
-export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
+export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, filesRes) {
     let template = "";
     let filesInfoSub = [];
     let filesInfoCom = [];
+    let filesInfoRes = [];
     
     for (const file of filesSub) {
         const fileInfo = await getFileInfo(file.id);
@@ -1105,8 +1104,17 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
         const fileInfo = await getFileInfo(file.id);
         filesInfoCom.push(fileInfo);
     }
+
+    for (const file of filesRes) {
+        const fileInfo = await getFileInfo(file.id);
+        filesInfoRes.push(fileInfo);
+    }
+
+    // Remove files from filesInfoSub that match names in filesInfoRes
+    const resFileNames = filesInfoRes.map(file => file.name);
+    filesInfoSub = filesInfoSub.filter(file => !resFileNames.includes(file.name));
     
-    if (filesInfoSub.length > 0 || filesInfoCom.length > 0) {
+    if (filesInfoSub.length > 0 || filesInfoCom.length > 0 || filesInfoRes.length > 0) {
         template += `
             <div id='decidedFiles'>
                 <div class='row'>
@@ -1144,8 +1152,8 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
     
     document.getElementById("authTableView").innerHTML = template;
     
-    if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0) {
-        await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom);
+    if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0 || filesInfoRes.length !== 0) {
+        await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, filesInfoRes);
         
         // Add checkbox change listeners to enable/disable buttons
         const updateButtonStates = () => {
@@ -1173,16 +1181,14 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
         
         for (const file of filesInfoSub) {
             showCommentsDCEG(file.id, true)
-            // document
-            //   .getElementById(`study${file.id}`)
-            //   .addEventListener("click", showCommentsDCEG(file.id));
         }
         
         for (const file of filesInfoCom) {
             showCommentsDCEG(file.id, true)
-            // document
-            //   .getElementById(`study${file.id}`)
-            //   .addEventListener("click", showCommentsDCEG(file.id));
+        }
+
+        for (const file of filesInfoRes) {
+            showCommentsDCEG(file.id, true)
         }
         
         let btns = Array.from(document.querySelectorAll(".preview-file"));
@@ -1231,7 +1237,8 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom) {
     }
 };
 
-export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
+export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, filesInfoRes) {
+  
   let template = `
     <div class="row m-0 align-left allow-overflow w-100">
       <div class="accordion accordion-flush col-md-12" id="adminAccordian">
@@ -1267,9 +1274,27 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
     return { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, isSubmitted: false };
   });
   
-  const [processedSubFiles, processedComFiles] = await Promise.all([
+  // Process filesInfoRes in parallel
+  const resFilePromises = filesInfoRes.map(async (fileInfo) => {
+    const fileId = fileInfo.id;
+    const [docContent, completion_date] = await Promise.all([
+      readDocFile(fileId),
+      getChairApprovalDate(fileId)
+    ]);
+    
+    const contacts = extractContactInvestigators(docContent);
+    const filename = fileInfo.name;
+    const lastUnderscoreIndex = filename.lastIndexOf('_');
+    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+    
+    return { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput: true };
+  });
+  
+  const [processedSubFiles, processedComFiles, processedResFiles] = await Promise.all([
     Promise.all(subFilePromises),
-    Promise.all(comFilePromises)
+    Promise.all(comFilePromises),
+    Promise.all(resFilePromises)
   ]);
   
   // Build template with processed data
@@ -1603,35 +1628,144 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
       </div>`;
       }
 
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput } of processedResFiles) {
+    template += `
+      <div class="accordian-item mb-2 border-bottom pb-2">
+        <div class="row-24 align-items-center position-relative">
+          <div class="col-24-1 text-left">
+            <input type="checkbox" class="pl admin-checkbox" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
+          </div>
+          <div class="col-24-5 text-left">
+            <span class="responsive-text" title="${titlename}">${shorttitlename}</span>
+          </div>
+          <div class="col-24-3 text-left">
+            <span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span>
+          </div>
+          <div class="col-24-2 text-left">
+            <h6 class="badge badge-pill bg-info">Returned</h6>
+          </div>
+          <div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="AABCG Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="BCAC Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="C-NCI Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="CIMBA Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="LAGENO Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE">
+            <select class="form-select form-select-sm decision-dropdown" aria-label="MERGE Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-2 text-center" id="TEST${fileId}" data-value="TEST" hidden>
+            <select class="form-select form-select-sm decision-dropdown" aria-label="TEST Decision">
+              <option value="--" selected>--</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="777">777</option>
+              <option value="NA">NA</option>
+            </select>
+          </div>
+          <div class="col-24-1 text-right">
+            <button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+        <h2 class="accordion-header d-none" id="flush-heading${fileId}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}"></button>
+        </h2>
+        <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}">
+          <div class="accordion-body">
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Concept</div>
+              <div class="col">
+                ${filename} 
+                <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#bcrppPreviewerModal" style="vertical-align: baseline; padding: 2px 6px; margin-left: 8px; line-height: 1;">
+                  <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Investigator(s)</div>
+              <div class="col">${contacts}</div>
+            </div>
+            <div class="row mb-1 m-0">
+              <div class="col-md-2 pl-2 font-bold">Comments</div>
+              <div class="col" id='file${fileId}Comments'></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
     template += `</div></div></div></div>`;
     if (document.getElementById("files") != null) {
         document.getElementById("files").innerHTML = template;
 
-        // Add event listeners for the dropdowns
-        // document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
-        //     dropdown.addEventListener('change', function() {
-        //         const selectedValue = this.value;
-        //         const parentElement = this.closest('[data-value]');
-        //         const consortium = parentElement.getAttribute('data-value');
-        //         const fileId = parentElement.id.replace(consortium, '');
-            
-        //         console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
-            
-        //         // Remove any existing badge classes
-        //         this.className = 'form-select form-select-sm decision-dropdown';
-            
-        //         // Add styling based on selection
-        //         if (selectedValue !== '--') {
-        //             this.classList.add(`badge-${selectedValue}`);
-        //         }
-        //     });
-        // });
-
         document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
-        
-            // Store initial value as a data attribute
-            // dropdown.setAttribute('data-previous-value', dropdown.value);
-            // console.log(dropdown.value);
             
             dropdown.addEventListener('change', async function() {
                 const selectedValue = this.value;
@@ -1646,22 +1780,6 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom) {
                     this.value = previousValue;
                     return;
                 }
-
-                // const header = document.getElementById("confluenceModalHeader");
-                // const body = document.getElementById("confluenceModalBody");
-                // header.innerHTML = `
-                //     <h5 class="modal-title">Changing Score for ${fileId}</h5>
-                //     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                // `;
-                // 
-                // let template = '<form id="changeScore"></form>';
-                // body.innerHTML = template;
-                // $("#confluenceMainModal").modal("show");
-                // 
-                // let form = document.getElementById('changeScore');
-                // form.innerHTML = `Locating box file ${fileId}`
-                // form.innerHTML = `Commenting change on file ${fileId}`
-                // submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: changed by admin`;
 
                 const header = document.getElementById('confluenceModalHeader');
                 const body = document.getElementById('confluenceModalBody');
@@ -1838,112 +1956,189 @@ export const returnToSubmitter = () => {
         e.preventDefault();
         const btn = document.activeElement;
         var inputsChecked = document.querySelectorAll('.pl');
+        
+        if (inputsChecked.length === 0 || !Array.from(inputsChecked).some(cb => cb.checked)) {
+            alert('Please select at least one file to return.');
+            return;
+        }
+        
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        
+        // Get checked files
+        const checkedFiles = Array.from(inputsChecked).filter(cb => cb.checked);
+        
+        header.innerHTML = `
+            <h5 class="modal-title">Select Decision for File Return</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+        
+        let template = `
+            <form id="decisionSelectionForm">
+                <div class="form-group mb-3">
+                    <h6>File to be returned:</h6>
+                    <p><strong>${checkedFiles[0].value}</strong></p>
+                    <h6>Select decision:</h6>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success decision-btn" data-decision="Accepted">Accept</button>
+                        <button type="button" class="btn btn-danger decision-btn" data-decision="Denied">Deny</button>
+                        <button type="button" class="btn btn-warning decision-btn" data-decision="Requiring Input">Require Input</button>
+                    </div>
+                </div>
+            </form>
+        `;
+        
+        body.innerHTML = template;
+        $("#confluenceMainModal").modal("show");
+        
+        // Handle decision button clicks
+        document.querySelectorAll('.decision-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const decision = btn.dataset.decision;
+                $("#confluenceMainModal").modal("hide");
+                await processFileReturn(checkedFiles[0], decision);
+            });
+        });
+    }
+    
+    const processFileReturn = async (checkbox, decision) => {
         const header = document.getElementById("confluenceModalHeader");
         const body = document.getElementById("confluenceModalBody");
         
         header.innerHTML = `
-            <h5 class="modal-title">Returning to File to Sender</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title">Processing File Return</h5>
         `;
         
-        let template = '<form id="returnToSubmitterInfo"></form>';
-        body.innerHTML = template;
+        body.innerHTML = '<div id="returnToSubmitterInfo" style="max-height: 400px; overflow-y: auto;"></div>';
         $("#confluenceMainModal").modal("show");
-        let popup = document.getElementById('confluenceMainModal');
-        let btns = popup.querySelectorAll('button');
-        
-        for (let button of btns) {
-            button.addEventListener('click', function () {
-                location.reload();
-            })
-        }
         
         const form = document.getElementById("returnToSubmitterInfo");
-        for (var checkbox of inputsChecked) {
-            if (checkbox.checked) {
-                form.innerHTML = `Gathering data for Box file: ${checkbox.id}`;
-                console.log(checkbox.id);
-                let fileSelected = await getFileInfo(checkbox.id);
-                let fileName = fileSelected.name;
-                let userFound = fileSelected.created_by.login;
-                let submittedItems = await getAllFilesRecursive(returnToSubmitterFolder);
-                let folderID = "none";
+        const addStatus = (message) => {
+            form.innerHTML += `<p>${message}</p>`;
+            form.scrollTop = form.scrollHeight;
+        };
+        
+        addStatus(`Starting process...`);
+        addStatus(`Gathering data for Box file: ${checkbox.id}`);
+        console.log(checkbox.id);
+        let fileSelected = await getFileInfo(checkbox.id);
+        let fileName = fileSelected.name;
+        let userFound = fileSelected.created_by.login;
+        let submittedItems = await getFolderItems(returnToSubmitterFolder);
+        let folderID = "none";
+        let targetFolderId = "";
+
+        // Check if user has a folder already
+        for (let item of submittedItems.entries) {
+            if (item.name === `The_Confluence_Project_Returned_Concepts-${userFound}`) {
+                addStatus(`Folder already exists for: ${userFound}`);
+                folderID = item.id;
+                break;
+            }
+        }
+        
+        // Create parent folder and subfolders if needed
+        if (folderID == "none") {
+            addStatus(`Creating folder for user: ${userFound}`);
+            const folderName = `The_Confluence_Project_Returned_Concepts-${userFound}`;
+            const newFolder = await createFolder(returnToSubmitterFolder, folderName);
+            folderID = newFolder.id;
+            
+            addStatus(`Creating subfolders...`);
+            await createFolder(folderID, "Accepted");
+            await createFolder(folderID, "Denied");
+            await createFolder(folderID, "Requiring Input");
+            
+            addStatus(`Adding collaborator access...`);
+            await addNewCollaborator(folderID, "folder", userFound, "viewer");
+        }
+        
+        // Get the target subfolder
+        addStatus(`Finding ${decision} folder...`);
+        const subfolders = await getFolderItems(folderID);
+        for (let subfolder of subfolders.entries) {
+            if (subfolder.name === decision) {
+                targetFolderId = subfolder.id;
+                break;
+            }
+        }
+        
+        // If subfolder doesn't exist, create it
+        if (!targetFolderId) {
+            addStatus(`Creating ${decision} folder...`);
+            const newSubfolder = await createFolder(folderID, decision);
+            targetFolderId = newSubfolder.id;
+        }
+        
+        addStatus(`Copying file to ${decision} folder...`);
+        const cpFile = await copyFile(checkbox.id, targetFolderId);
+        const cpFileId = cpFile.id;
+        
+        addStatus(`Copying comments...`);
+        let returnComments = await listComments(checkbox.id);
+        let commentsToCp = JSON.parse(returnComments).entries;
+        console.log(commentsToCp);
+        await copyComments(commentsToCp, cpFileId);
+        
+        // Only search chair folders if decision is Accepted or Denied
+        if (decision === "Accepted" || decision === "Denied") {
+            for (let info of chairsInfo) {
+                addStatus(`Searching chair folders for same file: ${info.consortium}`);
+                let fileFound = false;
                 
-                for (let item of submittedItems.entries) {
-                    if (item.name ===  `The_Confluence_Project_Returned_Concepts-${userFound}`) {
-                        form.innerHTML = `Folder already previously created: ${userFound}`;
-                        folderID = item.id
+                let files = await getAllFilesRecursive(info.boxIdNew);
+                for (let file of files.entries) {
+                    if (file.name === fileName) {
+                        fileFound = true;
+                        addStatus(`Moving file to completed folder: ${info.consortium}`);
+                        await moveFile(file.id, info.boxIdComplete);
+                        break;
                     }
                 }
-                
-                let cpFileId = "";
-                if (folderID == "none") {
-                    form.innerHTML = `Creating forlder for user: ${userFound}`;
-                    const folderName = `The_Confluence_Project_Returned_Concepts-${userFound}`;
-                    const newFolder = await createFolder(returnToSubmitterFolder, folderName);
-                    await addNewCollaborator(newFolder.id, "folder", userFound, "viewer");
-                    
-                    form.innerHTML = `Submission being copied for return`;
-                    const cpFile = await copyFile(checkbox.id, newFolder.id);
-                    cpFileId = cpFile.id;
-                    let returnComments = await listComments(checkbox.id);
-                    let commentsToCp = JSON.parse(returnComments).entries
-                    
-                    form.innerHTML = `Copying comments`;
-                    console.log(commentsToCp);
-                    await copyComments(commentsToCp, cpFileId);
-                } else {
-                    form.innerHTML = `Submission being copied for return`;
-                    const cpFile = await copyFile(checkbox.id, folderID);
-                    cpFileId = cpFile.id;
-                    let returnComments = await listComments(checkbox.id);
-                    let commentsToCp = JSON.parse(returnComments).entries
-                    
-                    form.innerHTML = `Copying comments`;
-                    console.log(commentsToCp);
-                    await copyComments(commentsToCp, cpFileId);
-                }
-                for (let info of chairsInfo) {
-                    form.innerHTML = `Searching chair folders for same file: ${info.consortium}`;
-                    let fileFound = false;
-                    console.log(info.boxIdNew);
-                    
-                    let files = await getAllFilesRecursive(info.boxIdNew);
+                if (!fileFound) {
+                    files = await getAllFilesRecursive(info.boxIdClara);
                     for (let file of files.entries) {
-                        console.log(file);
-                        
                         if (file.name === fileName) {
+                            addStatus(`Moving file to completed folder: ${info.consortium}`);
                             fileFound = true;
-                            console.log(fileName);
-                            form.innerHTML = `Moving file to completed folder: ${info.consortium}`;
                             await moveFile(file.id, info.boxIdComplete);
                             break;
                         }
                     }
-                    if (!fileFound) {
-                        files = await getAllFilesRecursive(info.boxIdClara);
-                        for (let file of files.entries) {
-                            console.log(file);
-                            if (file.name === fileName) {
-                                form.innerHTML = `Moving file to completed folder: ${info.consortium}`;
-                                fileFound = true;
-                                console.log(fileName);
-                                await moveFile(file.id, info.boxIdComplete);
-                                break;
-                            }
-                        }
-                    }
                 }
-                
-                await moveFile(checkbox.id, completedFolder);
-                console.log(cpFileId);
-                form.innerHTML = `Preparing email for submitter: ${userFound}`;
-                window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at: https://app.box.com/file/${cpFileId}`;
             }
+            
+            addStatus(`Moving file to completed folder...`);
+            await moveFile(checkbox.id, completedFolder);
         }
         
-        btn.classList.toggle("buttonsubmit--loading");
-        //document.location.reload(true);
+        addStatus(`Preparing email for submitter: ${userFound}`);
+        addStatus(`<strong style="color: green;">Complete!</strong>`);
+        
+        // Update header to show completion and add close button
+        header.innerHTML = `
+            <h5 class="modal-title">File Return Complete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+        
+        // Add close button at bottom
+        form.innerHTML += `
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="closeAndRefresh">Close</button>
+            </div>
+        `;
+        
+        // Handle close button click
+        document.getElementById('closeAndRefresh').addEventListener('click', () => {
+            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at https://epidataplatforms.cancer.gov/confluence/#data_submissions. Please review the comments added to your submission.`;
+            setTimeout(() => location.reload(), 100);
+        });
+        
+        // Handle X button click
+        document.querySelector('.btn-close').addEventListener('click', () => {
+            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at https://epidataplatforms.cancer.gov/confluence/#data_submissions. Please review the comments added to your submission.`;
+            setTimeout(() => location.reload(), 100);
+        });
     }
     
     const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
@@ -1956,11 +2151,10 @@ export const copyComments = async (comments, fileId) => {
     for (let chairs of chairsInfo) {
         let consortiumName = chairs.consortium;
         let chairEmail = chairs.email;
-        let chairComments = comments.filter(dt => dt.created_by.login === chairEmail);
+        let chairComments = comments.filter(dt => dt.created_by.login === chairEmail && dt.message.includes(`Consortium: ${consortiumName}`));
         
         for (let comment of chairComments) {
-            let commentMessage = comment.message;
-            let submitMessage = `DACC Review Comments from ${consortiumName}: ` + commentMessage;
+            let submitMessage = comment.message + ` (Box Comment ID: ${comment.id})`;
             await createComment(fileId, submitMessage);
         }
     }
@@ -2466,6 +2660,13 @@ export const showRenameFilesPopup = (files) => {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     `;
     
+    // Sort files by ID number
+    const sortedFiles = [...files].sort((a, b) => {
+        const idA = parseInt(a.id) || 0;
+        const idB = parseInt(b.id) || 0;
+        return idA - idB;
+    });
+    
     let template = `
         <form id="renameFilesForm">
             <div class="form-group mb-3">
@@ -2477,7 +2678,7 @@ export const showRenameFilesPopup = (files) => {
                 <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
     `;
     
-    files.forEach((file, index) => {
+    sortedFiles.forEach((file, index) => {
         const currentTitle = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
         const extension = file.name.split('.').pop(); // Get extension
         const newTitle = `${currentTitle}_RX_${String(index + 1).padStart(3, '0')}.${extension}`;
@@ -2507,7 +2708,7 @@ export const showRenameFilesPopup = (files) => {
     const roundInput = document.getElementById('roundNumber');
     roundInput.addEventListener('input', (e) => {
         const roundValue = e.target.value || 'X';
-        files.forEach((file, index) => {
+        sortedFiles.forEach((file, index) => {
             const currentTitle = file.name.replace(/\.[^/.]+$/, "");
             const extension = file.name.split('.').pop();
             const newTitle = `${currentTitle}_R${roundValue}_${String(index + 1).padStart(3, '0')}.${extension}`;
@@ -2523,7 +2724,7 @@ export const showRenameFilesPopup = (files) => {
             alert('Please enter a round number');
             return;
         }
-        await renameFilesWithRound(files, roundNumber);
+        await renameFilesWithRound(sortedFiles, roundNumber);
         $("#confluenceMainModal").modal("hide");
     });
 };

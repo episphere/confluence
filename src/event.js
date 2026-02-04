@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, updateBoxCollaboratorTime, createComment } from './shared.js';
+import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, showCommentsSub, updateBoxCollaboratorTime, createComment } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -1867,7 +1867,11 @@ export function switchTabs(show, hide, files) {
                     
                     if (show !== "recommendation") {
                         document.getElementById("boxFilePreview").classList.add("col-8");
-                        showComments(files[0].id);
+                        if (show === "conceptNeedingClarification") {
+                            showCommentsSub(files[0].id);
+                        } else {
+                            showComments(files[0].id);
+                        }
                     } else {
                         document
                         .getElementById("boxFilePreview")
@@ -1940,7 +1944,7 @@ export function switchTabsDataSubmission(show, hide, files) {
                 const selectedFile = document.getElementById(show + "selectedDoc").value || files[0].id;
                 document.getElementById(show + "selectedDoc").value = selectedFile;
                 showPreview(selectedFile);
-                showComments(selectedFile);
+                showCommentsSub(selectedFile);
                 
                 // Add response inputs only for needinput tab
                 if (show === 'needinput') {
@@ -1961,7 +1965,11 @@ export function switchFiles(tab) {
         .addEventListener("change", (e) => {
             const file_id = e.target.value;
             showPreview(file_id);
-            showComments(file_id);
+            if (tab === 'conceptNeedingClarification') {
+                showCommentsSub(file_id);
+            } else {
+                showComments(file_id);
+            }
     });
 };
 

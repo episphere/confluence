@@ -1,43 +1,41 @@
-import { showComments, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile } from "../shared.js";
+import { returnToSubmitterFolder, showComments, showCommentsSub, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile, createComment, emailsAllowedToUpdateData } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 import { renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabsDataSubmission, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
 
-const Return_to_Submitter = 200908340220;
-
 export const getReturnedConcepts = async () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     
     try {
-        // Check if user has access to Return_to_Submitter folder
-        await getFolderInfo(Return_to_Submitter);
+        // Check if user has access to returnToSubmitterFolder folder
+        await getFolderInfo(returnToSubmitterFolder);
         
         // Look for folder ending with user's email
-        const items = await getFolderItems(Return_to_Submitter);
+        const items = await getFolderItems(returnToSubmitterFolder);
         const userFolder = items.entries.find(item => 
             item.type === 'folder' && item.name.endsWith(userEmail)
         );
         
         if (userFolder) {
-            return await categorizeFilesByFolderStructure(userFolder.id);
+            return await categorizeFilesByFolderStructure(userFolder.id, userEmail);
         }
     } catch {
-        // No access to Return_to_Submitter, check root folder
+        // No access to returnToSubmitterFolder, check root folder
         const rootItems = await getFolderItems(0);
         const returnFolder = rootItems.entries.find(item => 
             item.type === 'folder' && item.name.startsWith('The_Confluence_Project_Returned_Concepts')
         );
         
         if (returnFolder) {
-            return await categorizeFilesByFolderStructure(returnFolder.id);
+            return await categorizeFilesByFolderStructure(returnFolder.id, userEmail);
         }
     }
     
     return { needinput: [], accepted: [], declined: [] };
 };
 
-export const categorizeFilesByFolderStructure = async (rootFolderId) => {
+export const categorizeFilesByFolderStructure = async (rootFolderId, userEmail) => {
     const categorized = {
         needinput: [],
         accepted: [],
@@ -74,7 +72,7 @@ export const showCommentsInPane = (fileId, tabName = '') => {
     const commentsContainer = document.getElementById('fileComments');
     if (commentsContainer) {
         commentsContainer.innerHTML = '';
-        showComments(fileId);
+        showCommentsSub(fileId);
         console.log("Comments shown");
         // Move comments from default location to our pane
         setTimeout(() => {
@@ -93,11 +91,20 @@ export const showCommentsInPane = (fileId, tabName = '') => {
     }
 };
 
-export const addResponseInputs = () => {
+export const addResponseInputs = async () => {
     const commentsContainer = document.getElementById('fileComments');
     if (commentsContainer) {
         // Wait a bit more for comments to fully load
-        setTimeout(() => {
+        setTimeout(async () => {
+            const fileId = document.getElementById('needinputselectedDoc').value;
+            const userEmail = JSON.parse(localStorage.parms).login;
+            
+            // Check if user has already commented
+            const commentsResponse = await listComments(fileId);
+            const comments = JSON.parse(commentsResponse).entries;
+            const isAllowedUser = emailsAllowedToUpdateData.includes(userEmail);
+            const userHasCommented = !isAllowedUser && comments.some(comment => comment.created_by.login === userEmail);
+            
             // Find all comment divs and add one response input per comment
             const commentDivs = commentsContainer.querySelectorAll('.comment');
             let responsesAdded = 0;
@@ -119,7 +126,7 @@ export const addResponseInputs = () => {
                         responseInput.innerHTML = `
                             <div class="mt-2 p-3 border rounded" style="background-color: #f1f3f4; border-left: 4px solid #007bff;">
                                 <small class="text-muted font-weight-bold">Your Response to the above comment:</small>
-                                <textarea class="form-control mt-2 comment-response" placeholder="Type your response..." rows="2"></textarea>
+                                <textarea class="form-control mt-2 comment-response" placeholder="Type your response..." rows="2" ${userHasCommented ? 'disabled' : ''}></textarea>
                             </div>
                             <hr class="mt-3">
                         `;
@@ -138,8 +145,64 @@ export const addResponseInputs = () => {
             if (responsesAdded > 0 && !document.getElementById('submitResponsesContainer').querySelector('.submit-all-responses')) {
                 const submitButton = document.createElement('div');
                 submitButton.className = 'submit-all-responses text-center';
-                submitButton.innerHTML = `<button class="btn btn-primary">Submit All Responses</button>`;
+                submitButton.innerHTML = `
+                    ${userHasCommented ? '<p class="text-danger">Comments have already been responded to.</p>' : '<p class="text-danger" id="validationWarning" style="display: none;">Please respond to all required comments before continuing.</p>'}
+                    <button class="buttonsubmit" id="submitAllResponsesBtn" ${userHasCommented ? 'disabled' : 'disabled'}><span class="buttonsubmit__text">Submit All Responses</span></button>
+                `;
                 document.getElementById('submitResponsesContainer').appendChild(submitButton);
+                
+                // Add validation function
+                if (!userHasCommented) {
+                    const validateResponses = () => {
+                        const commentDivs = document.getElementById('fileComments').querySelectorAll('.comment');
+                        const responseTextareas = Array.from(commentDivs).map(div => div.querySelector('.comment-response')).filter(textarea => textarea !== null);
+                        const allFilled = responseTextareas.every(textarea => textarea.value.trim() !== '');
+                        
+                        const submitBtn = document.getElementById('submitAllResponsesBtn');
+                        const warning = document.getElementById('validationWarning');
+                        
+                        if (allFilled) {
+                            submitBtn.disabled = false;
+                            submitBtn.style.opacity = '1';
+                            warning.style.display = 'none';
+                        } else {
+                            submitBtn.disabled = true;
+                            submitBtn.style.opacity = '0.5';
+                            warning.style.display = 'block';
+                        }
+                    };
+                    
+                    // Add input listeners to all textareas
+                    const commentDivs = document.getElementById('fileComments').querySelectorAll('.comment');
+                    commentDivs.forEach(div => {
+                        const textarea = div.querySelector('.comment-response');
+                        if (textarea) {
+                            textarea.addEventListener('input', validateResponses);
+                        }
+                    });
+                    
+                    // Initial validation
+                    validateResponses();
+                    
+                    // Add click event listener
+                    document.getElementById('submitAllResponsesBtn').addEventListener('click', async () => {
+                        if (confirm('Are you ready to submit your responses?')) {
+                            const commentDivs = document.getElementById('fileComments').querySelectorAll('.comment');
+                            
+                            for (const commentDiv of commentDivs) {
+                                const responseTextarea = commentDiv.querySelector('.comment-response');
+                                if (responseTextarea && responseTextarea.value.trim()) {
+                                    const responseId = commentDiv.id;
+                                    const message = `Response ID: ${responseId}, ${responseTextarea.value.trim()}`;
+                                    await createComment(fileId, message);
+                                }
+                            }
+                            
+                            alert('All responses submitted successfully!');
+                            location.reload();
+                        }
+                    });
+                }
             }
             
             // Hide existing separator lines between comments and response boxes
@@ -179,7 +242,7 @@ export const switchFilesWithResponse = (tab) => {
         element.addEventListener("change", (e) => {
             const file_id = e.target.value;
             showPreviewInPane(file_id);
-            showComments(file_id);
+            showCommentsSub(file_id);
             
             // Add response inputs if on needinput tab
             if (tab === 'needinput') {
@@ -244,7 +307,7 @@ export const dataSubmissionForm = async () => {
                         </ul>
                         <div class="row">
                             <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
-                                <div class="div-border white-bg align-left p-2">
+                                <div class="div-border white-bg align-left p-2 mb-3">
                                     <div class="main-summary-row">
                                         <div class="col-xl-12 pl-1 pr-0">
                                             <span class="font-size-10">
@@ -266,7 +329,7 @@ export const dataSubmissionForm = async () => {
     
         template += `
             <div class='tab-pane fade show active' id='needinput' role='tabpanel' aria-labeledby='needinputTab'>
-                <button id='downloadCommentsBtn' class='btn btn-secondary mb-3' style='float: right; margin-right: 10px;'>Download Comments for Offline Response</button>
+                <button id='downloadCommentsBtn' class='buttonsubmit' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download Comments for Offline Response</span></button>
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.needinput, "needinput", true);
@@ -305,7 +368,7 @@ export const dataSubmissionForm = async () => {
 
     if (categorizedEntries.needinput.length > 0) {
         showPreviewInPane(categorizedEntries.needinput[0].id);
-        showComments(categorizedEntries.needinput[0].id);
+        showCommentsSub(categorizedEntries.needinput[0].id);
         setTimeout(() => {
             addResponseInputs(); // Add response inputs for initial load
         }, 300);
@@ -337,15 +400,18 @@ export const dataSubmissionForm = async () => {
         if (categorizedEntries.needinput.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
+            document.getElementById('submitResponsesContainer').innerHTML = '';
         }
     });
     document.getElementById('acceptedTab').addEventListener('click', () => {
+        document.getElementById('submitResponsesContainer').innerHTML = '';
         if (categorizedEntries.accepted.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
         }
     });
     document.getElementById('declinedTab').addEventListener('click', () => {
+        document.getElementById('submitResponsesContainer').innerHTML = '';
         if (categorizedEntries.declined.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';

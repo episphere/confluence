@@ -1559,6 +1559,100 @@ export async function showComments(id) {
     return;
 };
 
+export async function showCommentsSub(id) {
+    const commentSection = document.getElementById("fileComments");
+    const response = await listComments(id);
+    let comments = JSON.parse(response).entries;
+    console.log(comments);
+    if (comments.length === 0) {
+        const dropdownSection = document.getElementById(`fileComments`);
+        dropdownSection.innerHTML = `
+            <div class='comments'>
+                <b>Comments</b>
+                <div class='text-left'>
+                    No comments to show.
+                </div>
+            </div>
+        `;
+    
+        return;
+    }
+    
+    // Separate response comments from original comments
+    const responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
+    const originalComments = comments.filter(c => !c.message.startsWith('Response ID:'));
+    
+    let template = `
+        <div class='comments'>
+        <b>Comments</b>
+        <div class='container-fluid'>
+    `;
+    const user = JSON.parse(localStorage.parms).login;
+  
+    for (const comment of originalComments) {
+        const comment_user = comment.created_by;
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        const consortium = comment.message.split(',')[0];
+        const afterComma = comment.message.substring(comment.message.indexOf(',') + 1);
+        const comment_message = afterComma.substring(0, afterComma.indexOf('Box Comment ID:')).trim();
+        const respondingid = comment.message.substring(comment.message.indexOf('Box Comment ID:') + 15).trim();
+        
+        // Extract rating number
+        const ratingMatch = comment_message.match(/Rating:\s*(\d+|NA|\w+)/);
+        const rating = ratingMatch ? ratingMatch[1] : null;
+        
+        // Remove "Rating: X, " from the message to get just the comment
+        const commentText = comment_message.replace(/Rating:\s*\d+,\s*Comment:\s*/, '').replace(/Rating:\s*\w+,\s*Comment:\s*/, '');
+
+            template += `
+                <div class='comment' id='${respondingid}'>
+                    <div class='row'>
+                        <div class='col-12 p-0'>`;
+            
+            if (rating) {
+                template += `<h6 class="badge badge-pill badge-${rating}" style="display: inline-block;">${rating}</h6> `;
+            }
+            
+            template += `<span class='text-primary small mb-0 align-left'>${consortium}</span>
+                        </div>
+            `;
+            template += `    
+                </div>
+                    <div class='row'>
+                        <p class='my-0' id='comment${comment.id}'>${commentText}</p>
+                    </div>
+            `;
+            
+            // Find and display corresponding response
+            const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${respondingid},`));
+            if (matchingResponse) {
+                const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
+                template += `
+                    <div class='row mt-2'>
+                        <div class='col-12 p-2' style='background-color: #e7f3ff; border-left: 3px solid #007bff;'>
+                            <small class='font-weight-bold'>Response:</small>
+                            <p class='my-0'>${responseText}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            template += `
+                    <hr class='my-1'>
+                </div>
+            `;
+        
+    }
+    
+    
+    template += "</div>";
+    
+    commentSection.innerHTML = template;
+    return;
+};
+
 export const getChairApprovalDate = async (id) => {
     let fileTasks = await getTaskList(id);
     let completion_date = "";
@@ -1660,7 +1754,6 @@ export async function showCommentsDropDown(id) {
 export async function showCommentsDCEG(id, change=false) {
     const commentSection = document.getElementById(`file${id}Comments`);
     const response = await listComments(id);
-    // console.log(response);
     
     let comments = JSON.parse(response).entries;
     if (comments.length === 0) {
@@ -1676,8 +1769,6 @@ export async function showCommentsDCEG(id, change=false) {
     const user = JSON.parse(localStorage.parms).login;
     const uniqueUsers = [...new Set(comments.map((item) => item.created_by.login))]
     
-    // for (const user of uniqueUsers) {
-        // const userComments = comments.filter(element => element.created_by.login === user);
         let newDate = new Date(0);
         for (const comment of comments) {
             const comment_date = new Date(comment.created_at);
@@ -1901,3 +1992,73 @@ export const addMetaData = async (file, meta) => {
         if ((await refreshToken()) === true) return await addMetaData(file, meta);
     }
 };
+
+
+export async function showCommentsWithResponses(id, responseComments = []) {
+    const commentSection = document.getElementById("fileComments");
+    const response = await listComments(id);
+    let comments = JSON.parse(response).entries;
+    
+    if (comments.length === 0) {
+        commentSection.innerHTML = `
+            <div class='comments'>
+                <b>Comments</b>
+                <div class='text-left'>
+                    No comments to show.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let template = `
+        <div class='comments'>
+        <b>Comments</b>
+        <div class='container-fluid'>
+    `;
+    
+    for (const comment of comments) {
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        
+        template += `
+            <div class='comment'>
+                <div class='row'>
+                    <div class='col-8 p-0'>
+                        <p class='text-primary small mb-0 align-left'>${comment.created_by.name}</p>
+                    </div>
+                </div>
+                <div class='row'>
+                    <p class='my-0' id='comment${comment.id}'>${comment.message}</p>
+                </div>
+                <div class='row'>
+                    <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+                </div>
+        `;
+        
+        // Find and display corresponding response
+        const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${comment.id},`));
+        console.log(matchingResponse);
+        if (matchingResponse) {
+            const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
+            template += `
+                <div class='row mt-2'>
+                    <div class='col-12 p-2' style='background-color: #e7f3ff; border-left: 3px solid #007bff;'>
+                        <small class='font-weight-bold'>Response:</small>
+                        <p class='my-0'>${responseText}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        template += `
+                <hr class='my-1'>
+            </div>
+        `;
+    }
+    
+    template += "</div></div>";
+    commentSection.innerHTML = template;
+    return;
+}
