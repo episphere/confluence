@@ -654,7 +654,7 @@ export const moveFile = async (fileId, parentId) => {
     }
 };
 
-export const copyFile = async (fileId, parentId) => {
+export const copyFile = async (fileId, parentId, description = null) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
         let obj = {
@@ -662,6 +662,9 @@ export const copyFile = async (fileId, parentId) => {
                 "id": parentId
             }
         };
+        if (description) {
+            obj.description = description;
+        }
         let response = await fetch(`https://api.box.com/2.0/files/${fileId}/copy`, {
             method: "POST",
             headers:{
@@ -788,6 +791,54 @@ export const uploadFileVersion2 = async (data, fileId, type) => {
     }
     catch (err) {
         if ((await refreshToken()) === true) return await uploadFileVersion(data, fileId, 'text/html');
+    }
+};
+
+export const uploadWordFileVersion = async (data, fileId, fileName, folderId) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        // const user = await getCurrentUser();
+        
+        // Check for bad data
+        const form = new FormData();
+        form.append("file", data);
+        form.append(
+            "attributes",
+            `{"name": "${fileName}", "parent": {"id": "${folderId}"}}`
+        );
+    
+        let response = await fetch(`https://upload.box.com/api/2.0/files/${fileId}/content`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + access_token
+            },
+            body: form,
+            contentType: false
+        });
+        
+        if (response.status === 400) {
+            if (response.code === "bad_request") {
+                return "Bad request";
+            }
+            if ((await refreshToken()) === true) return await uploadWordFileVersion(data, fileId, fileName, folderId);
+        } else if (response.status === 201) {
+            return response.json();
+        } else if (response.status === 400) {
+            return {
+                status: response.status,
+                json: await response.json(),
+            };
+        } else {
+            return {
+                status: response.status,
+                statusText: response.statusText
+            };
+        }
+    } catch (err) {
+        return {
+            status: 'error',
+            statusText: err.message || 'An error occurred while uploading the file version'
+        };
     }
 };
 
@@ -1611,6 +1662,99 @@ export async function showCommentsSub(id) {
                     <div class='row'>
                         <div class='col-12 p-0'>`;
             
+            template += `<span class='text-primary'>${consortium}</span>
+            `;
+            if (rating) {
+                template += `<span class="badge badge-pill badge-${rating}">${rating}</span> </div>`;
+            }
+            
+            template += `    
+                </div>
+                    <div class='row'>
+                        <p class='my-0' id='comment${comment.id}'>${commentText}</p>
+                    </div>
+            `;
+            
+            // Find and display corresponding response
+            const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${respondingid},`));
+            if (matchingResponse) {
+                const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
+                template += `
+                    <div class='row mt-2'>
+                        <div class='col-12 p-2' style='background-color: #e7f3ff; border-left: 3px solid #007bff;'>
+                            <small class='font-weight-bold'>Response:</small>
+                            <p class='my-0'>${responseText}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            template += `
+                    <hr class='my-1'>
+                </div>
+            `;
+        
+    }
+    
+    
+    template += "</div>";
+    
+    commentSection.innerHTML = template;
+    return;
+};
+
+export async function showCommentsSub2(id) {
+    const commentSection = document.getElementById("fileComments");
+    const response = await listComments(id);
+    let comments = JSON.parse(response).entries;
+    console.log(comments);
+    if (comments.length === 0) {
+        const dropdownSection = document.getElementById(`fileComments`);
+        dropdownSection.innerHTML = `
+            <div class='comments'>
+                <b>Comments</b>
+                <div class='text-left'>
+                    No comments to show.
+                </div>
+            </div>
+        `;
+    
+        return;
+    }
+    
+    // Separate response comments from original comments
+    const responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
+    const originalComments = comments.filter(c => !c.message.startsWith('Response ID:'));
+    
+    let template = `
+        <div class='comments'>
+        <b>Comments</b>
+        <div class='container-fluid'>
+    `;
+    const user = JSON.parse(localStorage.parms).login;
+  
+    for (const comment of originalComments) {
+        const comment_user = comment.created_by;
+        const comment_date = new Date(comment.created_at);
+        const date = comment_date.toLocaleDateString();
+        const time = comment_date.toLocaleTimeString();
+        const consortium = comment.message.split(',')[0];
+        const afterComma = comment.message.substring(comment.message.indexOf(',') + 1);
+        const comment_message = afterComma.substring(0, afterComma.indexOf('Box Comment ID:')).trim();
+        const respondingid = comment.message.substring(comment.message.indexOf('Box Comment ID:') + 15).trim();
+        
+        // Extract rating number
+        const ratingMatch = comment_message.match(/Rating:\s*(\d+|NA|\w+)/);
+        const rating = ratingMatch ? ratingMatch[1] : null;
+        
+        // Remove "Rating: X, " from the message to get just the comment
+        const commentText = comment_message.replace(/Rating:\s*\d+,\s*Comment:\s*/, '').replace(/Rating:\s*\w+,\s*Comment:\s*/, '');
+
+            template += `
+                <div class='comment' id='${respondingid}'>
+                    <div class='row'>
+                        <div class='col-12 p-0'>`;
+            
             if (rating) {
                 template += `<h6 class="badge badge-pill badge-${rating}" style="display: inline-block;">${rating}</h6> `;
             }
@@ -1862,7 +2006,7 @@ export const listComments = async (id) => {
     }
 };
 
-export const uploadWordFile = async (data, fileName, folderId, html) => {
+export const uploadWordFile = async (data, fileName, folderId) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
         // const user = await getCurrentUser();
@@ -1888,7 +2032,7 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
             if (response.code === "bad_request") {
                 return "Bad request";
             }
-            if ((await refreshToken()) === true) return await uploadWordFile(data, fileName, folderId, html);
+            if ((await refreshToken()) === true) return await uploadWordFile(data, fileName, folderId);
         } else if (response.status === 201) {
             return response.json();
         } else if (response.status === 400) {
@@ -1903,7 +2047,10 @@ export const uploadWordFile = async (data, fileName, folderId, html) => {
             };
         }
     } catch (err) {
-        if ((await refreshToken()) === true) return await uploadWordFile(data, fileName, folderId, html);
+        return {
+            status: 'error',
+            statusText: err.message || 'An error occurred while uploading the file'
+        };
     }
 };
 
@@ -2039,7 +2186,9 @@ export async function showCommentsWithResponses(id, responseComments = []) {
         
         // Find and display corresponding response
         const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${comment.id},`));
+        console.log(comment);
         console.log(matchingResponse);
+        console.log(responseComments);
         if (matchingResponse) {
             const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
             template += `

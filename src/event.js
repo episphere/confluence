@@ -1,4 +1,4 @@
-import { showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, showCommentsSub, updateBoxCollaboratorTime, createComment } from './shared.js';
+import { showCommentsWithResponses, showAnimation, removeActiveClass, uploadFile, getCollaboration, addNewCollaborator, removeBoxCollaborator, notificationTemplate, updateBoxCollaborator, getFolderItems, consortiumSelection, filterStudies, filterDataTypes, filterFiles, copyFile, hideAnimation, getFileAccessStats, uploadFileVersion, getFile, csv2Json, json2csv, summaryStatsFileId, getFileInfo, missingnessStatsFileId, assignNavbarActive, reSizePlots, applicationURLs, tsv2Json, showComments, showCommentsSub, updateBoxCollaboratorTime, createComment } from './shared.js';
 import { renderDataSummary } from './pages/about.js';
 import { variables } from './variables.js';
 import { template as dataGovernanceTemplate, addFields, dataGovernanceLazyLoad, dataGovernanceCollaboration, dataGovernanceProjects } from './pages/dataGovernance.js';
@@ -6,6 +6,7 @@ import { myProjectsTemplate } from './pages/myProjects.js';
 import { getSelectedStudies, renderAllCharts, updateCounts } from './visualization.js';
 import { showPreview } from "./components/boxPreview.js";
 import { addResponseInputs } from './pages/dataSubmission.js';
+import { switchFilesWithComments } from './pages/chairmenu.js';
 
 let top = 0;
 export const addEventStudyRadioBtn = () => {
@@ -1861,18 +1862,21 @@ export function switchTabs(show, hide, files) {
                         }
                     }
                     
-                    switchFiles(show);
                     document.getElementById(show + "selectedDoc").value = files[0].id;
                     showPreview(files[0].id);
                     
                     if (show !== "recommendation") {
                         document.getElementById("boxFilePreview").classList.add("col-8");
                         if (show === "conceptNeedingClarification") {
-                            showCommentsSub(files[0].id);
+                            console.log("Showing response comments for conceptNeedingClarification");
+                            switchFilesWithComments(show, files);
+                            showCommentsWithResponses(files[0].id, files[0].responseComments);
                         } else {
+                            switchFiles(show);
                             showComments(files[0].id);
                         }
                     } else {
+                        switchFiles(show);
                         document
                         .getElementById("boxFilePreview")
                         .classList.remove("col-8");

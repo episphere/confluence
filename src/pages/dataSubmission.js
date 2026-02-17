@@ -1,4 +1,4 @@
-import { returnToSubmitterFolder, showComments, showCommentsSub, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile, createComment, emailsAllowedToUpdateData } from "../shared.js";
+import { getFileInfo, returnToSubmitterFolder, showComments, showCommentsSub, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile, createComment, emailsAllowedToUpdateData } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
 import { renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
 import { showPreview } from "../components/boxPreview.js";
@@ -116,7 +116,7 @@ export const addResponseInputs = async () => {
                     const commentText = commentDiv.textContent || commentDiv.innerText;
                     const ratingMatch = commentText.match(/Rating:\s*(\w+)/i);
                     const rating = ratingMatch ? ratingMatch[1] : null;
-                    
+                    console.log(commentText);
                     // Add response box unless rating is specifically "1" or "NA"
                     const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
                     
@@ -147,7 +147,7 @@ export const addResponseInputs = async () => {
                 submitButton.className = 'submit-all-responses text-center';
                 submitButton.innerHTML = `
                     ${userHasCommented ? '<p class="text-danger">Comments have already been responded to.</p>' : '<p class="text-danger" id="validationWarning" style="display: none;">Please respond to all required comments before continuing.</p>'}
-                    <button class="buttonsubmit" id="submitAllResponsesBtn" ${userHasCommented ? 'disabled' : 'disabled'}><span class="buttonsubmit__text">Submit All Responses</span></button>
+                    <button class="buttonsubmit button-glow-red" id="submitAllResponsesBtn" ${userHasCommented ? 'disabled' : 'disabled'}><span class="buttonsubmit__text">Submit All Responses</span></button>
                 `;
                 document.getElementById('submitResponsesContainer').appendChild(submitButton);
                 
@@ -329,7 +329,8 @@ export const dataSubmissionForm = async () => {
     
         template += `
             <div class='tab-pane fade show active' id='needinput' role='tabpanel' aria-labeledby='needinputTab'>
-                <button id='downloadCommentsBtn' class='buttonsubmit' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download Comments for Offline Response</span></button>
+                <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Resubmit Form</span></button>
+                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.needinput, "needinput", true);
@@ -424,6 +425,9 @@ export const dataSubmissionForm = async () => {
 
     // Set up download comments functionality
     setupDownloadComments(categorizedEntries.needinput);
+    
+    // Set up resubmit form functionality
+    setupResubmitForm(categorizedEntries.needinput);
 
     document.getElementById("needinputTab").click();
     document.getElementById("needinputselectedDoc").children[0].selected = true;
@@ -530,6 +534,142 @@ export const downloadCommentsAsWord = async (fileId) => {
     }
 };
 
+export const setupResubmitForm = (entries) => {
+    const resubmitBtn = document.getElementById('resubmitFormBtn');
+    if (resubmitBtn && entries.length > 0) {
+        resubmitBtn.addEventListener('click', async () => {
+            const selectedFileId = document.getElementById('needinputselectedDoc').value;
+            if (selectedFileId) {
+                await extractFormDataAndNavigate(selectedFileId);
+            }
+        });
+    }
+};
+
+export const extractFormDataAndNavigate = async (fileId) => {
+    try {
+        const [originalFileResponse, fileInfo] = await Promise.all([
+            downloadFile(fileId),
+            getFileInfo(fileId)
+        ]);
+        const originalBlob = await originalFileResponse.blob();
+        const arrayBuffer = await originalBlob.arrayBuffer();
+        
+        if (window.mammoth) {
+            const result = await window.mammoth.convertToHtml({arrayBuffer: arrayBuffer});
+            const htmlContent = result.value;
+            console.log('Raw HTML:', htmlContent);
+            
+            // Convert HTML to text while preserving paragraph breaks
+            let text = htmlContent
+                .replace(/<\/h2>/gi, '\n')
+                .replace(/<h2[^>]*>/gi, '')
+                .replace(/<\/p>/gi, '\n\n')
+                .replace(/<p[^>]*>/gi, '')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"');
+            
+            console.log('Full extracted text:', text);
+            
+            const formData = parseWordDocument(text);
+            formData.originalConceptId = fileInfo.description || '';
+            formData.fileId = fileId;
+            formData.originalFileName = fileInfo.name || '';
+            localStorage.setItem('resubmitFormData', JSON.stringify(formData));
+            window.location.hash = '#data_form_resubmit';
+        } else {
+            alert('Unable to parse document. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error extracting form data:', error);
+        alert('Error processing document. Please try again.');
+    }
+};
+
+export const parseWordDocument = (text) => {
+    const formData = {};
+    
+    const extractField = (label, text) => {
+        const regex = new RegExp(label + ':\\s*([^\\n]+)', 'i');
+        const match = text.match(regex);
+        return match ? match[1].trim() : '';
+    };
+    
+    const extractFieldNoColon = (label, text) => {
+        const regex = new RegExp(label + '\\s+([^\\n]+)', 'i');
+        const match = text.match(regex);
+        return match ? match[1].trim() : '';
+    };
+    
+    const extractBetween = (startLabel, endLabel, text) => {
+        const regex = new RegExp(startLabel + ':\\s*([\\s\\S]*?)(?=' + endLabel + ':|$)', 'i');
+        const match = text.match(regex);
+        return match ? match[1].trim() : '';
+    };
+    formData.date = extractField('Date', text);
+    console.log('date:', formData.date);
+    formData.projname = extractField('Project Title', text);
+    console.log('projname:', formData.projname);
+    formData.amendment = extractField('Is this an amendment', text);
+    console.log('amendment:', formData.amendment);
+    formData.conNum = extractField('Amendment', text);
+    console.log('conNum:', formData.conNum);
+    formData.investigators = extractField('Contact Investigator\\(s\\)', text);
+    console.log('investigators:', formData.investigators);
+    formData.institution = extractField('Institution\\(s\\)', text);
+    console.log('institution:', formData.institution);
+    formData.email = extractField('Contact Email', text);
+    console.log('email:', formData.email);
+    formData.memcon = extractFieldNoColon('Member of Consortia or Study \\/ Trial Group\\?', text);
+    console.log('memcon:', formData.memcon);
+    formData.acro = extractField('Confluence Study Acronym\\(s\\) for the Contact Investigator', text);
+    console.log('acro:', formData.acro);
+    formData.otherinvest = extractBetween('OTHER Investigators and their institutions', 'ALL Investigators \\(and Institutions\\) who require access', text);
+    console.log('otherinvest:', formData.otherinvest);
+    formData.allinvest = extractBetween('ALL Investigators \\(and Institutions\\) who require access', 'Consortia or Study \\/ Trial Group data being requested', text);
+    console.log('allinvest:', formData.allinvest);
+    formData.datacon = extractBetween('Consortia or Study \\/ Trial Group data being requested', 'Concept Background', text);
+    console.log('datacon:', formData.datacon);
+    formData.condesc = extractBetween('Concept Background', 'Concept Aims', text);
+    console.log('condesc:', formData.condesc);
+    formData.condescAims = extractBetween('Concept Aims', 'Description of Analysis Plan', text);
+    console.log('condescAims:', formData.condescAims);
+    formData.analdesc = extractBetween('Description of Analysis Plan', 'Primary Endpoint', text);
+    console.log('analdesc:', formData.analdesc);
+    formData.primend = extractBetween('Primary Endpoint', 'Subtype of Breast Cancer', text);
+    console.log('primend:', formData.primend);
+    formData.sbcin = extractField('Subtype of Breast Cancer', text);
+    console.log('sbcin:', formData.sbcin);
+    formData.otherinput = extractField('Other Primary Endpoint', text);
+    console.log('otherinput:', formData.otherinput);
+    formData.genotyping = extractBetween('Genotyping', 'Data Requested From', text);
+    console.log('genotyping:', formData.genotyping);
+    formData.sex = extractBetween('Data Requested From', 'Carrier Status requested', text);
+    console.log('sex:', formData.sex);
+    formData.carStatus = extractBetween('Carrier Status requested', 'Risk Factor Variables', text);
+    console.log('carStatus:', formData.carStatus);
+    formData.riskfactvarv = extractBetween('Risk Factor Variables', 'Pathology Variables', text);
+    console.log('riskfactvarv:', formData.riskfactvarv);
+    formData.pathvarv = extractBetween('Pathology Variables', 'Survival and Treatment Variables', text);
+    console.log('pathvarv:', formData.pathvarv);
+    formData.surtrevarv = extractBetween('Survival and Treatment Variables', 'Mammographic Density Variable', text);
+    console.log('surtrevarv:', formData.surtrevarv);
+    formData.mammvarv = extractBetween('Mammographic Density Variable', 'Time Plan', text);
+    console.log('mammvarv:', formData.mammvarv);
+    formData.time = extractBetween('Time Plan', 'Any other considerations you would like the DACC to be aware of', text);
+    console.log('time:', formData.time);
+    formData.anyoth = extractBetween('Any other considerations you would like the DACC to be aware of', 'Confluence authorship requirements', text);
+    console.log('anyoth:', formData.anyoth);
+    
+    console.log('Complete formData object:', formData);
+    return formData;
+};
+
 export const dataSubmissionTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     
@@ -541,103 +681,3 @@ export const dataSubmissionTemplate = () => {
 
     return template;
 };
-
-// export const lazyload = (element) => {
-//     let spinners = document.getElementsByClassName('lazy-loading-spinner');
-//     if (element) spinners = element.parentNode.querySelectorAll('.lazy-loading-spinner');
-//     Array.from(spinners).forEach(async element => {
-//         const id = element.dataset.id;
-//         const status = element.dataset.status;
-//         if (status !== 'pending') return;
-        
-//         let allEntries = (await getFolderItems(id)).entries;
-//         if (allEntries.length === 0) {
-//             element.classList = ['fas fa-exclamation-circle'];
-//             element.title = 'Empty folder'
-//         }
-//         allEntries = allEntries.filter(dt => dt.name !== 'Study Documents');
-        
-//         element.dataset.status = 'complete';
-        
-//         const entries = filterStudiesDataTypes(allEntries);
-//         const fileEntries = allEntries.filter(obj => obj.type === 'file');
-        
-//         if (entries.length > 0) {
-//             const ul = document.createElement('ul');
-//             ul.classList = ['ul-list-style collapse'];
-//             ul.id = `toggle${id}`
-
-//             for (const obj of entries) {
-//                 const li = document.createElement('li');
-//                 li.classList = ['collapsible-items'];
-//                 let type = obj.type;
-//                 let liClass = type === 'folder' ? 'collapsible consortia-folder' : '';
-//                 let title = type === 'folder' ? 'Expand / Collapse' : '';
-                
-//                 li.innerHTML = `
-//                     <button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
-//                         <i title="${title}" data-id="${obj.id}" data-folder-name="${obj.name}" data-status="pending" class="lazy-loading-spinner"></i>
-//                     </button> 
-//                     ${obj.name}
-//                     <a href="https://nih.app.box.com/${type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}">
-//                         <i class="fas fa-external-link-alt"></i>
-//                     </a>
-//                 `;
-                
-//                 ul.appendChild(li);
-//             }
-
-//             element.classList.remove('lazy-loading-spinner');
-//             element.classList.add('fas');
-//             element.classList.add('fa-folder-plus');
-//             element.parentNode.parentNode.appendChild(ul);
-//             dataSubmission(element.parentNode);
-//         }
-//         else if (fileEntries.length > 0) {
-//             const ul = document.createElement('ul');
-//             ul.classList = ['ul-list-style collapse'];
-//             ul.id = `toggle${id}`
-
-//             for (const obj of fileEntries) {
-//                 const li = document.createElement('li');
-//                 li.classList = ['collapsible-items'];
-                
-//                 li.innerHTML = `
-//                     <a>
-//                         <i title="files" data-id="${obj.id}" data-status="pending" class="fas fa-file-alt"></i>
-//                     </a> 
-//                     ${obj.name}
-//                     <a href="https://nih.app.box.com/${obj.type === 'folder' ? 'folder' : 'file'}/${obj.id}" target="_blank" rel="noopener noreferrer" title="Open ${obj.type}">
-//                         <i class="fas fa-external-link-alt"></i>
-//                     </a>
-//                 `;
-                
-//                 ul.appendChild(li);
-//             }
-
-//             element.classList.remove('lazy-loading-spinner');
-//             element.classList.add('fas');
-//             element.classList.add('fa-folder-plus');
-//             element.parentNode.parentNode.appendChild(ul);
-//             dataSubmission(element.parentNode);
-//         }
-//     });
-// };
-
-// export const dataSubmission = (element) => {
-//     element.addEventListener('click', e => {
-//         e.preventDefault();
-        
-//         if (element.getElementsByClassName('fa-folder-minus').length > 0 && element.getElementsByClassName('fa-folder-minus')[0].classList.contains('fa-folder-minus')) {
-//             element.getElementsByClassName('fa-folder-minus')[0].classList.add('fa-folder-plus');
-//             element.getElementsByClassName('fa-folder-minus')[0].classList.remove('fa-folder-minus');
-//         } else {
-//             element.getElementsByClassName('fa-folder-plus')[0].classList.add('fa-folder-minus');
-//             element.getElementsByClassName('fa-folder-plus')[0].classList.remove('fa-folder-plus');
-            
-//             if (document.getElementsByClassName('lazy-loading-spinner').length !== 0) {
-//                 lazyload(element);
-//             }
-//         }
-//     });
-// };

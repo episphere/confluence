@@ -6,7 +6,7 @@ import { template as dataRequestTemplate, templateAfterLogin as dataRequestTempl
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, testingDataGov } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -241,7 +241,7 @@ export const confluence = async () => {
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
-                authTableTemplate();
+                //authTableTemplate();
                 testingDataGov();
             });
         }
@@ -260,13 +260,13 @@ export const confluence = async () => {
             });
         }
         
-        const folders = await getFolderItems(0);
-        const array = filterConsortiums(folders.entries);
-        const projectArray = filterProjects(folders.entries);
-        const getCollaborators = await getCollaboration(137304373658, 'folders');
+        // const folders = await getFolderItems(0);
+        // const array = filterConsortiums(folders.entries);
+        // const projectArray = filterProjects(folders.entries);
+        const getCollaborators = await getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders');
         let getMyPermissionLevel = false;
         if (getCollaborators) getMyPermissionLevel = checkDataSubmissionPermissionLevel(getCollaborators, JSON.parse(localStorage.parms).login);
-        let showProjects = false;
+        //let showProjects = false;
         
         // for (let obj of projectArray) {
         //    if (showProjects === false) {
@@ -430,6 +430,19 @@ const manageRouter = async () => {
         formFunctions();
         //setupFormValidation("analysisConceptForm");
     }
+    else if (hash === '#data_form_resubmit') {
+        const element = document.getElementById('dataForm');
+        if (!element) return;
+        
+        document.title = 'Confluence - Resubmit Data Form';
+        assignNavbarActive(element, 2);
+        const prepopulateData = JSON.parse(localStorage.getItem('resubmitFormData') || '{}');
+        const fileName = prepopulateData.originalFileName || 'Unknown File';
+        confluenceDiv.innerHTML = dataFormTemplate(false, fileName);
+        dataForm(prepopulateData);  
+        formFunctions();
+        localStorage.removeItem('resubmitFormData');
+    }
     // else if (hash === '#upload_data_form') {
     //     const element = document.getElementById('uploaddataForm');
     //     if(!element) return;
@@ -526,6 +539,21 @@ const manageHash = async () => {
     else if (hash === '#data_form') {
         const element = document.getElementById('dataForm');
         element.click();
+    }
+    else if (hash === '#data_form_resubmit') {
+        const element = document.getElementById('dataForm');
+        if (!element) return;
+        
+        showAnimation();
+        assignNavbarActive(element, 2);
+        document.title = 'Confluence - Resubmit Data Form';
+        const prepopulateData = JSON.parse(localStorage.getItem('resubmitFormData') || '{}');
+        const fileName = prepopulateData.originalFileName || 'Unknown File';
+        confluenceDiv.innerHTML = dataFormTemplate(false, fileName);
+        dataForm(prepopulateData);
+        formFunctions();
+        localStorage.removeItem('resubmitFormData');
+        hideAnimation();
     }
     else if (hash === '#upload_data_form') {
         const element = document.getElementById('uploaddataForm');

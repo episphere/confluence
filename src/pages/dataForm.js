@@ -1,7 +1,7 @@
-import { submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel} from "../shared.js"
+import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment} from "../shared.js"
 // import * as docx from "docx";
 
-export const formtemplate = () => {
+export const formtemplate = (showDownloadButton = true, resubmitTitle = null) => {
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     let template = ` 
@@ -9,16 +9,18 @@ export const formtemplate = () => {
             <div class="container body-min-height">
                 <div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="align-left">
-                        <h1 class="page-header">Analysis Concept Form</h1>
+                        <h1 class="page-header">${resubmitTitle ? `Concept Form Resubmit: ${resubmitTitle}` : 'Analysis Concept Form'}</h1>
                     </div>
-                    <div class="align-right">
-                      <button type="button" id="downloadWordForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download a word version of the Analysis Concept Form."> 
+                    ${showDownloadButton ? `<div class="align-right">
+                      <button type="button" id="downloadWordForm" class="col-auto buttonsubmit mt-3 mb-3 button-glow-red" title="Download a word version of the Analysis Concept Form."> 
                         <span class="buttonsubmit__text">Download Blank Form</span>
                       </button>
-                    </div>
+                    </div>` : ''}
                 </div>
-                <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">             
-                    <section class="contact-form">
+                <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                    <div class="row">
+                        <div class="${resubmitTitle ? 'col-md-8' : 'col-12'}" style="${resubmitTitle ? 'padding-right: 20px;' : ''}">
+                    <section class="contact-form" style="${resubmitTitle ? 'max-width: 100%;' : ''}">
                         <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px; font-size: 18px; text-align: center;">
                             User does not have permissions to upload form. Please contact administrator for access.
                         </div>
@@ -46,6 +48,7 @@ export const formtemplate = () => {
                             costs incurred using resources on the TRE (e.g., compute costs analyzing the data). 
                         </p>
                         <form id="analysisConceptForm">
+                            <input type="hidden" id="originalConceptId" name="originalConceptId" value="" />
                             <div class="input-group">
                               <label for="date" id="date-label"><b>Date</b><span class='required-label' aria-hidden="true">*</span></label>
                               <input id="date" name="date" type="date" value='${today}' class="form-text-input" aria-required="true" aria-describedby="date-error" required/>
@@ -53,7 +56,7 @@ export const formtemplate = () => {
                             </div>
                             <div class="input-group">
                               <label for="projname" id="projname-label"><b>Title of Proposed Project</b> (Max length 250 characters)<span class='required-label' aria-hidden="true">*</span></label>
-                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" required/>
+                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" style="max-width: 100%;" required/>
                               <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             <div class="input-group form-check">
@@ -548,18 +551,26 @@ export const formtemplate = () => {
                                 <span class='required-label'>*</span></label>
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button type="button" id="downloadForm" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Download the form with your current responses to a word document."> 
+                                <button type="button" id="downloadForm" class="col-auto buttonsubmit mt-3 mb-3 button-glow-red" title="Download the form with your current responses to a word document."> 
                                   <span class="buttonsubmit__text">Download Form with Inputs</span>
                                 </button>
-                                <button type="submit" id="submitFormButton" class="col-auto btn btn-red mt-3 mb-3 button-glow-red" title="Submit your form for review."> 
+                                <button type="submit" id="submitFormButton" class="col-auto buttonsubmit mt-3 mb-3 button-glow-red" title="Submit your form for review."> 
                                   <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
                                 </button>
                             </div>
-                            <!---<button type="button" id="downloadWord" class="buttonsubmit"> 
+                            <!---<button type="button" id="downloadWord" class="buttonsubmit button-glow-red"> 
                                 <span class="buttonsubmit__text"> Download Word </span>
                             </button>--->
                         </form>
                     </section>
+                    </div>
+                    ${resubmitTitle ? `<div class="col-md-4">
+                        <div class="card" style="position: sticky; top: 20px; max-height: 90vh; overflow-y: auto;">
+                            <div class="card-header"><h5>Comments</h5></div>
+                            <div class="card-body" id="resubmitComments">Loading comments...</div>
+                        </div>
+                    </div>` : ''}
+                    </div>
                     <div id='popUpModal' class="modal" tabindex="-1" role="dialog">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -603,7 +614,7 @@ export const formFunctions = () => {
     });
 };
 
-export const dataForm = async () => {
+export const dataForm = async (prepopulateData = null) => {
   async function handleFormSubmit3() {
     console.log("Button Clicked to Download");
     let formFile = await downloadFile(conceptForm);
@@ -682,6 +693,63 @@ export const dataForm = async () => {
         await generateWord(jsondata, btn, true);
         btn.classList.toggle("buttonsubmit--loading");
         btn.disabled = false;
+    }
+
+    // Prepopulate form if data is provided
+    if (prepopulateData) {
+        if (prepopulateData.fileId) {
+            loadResubmitComments(prepopulateData.fileId);
+        }
+        setTimeout(() => {
+            Object.keys(prepopulateData).forEach(key => {
+                const value = prepopulateData[key];
+                
+                // Handle radio buttons (amendment)
+                if (key === 'amendment') {
+                    const radio = document.querySelector(`input[name="amendment"][value="${value}"]`);
+                    if (radio) radio.checked = true;
+                }
+                // Handle memcon checkboxes
+                else if (key === 'memcon') {
+                    const values = value.split(/[,\n]+/).map(v => v.trim()).filter(v => v);
+                    values.forEach(val => {
+                        const checkbox = document.querySelector(`input[name="mem-con"][value="${val}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+                // Handle datacon checkboxes
+                else if (key === 'datacon') {
+                    const values = value.split(/[,\n]+/).map(v => v.trim()).filter(v => v);
+                    values.forEach(val => {
+                        const checkbox = document.querySelector(`input[name="data-con"][value="${val}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+                // Handle primend, genotyping, sex, carStatus checkboxes
+                else if (key === 'primend' || key === 'genotyping' || key === 'sex' || key === 'carStatus') {
+                    const values = value.split(/[,\n]+/).map(v => v.trim()).filter(v => v);
+                    const fieldName = key === 'primend' ? 'prim-end' : key;
+                    values.forEach(val => {
+                        const checkbox = document.querySelector(`input[name="${fieldName}"][value="${val}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+                // Handle Yes/No checkboxes
+                else if (key === 'riskfactvarv' || key === 'pathvarv' || key === 'surtrevarv' || key === 'mammvarv') {
+                    const checkbox = document.getElementById(key);
+                    if (checkbox && value && value.toLowerCase() === 'yes') {
+                        checkbox.checked = true;
+                    }
+                }
+                // Handle regular text inputs, textareas, and hidden fields
+                else {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = value;
+                    }
+                }
+            });
+        }, 100);
     }
 
     async function generateWord(jsondata, button, uploadReady=false) {
@@ -960,47 +1028,47 @@ export const dataForm = async () => {
                 after: 150,
               }}),
 
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Concept Aims: "
-                                })
-                            ],
-                            spacing: {
-                                after: 0
-                            }
-                        }),
+            new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                    new docx.TextRun({
+                        text: "Concept Aims: "
+                    })
+                ],
+                spacing: {
+                    after: 0
+                }
+            }),
 
-                        new docx.Paragraph({
-                            children: aimsRun,
-                            spacing: {
-                                after: 150
-                            }, 
-                            style: "longinput"
-                        }),
+            new docx.Paragraph({
+                children: aimsRun,
+                spacing: {
+                    after: 150
+                }, 
+                style: "longinput"
+            }),
 
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Description of Analysis Plan: "
-                                })
-                            ],
-                            spacing: {
-                                after: 0
-                            }
-                        }),
+            new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                    new docx.TextRun({
+                        text: "Description of Analysis Plan: "
+                    })
+                ],
+                spacing: {
+                    after: 0
+                }
+            }),
 
-                        new docx.Paragraph({
-                            children: descRun,
-                            spacing: {
-                                after: 150
-                            },
-                            style: "longinput"
-                        }),
+            new docx.Paragraph({
+                children: descRun,
+                spacing: {
+                    after: 150
+                },
+                style: "longinput"
+            }),
 
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
@@ -1206,34 +1274,34 @@ export const dataForm = async () => {
               },
             }),
 
-                        new docx.Paragraph({
-                            children: timeRun,
-                            spacing: {
-                                after: 150
-                            },
-                            style: "longinput"
-                        }),
+            new docx.Paragraph({
+                children: timeRun,
+                spacing: {
+                    after: 150
+                },
+                style: "longinput"
+            }),
 
-                        new docx.Paragraph({
-                            heading: docx.HeadingLevel.HEADING_2,
-                            alignment: docx.AlignmentType.START,
-                            children: [
-                                new docx.TextRun({
-                                    text: "Any other considerations you would like the DACC to be aware of: "
-                                })
-                            ],
-                            spacing: {
-                                after: 0
-                            }
-                        }),
+            new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                    new docx.TextRun({
+                        text: "Any other considerations you would like the DACC to be aware of: "
+                    })
+                ],
+                spacing: {
+                    after: 0
+                }
+            }),
 
-                        new docx.Paragraph({
-                            children: anyothRun,
-                            spacing: {
-                                after: 150
-                            },
-                            style: "longinput"
-                        }),
+            new docx.Paragraph({
+                children: anyothRun,
+                spacing: {
+                    after: 150
+                },
+                style: "longinput"
+            }),
 
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
@@ -1265,33 +1333,35 @@ export const dataForm = async () => {
     await docx.Packer.toBlob(doc).then(async (blob) => {
       console.log(btn);
       if (uploadReady) {
-      let response = await uploadWordFile(blob, filename, submitterFolder);
-      //let response = {'status': 201};
+      const originalConceptId = document.getElementById('originalConceptId').value;
+      const fileId = prepopulateData?.fileId;
+      let response;
+      
+      if (originalConceptId) {
+        const originalFileName = prepopulateData?.originalFileName || filename;
+        response = await uploadWordFileVersion(blob, originalConceptId, originalFileName, submitterFolder);
+        
+        // Add comment if fileId exists
+        if (fileId && response.entries) {
+          await createComment(fileId, 'New version uploaded');
+        }
+      } else {
+        response = await uploadWordFile(blob, filename, submitterFolder);
+      }
+      
       console.log(response);
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
             <p>Error detected, please upload again.</p>`;
         $("#popUpModal").modal("show");
-        // let popup = document.getElementById('popUpModal');
-        // let btns = popup.querySelectorAll('button');
-        // for (let button of btns) {
-        //       button.addEventListener('click', function () {
-        //       btn.classList.toggle("buttonsubmit--loading");
-        //       btn.disabled = false;
-        //     })
-        //   }
       } else if (response.status === 409){
         document.getElementById("modalBody").innerHTML = `
         <p>Conflict detected, please upload again.</p>`;
         $("#popUpModal").modal("show");
-        // let popup = document.getElementById('popUpModal');
-        // let btns = popup.querySelectorAll('button');
-        // for (let button of btns) {
-        //       button.addEventListener('click', function () {
-        //       btn.classList.toggle("buttonsubmit--loading");
-        //       btn.disabled = false;
-        //     })
-        //   }
+      } else if (response.status === 'error') {
+        document.getElementById("modalBody").innerHTML = `
+        <p>Error: ${response.statusText}</p>`;
+        $("#popUpModal").modal("show");
       } else {
         fileid = response.entries[0].id;
         document.getElementById("modalBody").innerHTML = `
@@ -1363,6 +1433,51 @@ export const dataForm = async () => {
 
   await checkUserPermissions();
 }
+
+const loadResubmitComments = async (fileId) => {
+    const container = document.getElementById('resubmitComments');
+    if (!container) return;
+    
+    try {
+        const response = await listComments(fileId);
+        const comments = JSON.parse(response).entries;
+        
+        if (comments.length === 0) {
+            container.innerHTML = '<p class="text-muted">No comments to show.</p>';
+            return;
+        }
+        
+        let html = '';
+        comments.forEach(comment => {
+            const date = new Date(comment.created_at);
+            const message = comment.message;
+            
+            // Parse consortium and rating from message
+            let displayMessage = message;
+            if (message.startsWith('Consortium')) {
+                const consMatch = message.match(/Consortium:\s*([^,]+)/);
+                const ratingMatch = message.match(/Rating:\s*(\w+)/i);
+                const commentMatch = message.match(/Comment:\s*(.+)/);
+                
+                const consortium = consMatch ? consMatch[1].trim() : '';
+                const rating = ratingMatch ? ratingMatch[1].trim() : '';
+                const commentText = commentMatch ? commentMatch[1].substring(0, commentMatch[1].indexOf('Box Comment ID:')).trim() : '';
+                
+                displayMessage = `<span class="text-primary">Consortium: ${consortium}</span> <span class="badge badge-pill badge-${rating}">${rating}</span><br>${commentText}`;
+            }
+            
+            html += `
+                <div class="mb-3 pb-3 border-bottom">
+                    <p class="mb-1">${displayMessage}</p>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading comments:', error);
+        container.innerHTML = '<p class="text-danger">Error loading comments.</p>';
+    }
+};
 
 export const uploaddataFormTemplate = () => {
     let template = ` 

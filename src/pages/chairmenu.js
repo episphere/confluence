@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -45,14 +45,6 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     return template;
 };
 
-// export function switchFiles(tab, div_id = '') {
-//     console.log('switchFile:', tab, document.getElementById(`${tab}selectedDoc`))
-//     document.getElementById(`${tab}selectedDoc`).addEventListener("change", (e) => {
-//         const file_id = e.target.value;
-//         showPreview(file_id, div_id);
-//     });
-// };
-
 const getCurrentUserAuth = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     let authChair = chairsInfo.find(({ email }) => email === userEmail);
@@ -89,9 +81,12 @@ export const switchFilesWithComments = (tab, files = []) => {
             
             // Check if this file has response comments
             const file = files.find(f => f.id === file_id);
+            console.log(file);
             if (file && file.responseComments) {
+                console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
                 showCommentsWithResponses(file_id, file.responseComments);
             } else if (tab === 'conceptNeedingClarification') {
+                console.log("Using showCommentsSub for file:", file.name);
                 showCommentsSub(file_id);
             } else {
                 showComments(file_id);
@@ -221,7 +216,13 @@ export const generateChairMenuFiles = async () => {
     claraResults.forEach(items => {
         items.forEach(item => {
             if (filesClaraIncompleted.findIndex(element => element.id === item.id) === -1) {
-                filesClaraIncompleted.push(item);
+                // Find the matching file in submitterFolder
+                const submitterFile = filearrayAllFiles.find(f => f.name === item.name);
+                if (submitterFile) {
+                    filesClaraIncompleted.push(submitterFile);
+                } else {
+                    filesClaraIncompleted.push(item);
+                }
             }
         });
     });
@@ -235,37 +236,10 @@ export const generateChairMenuFiles = async () => {
             const commentsResponse = await listComments(matchingFile.id);
             const comments = JSON.parse(commentsResponse).entries;
             claraFile.responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
-            console.log(claraFile.responseComments);
         }
     }
-    // console.log(filesIncompleted);
 
     const message = messagesForChair[userChairItem.id];
-    // let template = `
-    //     <div class="general-bg padding-bottom-1rem">
-    //         <div class="container body-min-height">
-    //             <div class="main-summary-row">
-    //                 <div class="align-left">
-    //                     <h1 class="page-header">${message}</h1>
-    //                 </div>
-    //             </div>
-    //             <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-    //                 <ul class='nav nav-tabs mb-3' role='tablist'>
-    //                     <li class='nav-item active' role='presentation'>
-    //                         <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'> Submit concept recommendation</a>
-    //                     </li>
-    //                     <li class='nav-item' role='presentation'>
-    //                         <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>Concept Needing Clarification</a>
-    //                     </li>
-    //                     <li class='nav-item' role='presentation'>
-    //                         <a class='nav-link' id='daccDecisionTab' href='#daccDecision' data-mdb-toggle="tab" role='tab' aria-controls='daccDecision' aria-selected='true'> DACC Decision </a>
-    //                     </li>
-    //                 </ul>
-    //                 <div class="tab-content" id="selectedTab"></div>  
-    //             </div>
-    //         </div>
-    //     </div>
-    // `;
 
     var template = `
         <div class="general-bg padding-bottom-1rem">
@@ -348,7 +322,7 @@ export const generateChairMenuFiles = async () => {
                                     <option value = "NA"> NA - Not Applicable</option>
                                 </select>
                             </div>
-                            <button type="submit" class="buttonsubmit mt-2" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
+                            <button type="submit" class="buttonsubmit button-glow-red mt-2" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
                                 <span class="buttonsubmit__text"> Submit </span>
                             </button>
                             <div id="commentWarning" class="text-danger small mt-1" style="display: none;">A comment is required with this score.</div>
@@ -434,8 +408,10 @@ export const generateChairMenuFiles = async () => {
             }
         }, 200);
     } else if (!!filesClaraIncompleted.length) {
+        console.log("Clari showing");
         showPreviewInPane(filesClaraIncompleted[0].id);
         if (filesClaraIncompleted[0].responseComments) {
+            console.log("Showing comments with responses for file:", filesClaraIncompleted[0].name);
             showCommentsWithResponses(filesClaraIncompleted[0].id, filesClaraIncompleted[0].responseComments);
         } else {
             showCommentsSub(filesClaraIncompleted[0].id);
@@ -1021,10 +997,10 @@ export const authTableTemplate = () => {
                       <h1 class="page-header">Admin Table View</h1>
                   </div>
                   <div class="align-right">
-                      <button type="submit" id="submitID" class="buttonsubmit" onclick="this.classList.toggle('buttonsubmit--loading')"> 
+                      <button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> 
                         <span class="buttonsubmit__text"> Update Users </span>
                       </button>
-                      <button type="button" id="renameFilesBtn" class="buttonsubmit" style="margin-left: 10px;"> 
+                      <button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> 
                         <span class="buttonsubmit__text"> Rename Files </span>
                       </button>
                   </div>
@@ -1033,10 +1009,10 @@ export const authTableTemplate = () => {
                     <div class="tab-content" id="selectedTab">
                         <div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab">
                             <div id="authTableView" class="align-left"></div>
-                                <button type="submit" class="buttonsubmit" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')">
+                                <button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')">
                                     <span class="buttonsubmit__text"> Return to Submitter </span>
                                 </button>
-                                <button type="submit" class="buttonsubmit" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')">
+                                <button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')">
                                     <span class="buttonsubmit__text"> Return to Chairs </span>
                                 </button>
                                 <a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>
@@ -1980,7 +1956,7 @@ export const returnToSubmitter = () => {
                     <p><strong>${checkedFiles[0].value}</strong></p>
                     <h6>Select decision:</h6>
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success decision-btn" data-decision="Accepted">Accept</button>
+                        <button type="button" class="btn btn-success decision-btn" data-decision="Accepted">Accept: No comments from DACC</button>
                         <button type="button" class="btn btn-danger decision-btn" data-decision="Denied">Deny</button>
                         <button type="button" class="btn btn-warning decision-btn" data-decision="Requiring Input">Require Input</button>
                     </div>
@@ -2071,11 +2047,12 @@ export const returnToSubmitter = () => {
         }
         
         addStatus(`Copying file to ${decision} folder...`);
-        const cpFile = await copyFile(checkbox.id, targetFolderId);
+        const cpFile = await copyFile(checkbox.id, targetFolderId, checkbox.id);
         const cpFileId = cpFile.id;
         
         addStatus(`Copying comments...`);
         let returnComments = await listComments(checkbox.id);
+        console.log(returnComments);
         let commentsToCp = JSON.parse(returnComments).entries;
         console.log(commentsToCp);
         await copyComments(commentsToCp, cpFileId);
@@ -2150,11 +2127,11 @@ export const returnToSubmitter = () => {
 export const copyComments = async (comments, fileId) => {
     for (let chairs of chairsInfo) {
         let consortiumName = chairs.consortium;
-        let chairEmail = chairs.email;
-        let chairComments = comments.filter(dt => dt.created_by.login === chairEmail && dt.message.includes(`Consortium: ${consortiumName}`));
+        let chairComments = comments.filter(dt => dt.message.includes(`Consortium: ${consortiumName}`));
         
         for (let comment of chairComments) {
-            let submitMessage = comment.message + ` (Box Comment ID: ${comment.id})`;
+            let submitMessage = comment.message + ` Box Comment ID: ${comment.id}`;
+            console.log(submitMessage);
             await createComment(fileId, submitMessage);
         }
     }
