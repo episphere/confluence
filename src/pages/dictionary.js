@@ -344,9 +344,9 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     dictionary.forEach((desc, index) => {
         if (index > pageSize) return
         template += `
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" aria-expanded="false" aria-controls="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}">
+            <div class="accordion-item" style="transition: all 0.3s ease;">
+                <h2 class="accordion-header" id="flush-headingOne" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" onmouseover="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor='#f0f7ff'; this.querySelector('.accordion-button').style.boxShadow='0 2px 8px rgba(164, 22, 82, 0.1)'; this.querySelector('.accordion-button').style.borderLeft='3px solid #A41652';}" onmouseout="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor=''; this.querySelector('.accordion-button').style.boxShadow=''; this.querySelector('.accordion-button').style.borderLeft='3px solid transparent';}">
+                    <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" style="pointer-events: none; padding: 1rem; transition: all 0.2s; border-left: 3px solid transparent;">
                         <div class="col-md-3">${desc['Variable'] ? desc['Variable'] : ''}</div>
                         <div class="col-md-5">${desc['Label'] ? desc['Label'] : ''}</div>
                         <div class="col-md-2">${desc['Category'] ? desc['Category'] : ''}</div>
@@ -354,7 +354,7 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
                     </button>
                 </h2>
                 <div id="study${desc['Variable'] ? desc['Variable'].replace(/(<b>)|(<\/b>)/g, '') : ''}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
-                    <div class="accordion-body">
+                    <div class="accordion-body" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
                         ${desc['Coding'] ? `<div class="row mb-1 m-0 white-space"><div class="col-md-2 pl-2 font-bold">Coding</div><div class="col">${desc['Coding']}</div></div>`: ``}
                         ${desc['Variable type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Variable type</div><div class="col">${desc['Variable type']}</div></div>`: ``}
                         ${desc['Data Type'] ? `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Data Type</div><div class="col">${desc['Data Type']}</div></div>`: ``}
@@ -369,8 +369,27 @@ const renderDataDictionary = (dictionary, pageSize, headers) => {
     template += `</div></div>`;
     document.getElementById('dataDictionaryBody').innerHTML = template;
     
+    addEventAccordionStateDictionary();
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(dictionary, pageSize, headers);
+};
+
+const addEventAccordionStateDictionary = () => {
+    const accordionItems = document.querySelectorAll('.accordion-collapse');
+    accordionItems.forEach(item => {
+        item.addEventListener('shown.bs.collapse', (e) => {
+            const btn = e.target.previousElementSibling.querySelector('.accordion-button');
+            btn.style.backgroundColor = '#ffe6f0';
+            btn.style.borderLeft = '4px solid #A41652';
+            btn.style.boxShadow = '0 4px 12px rgba(164, 22, 82, 0.25)';
+        });
+        item.addEventListener('hidden.bs.collapse', (e) => {
+            const btn = e.target.previousElementSibling.querySelector('.accordion-button');
+            btn.style.backgroundColor = '';
+            btn.style.borderLeft = '3px solid transparent';
+            btn.style.boxShadow = '';
+        });
+    });
 };
 
 export const downloadFiles = (data, headers, fileName, studyDescription) => {

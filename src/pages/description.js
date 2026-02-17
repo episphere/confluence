@@ -81,8 +81,8 @@ const getDescription = async () => {
     // const tsv2json = tsv2Json(data);
     const json = JSON.parse(data);
     const headers = getAllKeys(json);
-    console.log(json);
-    console.log(headers);
+    // console.log(json);
+    // console.log(headers);
     // const tsv2json = csv2Json(data);
     // const json = tsv2json.data;
     // const headers = tsv2json.headers;
@@ -253,8 +253,8 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
             
             template += `
                 <div class="accordion-item" style="transition: all 0.3s ease;">
-                    <h2 class="accordion-header" id="flush-headingOne">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" aria-expanded="false" aria-controls="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}">
+                    <h2 class="accordion-header" id="flush-headingOne" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" onmouseover="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor='#f0f7ff'; this.querySelector('.accordion-button').style.boxShadow='0 2px 8px rgba(164, 22, 82, 0.1)'; this.querySelector('.accordion-button').style.borderLeft='3px solid #A41652';}" onmouseout="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor=''; this.querySelector('.accordion-button').style.boxShadow=''; this.querySelector('.accordion-button').style.borderLeft='3px solid transparent';}">
+                        <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" style="pointer-events: none; padding: 1rem; transition: all 0.2s; border-left: 3px solid transparent;">
                             <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
                             <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
                             <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
@@ -263,7 +263,7 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                         </button>
                     </h2>
                     <div id="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
-                        <div class="accordion-body" style="box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 3px solid #A41652;">
+                        <div class="accordion-body" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 8px rgba(0,0,0,0.1); background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
                             ${desc['Case definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Case Definition</div><div class="col">${desc['Case definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
                             ${desc['Control definition'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">Control Definition</div><div class="col">${desc['Control definition'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
                             ${desc['References'] ? `<div class="row mb-3 pb-2" style="border-bottom: 1px solid #e9ecef;"><div class="col-md-2 font-bold">References</div><div class="col">${desc['References'].replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div></div>`: ``}
@@ -298,8 +298,27 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
     }
     
     document.getElementById('descriptionBody').innerHTML = template;
+    addEventAccordionState();
     addEventToggleCollapsePanelBtn();
     addEventSortColumn(descriptions, pageSize, headers);
+};
+
+const addEventAccordionState = () => {
+    const accordionItems = document.querySelectorAll('.accordion-collapse');
+    accordionItems.forEach(item => {
+        item.addEventListener('shown.bs.collapse', (e) => {
+            const btn = e.target.previousElementSibling.querySelector('.accordion-button');
+            btn.style.backgroundColor = '#ffe6f0';
+            btn.style.borderLeft = '4px solid #A41652';
+            btn.style.boxShadow = '0 4px 12px rgba(164, 22, 82, 0.25)';
+        });
+        item.addEventListener('hidden.bs.collapse', (e) => {
+            const btn = e.target.previousElementSibling.querySelector('.accordion-button');
+            btn.style.backgroundColor = '';
+            btn.style.borderLeft = '3px solid transparent';
+            btn.style.boxShadow = '';
+        });
+    });
 };
 
 const addEventSortColumn = (descriptions, pageSize, headers) => {
@@ -590,14 +609,14 @@ export const updateDesc = () => {
             let data = await getFileXLSX(obj.id);
             let file = await data.arrayBuffer();
             let workbook = XLSX.read(file);
-            console.log(workbook);
+            // console.log(workbook);
             let worksheet = workbook.Sheets[workbook.SheetNames[0]];
             let raw_data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
             let json_input = array2Json(raw_data);
-            console.log(json_input);
+            // console.log(json_input);
             let json_input_noempty = json_input.filter(obj => Object.keys(obj).length !== 0);
             json_list = json_list.concat(json_input_noempty);
-            console.log(json_list);
+            // console.log(json_list);
         }
         
         JSONToFile(json_list, 'studyDescriptions');
