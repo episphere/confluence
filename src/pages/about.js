@@ -2,7 +2,7 @@ import { addEventConsortiaFilter } from "../event.js";
 import { getPublicFile, numberWithCommas, publicDataFileId } from "./../shared.js";
 
 export const aboutConfluence = (activeTab, showDescripton, accessToUpload) => {
-    console.log(activeTab);
+    //console.log(activeTab);
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
             <div class="container">

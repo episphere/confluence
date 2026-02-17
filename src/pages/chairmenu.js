@@ -81,12 +81,12 @@ export const switchFilesWithComments = (tab, files = []) => {
             
             // Check if this file has response comments
             const file = files.find(f => f.id === file_id);
-            console.log(file);
+            //console.log(file);
             if (file && file.responseComments) {
-                console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
+                //console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
                 showCommentsWithResponses(file_id, file.responseComments);
             } else if (tab === 'conceptNeedingClarification') {
-                console.log("Using showCommentsSub for file:", file.name);
+                //console.log("Using showCommentsSub for file:", file.name);
                 showCommentsSub(file_id);
             } else {
                 showComments(file_id);
@@ -115,7 +115,7 @@ export const generateChairMenuFiles = async () => {
     const daccEmails = data.filter(item => item['DACC']==consortium).map(dt => dt['Email']).splice(1);
 
     const filesIncompleted = [];
-    console.log("1");
+    //console.log("1");
     
     // Process filearrayChair in parallel
     const chairTaskPromises = filearrayChair.map(async (obj) => {
@@ -167,7 +167,7 @@ export const generateChairMenuFiles = async () => {
         });
     });
 
-    console.log("2");
+    //console.log("2");
 
     const filesClaraIncompleted = [];
     
@@ -231,7 +231,7 @@ export const generateChairMenuFiles = async () => {
     const returnFolderFiles = await getAllFilesRecursive(returnToSubmitterFolder);
     for (const claraFile of filesClaraIncompleted) {
         const matchingFile = returnFolderFiles.find(f => f.name === claraFile.name);
-        console.log(matchingFile)
+        //console.log(matchingFile)
         if (matchingFile) {
             const commentsResponse = await listComments(matchingFile.id);
             const comments = JSON.parse(commentsResponse).entries;
@@ -393,7 +393,7 @@ export const generateChairMenuFiles = async () => {
     
     downloadAll('recommendation', filesIncompleted)
     downloadAll('conceptNeedingClarification', filesClaraIncompleted)
-    console.log(filesIncompleted);
+    //console.log(filesIncompleted);
     if (!!filesIncompleted.length) {
         showPreviewInPane(filesIncompleted[0].id);
         // Don't call showCommentsInPane initially to preserve the form
@@ -408,10 +408,10 @@ export const generateChairMenuFiles = async () => {
             }
         }, 200);
     } else if (!!filesClaraIncompleted.length) {
-        console.log("Clari showing");
+        //console.log("Clari showing");
         showPreviewInPane(filesClaraIncompleted[0].id);
         if (filesClaraIncompleted[0].responseComments) {
-            console.log("Showing comments with responses for file:", filesClaraIncompleted[0].name);
+            //console.log("Showing comments with responses for file:", filesClaraIncompleted[0].name);
             showCommentsWithResponses(filesClaraIncompleted[0].id, filesClaraIncompleted[0].responseComments);
         } else {
             showCommentsSub(filesClaraIncompleted[0].id);
@@ -507,7 +507,7 @@ export const commentSubmit = async (consortium) => {
         
         const filesToSend = [];
         const elements = document.querySelectorAll(`.tab-content .active option`);
-        console.log({elements})
+        //console.log({elements})
         
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].selected) {
@@ -516,7 +516,7 @@ export const commentSubmit = async (consortium) => {
         }
         
         for (const fileId of filesToSend) {
-            console.log(fileId);
+            //console.log(fileId);
             
             let fileinfo = await getFileInfo(fileId);
             let filename = fileinfo.name;
@@ -530,7 +530,7 @@ export const commentSubmit = async (consortium) => {
             let comment = e.target[0].value;
             //let message = "Consortium: " + consortium + ", Rating: " + grade + "\nComment: " + comment;
             let message = `Consortium: ${consortium}, Rating: ${grade}, Comment: ${comment}`;
-            console.log(message);
+            //console.log(message);
             
             await createComment(fileId, message);
             if (allFileMatch && allFileMatch.id) {
@@ -578,7 +578,7 @@ export const downloadAll = (tab, files) => {
     const downloadFile = async (e) => {
         let items = []
         files.forEach(async ({id}, index) => {
-            console.log(id);
+            //console.log(id);
             let item = {
                 "type": "file",
                 "id": id
@@ -586,7 +586,7 @@ export const downloadAll = (tab, files) => {
             items.push(item);
         });
         
-        console.log(items);
+        //console.log(items);
         
         var chairName = document.getElementsByClassName("page-header")[0].innerHTML.replace(/ /g, "_");
         const d = new Date();
@@ -1785,7 +1785,7 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, fil
                 // Store the new value as previous for next change
                 this.setAttribute('data-previous-value', selectedValue);
                 
-                console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
+                //console.log(`Selected ${selectedValue} for ${consortium} on file ${fileId}`);
                 
                 // Remove any existing badge classes
                 this.className = 'form-select form-select-sm decision-dropdown';
@@ -1820,7 +1820,7 @@ export const returnToChairs = () => {
     const returnChairs = async (e) => {
         e.preventDefault();
         const btn = document.activeElement;
-        console.log("return to chairs selected");
+        //console.log("return to chairs selected");
         var inputsChecked = document.querySelectorAll('.pl');
         
         if (inputsChecked.length === 0 || !Array.from(inputsChecked).some(cb => cb.checked)) {
@@ -1893,7 +1893,7 @@ export const returnToChairs = () => {
                             if (item.name === checkbox.value) {
                                 let createTask = await createCompleteTask(item.id, "Returning to complete your review");
                                 let assignedTask = await assignTask(createTask.id, info.email);
-                                console.log("Found " + item.name + " in " + selectedConsortium);
+                                //console.log("Found " + item.name + " in " + selectedConsortium);
                                 itemFound = true;
                                 break;
                             }
@@ -1905,7 +1905,7 @@ export const returnToChairs = () => {
                                 if (item.name === checkbox.value) {
                                     let createTask = await createCompleteTask(item.id, "Returning to complete your review");
                                     let assignedTask = await assignTask(createTask.id, info.email);
-                                    console.log("Found " + item.name + " in " + selectedConsortium + " Clara folder");
+                                    //console.log("Found " + item.name + " in " + selectedConsortium + " Clara folder");
                                     itemFound = true;
                                     break;
                                 }
@@ -1996,7 +1996,7 @@ export const returnToSubmitter = () => {
         
         addStatus(`Starting process...`);
         addStatus(`Gathering data for Box file: ${checkbox.id}`);
-        console.log(checkbox.id);
+        //console.log(checkbox.id);
         let fileSelected = await getFileInfo(checkbox.id);
         let fileName = fileSelected.name;
         let userFound = fileSelected.created_by.login;
@@ -2052,9 +2052,9 @@ export const returnToSubmitter = () => {
         
         addStatus(`Copying comments...`);
         let returnComments = await listComments(checkbox.id);
-        console.log(returnComments);
+        //console.log(returnComments);
         let commentsToCp = JSON.parse(returnComments).entries;
-        console.log(commentsToCp);
+        //console.log(commentsToCp);
         await copyComments(commentsToCp, cpFileId);
         
         // Only search chair folders if decision is Accepted or Denied
@@ -2131,7 +2131,7 @@ export const copyComments = async (comments, fileId) => {
         
         for (let comment of chairComments) {
             let submitMessage = comment.message + ` Box Comment ID: ${comment.id}`;
-            console.log(submitMessage);
+            //console.log(submitMessage);
             await createComment(fileId, submitMessage);
         }
     }
@@ -2147,7 +2147,7 @@ export const testingDataGov = async () => {
 };
 
 export const dataGovTest = async () => {
-  console.log("testing data gov test function");
+  //console.log("testing data gov test function");
   ///
   const responseData = csv2Json(await getFile(1932355916952)); // Get summary level data
   const lastModified = (await getFileInfo(1932355916952)).modified_at;
@@ -2157,7 +2157,7 @@ export const dataGovTest = async () => {
   const getCollaborators_Upload = await getCollaboration(submitterFolder, 'folders', 1000);
 
   const pendingMetadataCollaborators = getCollaborators_Metadata.entries.filter(collab => collab.status === 'pending');
-  console.log('Pending Metadata Collaborators:', pendingMetadataCollaborators);
+  //console.log('Pending Metadata Collaborators:', pendingMetadataCollaborators);
   //console.log(pendingMetadataCollaborators);
 
   // Check for specific email
@@ -2165,14 +2165,14 @@ export const dataGovTest = async () => {
   const foundCollab = getCollaborators_Metadata.entries.find((collab, index) => {
     const email = collab.invite_email || (collab.accessible_by && collab.accessible_by.login);
     if (email === targetEmail) {
-      console.log(`Found ${targetEmail} at position ${index}:`, collab);
+      //console.log(`Found ${targetEmail} at position ${index}:`, collab);
       return true;
     }
     return false;
   });
   
   if (!foundCollab) {
-    console.log(`${targetEmail} not found in getCollaborators_Metadata`);
+    //console.log(`${targetEmail} not found in getCollaborators_Metadata`);
   }
 
   const emailsInMetadata = getCollaborators_Metadata.entries.map(collab => {
@@ -2197,7 +2197,7 @@ export const dataGovTest = async () => {
   }).filter(email => email !== null);
 
   const allEmails = responseData.data.map(user => user.Email.toLowerCase());
-  console.log(allEmails);
+  //console.log(allEmails);
 
   // Metadata
   const includedEmailsMetadata = allEmails.filter(email => emailsInMetadata.includes(email));
@@ -2211,12 +2211,12 @@ export const dataGovTest = async () => {
   const includedEmailsUpload = allEmails.filter(email => emailsInUploaddata.includes(email));
   const notIncludedEmailsUpload = allEmails.filter(email => !emailsInUploaddata.includes(email));
 
-  console.log('Metadata - Included:', includedEmailsMetadata);
-  console.log('Metadata - Not included:', notIncludedEmailsMetadata);
-  console.log('Events - Included:', includedEmailsEvents);
-  console.log('Events - Not included:', notIncludedEmailsEvents);
-  console.log('Upload - Included:', includedEmailsUpload);
-  console.log('Upload - Not included:', notIncludedEmailsUpload);
+  // console.log('Metadata - Included:', includedEmailsMetadata);
+  // console.log('Metadata - Not included:', notIncludedEmailsMetadata);
+  // console.log('Events - Included:', includedEmailsEvents);
+  // console.log('Events - Not included:', notIncludedEmailsEvents);
+  // console.log('Upload - Included:', includedEmailsUpload);
+  // console.log('Upload - Not included:', notIncludedEmailsUpload);
 
   // Show modal and add missing collaborators
   let successfulUpdate = '';
@@ -2320,7 +2320,7 @@ if (hasUsersToAdd) {
     }
   }
   
-  console.log(issueCount);
+  //console.log(issueCount);
   if (issueCount > 0) {
     listElement.innerHTML += `<p><strong>${issueCount} issues detected. Please review list or try again.</strong></p>`;
   } else {

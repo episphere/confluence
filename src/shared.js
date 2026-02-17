@@ -1439,19 +1439,19 @@ export const defaultPageSize = 40;
 export const handleRangeRequests = async () => {
     const fileInfo = await getFileInfo('751586322923');
     const fileSize = fileInfo.size;
-    console.log(`File size ${fileSize/1000000} MB`)
+    //console.log(`File size ${fileSize/1000000} MB`)
     
     const rangeStart = 0;
     const rangeEnd = 10000000;
-    console.time('Downloading 10 MB of data')
+    //console.time('Downloading 10 MB of data')
     const rangeData = await getFileRange('751586322923', rangeStart, rangeEnd);
-    console.timeEnd('Downloading 10 MB of data')
-    console.time('Parsing')
+    //console.timeEnd('Downloading 10 MB of data')
+    //console.time('Parsing')
     
     const lines = rangeData.trim().split(/[\n]/g);
     const header = lines[0];
     const headerArray = header.split(/[\s]/g);
-    console.log(headerArray)
+    //console.log(headerArray)
     const dataArray = [];
     lines.forEach((l,i) => {
         if (rangeStart === 0 && i === 0) return;
@@ -1459,8 +1459,8 @@ export const handleRangeRequests = async () => {
         dataArray.push(l.split(/[\s]/g));
     });
     
-    console.timeEnd('Parsing');
-    console.log(dataArray);
+    //console.timeEnd('Parsing');
+    //console.log(dataArray);
 };
 
 export const applicationURLs = {
@@ -1482,7 +1482,7 @@ export async function showComments(id) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
     let comments = JSON.parse(response).entries;
-    console.log(comments);
+    //console.log(comments);
     if (comments.length === 0) {
         const dropdownSection = document.getElementById(`fileComments`);
         dropdownSection.innerHTML = `
@@ -1614,7 +1614,7 @@ export async function showCommentsSub(id) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
     let comments = JSON.parse(response).entries;
-    console.log(comments);
+    //console.log(comments);
     if (comments.length === 0) {
         const dropdownSection = document.getElementById(`fileComments`);
         dropdownSection.innerHTML = `
@@ -1707,7 +1707,7 @@ export async function showCommentsSub2(id) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
     let comments = JSON.parse(response).entries;
-    console.log(comments);
+    //console.log(comments);
     if (comments.length === 0) {
         const dropdownSection = document.getElementById(`fileComments`);
         dropdownSection.innerHTML = `
@@ -2186,9 +2186,9 @@ export async function showCommentsWithResponses(id, responseComments = []) {
         
         // Find and display corresponding response
         const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${comment.id},`));
-        console.log(comment);
-        console.log(matchingResponse);
-        console.log(responseComments);
+        //console.log(comment);
+        //console.log(matchingResponse);
+       // console.log(responseComments);
         if (matchingResponse) {
             const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
             template += `

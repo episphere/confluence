@@ -43,28 +43,28 @@ export const categorizeFilesByFolderStructure = async (rootFolderId, userEmail) 
     };
     
     const rootItems = await getFolderItems(rootFolderId);
-    console.log('Root Items:', rootItems);
+    // console.log('Root Items:', rootItems);
     for (const item of rootItems.entries) {
-        console.log(item);
+        // console.log(item);
         if (item.type === 'folder') {
             const folderName = item.name.toLowerCase();
-            console.log(folderName);
+            // console.log(folderName);
             const folderFiles = await getAllFilesRecursive(item.id);
             
             if (folderName.includes('requiring input')) {
-                console.log("requires input");
+                // console.log("requires input");
                 categorized.needinput.push(...folderFiles);
             } else if (folderName.includes('accepted')) {
-                console.log("Accepted");
+                // console.log("Accepted");
                 categorized.accepted.push(...folderFiles);
             } else if (folderName.includes('denied') || folderName.includes('rejected')) {
-                console.log("Denied/Rejected");
+                // console.log("Denied/Rejected");
                 categorized.declined.push(...folderFiles);
             }
         }
     }
     
-    console.log(categorized);
+    // console.log(categorized);
     return categorized;
 };
 
@@ -73,7 +73,7 @@ export const showCommentsInPane = (fileId, tabName = '') => {
     if (commentsContainer) {
         commentsContainer.innerHTML = '';
         showCommentsSub(fileId);
-        console.log("Comments shown");
+        // console.log("Comments shown");
         // Move comments from default location to our pane
         setTimeout(() => {
             const defaultComments = document.querySelector('[id*="Comments"]');
@@ -84,7 +84,7 @@ export const showCommentsInPane = (fileId, tabName = '') => {
             
             // Add input boxes for needinput tab only
             if (tabName === 'needinput') {
-                console.log('Adding response inputs');
+                // console.log('Adding response inputs');
                 addResponseInputs();
             }
         }, 100);
@@ -116,7 +116,7 @@ export const addResponseInputs = async () => {
                     const commentText = commentDiv.textContent || commentDiv.innerText;
                     const ratingMatch = commentText.match(/Rating:\s*(\w+)/i);
                     const rating = ratingMatch ? ratingMatch[1] : null;
-                    console.log(commentText);
+                    // console.log(commentText);
                     // Add response box unless rating is specifically "1" or "NA"
                     const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
                     
@@ -256,7 +256,7 @@ export const switchFilesWithResponse = (tab) => {
 
 export const dataSubmissionForm = async () => {
     const categorizedEntries = await getReturnedConcepts();
-    console.log('Categorized Entries:', categorizedEntries);
+    // console.log('Categorized Entries:', categorizedEntries);
 
     const totalFiles = categorizedEntries.needinput.length + categorizedEntries.accepted.length + categorizedEntries.declined.length;
     let message = JSON.parse(localStorage.parms).name + "'s Concepts Returned";
@@ -467,7 +467,7 @@ export const downloadCommentsAsWord = async (fileId) => {
                 throw new Error('Mammoth.js not available');
             }
         } catch (docxError) {
-            console.warn('Could not parse as Word document:', docxError);
+            // console.warn('Could not parse as Word document:', docxError);
             originalContent = '<p>Could not extract Word document content. Please refer to the original file.</p>';
         }
         
@@ -558,7 +558,7 @@ export const extractFormDataAndNavigate = async (fileId) => {
         if (window.mammoth) {
             const result = await window.mammoth.convertToHtml({arrayBuffer: arrayBuffer});
             const htmlContent = result.value;
-            console.log('Raw HTML:', htmlContent);
+            // console.log('Raw HTML:', htmlContent);
             
             // Convert HTML to text while preserving paragraph breaks
             let text = htmlContent
@@ -574,7 +574,7 @@ export const extractFormDataAndNavigate = async (fileId) => {
                 .replace(/&gt;/g, '>')
                 .replace(/&quot;/g, '"');
             
-            console.log('Full extracted text:', text);
+            // console.log('Full extracted text:', text);
             
             const formData = parseWordDocument(text);
             formData.originalConceptId = fileInfo.description || '';
@@ -612,61 +612,61 @@ export const parseWordDocument = (text) => {
         return match ? match[1].trim() : '';
     };
     formData.date = extractField('Date', text);
-    console.log('date:', formData.date);
+    // console.log('date:', formData.date);
     formData.projname = extractField('Project Title', text);
-    console.log('projname:', formData.projname);
+    // console.log('projname:', formData.projname);
     formData.amendment = extractField('Is this an amendment', text);
-    console.log('amendment:', formData.amendment);
+    // console.log('amendment:', formData.amendment);
     formData.conNum = extractField('Amendment', text);
-    console.log('conNum:', formData.conNum);
+    // console.log('conNum:', formData.conNum);
     formData.investigators = extractField('Contact Investigator\\(s\\)', text);
-    console.log('investigators:', formData.investigators);
+    // console.log('investigators:', formData.investigators);
     formData.institution = extractField('Institution\\(s\\)', text);
-    console.log('institution:', formData.institution);
+    // console.log('institution:', formData.institution);
     formData.email = extractField('Contact Email', text);
-    console.log('email:', formData.email);
+    // console.log('email:', formData.email);
     formData.memcon = extractFieldNoColon('Member of Consortia or Study \\/ Trial Group\\?', text);
-    console.log('memcon:', formData.memcon);
+    // console.log('memcon:', formData.memcon);
     formData.acro = extractField('Confluence Study Acronym\\(s\\) for the Contact Investigator', text);
-    console.log('acro:', formData.acro);
+    // console.log('acro:', formData.acro);
     formData.otherinvest = extractBetween('OTHER Investigators and their institutions', 'ALL Investigators \\(and Institutions\\) who require access', text);
-    console.log('otherinvest:', formData.otherinvest);
+    // console.log('otherinvest:', formData.otherinvest);
     formData.allinvest = extractBetween('ALL Investigators \\(and Institutions\\) who require access', 'Consortia or Study \\/ Trial Group data being requested', text);
-    console.log('allinvest:', formData.allinvest);
+    // console.log('allinvest:', formData.allinvest);
     formData.datacon = extractBetween('Consortia or Study \\/ Trial Group data being requested', 'Concept Background', text);
-    console.log('datacon:', formData.datacon);
+    // console.log('datacon:', formData.datacon);
     formData.condesc = extractBetween('Concept Background', 'Concept Aims', text);
-    console.log('condesc:', formData.condesc);
+    // console.log('condesc:', formData.condesc);
     formData.condescAims = extractBetween('Concept Aims', 'Description of Analysis Plan', text);
-    console.log('condescAims:', formData.condescAims);
+    // console.log('condescAims:', formData.condescAims);
     formData.analdesc = extractBetween('Description of Analysis Plan', 'Primary Endpoint', text);
-    console.log('analdesc:', formData.analdesc);
+    // console.log('analdesc:', formData.analdesc);
     formData.primend = extractBetween('Primary Endpoint', 'Subtype of Breast Cancer', text);
-    console.log('primend:', formData.primend);
+    // console.log('primend:', formData.primend);
     formData.sbcin = extractField('Subtype of Breast Cancer', text);
-    console.log('sbcin:', formData.sbcin);
+    // console.log('sbcin:', formData.sbcin);
     formData.otherinput = extractField('Other Primary Endpoint', text);
-    console.log('otherinput:', formData.otherinput);
+    // console.log('otherinput:', formData.otherinput);
     formData.genotyping = extractBetween('Genotyping', 'Data Requested From', text);
-    console.log('genotyping:', formData.genotyping);
+    // console.log('genotyping:', formData.genotyping);
     formData.sex = extractBetween('Data Requested From', 'Carrier Status requested', text);
-    console.log('sex:', formData.sex);
+    // console.log('sex:', formData.sex);
     formData.carStatus = extractBetween('Carrier Status requested', 'Risk Factor Variables', text);
-    console.log('carStatus:', formData.carStatus);
+    // console.log('carStatus:', formData.carStatus);
     formData.riskfactvarv = extractBetween('Risk Factor Variables', 'Pathology Variables', text);
-    console.log('riskfactvarv:', formData.riskfactvarv);
+    // console.log('riskfactvarv:', formData.riskfactvarv);
     formData.pathvarv = extractBetween('Pathology Variables', 'Survival and Treatment Variables', text);
-    console.log('pathvarv:', formData.pathvarv);
+    // console.log('pathvarv:', formData.pathvarv);
     formData.surtrevarv = extractBetween('Survival and Treatment Variables', 'Mammographic Density Variable', text);
-    console.log('surtrevarv:', formData.surtrevarv);
+    // console.log('surtrevarv:', formData.surtrevarv);
     formData.mammvarv = extractBetween('Mammographic Density Variable', 'Time Plan', text);
-    console.log('mammvarv:', formData.mammvarv);
+    // console.log('mammvarv:', formData.mammvarv);
     formData.time = extractBetween('Time Plan', 'Any other considerations you would like the DACC to be aware of', text);
-    console.log('time:', formData.time);
+    // console.log('time:', formData.time);
     formData.anyoth = extractBetween('Any other considerations you would like the DACC to be aware of', 'Confluence authorship requirements', text);
-    console.log('anyoth:', formData.anyoth);
+    // console.log('anyoth:', formData.anyoth);
     
-    console.log('Complete formData object:', formData);
+    // console.log('Complete formData object:', formData);
     return formData;
 };
 

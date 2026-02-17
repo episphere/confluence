@@ -63,7 +63,7 @@ export const acceptedDocs = () => {
 
 export const acceptedDocsView = async () => {
     const accepted_data = await readExcelFile();
-    console.log(accepted_data.files);
+    //console.log(accepted_data.files);
     //const allFiles = await getFolderItems(acceptedFolder);
     
     let filearrayAllFiles = accepted_data.files;

@@ -254,7 +254,7 @@ export const confluence = async () => {
                 assignNavbarActive(element, 2);
                 document.title = 'Confluence - Accepted Data Requests';
                 // confluenceDiv.innerHTML = authTableTemplate();
-                console.log("accepted forms");
+                //console.log("accepted forms");
                 confluenceDiv.innerHTML = acceptedDocs();
                 acceptedDocsView();
             });
@@ -482,7 +482,7 @@ const manageRouter = async () => {
         document.title = 'Confluence - Accepted Data Requests';
         assignNavbarActive(element, 2);
         // confluenceDiv.innerHTML = AuthTableTemplate();
-        console.log("accepted forms");
+        //console.log("accepted forms");
         confluenceDiv.innerHTML = acceptedDocs();
         acceptedDocsView();
     }
@@ -689,7 +689,7 @@ const manageHash = async () => {
         assignNavbarActive(element, 2);
         document.title = 'Confluence - Contact';
         confluenceDiv.innerHTML = confluenceContactPage(true, accessToUpload);
-        console.log(accessToUpload);
+        //console.log(accessToUpload);
         hideAnimation();
     }
     else if (hash === '#events/meetings') {
