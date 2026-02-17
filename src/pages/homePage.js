@@ -128,7 +128,7 @@ export const infoDeckAfterLoggedIn = async (accessToUpload) => {
 
 const cardContents = (obj) => {
     return `
-        <div class="col-xl card confluence-cards" style="min-width:225px">
+        <div class="col-xl card confluence-cards" style="min-width:225px; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px) scale(1.02)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='';">
             <div class="primary-bg rounded-circle" style="margin-top: -40px; padding: 10px;">
                 <i class="fas ${obj.icon} fa-2x icon-padding font-white"></i>
             </div>
