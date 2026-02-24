@@ -83,11 +83,11 @@ export const switchFilesWithComments = (tab, files = []) => {
             const file = files.find(f => f.id === file_id);
             //console.log(file);
             if (file && file.responseComments) {
-                //console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
+                console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
                 showCommentsWithResponses(file_id, file.responseComments);
             } else if (tab === 'conceptNeedingClarification') {
-                //console.log("Using showCommentsSub for file:", file.name);
-                showCommentsSub(file_id);
+                console.log("Using showCommentsSub for file:", file.name);
+                showCommentsWithResponses(file_id, file_id.responseComments);
             } else {
                 showComments(file_id);
             }
@@ -1971,7 +1971,7 @@ export const returnToSubmitter = () => {
         document.querySelectorAll('.decision-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const decision = btn.dataset.decision;
-                $("#confluenceMainModal").modal("hide");
+                // Don't hide modal, just update it
                 await processFileReturn(checkedFiles[0], decision);
             });
         });
@@ -1986,7 +1986,6 @@ export const returnToSubmitter = () => {
         `;
         
         body.innerHTML = '<div id="returnToSubmitterInfo" style="max-height: 400px; overflow-y: auto;"></div>';
-        $("#confluenceMainModal").modal("show");
         
         const form = document.getElementById("returnToSubmitterInfo");
         const addStatus = (message) => {
@@ -2047,7 +2046,8 @@ export const returnToSubmitter = () => {
         }
         
         addStatus(`Copying file to ${decision} folder...`);
-        const cpFile = await copyFile(checkbox.id, targetFolderId, checkbox.id);
+        const cpFile = await copyFile(checkbox.id, targetFolderId, String(checkbox.id));
+        console.log(cpFile);
         const cpFileId = cpFile.id;
         
         addStatus(`Copying comments...`);
@@ -2098,31 +2098,28 @@ export const returnToSubmitter = () => {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         `;
         
-        // Add close button at bottom
-        form.innerHTML += `
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="closeAndRefresh">Close</button>
+        body.innerHTML += `
+            <div class="mt-3 text-center">
+                <button type="button" class="btn btn-primary" id="sendEmailAndRefresh">Send Email & Refresh</button>
             </div>
         `;
         
-        // Handle close button click
-        document.getElementById('closeAndRefresh').addEventListener('click', () => {
-            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at https://epidataplatforms.cancer.gov/confluence/#data_submissions. Please review the comments added to your submission.`;
-            setTimeout(() => location.reload(), 100);
+        document.getElementById('sendEmailAndRefresh').addEventListener('click', () => {
+            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
+            setTimeout(() => {
+                $("#confluenceMainModal").modal("hide");
+                location.reload();
+            }, 500);
         });
-        
-        // Handle X button click
-        document.querySelector('.btn-close').addEventListener('click', () => {
-            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned at https://epidataplatforms.cancer.gov/confluence/#data_submissions. Please review the comments added to your submission.`;
-            setTimeout(() => location.reload(), 100);
-        });
-    }
+    };
     
     const returnSubmitterButton = document.querySelector(`#returnSubmitter`);
     if (returnSubmitterButton) {
         returnSubmitterButton.addEventListener("click", returnSubmitter);
     }
 };
+
+
 
 export const copyComments = async (comments, fileId) => {
     for (let chairs of chairsInfo) {

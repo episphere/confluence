@@ -1,4 +1,4 @@
-import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment} from "../shared.js"
+import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData} from "../shared.js"
 // import * as docx from "docx";
 
 export const formtemplate = (showDownloadButton = true, resubmitTitle = null) => {
@@ -24,6 +24,8 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                         <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px; font-size: 18px; text-align: center;">
                             User does not have permissions to upload form. Please contact administrator for access.
                         </div>
+                        ${resubmitTitle ? '<p style="font-weight: bold; font-size: 20px; color: #d9534f; margin-bottom: 20px;">Please revise your submission below and respond to all comments.</p>' : ''}
+                        ${resubmitTitle ? '<p style="font-size: 20px; color: #d9534f; margin-bottom: 12px;">Based on comments, it may be necessary to revise your concept form which can be completed below.</p>' : ''}
                         <p>
                             Please fill out the form to request access to Confluence Project data. This form 
                             should only be used to request access to data from two or more consortia 
@@ -56,7 +58,7 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                             </div>
                             <div class="input-group">
                               <label for="projname" id="projname-label"><b>Title of Proposed Project</b> (Max length 250 characters)<span class='required-label' aria-hidden="true">*</span></label>
-                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" style="max-width: 100%;" required/>
+                              <input id="projname" name="projname" type="text" class="form-text-input" aria-required="true" aria-describedby="projname-error" maxlength="250" style="max-width: 100%;" ${resubmitTitle ? 'readonly' : ''} required/>
                               <div id="projname-error" class="error-message" aria-live="polite"></div>
                             </div>
                             <div class="input-group form-check">
@@ -550,12 +552,24 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                                   </u>
                                 <span class='required-label'>*</span></label>
                             </div>
+                            ${resubmitTitle ? `
+                            <div class="input-group" style="display: block !important;">
+                                <label><b>Revision Status</b><span class='required-label'>*</span></label>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="commentsAddressed" name="commentsAddressed" type="checkbox" value="Yes" style="position: relative; top: -2px;" required/>
+                                    <label class="form-check-label" for="commentsAddressed">Please check here if all comments have been addressed.</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="revisionsMade" name="revisionsMade" type="checkbox" value="Yes" style="position: relative; top: -2px;"/>
+                                    <label class="form-check-label" for="revisionsMade">Please check here if revisions have been made to the concept form.</label>
+                                </div>
+                            </div>` : ''}
                             <div style="display: flex; gap: 10px;">
                                 <button type="button" id="downloadForm" class="col-auto buttonsubmit mt-3 mb-3 button-glow-red" title="Download the form with your current responses to a word document."> 
                                   <span class="buttonsubmit__text">Download Form with Inputs</span>
                                 </button>
                                 <button type="submit" id="submitFormButton" class="col-auto buttonsubmit mt-3 mb-3 button-glow-red" title="Submit your form for review."> 
-                                  <span class="buttonsubmit__text"> Submit to DACCs & Download</span>
+                                  <span class="buttonsubmit__text">${resubmitTitle ? 'Resubmit Updates and Comments' : 'Submit to DACCs & Download'}</span>
                                 </button>
                             </div>
                             <!---<button type="button" id="downloadWord" class="buttonsubmit button-glow-red"> 
@@ -659,10 +673,28 @@ export const dataForm = async (prepopulateData = null) => {
     btn.disabled = false;
   }
   async function handleFormSubmit(eventtest) {
+    eventtest.preventDefault();
+    
+    // Check if all comment responses are filled for resubmissions
+    if (prepopulateData?.fileId) {
+      const textareas = document.querySelectorAll('.comment-response-resubmit');
+      const allFilled = Array.from(textareas).every(textarea => textarea.value.trim() !== '');
+      
+      if (textareas.length > 0 && !allFilled) {
+        document.getElementById("modalBody").innerHTML = `
+          <div style="text-align: center;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ffc107; margin-bottom: 15px;"></i>
+            <h5>Response Required</h5>
+            <p>Please respond to all required comments before resubmitting the form.</p>
+          </div>`;
+        $("#popUpModal").modal("show");
+        return;
+      }
+    }
+    
     const btn = document.activeElement;
     btn.classList.toggle("buttonsubmit--loading");
     btn.disabled = true;
-    eventtest.preventDefault();
     const form = document.querySelector(".contact-form form");
     const data = new FormData(form);
     const jsondata = Object.fromEntries(data.entries());
@@ -810,6 +842,38 @@ export const dataForm = async (prepopulateData = null) => {
             }),
           },
           children: [
+            ...(prepopulateData?.fileId ? [
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_1,
+                alignment: docx.AlignmentType.CENTER,
+                children: [
+                  new docx.TextRun({
+                    text: "RESUBMISSION",
+                    bold: true,
+                    color: "FF0000",
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+              new docx.Paragraph({
+                heading: docx.HeadingLevel.HEADING_2,
+                alignment: docx.AlignmentType.START,
+                children: [
+                  new docx.TextRun({
+                    text: "Revision Status: ",
+                  }),
+                  new docx.TextRun({
+                    text: jsondata.revisionStatus || "Not specified",
+                    bold: false,
+                  }),
+                ],
+                spacing: {
+                  after: 150,
+                },
+              }),
+            ] : []),
             new docx.Paragraph({
               heading: docx.HeadingLevel.HEADING_2,
               alignment: docx.AlignmentType.START,
@@ -1326,7 +1390,7 @@ export const dataForm = async (prepopulateData = null) => {
     let user = JSON.parse(localStorage.parms).login.split('@')[0];
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-    let filename = jsondata.projname + '_' + today + '.docx';
+    let filename = (prepopulateData?.originalFileName || jsondata.projname + '_' + today + '.docx');
     let fileid = 'Not Generated'
     let btn = button;
     console.log(btn);
@@ -1335,6 +1399,20 @@ export const dataForm = async (prepopulateData = null) => {
       if (uploadReady) {
       const originalConceptId = document.getElementById('originalConceptId').value;
       const fileId = prepopulateData?.fileId;
+      
+      // Submit comment responses if this is a resubmit
+      if (fileId) {
+        const commentItems = document.querySelectorAll('.comment-item');
+        for (const item of commentItems) {
+          const textarea = item.querySelector('.comment-response-resubmit');
+          if (textarea && textarea.value.trim()) {
+            const responseId = item.dataset.commentId;
+            const message = `Response ID: ${responseId}, ${textarea.value.trim()}`;
+            await createComment(fileId, message);
+          }
+        }
+      }
+      
       let response;
       
       if (originalConceptId) {
@@ -1439,8 +1517,11 @@ const loadResubmitComments = async (fileId) => {
     if (!container) return;
     
     try {
+        const userEmail = JSON.parse(localStorage.parms).login;
         const response = await listComments(fileId);
         const comments = JSON.parse(response).entries;
+        const isAllowedUser = emailsAllowedToUpdateData.includes(userEmail);
+        const userHasCommented = !isAllowedUser && comments.some(comment => comment.created_by.login === userEmail);
         
         if (comments.length === 0) {
             container.innerHTML = '<p class="text-muted">No comments to show.</p>';
@@ -1448,30 +1529,56 @@ const loadResubmitComments = async (fileId) => {
         }
         
         let html = '';
-        comments.forEach(comment => {
+        let responsesAdded = 0;
+        comments.forEach((comment, index) => {
             const date = new Date(comment.created_at);
             const message = comment.message;
             
             // Parse consortium and rating from message
             let displayMessage = message;
+            let rating = null;
             if (message.startsWith('Consortium')) {
                 const consMatch = message.match(/Consortium:\s*([^,]+)/);
                 const ratingMatch = message.match(/Rating:\s*(\w+)/i);
                 const commentMatch = message.match(/Comment:\s*(.+)/);
                 
                 const consortium = consMatch ? consMatch[1].trim() : '';
-                const rating = ratingMatch ? ratingMatch[1].trim() : '';
+                rating = ratingMatch ? ratingMatch[1].trim() : null;
                 const commentText = commentMatch ? commentMatch[1].substring(0, commentMatch[1].indexOf('Box Comment ID:')).trim() : '';
                 
                 displayMessage = `<span class="text-primary">Consortium: ${consortium}</span> <span class="badge badge-pill badge-${rating}">${rating}</span><br>${commentText}`;
             }
             
+            const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
+            
             html += `
-                <div class="mb-3 pb-3 border-bottom">
-                    <p class="mb-1">${displayMessage}</p>
-                </div>
-            `;
+                <div class="mb-3 pb-3 border-bottom comment-item" data-comment-id="${comment.id}">
+                    <p class="mb-1">${displayMessage}</p>`;
+            
+            if (shouldAddResponse) {
+                html += `
+                    <div class="mt-2 p-2 border rounded" style="background-color: #f1f3f4;">
+                        <small class="text-muted font-weight-bold">Your Response:</small>
+                        <textarea class="form-control mt-1 comment-response-resubmit" placeholder="Type your response..." rows="2" ${userHasCommented ? 'disabled' : ''}></textarea>
+                    </div>`;
+                responsesAdded++;
+            }
+            
+            html += `</div>`;
         });
+        
+        if (responsesAdded > 0 && !userHasCommented) {
+            html += `
+                <div class="text-center mt-3">
+                    <p class="text-info small">Please respond to all required comments before resubmitting the form.</p>
+                </div>`;
+        } else if (userHasCommented) {
+            html += `
+                <div class="text-center mt-3">
+                    <p class="text-danger small">Comments have already been responded to.</p>
+                </div>`;
+        }
+        
         container.innerHTML = html;
     } catch (error) {
         console.error('Error loading comments:', error);
