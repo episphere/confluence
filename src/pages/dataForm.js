@@ -844,20 +844,6 @@ export const dataForm = async (prepopulateData = null) => {
           children: [
             ...(prepopulateData?.fileId ? [
               new docx.Paragraph({
-                heading: docx.HeadingLevel.HEADING_1,
-                alignment: docx.AlignmentType.CENTER,
-                children: [
-                  new docx.TextRun({
-                    text: "RESUBMISSION",
-                    bold: true,
-                    color: "FF0000",
-                  }),
-                ],
-                spacing: {
-                  after: 150,
-                },
-              }),
-              new docx.Paragraph({
                 heading: docx.HeadingLevel.HEADING_2,
                 alignment: docx.AlignmentType.START,
                 children: [
@@ -1537,6 +1523,7 @@ const loadResubmitComments = async (fileId) => {
             // Parse consortium and rating from message
             let displayMessage = message;
             let rating = null;
+            let respondingid = null;
             if (message.startsWith('Consortium')) {
                 const consMatch = message.match(/Consortium:\s*([^,]+)/);
                 const ratingMatch = message.match(/Rating:\s*(\w+)/i);
@@ -1545,6 +1532,7 @@ const loadResubmitComments = async (fileId) => {
                 const consortium = consMatch ? consMatch[1].trim() : '';
                 rating = ratingMatch ? ratingMatch[1].trim() : null;
                 const commentText = commentMatch ? commentMatch[1].substring(0, commentMatch[1].indexOf('Box Comment ID:')).trim() : '';
+                respondingid = comment.message.substring(comment.message.indexOf('Box Comment ID:') + 15).trim();
                 
                 displayMessage = `<span class="text-primary">Consortium: ${consortium}</span> <span class="badge badge-pill badge-${rating}">${rating}</span><br>${commentText}`;
             }
@@ -1552,7 +1540,7 @@ const loadResubmitComments = async (fileId) => {
             const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
             
             html += `
-                <div class="mb-3 pb-3 border-bottom comment-item" data-comment-id="${comment.id}">
+                <div class="mb-3 pb-3 border-bottom comment-item" data-comment-id="${respondingid ? respondingid : comment.id}">
                     <p class="mb-1">${displayMessage}</p>`;
             
             if (shouldAddResponse) {

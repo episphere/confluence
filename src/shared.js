@@ -662,9 +662,6 @@ export const copyFile = async (fileId, parentId, description = null) => {
                 "id": parentId
             }
         };
-        if (description) {
-            obj.description = description;
-        }
         let response = await fetch(`https://api.box.com/2.0/files/${fileId}/copy`, {
             method: "POST",
             headers:{
@@ -674,17 +671,51 @@ export const copyFile = async (fileId, parentId, description = null) => {
         });
         
         if (response.status === 401) {
-            if((await refreshToken()) === true) return await copyFile(fileId, parentId);
+            if((await refreshToken()) === true) return await copyFile(fileId, parentId, description);
         }
         else if (response.status === 201) {
-            return await response.json();
+            const copiedFile = await response.json();
+            
+            // If description is provided, update the copied file with the description
+            if (description) {
+                await updateFileDescription(copiedFile.id, description);
+            }
+            
+            return copiedFile;
         }
         else {
             return {status: response.status, statusText: response.statusText};
         };
     }
     catch (err) {
-        if ((await refreshToken()) === true) return await copyFile(fileId, parentId);
+        if ((await refreshToken()) === true) return await copyFile(fileId, parentId, description);
+    }
+};
+
+export const updateFileDescription = async (fileId, description) => {
+    try {
+        const access_token = JSON.parse(localStorage.parms).access_token;
+        let response = await fetch(`https://api.box.com/2.0/files/${fileId}`, {
+            method: "PUT",
+            headers: {
+                Authorization: "Bearer " + access_token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ description })
+        });
+        
+        if (response.status === 401) {
+            if ((await refreshToken()) === true) return await updateFileDescription(fileId, description);
+        }
+        else if (response.status === 200) {
+            return await response.json();
+        }
+        else {
+            return {status: response.status, statusText: response.statusText};
+        }
+    }
+    catch (err) {
+        if ((await refreshToken()) === true) return await updateFileDescription(fileId, description);
     }
 };
 
@@ -2145,7 +2176,7 @@ export async function showCommentsWithResponses(id, responseComments = []) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
     let comments = JSON.parse(response).entries;
-    
+    console.log(comments);
     if (comments.length === 0) {
         commentSection.innerHTML = `
             <div class='comments'>
@@ -2185,10 +2216,11 @@ export async function showCommentsWithResponses(id, responseComments = []) {
         `;
         
         // Find and display corresponding response
+        console.log(comment.id);
         const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${comment.id},`));
         //console.log(comment);
-        //console.log(matchingResponse);
-       // console.log(responseComments);
+        console.log(matchingResponse);
+       console.log(responseComments);
         if (matchingResponse) {
             const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
             template += `
