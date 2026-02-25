@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, createZip, addMetaData, DACCmembers, csv2Json, boxUpdateFile, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -13,16 +13,16 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         }
         template += `
         <div class='card-body p-0'>
-          <div class='card-title col-5'>
-            <label for='${tab}selectedDoc'>
-                <b>Select Concept Form:</b>
-            </label>
-            <br>
-            <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
+          <div class='card-title' style='display: flex; gap: 20px; align-items: flex-start;'>
+            <div>
+              <label for='${tab}selectedDoc'>
+                  <b>Select Concept Form:</b>
+              </label>
+              <br>
+              <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
       for (const file of files) {
         const fileId = file.id;
-        //console.log(fileInfo);
-        let filename = file.name//.slice(0,-19);
+        let filename = file.name;
         let lastUnderscoreIndex = filename.lastIndexOf('_');
         let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
         template += `
@@ -30,7 +30,17 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
             ${titlename}</option>`;
       }
       template += `
-            </select>
+              </select>
+            </div>
+            <div style='display: none;' id='${tab}versionContainer'>
+              <label for='${tab}versionSelect'>
+                  <b>Select Version:</b>
+              </label>
+              <br>
+              <select class="form-select" aria-label="Select Version" id='${tab}versionSelect' style='width: 250px;'>
+                  <option value='current'>Current Version</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>`;
@@ -75,13 +85,52 @@ export const showCommentsInPane = (fileId) => {
 export const switchFilesWithComments = (tab, files = []) => {
     const element = document.getElementById(`${tab}selectedDoc`);
     if (element) {
-        element.addEventListener("change", (e) => {
+        element.addEventListener("change", async (e) => {
             const file_id = e.target.value;
+            
+            // Check for versions and update version dropdown
+            const versionSelect = document.getElementById(`${tab}versionSelect`);
+            const versionContainer = document.getElementById(`${tab}versionContainer`);
+            if (versionSelect && versionContainer) {
+                const versions = await getFileVersions(file_id);
+                if (versions && versions.entries && versions.entries.length > 0) {
+                    versionSelect.innerHTML = '<option value="current">Current Version</option>';
+                    versions.entries.forEach((version, index) => {
+                        versionSelect.innerHTML += `<option value="${version.id}">Version ${versions.entries.length - index} (${new Date(version.created_at).toLocaleDateString()})</option>`;
+                    });
+                    versionContainer.style.display = 'block';
+                    
+                    // Re-attach version change listener
+                    versionSelect.onchange = (e) => {
+                        const versionId = e.target.value;
+                        const previewContainer = document.getElementById('boxFilePreview');
+                        previewContainer.innerHTML = '';
+                        const access_token = JSON.parse(localStorage.parms).access_token;
+                        const preview = new Box.Preview();
+                        if (versionId === 'current') {
+                            preview.show(file_id, access_token, {
+                                container: previewContainer,
+                                showDownload: true,
+                                header: "light"
+                            });
+                        } else {
+                            preview.show(file_id, access_token, {
+                                container: previewContainer,
+                                showDownload: true,
+                                header: "light",
+                                fileOptions: { [file_id]: { fileVersionId: versionId } }
+                            });
+                        }
+                    };
+                } else {
+                    versionContainer.style.display = 'none';
+                }
+            }
+            
             showPreviewInPane(file_id);
             
             // Check if this file has response comments
             const file = files.find(f => f.id === file_id);
-            //console.log(file);
             if (file && file.responseComments) {
                 console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
                 showCommentsWithResponses(file_id, file.responseComments);
@@ -396,11 +445,9 @@ export const generateChairMenuFiles = async () => {
     //console.log(filesIncompleted);
     if (!!filesIncompleted.length) {
         showPreviewInPane(filesIncompleted[0].id);
-        // Don't call showCommentsInPane initially to preserve the form
         showCommentsInPane(filesIncompleted[0].id);
         switchFilesWithComments("recommendation", filesIncompleted);
         document.getElementById("recommendationselectedDoc").children[0].selected = true;
-        // Ensure finalChairDecision is always visible
         setTimeout(() => {
             const finalDecisionForm = document.getElementById('finalChairDecision');
             if (finalDecisionForm) {
@@ -408,10 +455,8 @@ export const generateChairMenuFiles = async () => {
             }
         }, 200);
     } else if (!!filesClaraIncompleted.length) {
-        //console.log("Clari showing");
         showPreviewInPane(filesClaraIncompleted[0].id);
         if (filesClaraIncompleted[0].responseComments) {
-            //console.log("Showing comments with responses for file:", filesClaraIncompleted[0].name);
             showCommentsWithResponses(filesClaraIncompleted[0].id, filesClaraIncompleted[0].responseComments);
         } else {
             showCommentsSub(filesClaraIncompleted[0].id);
