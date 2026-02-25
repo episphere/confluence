@@ -656,6 +656,14 @@ export const dataForm = async (prepopulateData = null) => {
     jsondata.descsplit = jsondata.analdesc.split('\n');
     jsondata.timesplit = jsondata.time.split('\n');
     jsondata.anyothsplit = jsondata.anyoth.split('\n');
+    
+    if (prepopulateData?.fileId) {
+        if (jsondata.revisionsMade === 'Yes') {
+            jsondata.revisionStatus = 'Revisions made';
+        } else if (jsondata.commentsAddressed === 'Yes') {
+            jsondata.revisionStatus = 'Comments addressed';
+        }
+    }
 
         // Added for testing
         // console.log(jsondata);
@@ -710,6 +718,14 @@ export const dataForm = async (prepopulateData = null) => {
     jsondata.descsplit = jsondata.analdesc.split('\n');
     jsondata.timesplit = jsondata.time.split('\n');
     jsondata.anyothsplit = jsondata.anyoth.split('\n');
+    
+    if (prepopulateData?.fileId) {
+        if (jsondata.revisionsMade === 'Yes') {
+            jsondata.revisionStatus = 'Revisions made';
+        } else if (jsondata.commentsAddressed === 'Yes') {
+            jsondata.revisionStatus = 'Comments addressed';
+        }
+    }
 
         // Added for testing
         // console.log(jsondata);
