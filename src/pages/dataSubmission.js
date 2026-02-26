@@ -430,7 +430,9 @@ export const dataSubmissionForm = async () => {
     setupResubmitForm(categorizedEntries.needinput);
 
     document.getElementById("needinputTab").click();
-    document.getElementById("needinputselectedDoc").children[0].selected = true;
+    if (categorizedEntries.needinput.length > 0) {
+        document.getElementById("needinputselectedDoc").children[0].selected = true;
+    }
     };
 
 export const setupDownloadComments = (entries) => {
