@@ -72,7 +72,9 @@ export const renderDescription = (modified_at) => {
     
     document.getElementById('overview').innerHTML = template;
     getDescription();
-    updateDesc();
+    if (authAdmin) {
+        updateDesc();
+    }
 };
 
 const getDescription = async () => {
