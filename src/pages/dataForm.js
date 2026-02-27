@@ -24,8 +24,12 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                         <div id="permissionBanner" style="display: none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border: 1px solid #f5c6cb; border-radius: 4px; font-size: 18px; text-align: center;">
                             User does not have permissions to upload form. Please contact administrator for access.
                         </div>
-                        ${resubmitTitle ? '<p style="font-weight: bold; font-size: 20px; color: #d9534f; margin-bottom: 20px;">Please revise your submission below and respond to all comments.</p>' : ''}
-                        ${resubmitTitle ? '<p style="font-size: 20px; color: #d9534f; margin-bottom: 12px;">Based on comments, it may be necessary to revise your concept form which can be completed below.</p>' : ''}
+                        ${resubmitTitle ? '<p style="font-weight: bold; font-size: 20px; margin-bottom: 20px; color: #000000;">Instructions for Researchers Submitting Responses to DACC Questions and Comments</p>' : ''}
+                        ${resubmitTitle ? `<p> This page displays the comments and questions submitted by the data access coordinating committees (DACCs) in response to your concept proposal requesting access to data shared with the Confluence Project.</p>
+                                          <p>To reply to DACC comments and questions, please enter your responses in the text boxes provided. <b>A reply is required in every text box.</b> Where applicable, you may reference revisions made to your concept in your replies. If a DACC inquiry warrants revising your concept, it is strongly encouraged that you do so before resubmitting.</p>
+                                          <p style="padding-left: 25px;"><b>Note:</b> Work in progress cannot be saved on this platform. If needed, you may download the DACC inquiries and your concept to work on your replies offline, then copy and paste your responses into the text boxes when ready.</p>
+                                          <p>When you have finished, confirm that you have replied to all comments and indicate whether revisions to the concept have been made. Then select <b>"Resubmit Updates and Comments"</b> to return your submission to the DACCs.</p>
+                         ` : `
                         <p>
                             Please fill out the form to request access to Confluence Project data. This form 
                             should only be used to request access to data from two or more consortia 
@@ -49,6 +53,7 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                             Approved researchers granted access to data will be responsible for paying their 
                             costs incurred using resources on the TRE (e.g., compute costs analyzing the data). 
                         </p>
+                        `}
                         <form id="analysisConceptForm">
                             <input type="hidden" id="originalConceptId" name="originalConceptId" value="" />
                             <div class="input-group">
@@ -553,15 +558,21 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                                 <span class='required-label'>*</span></label>
                             </div>
                             ${resubmitTitle ? `
+                            <p><u>4. CONFIRMATION OF REVISIONS</u></p>
                             <div class="input-group" style="display: block !important;">
-                                <label><b>Revision Status</b><span class='required-label'>*</span></label>
+                                <label><b> Comments addressed: </b></label>
                                 <div class="form-check">
                                     <input class="form-check-input" id="commentsAddressed" name="commentsAddressed" type="checkbox" value="Yes" style="position: relative; top: -2px;" required/>
-                                    <label class="form-check-label" for="commentsAddressed">Please check here if all comments have been addressed.</label>
+                                    <label class="form-check-label" for="commentsAddressed">Please check to confirm replies have been submitted to all DACC inquiries.<span class='required-label'>*</span></label>
                                 </div>
+                                <label><b> Revisions made: </b></label>
                                 <div class="form-check">
                                     <input class="form-check-input" id="revisionsMade" name="revisionsMade" type="checkbox" value="Yes" style="position: relative; top: -2px;"/>
-                                    <label class="form-check-label" for="revisionsMade">Please check here if revisions have been made to the concept form.</label>
+                                    <label class="form-check-label" for="revisionsMade">Check to confirm revisions to concept have been made in response to DACC inquiries.</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="revisionsNotMade" name="revisionsMade" type="checkbox" value="Yes" style="position: relative; top: -2px;"/>
+                                    <label class="form-check-label" for="revisionsNotMade">Check to confirm no revision are being made to concept.</label>
                                 </div>
                             </div>` : ''}
                             <div style="display: flex; gap: 10px;">
