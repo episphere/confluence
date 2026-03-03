@@ -454,6 +454,7 @@ const manageRouter = async () => {
     //     //formFunctions(); 
     // }
     else if (hash === '#chair_menu') {
+        console.log("chair menu clicked");
         const element = document.getElementById('chairMenu');
         if (!element) return;
         if (element.classList.contains('navbar-active')) return;

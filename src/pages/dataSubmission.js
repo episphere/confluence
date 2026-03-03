@@ -118,7 +118,7 @@ export const addResponseInputs = async () => {
                     const rating = ratingMatch ? ratingMatch[1] : null;
                     // console.log(commentText);
                     // Add response box unless rating is specifically "1" or "NA"
-                    const shouldAddResponse = !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
+                    const shouldAddResponse = false;// !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
                     
                     if (shouldAddResponse) {
                         const responseInput = document.createElement('div');
@@ -260,24 +260,9 @@ export const dataSubmissionForm = async () => {
 
     const totalFiles = categorizedEntries.needinput.length + categorizedEntries.accepted.length + categorizedEntries.declined.length;
     let message = JSON.parse(localStorage.parms).name + "'s Concepts Returned";
-    
-    if (totalFiles <= 0) {
-        hideAnimation();
-        return `
-            <div class="general-bg padding-bottom-1rem">
-                <div class="container body-min-height">
-                    <div class="main-summary-row">
-                        <div class="align-left">
-                            <h1 class="page-header">Data Submitted</h1>
-                        </div>
-                    </div>
-                    <div class="data-submission div-border font-size-18" style="padding-left: 1rem;">
-                        No folder found for Returned Concepts
-                    </div>
-                </div>
-            </div>
-        `;
-    };
+    console.log(totalFiles);
+
+
     
     var template = `
             <div class="general-bg padding-bottom-1rem">
@@ -329,20 +314,24 @@ export const dataSubmissionForm = async () => {
     
         template += `
             <div class='tab-pane fade show active' id='needinput' role='tabpanel' aria-labeledby='needinputTab'>
+                ${categorizedEntries.needinput.length > 0 ? `
                 <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Resubmit Form</span></button>
-                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>
+                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>` : ''}
+                ${categorizedEntries.needinput.length === 0 ? '<p>No concepts returned Requiring Input</p>' : ''}
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.needinput, "needinput", true);
     
         template += `
             <div class='tab-pane fade' id='accepted' role='tabpanel' aria-labeledby='acceptedTab'>
+                ${categorizedEntries.accepted.length === 0 ? '<p>No concepts returned Accepted</p>' : ''}
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.accepted, "accepted", true);
     
         template += `
             <div class='tab-pane fade' id='declined' role='tabpanel' aria-labeledby='declinedTab'>
+                ${categorizedEntries.declined.length === 0 ? '<p>No concepts returned Rejected</p>' : ''}
         `;
 
         template += renderFilePreviewDropdown(categorizedEntries.declined, "declined", true);

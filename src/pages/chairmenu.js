@@ -47,7 +47,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     } else {
         template += `
             <br>
-            No files to show.    
+            No files to preview.    
         </div>
         `;
     }
@@ -2150,7 +2150,7 @@ export const returnToSubmitter = () => {
         `;
         
         document.getElementById('sendEmailAndRefresh').addEventListener('click', () => {
-            window.location.href = `mailto:${userFound}?subject=Confluence Submission Returned: ${fileName}&body=Your Confluence data access submission has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
+            window.location.href = `mailto:${userFound}?subject=Confluence Project: DACC responses to your concept submission are ready for your review &body=Your Confluence data access submission for ${fileName} has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
             setTimeout(() => {
                 $("#confluenceMainModal").modal("hide");
                 location.reload();
