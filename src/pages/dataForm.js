@@ -567,11 +567,11 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                                 </div>
                                 <label><b> Revisions made: </b></label>
                                 <div class="form-check">
-                                    <input class="form-check-input" id="revisionsMade" name="revisionsMade" type="checkbox" value="Yes" style="position: relative; top: -2px;"/>
+                                    <input class="form-check-input" id="revisionsMade" name="revisionStatus" type="radio" value="Revisions made" style="position: relative; top: -2px;" required/>
                                     <label class="form-check-label" for="revisionsMade">Check to confirm revisions to concept have been made in response to DACC inquiries.</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" id="revisionsNotMade" name="revisionsMade" type="checkbox" value="Yes" style="position: relative; top: -2px;"/>
+                                    <input class="form-check-input" id="revisionsNotMade" name="revisionStatus" type="radio" value="No revisions made" style="position: relative; top: -2px;" required/>
                                     <label class="form-check-label" for="revisionsNotMade">Check to confirm no revision are being made to concept.</label>
                                 </div>
                             </div>` : ''}

@@ -315,8 +315,8 @@ export const dataSubmissionForm = async () => {
         template += `
             <div class='tab-pane fade show active' id='needinput' role='tabpanel' aria-labeledby='needinputTab'>
                 ${categorizedEntries.needinput.length > 0 ? `
-                <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Resubmit Form</span></button>
-                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>` : ''}
+                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>
+                <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Form to Respond to Comments and Resubmit</span></button>` : ''}
                 ${categorizedEntries.needinput.length === 0 ? '<p>No concepts returned Requiring Input</p>' : ''}
         `;
         
