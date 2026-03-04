@@ -501,10 +501,7 @@ export const downloadCommentsAsWord = async (fileId) => {
                 const time = commentDate.toLocaleTimeString();
                 
                 mergedContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; page-break-inside: avoid;">`;
-                mergedContent += `<h3>Comment ${index + 1}</h3>`;
-                mergedContent += `<p><strong>From:</strong> ${comment.created_by.name}</p>`;
-                mergedContent += `<p><strong>Date:</strong> ${date} at ${time}</p>`;
-                mergedContent += `<p><strong>Comment:</strong></p>`;
+                mergedContent += `<h3>Comment ${index + 1}:</h3>`;
                 mergedContent += `<div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div>`;
                 mergedContent += `<p><strong>Your Response:</strong></p>`;
                 mergedContent += `<div style="border: 1px solid #ddd; min-height: 100px; padding: 10px; background-color: white;"></div>`;
