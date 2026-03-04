@@ -290,6 +290,11 @@ export const dataSubmissionForm = async () => {
                                 </a>
                             </li>
                         </ul>
+                        <div class='alert alert-primary mt-2' id='needinputAlert' role='alert'>
+                            Concepts shown below have been reviewed by the data access coordinating committees (DACCs) and their comments and scores are shown in the Comments tab.<br><br>
+                            To enter and submit a reply to the comments, select <strong>"Reply to comments from DACCs"</strong>.<br>
+                            To work on your reply to the comments offline, select <strong>"Download concept and comments"</strong> to download your concept and the comments.
+                        </div>
                         <div class="row">
                             <div class="col-xl-12 filter-column" id="summaryFilterSiderBar">
                                 <div class="div-border white-bg align-left p-2 mb-3">
@@ -315,8 +320,8 @@ export const dataSubmissionForm = async () => {
         template += `
             <div class='tab-pane fade show active' id='needinput' role='tabpanel' aria-labeledby='needinputTab'>
                 ${categorizedEntries.needinput.length > 0 ? `
-                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download All Comments</span></button>
-                <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Form to Respond to Comments and Resubmit</span></button>` : ''}
+                <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download Concept and Comments</span></button>
+                <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Reply to comments from DACCs</span></button>` : ''}
                 ${categorizedEntries.needinput.length === 0 ? '<p>No concepts returned Requiring Input</p>' : ''}
         `;
         
@@ -387,6 +392,7 @@ export const dataSubmissionForm = async () => {
     
     // Clear preview and comments when switching to empty tabs
     document.getElementById('needinputTab').addEventListener('click', () => {
+        document.getElementById('needinputAlert').style.display = 'block';
         if (categorizedEntries.needinput.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
@@ -394,6 +400,7 @@ export const dataSubmissionForm = async () => {
         }
     });
     document.getElementById('acceptedTab').addEventListener('click', () => {
+        document.getElementById('needinputAlert').style.display = 'none';
         document.getElementById('submitResponsesContainer').innerHTML = '';
         if (categorizedEntries.accepted.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
@@ -401,6 +408,7 @@ export const dataSubmissionForm = async () => {
         }
     });
     document.getElementById('declinedTab').addEventListener('click', () => {
+        document.getElementById('needinputAlert').style.display = 'none';
         document.getElementById('submitResponsesContainer').innerHTML = '';
         if (categorizedEntries.declined.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
