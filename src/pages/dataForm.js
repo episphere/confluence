@@ -572,7 +572,7 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" id="revisionsNotMade" name="revisionStatus" type="radio" value="No revisions made" style="position: relative; top: -2px;" required/>
-                                    <label class="form-check-label" for="revisionsNotMade">Check to confirm no revision are being made to concept.</label>
+                                    <label class="form-check-label" for="revisionsNotMade">Check to confirm no revisions are being made to concept.</label>
                                 </div>
                             </div>` : ''}
                             <div style="display: flex; gap: 10px;">
