@@ -301,12 +301,12 @@ export const dataSubmissionForm = async () => {
                                     <div class="main-summary-row">
                                         <div class="col-xl-12 pl-1 pr-0">
                                             <span class="font-size-10">
+                                                <h5 class="">DACC Scores Definitions</h5>
                                                 <h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted 
                                                 <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions 
                                                 <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed 
                                                 <h6 class="badge badge-pill badge-4">4</h6>: Not Approved 
                                                 <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification 
-                                                <h6 class="badge badge-pill badge-777">777</h6>: Duplicate
                                                 <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable
                                             </span>
                                         </div>
