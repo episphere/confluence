@@ -322,21 +322,21 @@ export const dataSubmissionForm = async () => {
                 ${categorizedEntries.needinput.length > 0 ? `
                 <button id='downloadCommentsBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;'><span class="buttonsubmit__text">Download Concept and Comments</span></button>
                 <button id='resubmitFormBtn' class='buttonsubmit button-glow-red' style='float: right; margin-right: 10px;' title='Use to resubmit a new form that is linked to your current response'><span class="buttonsubmit__text">Reply To Comments From DACCs</span></button>` : ''}
-                ${categorizedEntries.needinput.length === 0 ? '<p>No concepts returned Requiring Input</p>' : ''}
+                ${categorizedEntries.needinput.length === 0 ? '<p>No concepts returned requiring input.</p>' : ''}
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.needinput, "needinput", true);
     
         template += `
             <div class='tab-pane fade' id='accepted' role='tabpanel' aria-labeledby='acceptedTab'>
-                ${categorizedEntries.accepted.length === 0 ? '<p>No concepts returned Accepted</p>' : ''}
+                ${categorizedEntries.accepted.length === 0 ? '<p>No concepts returned accepted.</p>' : ''}
         `;
         
         template += renderFilePreviewDropdown(categorizedEntries.accepted, "accepted", true);
     
         template += `
             <div class='tab-pane fade' id='declined' role='tabpanel' aria-labeledby='declinedTab'>
-                ${categorizedEntries.declined.length === 0 ? '<p>No concepts returned Rejected</p>' : ''}
+                ${categorizedEntries.declined.length === 0 ? '<p>No concepts returned rejected.</p>' : ''}
         `;
 
         template += renderFilePreviewDropdown(categorizedEntries.declined, "declined", true);
