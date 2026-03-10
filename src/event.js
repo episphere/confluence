@@ -1407,7 +1407,7 @@ const addEventUpdateSummaryStatsForm = () => {
     })
 };
 
-export const addEventUpdateScore = async (fileId, selectedValue, consortium) => {
+export const addEventUpdateScore = async (fileId, selectedValue, consortium, refreshCallback = null) => {
     const form = document.getElementById('changeScore');
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -1415,15 +1415,22 @@ export const addEventUpdateScore = async (fileId, selectedValue, consortium) => 
         form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Updating...';
         const comment = document.getElementById('scoreMessage').value;
         const submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: ${comment}`;
-        let commentReturn = await createComment(fileId, submitMessage);
-        console.log(commentReturn);
-        //form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
         
-        if (commentReturn.status===201) {
-            form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
-            setTimeout(() => {document.location.reload(true)}, 2000);
-        } else {
+        try {
+            let commentReturn = await createComment(fileId, submitMessage);
+            if (commentReturn.status === 201) {
+                form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
+                setTimeout(() => {
+                    $("#confluenceMainModal").modal("hide");
+                    if (refreshCallback) refreshCallback();
+                }, 500);
+            } else {
+                throw new Error("Update failed");
+            }
+        } catch (error) {
             form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Error';
+            form.querySelectorAll('[type="submit"]')[0].classList.remove('disabled');
+            alert("Failed to update score. Please try again.");
         }
     })
 };

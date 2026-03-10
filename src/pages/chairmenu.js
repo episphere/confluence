@@ -61,6 +61,49 @@ const getCurrentUserAuth = () => {
     return authChair ? authChair : null;
 }
 
+let adminDataCache = null;
+
+const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
+    return await Promise.all(files.map(async (file) => {
+        const fileId = file.id;
+        const promises = [getFileInfo(fileId), getChairApprovalDate(fileId)];
+        if (type !== 'com') promises.push(readDocFile(fileId));
+        
+        const [fileInfo, completion_date, docContent] = await Promise.all(promises);
+        
+        const contacts = docContent ? extractContactInvestigators(docContent) : "";
+        const filename = fileInfo.name;
+        const lastUnderscoreIndex = filename.lastIndexOf('_');
+        
+        let titlename;
+        if (type !== 'com') {
+            titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
+        } else {
+            titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
+        }
+        const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+        
+        let submissionDate = fileInfo.created_at;
+        let returnedDate = null;
+
+        if (type === 'res') {
+            returnedDate = fileInfo.created_at;
+            const originalFile = allSubFiles.find(f => f.name === filename);
+            if (originalFile) {
+                submissionDate = originalFile.created_at;
+            }
+        }
+
+        return { 
+            fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, 
+            submissionDate, returnedDate,
+            parentId: fileInfo.parent.id,
+            name: fileInfo.name,
+            type: type
+        };
+    }));
+};
+
 export const showPreviewInPane = (fileId) => {
     showPreview(fileId, 'boxFilePreview');
     setTimeout(() => {
@@ -692,6 +735,36 @@ export function viewFinalDecisionFilesColumns() {
     `;
 };
 
+export function viewAuthFinalDecisionFilesColumns() {
+    return `
+        <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+            <div class="row-24 align-items-center position-relative">
+            
+            <!-- Selection checkbox header -->
+            <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
+
+            <!-- Left side: Basic file info columns -->
+            <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Ret Date <button class="transparent-btn sort-column" data-column-name="Return Date"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="Date"><i class="fas fa-sort"></i></button></div>
+            
+            <!-- Consortium columns -->
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+            <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text" hidden>TEST <button class="transparent-btn sort-column" data-column-name="TESTDecision"><i class="fas fa-sort"></i></button></div>
+            
+            <!-- Empty space for the accordion toggle button -->
+            <div class="col-24-1"></div>
+            </div>
+        </div>
+    `;
+};
+
 export async function viewFinalDecisionFilesTemplate(files) {
     let template = "";
     let filesInfo = [];
@@ -726,7 +799,7 @@ export async function viewFinalDecisionFilesTemplate(files) {
             <div class='col-xl-12 pr-0'>
         `;
         
-        template += viewFinalDecisionFilesColumns();
+        template += viewAuthFinalDecisionFilesColumns();
         template += '<div id="files"> </div>';
         template += '<!--tbody id="files"-->';
     } else {
@@ -1041,6 +1114,7 @@ export const authTableTemplate = () => {
                   <div class="align-left">
                       <h1 class="page-header">Admin Table View</h1>
                   </div>
+                  <div id="roundSelectionContainer" style="margin-left: 20px;"></div>
                   <div class="align-right">
                       <button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> 
                         <span class="buttonsubmit__text"> Update Users </span>
@@ -1093,49 +1167,91 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
 };
 
 export const generateAuthTableFiles = async () => {
-    let filearrayAllFilesSub = await getAllFilesRecursive(submitterFolder);
-    let filearrayAllFilesCom = await getAllFilesRecursive(completedFolder);
-    let filearrayAllFilesRes = await getRequiringInputFiles(returnToSubmitterFolder);
-    //let filearrayAllFilesSub = allFilessub.entries;
-    //let filearrayAllFilesCom = allFilescom.entries;
-    //console.log(filearrayAllFilesSub);
-
-    // document.getElementById("authTableView").innerHTML = template;
-    await viewAuthFinalDecisionFilesTemplate(filearrayAllFilesSub, filearrayAllFilesCom, filearrayAllFilesRes);
+    showAnimation();
     
-    // commentSubmit();
-    returnToChairs();
-    returnToSubmitter();
-    addRenameFilesEvent(filearrayAllFilesSub);
+    const folderItems = await getFolderItems(submitterFolder);
+    const roundFolders = folderItems.entries.filter(item => item.type === 'folder' && item.name.toLowerCase().startsWith('round'));
+    roundFolders.sort((a, b) => b.name.localeCompare(a.name));
+
+    if (!adminDataCache) {
+        // Initial deep fetch and processing
+        const [allFilesSub, allFilesCom, allFilesRes] = await Promise.all([
+            getAllFilesRecursive(submitterFolder),
+            getAllFilesRecursive(completedFolder),
+            getRequiringInputFiles(returnToSubmitterFolder)
+        ]);
+
+        const [processedSub, processedCom, processedRes] = await Promise.all([
+            getProcessedAdminFiles(allFilesSub, 'sub'),
+            getProcessedAdminFiles(allFilesCom, 'com'),
+            getProcessedAdminFiles(allFilesRes, 'res')
+        ]);
+
+        adminDataCache = {
+            sub: processedSub,
+            com: processedCom,
+            res: processedRes
+        };
+    }
+
+    const renderSelectedRound = async (selectedFolderId) => {
+        let filteredSub, filteredCom, filteredRes;
+        
+        if (selectedFolderId === 'all') {
+            filteredSub = adminDataCache.sub;
+        } else {
+            filteredSub = adminDataCache.sub.filter(f => f.parentId === selectedFolderId);
+        }
+        
+        filteredCom = adminDataCache.com; // Completed folder is usually not broken by round in the same way, keeping all for now
+        
+        // Filter requiring input files to only include those whose names match the filtered sub files
+        const subFileNames = filteredSub.map(f => f.name);
+        filteredRes = adminDataCache.res.filter(f => subFileNames.includes(f.name));
+
+        await viewAuthFinalDecisionFilesTemplate(filteredSub, filteredCom, filteredRes);
+        returnToChairs();
+        returnToSubmitter();
+        addRenameFilesEvent(filteredSub.map(f => f.fileInfo));
+    };
+
+    const roundSelectionContainer = document.getElementById('roundSelectionContainer');
+    if (roundSelectionContainer && roundFolders.length > 0) {
+        let dropdownHtml = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label for="roundSelect"><b>Select Round:</b></label>
+                <select id="roundSelect" class="form-select" style="width: auto;">
+                    <option value="all">All Rounds</option>
+        `;
+        roundFolders.forEach(folder => {
+            dropdownHtml += `<option value="${folder.id}">${folder.name}</option>`;
+        });
+        dropdownHtml += `
+                </select>
+            </div>
+        `;
+        roundSelectionContainer.innerHTML = dropdownHtml;
+
+        document.getElementById('roundSelect').addEventListener('change', async (e) => {
+            showAnimation();
+            await renderSelectedRound(e.target.value);
+            hideAnimation();
+        });
+    }
+
+    // Initial render
+    await renderSelectedRound('all');
     hideAnimation();
 };
 
-export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, filesRes) {
+export async function viewAuthFinalDecisionFilesTemplate(processedSub, processedCom, processedRes) {
     let template = "";
-    let filesInfoSub = [];
-    let filesInfoCom = [];
-    let filesInfoRes = [];
     
-    for (const file of filesSub) {
-        const fileInfo = await getFileInfo(file.id);
-        filesInfoSub.push(fileInfo);
-    }
+    // Remove files from processedSub that match names in processedRes
+    const resFileNames = processedRes.map(file => file.name);
+    const filteredSub = processedSub.filter(file => !resFileNames.includes(file.name));
     
-    for (const file of filesCom) {
-        const fileInfo = await getFileInfo(file.id);
-        filesInfoCom.push(fileInfo);
-    }
-
-    for (const file of filesRes) {
-        const fileInfo = await getFileInfo(file.id);
-        filesInfoRes.push(fileInfo);
-    }
-
-    // Remove files from filesInfoSub that match names in filesInfoRes
-    const resFileNames = filesInfoRes.map(file => file.name);
-    filesInfoSub = filesInfoSub.filter(file => !resFileNames.includes(file.name));
-    
-    if (filesInfoSub.length > 0 || filesInfoCom.length > 0 || filesInfoRes.length > 0) {
+    if (filteredSub.length > 0 || processedCom.length > 0 || processedRes.length > 0) {
         template += `
             <div id='decidedFiles'>
                 <div class='row'>
@@ -1160,7 +1276,7 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, fil
             <div class='col-xl-12 pr-0'>
         `;
         
-        template += viewFinalDecisionFilesColumns();
+        template += viewAuthFinalDecisionFilesColumns();
         template += '<div id="files"> </div>';
         template += '<!--tbody id="files"-->';
     } else {
@@ -1173,8 +1289,8 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, fil
     
     document.getElementById("authTableView").innerHTML = template;
     
-    if (filesInfoSub.length !== 0 || filesInfoCom.length !== 0 || filesInfoRes.length !== 0) {
-        await viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, filesInfoRes);
+    if (filteredSub.length !== 0 || processedCom.length !== 0 || processedRes.length !== 0) {
+        viewAuthFinalDecisionFiles(filteredSub, processedCom, processedRes);
         
         // Add checkbox change listeners to enable/disable buttons
         const updateButtonStates = () => {
@@ -1200,16 +1316,16 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, fil
             checkbox.addEventListener('change', updateButtonStates);
         });
         
-        for (const file of filesInfoSub) {
-            showCommentsDCEG(file.id, true)
+        for (const file of filteredSub) {
+            showCommentsDCEG(file.fileId, true)
         }
         
-        for (const file of filesInfoCom) {
-            showCommentsDCEG(file.id, true)
+        for (const file of processedCom) {
+            showCommentsDCEG(file.fileId, true)
         }
 
-        for (const file of filesInfoRes) {
-            showCommentsDCEG(file.id, true)
+        for (const file of processedRes) {
+            showCommentsDCEG(file.fileId, true)
         }
         
         let btns = Array.from(document.querySelectorAll(".preview-file"));
@@ -1246,80 +1362,21 @@ export async function viewAuthFinalDecisionFilesTemplate(filesSub, filesCom, fil
                 document.getElementsByClassName("header-sortable")[0];
                 const tableElement =
                 headerCell.parentElement.parentElement.parentElement;
-                filterCheckBox(tableElement, filesInfo);
+                filterCheckBox(tableElement, filteredSub.map(f => f.fileInfo));
             });
         });
-        // const input = document.getElementById("searchDataDictionary");
-        // input.addEventListener("input", () => {
-        //     const headerCell = document.getElementsByClassName("header-sortable")[0];
-        //     const tableElement = headerCell.parentElement.parentElement.parentElement;
-        //     filterCheckBox(tableElement, filesInfo);
-        // });
     }
 };
 
-export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, filesInfoRes) {
+export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles, processedResFiles) {
   
   let template = `
     <div class="row m-0 align-left allow-overflow w-100">
       <div class="accordion accordion-flush col-md-12" id="adminAccordian">
   `;
   
-  // Process filesInfoSub in parallel
-  const subFilePromises = filesInfoSub.map(async (fileInfo) => {
-    const fileId = fileInfo.id;
-    const [docContent, completion_date] = await Promise.all([
-      readDocFile(fileId),
-      getChairApprovalDate(fileId)
-    ]);
-    
-    const contacts = extractContactInvestigators(docContent);
-    const filename = fileInfo.name;
-    const lastUnderscoreIndex = filename.lastIndexOf('_');
-    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
-    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    
-    return { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isSubmitted: true };
-  });
-  
-  // Process filesInfoCom in parallel
-  const comFilePromises = filesInfoCom.map(async (fileInfo) => {
-    const fileId = fileInfo.id;
-    const completion_date = await getChairApprovalDate(fileId);
-    
-    const filename = fileInfo.name;
-    const lastUnderscoreIndex = filename.lastIndexOf('_');
-    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
-    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    
-    return { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, isSubmitted: false };
-  });
-  
-  // Process filesInfoRes in parallel
-  const resFilePromises = filesInfoRes.map(async (fileInfo) => {
-    const fileId = fileInfo.id;
-    const [docContent, completion_date] = await Promise.all([
-      readDocFile(fileId),
-      getChairApprovalDate(fileId)
-    ]);
-    
-    const contacts = extractContactInvestigators(docContent);
-    const filename = fileInfo.name;
-    const lastUnderscoreIndex = filename.lastIndexOf('_');
-    const titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
-    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-    
-    return { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput: true };
-  });
-  
-  const [processedSubFiles, processedComFiles, processedResFiles] = await Promise.all([
-    Promise.all(subFilePromises),
-    Promise.all(comFilePromises),
-    Promise.all(resFilePromises)
-  ]);
-  
   // Build template with processed data
-  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isSubmitted } of processedSubFiles) {
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate } of processedSubFiles) {
 
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
@@ -1333,13 +1390,18 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, fil
 
 
           <!-- File Name (col-3) -->
-          <div class="col-24-5 text-left">
+          <div class="col-24-4 text-left">
             <span class="responsive-text" title="${titlename}">${shorttitlename}</span>
           </div>
           
           <!-- Date (col-1) -->
-          <div class="col-24-3 text-left">
-            <span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span>
+          <div class="col-24-2 text-left">
+            <span class="responsive-text">${new Date(submissionDate).toDateString().substring(4)}</span>
+          </div>
+
+          <!-- Return Date (col-1) -->
+          <div class="col-24-2 text-left">
+            <span class="responsive-text">${returnedDate ? new Date(returnedDate).toDateString().substring(4) : "--"}</span>
           </div>
           
           <!-- Status (col-1) -->
@@ -1489,21 +1551,29 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, fil
       </div>`;
       }
 
-  for (const { fileInfo, fileId, filename, titlename, shorttitlename, completion_date } of processedComFiles) {
+  for (const { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate } of processedComFiles) {
     //console.log(fileInfo.parent.id);
 
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
         <!-- File info row with accordion button and dropdowns side by side -->
         <div class="row-24 align-items-center position-relative">
+          
+          <div class="col-24-1 text-left"></div>
+
           <!-- File Name (col-3) -->
-          <div class="col-24-5 text-left">
+          <div class="col-24-4 text-left">
             <p title="${titlename}">${shorttitlename}</p>
           </div>
           
           <!-- Date (col-1) -->
-          <div class="col-24-4 text-left">
-            ${new Date(fileInfo.created_at).toDateString().substring(4)}
+          <div class="col-24-2 text-left">
+            ${new Date(submissionDate).toDateString().substring(4)}
+          </div>
+
+          <!-- Return Date (col-1) -->
+          <div class="col-24-2 text-left">
+            ${returnedDate ? new Date(returnedDate).toDateString().substring(4) : "--"}
           </div>
           
           <!-- Status (col-1) -->
@@ -1649,18 +1719,21 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, fil
       </div>`;
       }
 
-  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput } of processedResFiles) {
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput, submissionDate, returnedDate } of processedResFiles) {
     template += `
       <div class="accordian-item mb-2 border-bottom pb-2">
         <div class="row-24 align-items-center position-relative">
           <div class="col-24-1 text-left">
             <input type="checkbox" class="pl admin-checkbox" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
           </div>
-          <div class="col-24-5 text-left">
+          <div class="col-24-4 text-left">
             <span class="responsive-text" title="${titlename}">${shorttitlename}</span>
           </div>
-          <div class="col-24-3 text-left">
-            <span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span>
+          <div class="col-24-2 text-left">
+            <span class="responsive-text">${new Date(submissionDate).toDateString().substring(4)}</span>
+          </div>
+          <div class="col-24-2 text-left">
+            <span class="responsive-text">${returnedDate ? new Date(returnedDate).toDateString().substring(4) : "--"}</span>
           </div>
           <div class="col-24-2 text-left">
             <h6 class="badge badge-pill bg-info">Returned</h6>
@@ -1823,7 +1896,12 @@ export async function viewAuthFinalDecisionFiles(filesInfoSub, filesInfoCom, fil
                 body.innerHTML = template;
                 document.getElementById('confluenceMainModal').style.display = "block";
                 $("#confluenceMainModal").modal("show");
-                addEventUpdateScore(fileId, selectedValue, consortium);
+                
+                const refreshCallback = () => {
+                    adminDataCache = null; // Clear cache to force re-fetch of updated comments/scores
+                    generateAuthTableFiles();
+                };
+                addEventUpdateScore(fileId, selectedValue, consortium, refreshCallback);
 
                 // await createComment(fileId, submitMessage);
                 
@@ -1961,7 +2039,8 @@ export const returnToChairs = () => {
             }
             
             btn.classList.toggle("buttonsubmit--loading");
-            document.location.reload(true);
+            adminDataCache = null;
+            generateAuthTableFiles();
         });
     }
     
@@ -2153,7 +2232,8 @@ export const returnToSubmitter = () => {
             window.location.href = `mailto:${userFound}?subject=Confluence Project: DACC responses to your concept submission are ready for your review &body=Your Confluence data access submission for ${fileName} has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
             setTimeout(() => {
                 $("#confluenceMainModal").modal("hide");
-                location.reload();
+                adminDataCache = null;
+                generateAuthTableFiles();
             }, 500);
         });
     };
@@ -2748,6 +2828,11 @@ export const showRenameFilesPopup = (files) => {
     });
 };
 
+const localRefresh = () => {
+    adminDataCache = null;
+    generateAuthTableFiles();
+};
+
 export const renameFilesWithRound = async (files, roundNumber) => {
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
@@ -2791,7 +2876,16 @@ export const renameFilesWithRound = async (files, roundNumber) => {
         }
         
         progressDiv.innerHTML += '<p><strong>All files renamed successfully!</strong></p>';
-        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">Close & Refresh</button></div>';
+        const footer = document.createElement('div');
+        footer.className = 'modal-footer';
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn btn-primary';
+        closeBtn.dataset.bsDismiss = 'modal';
+        closeBtn.textContent = 'Close & Refresh';
+        closeBtn.onclick = localRefresh;
+        footer.appendChild(closeBtn);
+        progressDiv.appendChild(footer);
         
     } catch (error) {
         progressDiv.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
