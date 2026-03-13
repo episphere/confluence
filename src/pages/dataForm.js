@@ -28,7 +28,7 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                         ${resubmitTitle ? `<p> This page displays the comments and questions submitted by the data access coordinating committees (DACCs) in response to your concept proposal requesting access to data shared with the Confluence Project.</p>
                                           <p>To reply to DACC comments and questions, please enter your responses in the text boxes provided. <b>A reply is required in every text box.</b> Where applicable, you may reference revisions made to your concept in your replies. If a DACC inquiry warrants revising your concept, it is strongly encouraged that you do so before resubmitting.</p>
                                           <p style="padding-left: 25px;"><b>Note:</b> Work in progress cannot be saved on this platform. If needed, you may download the DACC inquiries and your concept to work on your replies offline, then copy and paste your responses into the text boxes when ready.</p>
-                                          <p>When you have finished, confirm that you have replied to all comments and indicate whether revisions to the concept have been made. Then select <b>"Submit Reply to DACCs"</b> to return your submission to the DACCs.</p>
+                                          <p>When you have finished, confirm that you have replied to all comments and indicate whether revisions to the concept have been made. Then select <b>"Resubmit Updates and Comments"</b> to return your submission to the DACCs.</p>
                          ` : `
                         <p>
                             Please fill out the form to request access to Confluence Project data. This form 
