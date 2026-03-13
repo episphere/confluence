@@ -224,14 +224,19 @@ export const addResponseInputs = async () => {
     }
 };
 
-export const showPreviewInPane = (fileId) => {
+export const showPreviewInPane = (fileId, fullWidth = false) => {
     showPreview(fileId, 'boxFilePreview');
     // Force the preview container to respect Bootstrap grid
     setTimeout(() => {
         const previewContainer = document.getElementById('boxFilePreview');
         if (previewContainer) {
-            previewContainer.style.maxWidth = '66.666667%'; // col-8 width
-            previewContainer.style.flex = '0 0 66.666667%';
+            if (fullWidth) {
+                previewContainer.style.maxWidth = '100%';
+                previewContainer.style.flex = '0 0 100%';
+            } else {
+                previewContainer.style.maxWidth = '66.666667%'; // col-8 width
+                previewContainer.style.flex = '0 0 66.666667%';
+            }
         }
     }, 100);
 };
@@ -241,14 +246,17 @@ export const switchFilesWithResponse = (tab) => {
     if (element) {
         element.addEventListener("change", (e) => {
             const file_id = e.target.value;
-            showPreviewInPane(file_id);
-            showCommentsSub(file_id);
+            const isAcceptedTab = tab === 'accepted';
+            showPreviewInPane(file_id, isAcceptedTab);
             
-            // Add response inputs if on needinput tab
-            if (tab === 'needinput') {
-                setTimeout(() => {
-                    addResponseInputs();
-                }, 300);
+            if (!isAcceptedTab) {
+                showCommentsSub(file_id);
+                // Add response inputs if on needinput tab
+                if (tab === 'needinput') {
+                    setTimeout(() => {
+                        addResponseInputs();
+                    }, 300);
+                }
             }
         });
     }
@@ -347,7 +355,7 @@ export const dataSubmissionForm = async () => {
             template += `
                 <div class='row'>
                     <div id='boxFilePreview' class="col-8 preview-container"></div>
-                    <div class='col-4 mt-2'>
+                    <div id='commentsPanel' class='col-4 mt-2'>
                         <div id='fileComments' style='max-height: 990px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px;'></div>
                         <div id='submitResponsesContainer' class='mt-2'></div>
                     </div>
@@ -393,26 +401,43 @@ export const dataSubmissionForm = async () => {
     // Clear preview and comments when switching to empty tabs
     document.getElementById('needinputTab').addEventListener('click', () => {
         document.getElementById('needinputAlert').style.display = 'block';
+        const commentsPanel = document.getElementById('commentsPanel');
+        if (commentsPanel) commentsPanel.style.display = 'block';
+        
         if (categorizedEntries.needinput.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
             document.getElementById('submitResponsesContainer').innerHTML = '';
+        } else {
+            showPreviewInPane(document.getElementById('needinputselectedDoc').value, false);
         }
     });
     document.getElementById('acceptedTab').addEventListener('click', () => {
         document.getElementById('needinputAlert').style.display = 'none';
         document.getElementById('submitResponsesContainer').innerHTML = '';
+        
+        const commentsPanel = document.getElementById('commentsPanel');
+        if (commentsPanel) commentsPanel.style.display = 'none';
+        
         if (categorizedEntries.accepted.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
+        } else {
+            showPreviewInPane(document.getElementById('acceptedselectedDoc').value, true);
         }
     });
     document.getElementById('declinedTab').addEventListener('click', () => {
         document.getElementById('needinputAlert').style.display = 'none';
         document.getElementById('submitResponsesContainer').innerHTML = '';
+        
+        const commentsPanel = document.getElementById('commentsPanel');
+        if (commentsPanel) commentsPanel.style.display = 'block';
+        
         if (categorizedEntries.declined.length === 0) {
             document.getElementById('boxFilePreview').innerHTML = '';
             document.getElementById('fileComments').innerHTML = '';
+        } else {
+            showPreviewInPane(document.getElementById('declinedselectedDoc').value, false);
         }
     });
     

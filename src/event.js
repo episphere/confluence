@@ -1955,7 +1955,13 @@ export function switchTabsDataSubmission(show, hide, files) {
                 const selectedFile = document.getElementById(show + "selectedDoc").value || files[0].id;
                 document.getElementById(show + "selectedDoc").value = selectedFile;
                 showPreview(selectedFile);
-                showCommentsSub(selectedFile);
+                
+                if (show !== 'accepted') {
+                    showCommentsSub(selectedFile);
+                } else {
+                    const fileComments = document.getElementById('fileComments');
+                    if (fileComments) fileComments.innerHTML = '';
+                }
                 
                 // Add response inputs only for needinput tab
                 if (show === 'needinput') {
