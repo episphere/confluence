@@ -839,6 +839,9 @@ label {
 
 .required {
     color: red;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 2px;
 }
 
 .filter-btn:hover {
@@ -2230,6 +2233,9 @@ ul.form {
 .required-label {
     content: "*";
     color: red;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 2px;
   }
 
 #grid {

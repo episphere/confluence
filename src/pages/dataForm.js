@@ -560,12 +560,12 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                             ${resubmitTitle ? `
                             <p><u>4. CONFIRMATION OF REVISIONS</u></p>
                             <div class="input-group" style="display: block !important;">
-                                <label><b> Comments addressed: </b></label>
+                                <label><b> Comments addressed: </b><span class='required-label'>*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" id="commentsAddressed" name="commentsAddressed" type="checkbox" value="Yes" style="position: relative; top: -2px;" required/>
-                                    <label class="form-check-label" for="commentsAddressed">Please check to confirm replies have been submitted to all DACC inquiries.<span class='required-label'>*</span></label>
+                                    <label class="form-check-label" for="commentsAddressed">Please check to confirm replies have been submitted to all DACC inquiries.</label>
                                 </div>
-                                <label><b> Revisions made: </b></label>
+                                <label><b> Revisions made: </b><span class='required-label'>*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" id="revisionsMade" name="revisionStatus" type="radio" value="Revisions made" style="position: relative; top: -2px;" required/>
                                     <label class="form-check-label" for="revisionsMade">Check to confirm revisions to concept have been made in response to DACC inquiries.</label>
