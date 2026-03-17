@@ -1554,12 +1554,16 @@ const loadResubmitComments = async (fileId) => {
             if (message.startsWith('Consortium')) {
                 const consMatch = message.match(/Consortium:\s*([^,]+)/);
                 const ratingMatch = message.match(/Rating:\s*(\w+)/i);
-                const commentMatch = message.match(/Comment:\s*(.+)/);
+                const commentMatch = message.match(/Comment:\s*([\s\S]+)/);
+
+                console.log(commentMatch);
                 
                 const consortium = consMatch ? consMatch[1].trim() : '';
                 rating = ratingMatch ? ratingMatch[1].trim() : null;
-                const commentText = commentMatch ? commentMatch[1].substring(0, commentMatch[1].indexOf('Box Comment ID:')).trim() : '';
-                respondingid = comment.message.substring(comment.message.indexOf('Box Comment ID:') + 15).trim();
+                const commentTextIndex = commentMatch ? commentMatch[1].indexOf('Box Comment ID:') : -1;
+                const commentText = commentMatch ? (commentTextIndex !== -1 ? commentMatch[1].substring(0, commentTextIndex).trim() : commentMatch[1].trim()) : '';
+                console.log(commentText);
+                respondingid = comment.message.includes('Box Comment ID:') ? comment.message.substring(comment.message.indexOf('Box Comment ID:') + 15).trim() : null;
                 
                 displayMessage = `<span class="text-primary">Consortium: ${consortium}</span> <span class="badge badge-pill badge-${rating}">${rating}</span><br>${commentText}`;
             }
@@ -1568,7 +1572,7 @@ const loadResubmitComments = async (fileId) => {
             
             html += `
                 <div class="mb-3 pb-3 border-bottom comment-item" data-comment-id="${respondingid ? respondingid : comment.id}">
-                    <p class="mb-1">${displayMessage}</p>`;
+                    <p class="mb-1" style="white-space: pre-wrap;">${displayMessage}</p>`;
             
             if (shouldAddResponse) {
                 html += `
