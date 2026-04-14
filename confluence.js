@@ -18,9 +18,9 @@ import { renderDescription } from './src/pages/description.js';
 import { dataDictionaryTemplate } from './src/pages/dictionary.js';
 import { confluenceEventsPage, eventsBody, eventsDACC } from './src/pages/events.js';
 import { acceptedDocs, acceptedDocsView } from './src/pages/accepteddocs.js';
+import { plotsTemplate, renderPlots } from './src/pages/plots.js';
 
 export const confluence = async () => {
-    // handleRangeRequests();
     if (window.navigator && navigator.serviceWorker) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for(let registration of registrations) {
@@ -48,12 +48,10 @@ export const confluence = async () => {
         const loginBoxAppProd = document.getElementById('loginBoxAppProd');
         const loginBoxAppStage = document.getElementById('loginBoxAppStage');
         if (location.origin.match('localhost')) loginBoxAppDev.hidden = false;
-        // if (location.origin.match(applicationURLs.stage)) loginBoxAppStage.hidden = false;
-        // if (location.origin.match(applicationURLs.prod)) loginBoxAppProd.hidden = false;
         if (applicationURLs.stage.includes(location.origin)) loginBoxAppStage.hidden = false;
         if (applicationURLs.prod.includes(location.origin)) loginBoxAppProd.hidden = false;
         if (location.origin.match('episphere')) loginBoxAppEpisphere.hidden = false;
-        storeAccessToken();
+        await storeAccessToken();
         manageRouter();
     }
     
@@ -94,6 +92,7 @@ export const confluence = async () => {
         const chairMenuElement = document.getElementById('chairMenu');
         const authTableElement = document.getElementById('authTable');
         const acceptedFormsElement = document.getElementById('acceptedForms');
+        const plotsTabElement = document.getElementById('plotsTab');
 
         if (dataSubmissionElement) {
             dataSubmissionElement.addEventListener('click', async () => {
@@ -257,6 +256,17 @@ export const confluence = async () => {
                 //console.log("accepted forms");
                 confluenceDiv.innerHTML = acceptedDocs();
                 acceptedDocsView();
+            });
+        }
+        if (plotsTabElement) {
+            plotsTabElement.addEventListener('click', () => {
+                if (plotsTabElement.classList.contains('navbar-active')) return;
+                
+                showAnimation();
+                assignNavbarActive(plotsTabElement, 2);
+                document.title = 'Confluence - Plots';
+                confluenceDiv.innerHTML = plotsTemplate();
+                renderPlots();
             });
         }
         
@@ -461,7 +471,7 @@ const manageRouter = async () => {
         
         document.title = 'Chair Menu';
         assignNavbarActive(element, 2);
-        confluenceDiv.innderHTML = chairMenuTemplate();
+        confluenceDiv.innerHTML = chairMenuTemplate();
         generateChairMenuFiles();
     }
     else if (hash === '#auth_table') {
@@ -503,6 +513,9 @@ const manageRouter = async () => {
             'Public Site'
         };
         dataDictionaryTemplate();
+    }
+    else if (hash && hash !== '#home' && (document.querySelector(`[href="${hash}"][data-mdb-toggle="tab"]`) || document.querySelector(`[href="${hash}"][data-bs-toggle="tab"]`))) {
+        return;
     }
     else window.location.hash = '#home';
 };
@@ -570,6 +583,10 @@ const manageHash = async () => {
     }
     else if (hash === '#accepted_forms') {
         const element = document.getElementById('acceptedForms');
+        element.click();
+    }
+    else if (hash === '#plots') {
+        const element = document.getElementById('plotsTab');
         element.click();
     }
     else if (hash === '#data_submission') {
@@ -716,6 +733,9 @@ const manageHash = async () => {
         confluenceDiv.innerHTML = confluenceEventsPage();
         await eventsDACC()
         hideAnimation();
+    }
+    else if (hash && hash !== '#home' && (document.querySelector(`[href="${hash}"][data-mdb-toggle="tab"]`) || document.querySelector(`[href="${hash}"][data-bs-toggle="tab"]`))) {
+        return;
     }
     else window.location.hash = '#home';
 };
