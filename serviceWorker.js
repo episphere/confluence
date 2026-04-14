@@ -23,7 +23,7 @@ registerRoute(/\.(?:png|jpg|jpeg|svg|gif|ico|webp)$/,
 );
 
 registerRoute(
-    new RegExp('https://api.box.com/.+'),
+    ({url}) => url.origin === 'https://api.box.com' && !url.pathname.includes('/oauth2/token'),
     new NetworkFirst({
         cacheName: 'api-cache',
         plugins: [
