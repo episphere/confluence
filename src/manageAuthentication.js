@@ -11,7 +11,19 @@ export const checkAccessTokenValidity = async () => {
             }
         });
         if (response.status === 401) {
-            if ((await refreshToken()) === true) return await checkAccessTokenValidity();
+            try {
+                if ((await refreshToken()) === true) {
+                    return await checkAccessTokenValidity();
+                } else {
+                    localStorage.removeItem('parms');
+                    location.href = location.origin + location.pathname;
+                    return null;
+                }
+            } catch (e) {
+                localStorage.removeItem('parms');
+                location.href = location.origin + location.pathname;
+                return null;
+            }
         } if (response.status === 200) {
             return response.json();
         }
@@ -20,7 +32,19 @@ export const checkAccessTokenValidity = async () => {
         }
     }
     catch (error) {
-        if ((await refreshToken()) === true) return await checkAccessTokenValidity();
+        try {
+            if ((await refreshToken()) === true) {
+                return await checkAccessTokenValidity();
+            } else {
+                localStorage.removeItem('parms');
+                location.href = location.origin + location.pathname;
+                return null;
+            }
+        } catch (e) {
+            localStorage.removeItem('parms');
+            location.href = location.origin + location.pathname;
+            return null;
+        }
     }
 };
 
