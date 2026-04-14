@@ -16,7 +16,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
           <div class='card-title' style='display: flex; gap: 20px; align-items: flex-start;'>
             <div>
               <label for='${tab}selectedDoc'>
-                  <b>Select Concept Form:</b>
+                  <b>Select Concept Form:</b> 🔵 = Replied
               </label>
               <br>
               <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
@@ -26,10 +26,10 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         let lastUnderscoreIndex = filename.lastIndexOf('_');
         let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
         
-        const replyStatus = file.isReplyCompleted ? " 🔵 Replied" : "";
+        const replyStatus = file.isReplyCompleted ? "🔵 " : "";
         template += `
             <option value='${fileId}'>
-            ${titlename}${replyStatus}</option>`;
+            ${replyStatus}${titlename}</option>`;
       }
       template += `
               </select>
