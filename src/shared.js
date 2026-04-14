@@ -24,10 +24,10 @@ export const chairsInfo = [
     {id: 'user_1', email:"wei.zheng@vumc.org", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
     {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146, boxIdNew: 199271619056,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:[]}, 
     {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:[]}, 
-    {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
+    {id: 'user_4', email:"kopchickbp@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
-    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
+    //{id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
 
 export const messagesForChair = {
@@ -61,10 +61,12 @@ export const readDocFile = async (id) => {
     return Array.from(textNodes).map(node => node.textContent).join(' ');
 }
 
-export const getFolderItems = async (id) => {
+export const getFolderItems = async (id, fields = "") => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
-        let r = await fetch('https://api.box.com/2.0/folders/' + id + '/items', {
+        let url = 'https://api.box.com/2.0/folders/' + id + '/items';
+        if (fields) url += '?fields=' + fields;
+        let r = await fetch(url, {
             method:'GET',
             headers:{
                 Authorization:"Bearer "+access_token
@@ -72,7 +74,7 @@ export const getFolderItems = async (id) => {
         })
         
         if (r.status === 401) {
-            if ((await refreshToken()) === true) return await getFolderItems(id);
+            if ((await refreshToken()) === true) return await getFolderItems(id, fields);
         }
         else if (r.status === 200) {
             return r.json();
@@ -83,20 +85,20 @@ export const getFolderItems = async (id) => {
         }
     }
     catch(err) {
-        if ((await refreshToken()) === true) return await getFolderItems(id);
+        if ((await refreshToken()) === true) return await getFolderItems(id, fields);
     }
 };
 
-export const getAllFilesRecursive = async (folderId) => {
+export const getAllFilesRecursive = async (folderId, fields = "") => {
     const allFiles = [];
-    const items = await getFolderItems(folderId);
+    const items = await getFolderItems(folderId, fields);
     //console.log(items);
     
     for (const item of items.entries) {
         if (item.type === 'file') {
             allFiles.push(item);
         } else if (item.type === 'folder') {
-            const subFiles = await getAllFilesRecursive(item.id);
+            const subFiles = await getAllFilesRecursive(item.id, fields);
             allFiles.push(...subFiles);
         }
     }
@@ -509,36 +511,30 @@ export const storeAccessToken = async () => {
     else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
     document.getElementById("confluenceDiv").innerHTML = "";
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-    var urlencoded = new URLSearchParams();
-    urlencoded.append("grant_type", "authorization_code");
-    urlencoded.append("client_id", clt.client_id);
-    urlencoded.append("client_secret", clt.server_id);
-    urlencoded.append("code", parms.code);
-
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: urlencoded,
-      redirect: "follow",
-    };
-    const response = await fetch(
-      "https://api.box.com/oauth2/token",
-      requestOptions
-    );
-    if (response.status === 400) {
-      window.history.replaceState({}, "", "./#home");
-    }
-    if (response.status && response.status === 200) {
-      localStorage.parms = JSON.stringify(await response.json());
-      window.history.replaceState({}, "", "./#home");
-      confluence();
-      document.getElementById("loginBoxAppDev").hidden = true;
-      document.getElementById("loginBoxAppStage").hidden = true;
-      document.getElementById("loginBoxAppEpisphere").hidden = true;
-      document.getElementById("loginBoxAppProd").hidden = true;
+    try {
+        const response = await fetch("https://api.box.com/oauth2/token", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: `grant_type=authorization_code&code=${parms.code}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+        });
+        if (response.status === 400) {
+          window.history.replaceState({}, "", "./#home");
+        }
+        if (response.status && response.status === 200) {
+          localStorage.parms = JSON.stringify(await response.json());
+          window.history.replaceState({}, "", "./#home");
+          confluence();
+          document.getElementById("loginBoxAppDev").hidden = true;
+          document.getElementById("loginBoxAppStage").hidden = true;
+          document.getElementById("loginBoxAppEpisphere").hidden = true;
+          document.getElementById("loginBoxAppProd").hidden = true;
+        }
+    } catch (err) {
+        console.error("Error during token exchange:", err);
+        window.history.replaceState({}, "", "./#home");
+        hideAnimation();
     }
   } else {
     if (localStorage.parms) {
@@ -552,7 +548,7 @@ export const storeAccessToken = async () => {
 };
 
 export const refreshToken = async () => {
-    if (!localStorage.parms) return;
+    if (!localStorage.parms) return false;
     const parms = JSON.parse(localStorage.parms);
     
     let clt = { }
@@ -560,23 +556,31 @@ export const refreshToken = async () => {
     else if (location.origin.indexOf('episphere') !== -1) clt = config.iniAppDev
     else if (applicationURLs.stage.indexOf(location.origin) !== -1) clt = config.iniAppStage;
     else if (applicationURLs.prod.indexOf(location.origin) !== -1) clt = config.iniAppProd;
-    const response = await fetch(`https://api.box.com/oauth2/token/`, {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        method:'POST',
-        body: `grant_type=refresh_token&refresh_token=${parms.refresh_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
-    });
     
-    if (response.status === 200) {
-        const newToken = await response.json();
-        const newParms = {...parms, ...newToken};
-        localStorage.parms = JSON.stringify(newParms);
-        return true;
-    }
-    else {
+    try {
+        const response = await fetch(`https://api.box.com/oauth2/token`, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            method:'POST',
+            body: `grant_type=refresh_token&refresh_token=${parms.refresh_token}&client_id=${clt.client_id}&client_secret=${clt.server_id}`
+        });
+        
+        if (response.status === 200) {
+            const newToken = await response.json();
+            const newParms = {...parms, ...newToken};
+            localStorage.parms = JSON.stringify(newParms);
+            return true;
+        }
+        else {
+            hideAnimation();
+            sessionExpired();
+            return false;
+        }
+    } catch (err) {
         hideAnimation();
         sessionExpired();
+        return false;
     }
 };
 
@@ -1927,6 +1931,7 @@ export async function showCommentsDropDown(id) {
 };
 
 export async function showCommentsDCEG(id, change=false) {
+    console.log(id);
     const commentSection = document.getElementById(`file${id}Comments`);
     const response = await listComments(id);
     
@@ -1950,12 +1955,11 @@ export async function showCommentsDCEG(id, change=false) {
             const date = comment_date.toLocaleDateString();
             const time = comment_date.toLocaleTimeString();
             newDate = comment_date;
-            const ifcons = chairsInfo.find(element => element.email === comment.created_by.login) || comment.message.substring(0,10)==="Consortium";
+            const ifcons = comment.message.substring(0,10)==="Consortium";
             
                 if (ifcons) {
                     let cons = chairsInfo.find(element => element.email === comment.created_by.login)?.consortium || "";
-                    let score = comment.message[8];
-                    
+                    let score = "--"
                     if (comment.message.substring(0,10)==="Consortium"){
                         cons = comment.message.substring(12, comment.message.indexOf(",", 12)).trim();
                         score = comment.message.substring(
@@ -1964,9 +1968,6 @@ export async function showCommentsDCEG(id, change=false) {
                             ).trim();
                     }
                     
-                    //console.log(cons)
-                
-                    // let score = comment.message[8];
                     const inputScore = document.getElementById(`${cons}${id}`);
                     const selectElement = inputScore.children[0];
                     selectElement.value = `${score}`;
@@ -2029,6 +2030,10 @@ export const listComments = async (id) => {
         
         if (response.status === 401) {
             if ((await refreshToken()) === true) return await listComments(id);
+        } else if (response.status === 429) {
+            const retryAfter = response.headers.get('retry-after') || 1;
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            return await listComments(id);
         } else {
             return response.text();
         }
