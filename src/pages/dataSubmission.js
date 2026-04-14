@@ -117,9 +117,9 @@ export const addResponseInputs = async () => {
                     const ratingMatch = commentText.match(/Rating:\s*(\w+)/i);
                     const rating = ratingMatch ? ratingMatch[1] : null;
                     // console.log(commentText);
-                    // Add response box unless rating is specifically "1" or "NA"
-                    const shouldAddResponse = false;// !rating || (rating !== '1' && rating.toUpperCase() !== 'NA');
-                    
+                    // Add response box for ratings except 1 or NA
+                    const shouldAddResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+
                     if (shouldAddResponse) {
                         const responseInput = document.createElement('div');
                         responseInput.className = 'response-input-container';
@@ -138,18 +138,17 @@ export const addResponseInputs = async () => {
                         separator.className = 'mt-3';
                         commentDiv.appendChild(separator);
                     }
-                }
-            });
-            
-            // Add single submit button at the bottom if there are response boxes
-            if (responsesAdded > 0 && !document.getElementById('submitResponsesContainer').querySelector('.submit-all-responses')) {
-                const submitButton = document.createElement('div');
-                submitButton.className = 'submit-all-responses text-center';
-                submitButton.innerHTML = `
+                    }
+                    });
+
+                    // Add single submit button at the bottom if there are response boxes
+                    if (responsesAdded > 0 && !document.getElementById('submitResponsesContainer').querySelector('.submit-all-responses')) {
+                    const submitButton = document.createElement('div');
+                    submitButton.className = 'submit-all-responses text-center';
+                    submitButton.innerHTML = `
                     ${userHasCommented ? '<p class="text-danger">Comments have already been responded to.</p>' : '<p class="text-danger" id="validationWarning" style="display: none;">Please respond to all required comments before continuing.</p>'}
-                    <button class="buttonsubmit button-glow-red" id="submitAllResponsesBtn" ${userHasCommented ? 'disabled' : 'disabled'}><span class="buttonsubmit__text">Submit All Responses</span></button>
-                `;
-                document.getElementById('submitResponsesContainer').appendChild(submitButton);
+                    <button class="buttonsubmit button-glow-red" id="submitAllResponsesBtn" ${userHasCommented ? 'disabled' : ''}><span class="buttonsubmit__text">Submit All Responses</span></button>
+                    `;                document.getElementById('submitResponsesContainer').appendChild(submitButton);
                 
                 // Add validation function
                 if (!userHasCommented) {
