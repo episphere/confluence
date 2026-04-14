@@ -25,9 +25,11 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         let filename = file.name;
         let lastUnderscoreIndex = filename.lastIndexOf('_');
         let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
+        
+        const replyStatus = file.isReplyCompleted ? " 🔵 Replied" : "";
         template += `
             <option value='${fileId}'>
-            ${titlename}</option>`;
+            ${titlename}${replyStatus}</option>`;
       }
       template += `
               </select>
@@ -376,6 +378,21 @@ export const generateChairMenuFiles = async () => {
             const commentsResponse = await listComments(matchingFile.id);
             const comments = JSON.parse(commentsResponse).entries;
             claraFile.responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
+            
+            const chairComments = comments.filter(c => {
+                const message = c.message;
+                const ratingMatch = message.match(/Rating:\s*(\w+)/i);
+                const rating = ratingMatch ? ratingMatch[1].trim() : null;
+                const isChair = chairsInfo.some(chair => chair.email === c.created_by.login) || message.startsWith('Consortium');
+                const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+                return isChair && requiresResponse && !message.startsWith('Response ID:');
+            });
+            
+            claraFile.isReplyCompleted = chairComments.every(chairComment => {
+                const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
+                const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
+                return claraFile.responseComments.some(resComment => resComment.message.includes(`Response ID: ${effectiveId}`));
+            });
         }
     }
 
