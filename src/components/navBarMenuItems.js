@@ -82,6 +82,11 @@ export const navBarMenutemplate = () => {
                             Approved Confluence Concepts
                         </a>
                     </li>
+                    <li>
+                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#plots" title="Plots" id="plotsTab">
+                            Plots
+                        </a>
+                    </li>
                     <!--${
                         location.origin.match(applicationURLs.prod) ? `` : `
                             <li>
