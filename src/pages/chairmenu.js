@@ -43,7 +43,8 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
             </div>
           </div>
         </div>
-      </div>`;
+      </div>
+      `;
     } else {
         template += `
             <br>
@@ -64,44 +65,91 @@ const getCurrentUserAuth = () => {
 let adminDataCache = null;
 
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
-    return await Promise.all(files.map(async (file) => {
-        const fileId = file.id;
-        const promises = [getFileInfo(fileId), getChairApprovalDate(fileId)];
-        if (type !== 'com') promises.push(readDocFile(fileId));
-        
-        const [fileInfo, completion_date, docContent] = await Promise.all(promises);
-        
-        const contacts = docContent ? extractContactInvestigators(docContent) : "";
-        const filename = fileInfo.name;
-        const lastUnderscoreIndex = filename.lastIndexOf('_');
-        
-        let titlename;
-        if (type !== 'com') {
-            titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
-        } else {
-            titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
-        }
-        const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-        
-        let submissionDate = fileInfo.created_at;
-        let returnedDate = null;
-
-        if (type === 'res') {
-            returnedDate = fileInfo.created_at;
-            const originalFile = allSubFiles.find(f => f.name === filename);
-            if (originalFile) {
-                submissionDate = originalFile.created_at;
+    const results = [];
+    const CHUNK_SIZE = 10;
+    
+    for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+        const chunk = files.slice(i, i + CHUNK_SIZE);
+        const chunkResults = await Promise.all(chunk.map(async (file) => {
+            const fileId = file.id;
+            const promises = {
+                fileInfo: getFileInfo(fileId),
+                completion_date: getChairApprovalDate(fileId)
+            };
+            if (type !== 'com') promises.docContent = readDocFile(fileId);
+            if (type === 'res') promises.comments = listComments(fileId);
+            
+            const keys = Object.keys(promises);
+            const promiseResults = await Promise.all(Object.values(promises));
+            const resolvedResults = {};
+            keys.forEach((key, i) => resolvedResults[key] = promiseResults[i]);
+            
+            const { fileInfo, completion_date, docContent, comments } = resolvedResults;
+            
+            const contacts = docContent ? extractContactInvestigators(docContent) : "";
+            const filename = fileInfo.name;
+            const lastUnderscoreIndex = filename.lastIndexOf('_');
+            
+            let titlename;
+            if (type !== 'com') {
+                titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
+            } else {
+                titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename.slice(0,-5);
             }
-        }
+            const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+            
+            let submissionDate = fileInfo.created_at;
+            let returnedDate = null;
+            let isReplyCompleted = false;
 
-        return { 
-            fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, 
-            submissionDate, returnedDate,
-            parentId: fileInfo.parent.id,
-            name: fileInfo.name,
-            type: type
-        };
-    }));
+            if (type === 'res') {
+                returnedDate = fileInfo.created_at;
+                const originalFile = allSubFiles.find(f => f.name === filename);
+                if (originalFile) {
+                    submissionDate = originalFile.created_at;
+                }
+
+                if (comments) {
+                    const commentEntries = JSON.parse(comments).entries;
+                    const chairComments = commentEntries.filter(c => {
+                        const message = c.message;
+                        const ratingMatch = message.match(/Rating:\s*(\w+)/i);
+                        const rating = ratingMatch ? ratingMatch[1].trim() : null;
+                        const isChair = chairsInfo.some(chair => chair.email === c.created_by.login) || message.startsWith('Consortium');
+                        const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+                        return isChair && requiresResponse && !message.startsWith('Response ID:');
+                    });
+                    
+                    const responseComments = commentEntries.filter(c => c.message.startsWith('Response ID:'));
+                    
+                    isReplyCompleted = chairComments.every(chairComment => {
+                        const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
+                        const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
+                        return responseComments.some(resComment => resComment.message.includes(`Response ID: ${effectiveId}`));
+                    });
+                }
+            }
+
+            let roundId = fileInfo.parent ? fileInfo.parent.id : null;
+            if (type === 'res' || type === 'com') {
+                const originalFile = allSubFiles.find(f => f.name === filename);
+                if (originalFile && originalFile.parent) {
+                    roundId = originalFile.parent.id;
+                }
+            }
+
+            return { 
+                fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, 
+                submissionDate, returnedDate, isReplyCompleted,
+                parentId: fileInfo.parent.id,
+                roundId: roundId,
+                name: fileInfo.name,
+                type: type
+            };
+        }));
+        results.push(...chunkResults);
+    }
+    return results;
 };
 
 export const showPreviewInPane = (fileId) => {
@@ -434,7 +482,7 @@ export const generateChairMenuFiles = async () => {
     `;
     
     document.getElementById("chairFileView").innerHTML = template;
-    viewFinalDecisionFilesTemplate(filearrayAllFiles);
+    await viewFinalDecisionFilesTemplate(filearrayAllFiles);
     commentSubmit(consortium);
     
     // Add form validation for finalChairDecision
@@ -450,7 +498,7 @@ export const generateChairMenuFiles = async () => {
                 const grade = gradeSelect.value;
                 const message = messageTextarea.value.trim();
                 
-                if (grade !== '1' && message === '') {
+                if (grade !== '1' && grade.toUpperCase() !== 'NA' && message === '') {
                     submitButton.disabled = true;
                     submitButton.style.opacity = '0.5';
                     warningDiv.style.display = 'block';
@@ -767,12 +815,8 @@ export function viewAuthFinalDecisionFilesColumns() {
 
 export async function viewFinalDecisionFilesTemplate(files) {
     let template = "";
-    let filesInfo = [];
     
-    for (const file of files) {
-        const fileInfo = await getFileInfo(file.id);
-        filesInfo.push(fileInfo);
-    }
+    const filesInfo = await Promise.all(files.map(file => getFileInfo(file.id)));
     
     if (filesInfo.length > 0) {
         template += `
@@ -810,7 +854,14 @@ export async function viewFinalDecisionFilesTemplate(files) {
         `;
     }
     
-    document.getElementById("daccDecision").innerHTML = template;
+    const daccDecisionElement = document.getElementById("daccDecision");
+    if (daccDecisionElement) {
+        daccDecisionElement.innerHTML = template;
+    } else {
+        console.warn("Element with id 'daccDecision' not found. It may have been removed from the DOM.");
+        return;
+    }
+
     if (filesInfo.length !== 0) {
         await viewFinalDecisionFiles(filesInfo);
         for (const file of filesInfo) {
@@ -1042,7 +1093,7 @@ export async function viewFinalDecisionFiles(files) {
         </div>
         <div class="row mb-1 m-0">
             <div class="col-md-2 pl-2 font-bold">Investigator(s)</div>
-            <div class="col">${contacts}}</div>
+            <div class="col">${contacts}</div>
         </div>
         <div class="row mb-1 m-0">
           <div class="col-md-2 pl-2 font-bold">Comments</div>
@@ -1156,7 +1207,7 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
             const subfolders = await getFolderItems(userFolder.id);
             for (const subfolder of subfolders.entries) {
                 if (subfolder.name === 'Requiring Input' && subfolder.type === 'folder') {
-                    const files = await getAllFilesRecursive(subfolder.id);
+                    const files = await getAllFilesRecursive(subfolder.id, "name,type,id,parent,created_at");
                     requiringInputFiles.push(...files);
                 }
             }
@@ -1176,15 +1227,15 @@ export const generateAuthTableFiles = async () => {
     if (!adminDataCache) {
         // Initial deep fetch and processing
         const [allFilesSub, allFilesCom, allFilesRes] = await Promise.all([
-            getAllFilesRecursive(submitterFolder),
-            getAllFilesRecursive(completedFolder),
+            getAllFilesRecursive(submitterFolder, "name,type,id,parent,created_at"),
+            getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at"),
             getRequiringInputFiles(returnToSubmitterFolder)
         ]);
 
         const [processedSub, processedCom, processedRes] = await Promise.all([
             getProcessedAdminFiles(allFilesSub, 'sub'),
-            getProcessedAdminFiles(allFilesCom, 'com'),
-            getProcessedAdminFiles(allFilesRes, 'res')
+            getProcessedAdminFiles(allFilesCom, 'com', allFilesSub),
+            getProcessedAdminFiles(allFilesRes, 'res', allFilesSub)
         ]);
 
         adminDataCache = {
@@ -1195,24 +1246,42 @@ export const generateAuthTableFiles = async () => {
     }
 
     const renderSelectedRound = async (selectedFolderId) => {
-        let filteredSub, filteredCom, filteredRes;
+        const tableContainer = document.getElementById('adminAccordian');
         
-        if (selectedFolderId === 'all') {
-            filteredSub = adminDataCache.sub;
-        } else {
-            filteredSub = adminDataCache.sub.filter(f => f.parentId === selectedFolderId);
+        if (tableContainer && tableContainer.innerHTML !== "") {
+            // Table is already rendered, just filter rows by roundId
+            const rows = tableContainer.querySelectorAll('.admin-table-row');
+            rows.forEach(row => {
+                const roundId = row.getAttribute('data-round-id');
+                if (selectedFolderId === 'all' || roundId === selectedFolderId) {
+                    row.classList.remove('d-none');
+                } else {
+                    row.classList.add('d-none');
+                }
+            });
+            return;
         }
-        
-        filteredCom = adminDataCache.com; // Completed folder is usually not broken by round in the same way, keeping all for now
-        
-        // Filter requiring input files to only include those whose names match the filtered sub files
-        const subFileNames = filteredSub.map(f => f.name);
-        filteredRes = adminDataCache.res.filter(f => subFileNames.includes(f.name));
+
+        // First time render - render ALL files
+        const filteredSub = adminDataCache.sub;
+        const filteredCom = adminDataCache.com;
+        const filteredRes = adminDataCache.res;
 
         await viewAuthFinalDecisionFilesTemplate(filteredSub, filteredCom, filteredRes);
         returnToChairs();
         returnToSubmitter();
         addRenameFilesEvent(filteredSub.map(f => f.fileInfo));
+        
+        // If initial selection was NOT 'all', filter immediately after rendering
+        if (selectedFolderId !== 'all') {
+            const rows = document.querySelectorAll('.admin-table-row');
+            rows.forEach(row => {
+                const roundId = row.getAttribute('data-round-id');
+                if (roundId !== selectedFolderId) {
+                    row.classList.add('d-none');
+                }
+            });
+        }
     };
 
     const roundSelectionContainer = document.getElementById('roundSelectionContainer');
@@ -1317,15 +1386,15 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
         });
         
         for (const file of filteredSub) {
-            showCommentsDCEG(file.fileId, true)
+            await showCommentsDCEG(file.fileId, true)
         }
         
         for (const file of processedCom) {
-            showCommentsDCEG(file.fileId, true)
+            await showCommentsDCEG(file.fileId, true)
         }
 
         for (const file of processedRes) {
-            showCommentsDCEG(file.fileId, true)
+            await showCommentsDCEG(file.fileId, true)
         }
         
         let btns = Array.from(document.querySelectorAll(".preview-file"));
@@ -1376,10 +1445,10 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
   `;
   
   // Build template with processed data
-  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate } of processedSubFiles) {
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate, roundId } of processedSubFiles) {
 
     template += `
-      <div class="accordian-item mb-2 border-bottom pb-2">
+      <div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${roundId}">
         <!-- File info row with accordion button and dropdowns side by side -->
         <div class="row-24 align-items-center position-relative">
 
@@ -1551,11 +1620,11 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
       </div>`;
       }
 
-  for (const { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate } of processedComFiles) {
+  for (const { fileInfo, fileId, filename, titlename, shorttitlename, completion_date, submissionDate, returnedDate, roundId } of processedComFiles) {
     //console.log(fileInfo.parent.id);
 
     template += `
-      <div class="accordian-item mb-2 border-bottom pb-2">
+      <div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${roundId}">
         <!-- File info row with accordion button and dropdowns side by side -->
         <div class="row-24 align-items-center position-relative">
           
@@ -1719,9 +1788,9 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
       </div>`;
       }
 
-  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isRequiringInput, submissionDate, returnedDate } of processedResFiles) {
+  for (const { fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, isReplyCompleted, submissionDate, returnedDate, roundId } of processedResFiles) {
     template += `
-      <div class="accordian-item mb-2 border-bottom pb-2">
+      <div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${roundId}">
         <div class="row-24 align-items-center position-relative">
           <div class="col-24-1 text-left">
             <input type="checkbox" class="pl admin-checkbox" id="${fileId}" value="${fileInfo.name}" aria-label="Select file">
@@ -1736,7 +1805,9 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
             <span class="responsive-text">${returnedDate ? new Date(returnedDate).toDateString().substring(4) : "--"}</span>
           </div>
           <div class="col-24-2 text-left">
-            <h6 class="badge badge-pill bg-info">Returned</h6>
+            ${isReplyCompleted 
+              ? '<h6 class="badge badge-pill bg-success">Replied</h6>' 
+              : '<h6 class="badge badge-pill bg-info">Returned</h6>'}
           </div>
           <div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG">
             <select class="form-select form-select-sm decision-dropdown" aria-label="AABCG Decision">
