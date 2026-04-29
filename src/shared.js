@@ -1931,7 +1931,7 @@ export async function showCommentsDropDown(id) {
 };
 
 export async function showCommentsDCEG(id, change=false) {
-    console.log(id);
+    //console.log(id);
     const commentSection = document.getElementById(`file${id}Comments`);
     const response = await listComments(id);
     

@@ -65,6 +65,7 @@ const getCurrentUserAuth = () => {
 }
 
 let adminDataCache = null;
+let chairMenuCache = null;
 
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
     const results = [];
@@ -223,7 +224,7 @@ export const switchFilesWithComments = (tab, files = []) => {
             showPreviewInPane(file_id);
             
             // Check if this file has response comments
-            const file = files.find(f => f.id === file_id);
+            const file = files.find(f => f && f.id === file_id);
             if (file && file.responseComments) {
                 console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
                 showCommentsWithResponses(file_id, file.responseComments);
@@ -237,372 +238,448 @@ export const switchFilesWithComments = (tab, files = []) => {
     }
 };
 
-export const generateChairMenuFiles = async () => {
+export const generateChairMenuFiles = async (forceRefresh = false) => {
     const userChairItem = getCurrentUserAuth();
     // console.log(userChairItem);
     
     if (!userChairItem) return null;
+    if (forceRefresh) chairMenuCache = null;
     
-    const filearrayChair = await getAllFilesRecursive(userChairItem.boxIdNew);
-    const filearrayClara = await getAllFilesRecursive(userChairItem.boxIdClara);
-    const filearrayAllFiles = await getAllFilesRecursive(submitterFolder);
-    // let filearrayChair = responseChair.entries;
-    // let filearrayClara = responseClara.entries;
-    // let filearrayAllFiles = allFiles.entries;
-    // console.log(filearrayAllFiles);
-
-    let test = await getFile(DACCmembers);
-    const { data, headers } = csv2Json(test);
-    const consortium = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).consortium;
-    const daccEmails = data.filter(item => item['DACC']==consortium).map(dt => dt['Email']).splice(1);
-
-    const filesIncompleted = [];
-    //console.log("1");
+    showAnimation();
     
-    // Process filearrayChair in parallel
-    const chairTaskPromises = filearrayChair.map(async (obj) => {
-        const [tasks, comments] = await Promise.all([getTaskList(obj.id), listComments(obj.id)]);
-        const incompleteItems = [];
-        
-        let hasIncompleteTask = false;
-        if (tasks && tasks.entries && tasks.entries.length != 0) {
-            for (let items of tasks.entries) {
-                for (let itemtasks of items.task_assignment_collection.entries) {
-                    if (itemtasks.status === 'incomplete') {
-                        hasIncompleteTask = true;
-                        incompleteItems.push(itemtasks.item);
-                        break;
+    const folderItems = await getFolderItems(submitterFolder);
+    const roundFolders = (folderItems && folderItems.entries) ? folderItems.entries.filter(item => item && item.type === 'folder' && item.name && item.name.toLowerCase().startsWith('round')) : [];
+    roundFolders.sort((a, b) => b.name.localeCompare(a.name));
+
+    if (!chairMenuCache) {
+        const [filearrayChair, filearrayClara, filearrayAllFiles, testData] = await Promise.all([
+            getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at"),
+            getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at"),
+            getAllFilesRecursive(submitterFolder, "name,type,id,parent,created_at"),
+            getFile(DACCmembers)
+        ]);
+
+        // Map roundId to all files in submitterFolder
+        if (filearrayAllFiles && Array.isArray(filearrayAllFiles)) {
+            filearrayAllFiles.forEach(file => {
+                if (file && file.parent && file.parent.id) {
+                    const round = roundFolders.find(r => r && r.id === file.parent.id);
+                    if (round) {
+                        file.roundId = round.id;
                     }
                 }
-                if (hasIncompleteTask) break;
+            });
+        }
+
+        const { data } = csv2Json(testData);
+        const userEmail = JSON.parse(localStorage.parms).login;
+        const chairEntry = chairsInfo.find(element => element && element.email === userEmail);
+        const consortium = chairEntry ? chairEntry.consortium : "";
+        const daccEmails = (data && Array.isArray(data)) ? data.filter(item => item && item['DACC']==consortium).map(dt => dt['Email']).splice(1) : [];
+
+        const findRoundId = (fileName) => {
+            if (!filearrayAllFiles || !Array.isArray(filearrayAllFiles)) return null;
+            const match = filearrayAllFiles.find(f => f && f.name === fileName);
+            return match ? match.roundId : null;
+        };
+
+        const filesIncompleted = [];
+        
+        // Process filearrayChair in parallel
+        const chairTaskPromises = (filearrayChair && Array.isArray(filearrayChair)) ? filearrayChair.map(async (obj) => {
+            if (!obj || !obj.id) return [];
+            const [tasks, comments] = await Promise.all([getTaskList(obj.id), listComments(obj.id)]);
+            const incompleteItems = [];
+            
+            let hasIncompleteTask = false;
+            if (tasks && tasks.entries && tasks.entries.length != 0) {
+                for (let items of tasks.entries) {
+                    if (items && items.task_assignment_collection && items.task_assignment_collection.entries) {
+                        for (let itemtasks of items.task_assignment_collection.entries) {
+                            if (itemtasks && itemtasks.status === 'incomplete') {
+                                hasIncompleteTask = true;
+                                if (itemtasks.item) incompleteItems.push(itemtasks.item);
+                                break;
+                            }
+                        }
+                    }
+                    if (hasIncompleteTask) break;
+                }
             }
-        }
-        
-        // If no incomplete task, check if file has no comments
-        // Handle case where comments is returned as a string
-        let commentsObj = comments;
-        if (typeof comments === 'string') {
-            try {
-                commentsObj = JSON.parse(comments);
-            } catch (e) {
-                commentsObj = null;
+            
+            // If no incomplete task, check if file has no comments
+            let commentsObj = comments;
+            if (typeof comments === 'string') {
+                try {
+                    commentsObj = JSON.parse(comments);
+                } catch (e) {
+                    commentsObj = null;
+                }
             }
-        }
+            
+            const hasComments = commentsObj && commentsObj.entries && Array.isArray(commentsObj.entries) && commentsObj.entries.length > 0;
+            
+            if (!hasIncompleteTask && !hasComments) {
+                incompleteItems.push(obj);
+            }
+            
+            return incompleteItems;
+        }) : [];
         
-        const hasComments = commentsObj && commentsObj.entries && Array.isArray(commentsObj.entries) && commentsObj.entries.length > 0;
+        const chairResults = await Promise.all(chairTaskPromises);
         
-        if (!hasIncompleteTask && !hasComments) {
-            incompleteItems.push(obj);
-        }
-        
-        return incompleteItems;
-    });
-    
-    const chairResults = await Promise.all(chairTaskPromises);
-    
-    // Flatten results and remove duplicates
-    chairResults.forEach(items => {
-        items.forEach(item => {
-            if (filesIncompleted.findIndex(element => element.id === item.id) === -1) {
-                filesIncompleted.push(item);
+        // Flatten results and remove duplicates
+        chairResults.forEach(items => {
+            if (items && Array.isArray(items)) {
+                items.forEach(item => {
+                    if (item && item.id && filesIncompleted.findIndex(element => element && element.id === item.id) === -1) {
+                        item.roundId = findRoundId(item.name);
+                        filesIncompleted.push(item);
+                    }
+                });
             }
         });
-    });
 
-    //console.log("2");
-
-    const filesClaraIncompleted = [];
-    
-    // Process filearrayClara in parallel
-    const claraTaskPromises = filearrayClara.map(async (obj) => {
-        const [tasks, comments] = await Promise.all([getTaskList(obj.id), listComments(obj.id)]);
-        const incompleteItems = [];
+        const filesClaraIncompleted = [];
         
-        let hasIncompleteTask = false;
-        if (tasks && tasks.entries && tasks.entries.length != 0) {
-            for (let items of tasks.entries) {
-                for (let itemtasks of items.task_assignment_collection.entries) {
-                    if (itemtasks.status === 'incomplete') {
-                        hasIncompleteTask = true;
-                        incompleteItems.push(itemtasks.item);
-                        break;
+        // Process filearrayClara in parallel
+        const claraTaskPromises = (filearrayClara && Array.isArray(filearrayClara)) ? filearrayClara.map(async (obj) => {
+            if (!obj || !obj.id) return [];
+            const [tasks, comments] = await Promise.all([getTaskList(obj.id), listComments(obj.id)]);
+            const incompleteItems = [];
+            
+            let hasIncompleteTask = false;
+            if (tasks && tasks.entries && tasks.entries.length != 0) {
+                for (let items of tasks.entries) {
+                    if (items && items.task_assignment_collection && items.task_assignment_collection.entries) {
+                        for (let itemtasks of items.task_assignment_collection.entries) {
+                            if (itemtasks && itemtasks.status === 'incomplete') {
+                                hasIncompleteTask = true;
+                                if (itemtasks.item) incompleteItems.push(itemtasks.item);
+                                break;
+                            }
+                        }
+                    }
+                    if (hasIncompleteTask) break;
+                }
+            }
+            
+            // If no incomplete task, check if file has no comments
+            let commentsObj = comments;
+            if (typeof comments === 'string') {
+                try {
+                    commentsObj = JSON.parse(comments);
+                } catch (e) {
+                    commentsObj = null;
+                }
+            }
+            
+            const hasComments = commentsObj && commentsObj.entries && Array.isArray(commentsObj.entries) && commentsObj.entries.length > 0;
+            
+            if (!hasIncompleteTask && !hasComments) {
+                incompleteItems.push(obj);
+            }
+            
+            return incompleteItems;
+        }) : [];
+        
+        const claraResults = await Promise.all(claraTaskPromises);
+        
+        // Flatten results and remove duplicates
+        claraResults.forEach(items => {
+            if (items && Array.isArray(items)) {
+                items.forEach(item => {
+                    if (item && item.id && filesClaraIncompleted.findIndex(element => element && element.id === item.id) === -1) {
+                        // Find the matching file in submitterFolder
+                        const submitterFile = (filearrayAllFiles && Array.isArray(filearrayAllFiles)) ? filearrayAllFiles.find(f => f && f.name === item.name) : null;
+                        if (submitterFile) {
+                            filesClaraIncompleted.push(submitterFile);
+                        } else {
+                            item.roundId = findRoundId(item.name);
+                            filesClaraIncompleted.push(item);
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Check for matching files in returnToSubmitterFolder and fetch response comments
+        const returnFolderFiles = await getAllFilesRecursive(returnToSubmitterFolder);
+        if (returnFolderFiles && Array.isArray(returnFolderFiles)) {
+            for (const claraFile of filesClaraIncompleted) {
+                if (!claraFile || !claraFile.name) continue;
+                const matchingFile = returnFolderFiles.find(f => f && f.name === claraFile.name);
+                if (matchingFile) {
+                    const commentsResponse = await listComments(matchingFile.id);
+                    if (commentsResponse) {
+                        const comments = JSON.parse(commentsResponse).entries;
+                        if (comments && Array.isArray(comments)) {
+                            claraFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
+                            
+                            const chairComments = comments.filter(c => {
+                                if (!c || !c.message) return false;
+                                const message = c.message;
+                                const ratingMatch = message.match(/Rating:\s*(\w+)/i);
+                                const rating = ratingMatch ? ratingMatch[1].trim() : null;
+                                const isChair = (c.created_by && chairsInfo.some(chair => chair && chair.email === c.created_by.login)) || message.startsWith('Consortium');
+                                const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+                                return isChair && requiresResponse && !message.startsWith('Response ID:');
+                            });
+                            
+                            claraFile.isReplyCompleted = chairComments.every(chairComment => {
+                                if (!chairComment || !chairComment.message) return false;
+                                const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
+                                const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
+                                return claraFile.responseComments && claraFile.responseComments.some(resComment => resComment && resComment.message && resComment.message.includes(`Response ID: ${effectiveId}`));
+                            });
+                        }
                     }
                 }
-                if (hasIncompleteTask) break;
             }
         }
-        
-        // If no incomplete task, check if file has no comments
-        // Handle case where comments might be a string
-        let commentsObj = comments;
-        if (typeof comments === 'string') {
-            try {
-                commentsObj = JSON.parse(comments);
-            } catch (e) {
-                commentsObj = null;
-            }
-        }
-        
-        const hasComments = commentsObj && commentsObj.entries && Array.isArray(commentsObj.entries) && commentsObj.entries.length > 0;
-        
-        if (!hasIncompleteTask && !hasComments) {
-            incompleteItems.push(obj);
-        }
-        
-        return incompleteItems;
-    });
-    
-    const claraResults = await Promise.all(claraTaskPromises);
-    
-    // Flatten results and remove duplicates
-    claraResults.forEach(items => {
-        items.forEach(item => {
-            if (filesClaraIncompleted.findIndex(element => element.id === item.id) === -1) {
-                // Find the matching file in submitterFolder
-                const submitterFile = filearrayAllFiles.find(f => f.name === item.name);
-                if (submitterFile) {
-                    filesClaraIncompleted.push(submitterFile);
-                } else {
-                    filesClaraIncompleted.push(item);
-                }
-            }
-        });
-    });
-    
-    // Check for matching files in returnToSubmitterFolder and fetch response comments
-    const returnFolderFiles = await getAllFilesRecursive(returnToSubmitterFolder);
-    for (const claraFile of filesClaraIncompleted) {
-        const matchingFile = returnFolderFiles.find(f => f.name === claraFile.name);
-        //console.log(matchingFile)
-        if (matchingFile) {
-            const commentsResponse = await listComments(matchingFile.id);
-            const comments = JSON.parse(commentsResponse).entries;
-            claraFile.responseComments = comments.filter(c => c.message.startsWith('Response ID:'));
-            
-            const chairComments = comments.filter(c => {
-                const message = c.message;
-                const ratingMatch = message.match(/Rating:\s*(\w+)/i);
-                const rating = ratingMatch ? ratingMatch[1].trim() : null;
-                const isChair = chairsInfo.some(chair => chair.email === c.created_by.login) || message.startsWith('Consortium');
-                const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
-                return isChair && requiresResponse && !message.startsWith('Response ID:');
-            });
-            
-            claraFile.isReplyCompleted = chairComments.every(chairComment => {
-                const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
-                const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
-                return claraFile.responseComments.some(resComment => resComment.message.includes(`Response ID: ${effectiveId}`));
-            });
-        }
+
+        chairMenuCache = {
+            filesIncompleted,
+            filesClaraIncompleted,
+            filearrayAllFiles,
+            daccEmails,
+            consortium,
+            message: messagesForChair[userChairItem.id]
+        };
     }
 
-    const message = messagesForChair[userChairItem.id];
+    const renderSelectedRound = async (selectedRoundId) => {
+        showAnimation();
+        
+        const filteredIncompleted = selectedRoundId === 'all' ? chairMenuCache.filesIncompleted : chairMenuCache.filesIncompleted.filter(f => f.roundId === selectedRoundId);
+        const filteredClara = selectedRoundId === 'all' ? chairMenuCache.filesClaraIncompleted : chairMenuCache.filesClaraIncompleted.filter(f => f.roundId === selectedRoundId);
+        const filteredAllFiles = selectedRoundId === 'all' ? chairMenuCache.filearrayAllFiles : chairMenuCache.filearrayAllFiles.filter(f => f.roundId === selectedRoundId);
 
-    var template = `
-        <div class="general-bg padding-bottom-1rem">
-            <div class="container body-min-height">
-                <div class="main-summary-row">
-                    <div class="align-left">
-                        <h1 class="page-header">${message}</h1>
+        var template = `
+            <div class="general-bg padding-bottom-1rem">
+                <div class="container body-min-height">
+                    <div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="align-left">
+                            <h1 class="page-header">${chairMenuCache.message}</h1>
+                        </div>
+                        <div id="roundSelectionContainer" style="margin-left: 20px;"></div>
                     </div>
-                </div>
-                <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                    <ul class='nav nav-tabs mb-3' role='tablist'>
-                        <li class='nav-item active' role='presentation'>
-                            <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'>
-                                New Concepts for Review (${filesIncompleted.length})
-                            </a>
-                        </li>
-                        <li class='nav-item' role='presentation'>
-                            <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>
-                                Concepts Requiring Clarifications (${filesClaraIncompleted.length})
-                            </a>
-                        </li>
-                        <li class='nav-item' role='presentation'>
-                            <a class='nav-link' id='daccDecisionTab' href='#daccDecision' data-mdb-toggle="tab" role='tab' aria-controls='daccDecision' aria-selected='true'>
-                                DACC Decision
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="selectedTab">
-    `;
+                    <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                        <ul class='nav nav-tabs mb-3' role='tablist'>
+                            <li class='nav-item active' role='presentation'>
+                                <a class='nav-link' id='recommendationTab' href='#recommendation' data-mdb-toggle="tab" role='tab' aria-controls='recommendation' aria-selected='true'>
+                                    New Concepts for Review (${filteredIncompleted.length})
+                                </a>
+                            </li>
+                            <li class='nav-item' role='presentation'>
+                                <a class='nav-link' id='conceptNeedingClarificationTab' href='#conceptNeedingClarification' data-mdb-toggle="tab" role='tab' aria-controls='conceptNeedingClarification' aria-selected='true'>
+                                    Concepts Requiring Clarifications (${filteredClara.length})
+                                </a>
+                            </li>
+                            <li class='nav-item' role='presentation'>
+                                <a class='nav-link' id='daccDecisionTab' href='#daccDecision' data-mdb-toggle="tab" role='tab' aria-controls='daccDecision' aria-selected='true'>
+                                    DACC Decision
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="selectedTab">
+        `;
 
-    template += `
-        <div class='tab-pane fade show active' id='recommendation' role='tabpanel' aria-labeledby='recommendationTab'>
-            <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>
-                Send Email to DACC
-            </a>
-    `;
-    
-    template += renderFilePreviewDropdown(filesIncompleted, "recommendation");
-
-    template += `
-        <div class='tab-pane fade' id='conceptNeedingClarification' role='tabpanel' aria-labeledby='conceptNeedingClarificationTab'>
-            <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>
-                Send Email to DACC
-            </a>
-    `;
-    
-    template += renderFilePreviewDropdown(filesClaraIncompleted, "conceptNeedingClarification");
-
-    template += `
-        <div class='tab-pane fade' id='daccDecision' role='tabpanel' aria-labeledby='daccDecisionTab'>
-        Loading...
-        </div>
-    `;
-    
-    // <a href="mailto:${daccEmails.join("; ")}" id='email' class='btn btn-dark'>
-    //     Send Email to DACC
-    // </a>
-    
-    template += `<div id='filePreview'>`;
-    if (filesIncompleted.length !== 0 || filesClaraIncompleted.length !== 0) {
         template += `
-            <div class='row'>
-                <div id='boxFilePreview' class="col-lg-8 col-12 preview-container"></div>
-                <div id='sidePanel' class='col-lg-4 col-12 mt-2' style='display: block;'>
-                    <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;">
-                        <form>
-                            <label for="message"><b>Enter Message for submitter</b></label>
-                            <div class='text-muted small'>Submitter will only see the below comment after final decision is made.</div>
-                            <div class="input-group">
-                                <textarea id="message" name="message" rows="4" class="form-control"></textarea>
-                            </div>
-                            <div class='mt-2'>
-                                <label for="grade">Select recommendation:</label>
-                                <select name="grade" id="grade2" class="form-select" aria-label="Select Document to Review">
-                                    <option value = "1"> 1 - Approved as submitted</option>
-                                    <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
-                                    <option value = "3"> 3 - Approved, but data release will be delayed </option>
-                                    <option value = "4"> 4 - Not approved </option>
-                                    <option value = "5"> 5 - Decision requires clarification</option>
-                                    <option value = "NA"> NA - Not Applicable</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="buttonsubmit button-glow-red mt-2" value="submitted" onclick="this.classList.toggle('buttonsubmit--loading')">
-                                <span class="buttonsubmit__text"> Submit </span>
-                            </button>
-                            <div id="commentWarning" class="text-danger small mt-1" style="display: none;">A comment is required with this score.</div>
-                        </form>
-                    </div>
-                    <div style="height: 20px; border-bottom: 2px solid #e9ecef; margin: 20px 0;"></div>
-                    <div id='fileComments' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;"></div>
+            <div class='tab-pane fade show active' id='recommendation' role='tabpanel' aria-labeledby='recommendationTab'>
+                <a href="mailto:${chairMenuCache.daccEmails.join("; ")}" id='email' class='btn btn-dark'>
+                    Send Email to DACC
+                </a>
+        `;
+        
+        template += renderFilePreviewDropdown(filteredIncompleted, "recommendation");
 
-                </div>
+        template += `
+            <div class='tab-pane fade' id='conceptNeedingClarification' role='tabpanel' aria-labeledby='conceptNeedingClarificationTab'>
+                <a href="mailto:${chairMenuCache.daccEmails.join("; ")}" id='email' class='btn btn-dark'>
+                    Send Email to DACC
+                </a>
+        `;
+        
+        template += renderFilePreviewDropdown(filteredClara, "conceptNeedingClarification");
+
+        template += `
+            <div class='tab-pane fade' id='daccDecision' role='tabpanel' aria-labeledby='daccDecisionTab'>
+            Loading...
             </div>
         `;
-    }
-    
-    template += `
-        </div>
-    </div>
-    `;
-    
-    document.getElementById("chairFileView").innerHTML = template;
-    await viewFinalDecisionFilesTemplate(filearrayAllFiles);
-    commentSubmit(consortium);
-    
-    // Add form validation for finalChairDecision
-    setTimeout(() => {
-        const messageTextarea = document.getElementById('message');
-        const gradeSelect = document.getElementById('grade2');
-        const submitButton = document.querySelector('#finalChairDecision button[type="submit"]');
         
-        if (messageTextarea && gradeSelect && submitButton) {
-            const warningDiv = document.getElementById('commentWarning');
-            
-            const validateForm = () => {
-                const grade = gradeSelect.value;
-                const message = messageTextarea.value.trim();
-                
-                if (grade !== '1' && grade.toUpperCase() !== 'NA' && message === '') {
-                    submitButton.disabled = true;
-                    submitButton.style.opacity = '0.5';
-                    warningDiv.style.display = 'block';
-                } else {
-                    submitButton.disabled = false;
-                    submitButton.style.opacity = '1';
-                    warningDiv.style.display = 'none';
-                }
-            };
-            
-            messageTextarea.addEventListener('input', validateForm);
-            gradeSelect.addEventListener('change', validateForm);
-            validateForm(); // Initial check
+        template += `<div id='filePreview'>`;
+        if (filteredIncompleted.length !== 0 || filteredClara.length !== 0) {
+            template += `
+                <div class='row'>
+                    <div id='boxFilePreview' class="col-lg-8 col-12 preview-container"></div>
+                    <div id='sidePanel' class='col-lg-4 col-12 mt-2' style='display: block;'>
+                        <div id='finalChairDecision' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;">
+                            <form>
+                                <label for="message"><b>Enter Message for submitter</b></label>
+                                <div class='text-muted small'>Submitter will only see the below comment after final decision is made.</div>
+                                <div class="input-group">
+                                    <textarea id="message" name="message" rows="4" class="form-control"></textarea>
+                                </div>
+                                <div class='mt-2'>
+                                    <label for="grade">Select recommendation:</label>
+                                    <select name="grade" id="grade2" class="form-select" aria-label="Select Document to Review">
+                                        <option value = "1"> 1 - Approved as submitted</option>
+                                        <option value = "2"> 2 - Approved, pending conditions/clarification of some issues </option>
+                                        <option value = "3"> 3 - Approved, but data release will be delayed </option>
+                                        <option value = "4"> 4 - Not approved </option>
+                                        <option value = "5"> 5 - Decision requires clarification</option>
+                                        <option value = "NA"> NA - Not Applicable</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="buttonsubmit button-glow-red mt-2" value="submitted">
+                                    <span class="buttonsubmit__text"> Submit </span>
+                                </button>
+                                <div id="commentWarning" class="text-danger small mt-1" style="display: none;">A comment is required with this score.</div>
+                            </form>
+                        </div>
+                        <div style="height: 20px; border-bottom: 2px solid #e9ecef; margin: 20px 0;"></div>
+                        <div id='fileComments' class="card-body submit-comment-recommendation" style="background-color:#FFFFFF; margin-top: 20px;"></div>
+
+                    </div>
+                </div>
+            `;
         }
-    }, 300);
-    
-    // Add resize listener for responsive preview container
-    const handleResize = () => {
-        const previewContainer = document.getElementById('boxFilePreview');
-        if (previewContainer) {
-            if (window.innerWidth >= 992) {
-                previewContainer.style.maxWidth = '66.666667%';
-                previewContainer.style.flex = '0 0 66.666667%';
-            } else {
-                previewContainer.style.maxWidth = '100%';
-                previewContainer.style.flex = '0 0 100%';
-            }
+        
+        template += `
+            </div>
+        </div>
+        `;
+        
+        document.getElementById("chairFileView").innerHTML = template;
+
+        // Add round selection dropdown
+        const roundSelectionContainer = document.getElementById('roundSelectionContainer');
+        if (roundSelectionContainer && roundFolders.length > 0) {
+            let dropdownHtml = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="roundSelect"><b>Select Round:</b></label>
+                    <select id="roundSelect" class="form-select" style="width: auto;">
+                        <option value="all">All Rounds</option>
+            `;
+            roundFolders.forEach(folder => {
+                dropdownHtml += `<option value="${folder.id}" ${folder.id === selectedRoundId ? 'selected' : ''}>${folder.name}</option>`;
+            });
+            dropdownHtml += `
+                    </select>
+                </div>
+            `;
+            roundSelectionContainer.innerHTML = dropdownHtml;
+
+            document.getElementById('roundSelect').addEventListener('change', async (e) => {
+                await renderSelectedRound(e.target.value);
+            });
         }
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Call once to set initial state
-    
-    downloadAll('recommendation', filesIncompleted)
-    downloadAll('conceptNeedingClarification', filesClaraIncompleted)
-    //console.log(filesIncompleted);
-    if (!!filesIncompleted.length) {
-        showPreviewInPane(filesIncompleted[0].id);
-        showCommentsInPane(filesIncompleted[0].id);
-        switchFilesWithComments("recommendation", filesIncompleted);
-        document.getElementById("recommendationselectedDoc").children[0].selected = true;
+
+        await viewFinalDecisionFilesTemplate(filteredAllFiles);
+        commentSubmit(chairMenuCache.consortium);
+        
+        // Add form validation for finalChairDecision
         setTimeout(() => {
-            const finalDecisionForm = document.getElementById('finalChairDecision');
-            if (finalDecisionForm) {
-                finalDecisionForm.style.display = 'block';
+            const messageTextarea = document.getElementById('message');
+            const gradeSelect = document.getElementById('grade2');
+            const submitButton = document.querySelector('#finalChairDecision button[type="submit"]');
+            
+            if (messageTextarea && gradeSelect && submitButton) {
+                const warningDiv = document.getElementById('commentWarning');
+                
+                const validateForm = () => {
+                    const grade = gradeSelect.value;
+                    const message = messageTextarea.value.trim();
+                    
+                    if (grade !== '1' && grade.toUpperCase() !== 'NA' && message === '') {
+                        submitButton.disabled = true;
+                        submitButton.style.opacity = '0.5';
+                        warningDiv.style.display = 'block';
+                    } else {
+                        submitButton.disabled = false;
+                        submitButton.style.opacity = '1';
+                        warningDiv.style.display = 'none';
+                    }
+                };
+                
+                messageTextarea.addEventListener('input', validateForm);
+                gradeSelect.addEventListener('change', validateForm);
+                validateForm(); // Initial check
             }
-        }, 200);
-    } else if (!!filesClaraIncompleted.length) {
-        showPreviewInPane(filesClaraIncompleted[0].id);
-        if (filesClaraIncompleted[0].responseComments) {
-            showCommentsWithResponses(filesClaraIncompleted[0].id, filesClaraIncompleted[0].responseComments);
+        }, 300);
+        
+        // Add resize listener for responsive preview container
+        const handleResize = () => {
+            const previewContainer = document.getElementById('boxFilePreview');
+            if (previewContainer) {
+                if (window.innerWidth >= 992) {
+                    previewContainer.style.maxWidth = '66.666667%';
+                    previewContainer.style.flex = '0 0 66.666667%';
+                } else {
+                    previewContainer.style.maxWidth = '100%';
+                    previewContainer.style.flex = '0 0 100%';
+                }
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Call once to set initial state
+        
+        downloadAll('recommendation', filteredIncompleted)
+        downloadAll('conceptNeedingClarification', filteredClara)
+        
+        if (!!filteredIncompleted.length) {
+            showPreviewInPane(filteredIncompleted[0].id);
+            showCommentsInPane(filteredIncompleted[0].id);
+            switchFilesWithComments("recommendation", filteredIncompleted);
+            document.getElementById("recommendationselectedDoc").children[0].selected = true;
+            setTimeout(() => {
+                const finalDecisionForm = document.getElementById('finalChairDecision');
+                if (finalDecisionForm) {
+                    finalDecisionForm.style.display = 'block';
+                }
+            }, 200);
+        } else if (!!filteredClara.length) {
+            showPreviewInPane(filteredClara[0].id);
+            if (filteredClara[0].responseComments) {
+                showCommentsWithResponses(filteredClara[0].id, filteredClara[0].responseComments);
+            } else {
+                showCommentsSub(filteredClara[0].id);
+            }
+            switchFilesWithComments("conceptNeedingClarification", filteredClara);
+            document.getElementById("conceptNeedingClarificationTab").click();
         } else {
-            showCommentsSub(filesClaraIncompleted[0].id);
+            const filePreview = document.getElementById("filePreview");
+            if (filePreview) {
+                filePreview.classList.remove("d-block");
+                filePreview.classList.add("d-None");
+            }
         }
-        switchFilesWithComments("conceptNeedingClarification", filesClaraIncompleted);
-        document.getElementById("conceptNeedingClarificationTab").click();
-    } else {
-        document.getElementById("filePreview").classList.remove("d-block");
-        document.getElementById("filePreview").classList.add("d-None");
-    }
 
-    switchTabs(
-        "recommendation",
-        ["daccDecision", 'conceptNeedingClarification'],
-        filesIncompleted
-    );
-    switchTabs(
-        "conceptNeedingClarification",
-        ["recommendation", 'daccDecision'],
-        filesClaraIncompleted
-    );
-    switchTabs(
-        "daccDecision",
-        ["recommendation", 'conceptNeedingClarification'],
-        filesIncompleted
-    );
+        switchTabs(
+            "recommendation",
+            ["daccDecision", 'conceptNeedingClarification'],
+            filteredIncompleted
+        );
+        switchTabs(
+            "conceptNeedingClarification",
+            ["recommendation", 'daccDecision'],
+            filteredClara
+        );
+        switchTabs(
+            "daccDecision",
+            ["recommendation", 'conceptNeedingClarification'],
+            filteredIncompleted
+        );
 
-    document.getElementById("recommendationTab").click();
-    // if (localStorage.getItem("currentTab")) {
-    //     const currTab = localStorage.getItem("currentTab");
-    //     if (document.getElementById(currTab) != null) {
-    //         document.getElementById(currTab).click();
-    //     }
-    // }
-    
-    // return template;
-    hideAnimation();
+        document.getElementById("recommendationTab").click();
+        hideAnimation();
+    };
+
+    await renderSelectedRound('all');
 };
+
 
 export const chairMenuTemplate = () => {
     // const userInfo = JSON.parse(localStorage.getItem('parms'));
@@ -652,79 +729,109 @@ export const chairMenuTemplate = () => {
 };
 
 export const commentSubmit = async (consortium) => {
-    let submitComment = async (e) => {
+    const submitComment = async (e) => {
         e.preventDefault();
         
-        const btn = document.activeElement;
+        const form = e.target;
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn.classList.contains('buttonsubmit--loading')) return;
+        
+        btn.classList.add('buttonsubmit--loading');
         btn.disabled = true;
         
-        const filesToSend = [];
-        const elements = document.querySelectorAll(`.tab-content .active option`);
-        //console.log({elements})
-        
-        for (let i = 0; i < elements.length; i++) {
-            if (elements[i].selected) {
-                filesToSend.push(elements[i].value);
-            }
-        }
-        
-        for (const fileId of filesToSend) {
-            //console.log(fileId);
+        try {
+            const activeTabPane = document.querySelector('.tab-content .tab-pane.active');
+            if (!activeTabPane) throw new Error("No active tab found");
             
-            let fileinfo = await getFileInfo(fileId);
-            let filename = fileinfo.name;
-            let allFiles = await getAllFilesRecursive(submitterFolder);
-            let entries = allFiles;
+            const selectedDocElement = activeTabPane.querySelector('select[id$="selectedDoc"]');
+            if (!selectedDocElement) throw new Error("No document selected");
             
-            let allFileMatch = entries.find(element => element.name === filename);
-            let tasklist = await getTaskList(fileId);
+            const fileId = selectedDocElement.value;
+            const gradeSelect = form.querySelector('#grade2');
+            const messageTextarea = form.querySelector('#message');
             
-            let grade = e.target[1].value;
-            let comment = e.target[0].value;
-            //let message = "Consortium: " + consortium + ", Rating: " + grade + "\nComment: " + comment;
-            let message = `Consortium: ${consortium}, Rating: ${grade}, Comment: ${comment}`;
-            //console.log(message);
+            if (!gradeSelect || !messageTextarea) throw new Error("Form elements not found");
+            
+            const grade = gradeSelect.value;
+            const comment = messageTextarea.value.trim();
+            const message = `Consortium: ${consortium}, Rating: ${grade}, Comment: ${comment}`;
+            
+            const fileinfo = await getFileInfo(fileId);
+            const filename = fileinfo.name;
+            
+            // Use cached all files if available, otherwise fetch
+            let allFiles = (chairMenuCache && chairMenuCache.filearrayAllFiles) ? chairMenuCache.filearrayAllFiles : await getAllFilesRecursive(submitterFolder, "name,id");
+            
+            const allFileMatch = allFiles.find(element => element.name === filename);
             
             await createComment(fileId, message);
+            
             if (allFileMatch && allFileMatch.id) {
                 await createComment(allFileMatch.id, message);
             } else {
-                alert('Error detected: Parent file cannot be found, score only recorded in local chair version.');
-                btn.disabled = false;
+                console.error("Parent file not found for:", filename);
+                alert('Error detected: Parent file cannot be found in the submitter folder. Score only recorded in local chair version.');
             }
-            if (grade === "5" || grade === "2"){
-                let clariFolder = chairsInfo.find(element => element.email === JSON.parse(localStorage.getItem('parms')).login).boxIdClara;
-                await moveFile(fileId, clariFolder)
+            
+            if (grade === "5" || grade === "2") {
+                const userEmail = JSON.parse(localStorage.parms).login;
+                const chairEntry = chairsInfo.find(element => element.email === userEmail);
+                if (chairEntry && chairEntry.boxIdClara) {
+                    await moveFile(fileId, chairEntry.boxIdClara);
+                }
             } else {
-                const taskEntries = tasklist.entries;
-                if (taskEntries.length !== 0) {
-                    for (let entry of taskEntries) {
-                        for (let item of entry.task_assignment_collection.entries) {
-                          console.log(item.status);
-                            if (item.status === 'incomplete') {
-                                console.log(item.status);
-                                await updateTaskAssignment(item.id, 'completed', 'You have completed your task');
+                const tasklist = await getTaskList(fileId);
+                if (tasklist && tasklist.entries && tasklist.entries.length !== 0) {
+                    for (let entry of tasklist.entries) {
+                        if (entry && entry.task_assignment_collection && entry.task_assignment_collection.entries) {
+                            for (let item of entry.task_assignment_collection.entries) {
+                                if (item.status === 'incomplete') {
+                                    await updateTaskAssignment(item.id, 'completed', 'You have completed your task');
+                                }
                             }
                         }
                     }
                 }
             }
+            
+            // Refresh and clear cache
+            await generateChairMenuFiles(true);
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert("An error occurred during submission. Please try again.");
+        } finally {
+            btn.classList.remove('buttonsubmit--loading');
+            btn.disabled = false;
         }
-        
-        // Refresh only the concept lists instead of full page reload
-        await generateChairMenuFiles();
-        btn.disabled = false;
     };
     
-    isElementLoaded('.nav-link.active').then((selector) => {
-        // console.log(selector);
-        // console.log(document.querySelector('.nav-link.active'));
-        const tab = document.querySelector('.nav-link.active').id.slice(0, -3);
-        const form = document.querySelector(".submit-comment-" + tab);
-        if (form) {
-            form.addEventListener("submit", submitComment);
+    // Attach listener to the form inside finalChairDecision
+    const attachListener = () => {
+        const decisionDiv = document.getElementById('finalChairDecision');
+        if (decisionDiv) {
+            const form = decisionDiv.querySelector('form');
+            if (form) {
+                // Remove existing listener if any (though innerHTML replacement should handle it)
+                form.removeEventListener("submit", submitComment);
+                form.addEventListener("submit", submitComment);
+                return true;
+            }
         }
-    })
+        return false;
+    };
+
+    if (!attachListener()) {
+        // Fallback if element not loaded yet
+        const observer = new MutationObserver((mutations, obs) => {
+            if (attachListener()) {
+                obs.disconnect();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Safety timeout
+        setTimeout(() => observer.disconnect(), 5000);
+    }
 };
 
 export const downloadAll = (tab, files) => {
