@@ -67,6 +67,38 @@ const getCurrentUserAuth = () => {
 let adminDataCache = null;
 let chairMenuCache = null;
 
+const updateProgressBar = (percentage, text) => {
+    const progressBar = document.getElementById('chairMenuProgressBar');
+    const progressText = document.getElementById('chairMenuProgressText');
+    const progressContainer = document.getElementById('chairMenuProgress');
+    
+    if (progressContainer) progressContainer.style.display = 'block';
+    if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+        progressBar.setAttribute('aria-valuenow', percentage);
+        progressBar.innerText = `${percentage}%`;
+    }
+    if (progressText) progressText.innerText = text;
+};
+
+const showProgressContainer = () => {
+    const chairFileView = document.getElementById('chairFileView');
+    if (chairFileView) {
+        chairFileView.innerHTML = `
+            <div id="chairMenuProgress" class="container mt-5 mb-5">
+                <div class="text-center mb-3">
+                    <h4>Loading Chair Menu Data</h4>
+                    <p class="text-muted">This initial load may take a moment while we sync with Box.</p>
+                </div>
+                <div class="progress" style="height: 35px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div id="chairMenuProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div id="chairMenuProgressText" class="text-center mt-2 font-weight-bold color-primary">Initializing...</div>
+            </div>
+        `;
+    }
+};
+
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
     const results = [];
     const CHUNK_SIZE = 10;
@@ -240,18 +272,22 @@ export const switchFilesWithComments = (tab, files = []) => {
 
 export const generateChairMenuFiles = async (forceRefresh = false) => {
     const userChairItem = getCurrentUserAuth();
-    // console.log(userChairItem);
-    
     if (!userChairItem) return null;
     if (forceRefresh) chairMenuCache = null;
     
-    showAnimation();
+    if (!chairMenuCache) {
+        showProgressContainer();
+        updateProgressBar(5, "Connecting to Box...");
+    } else {
+        showAnimation();
+    }
     
     const folderItems = await getFolderItems(submitterFolder);
     const roundFolders = (folderItems && folderItems.entries) ? folderItems.entries.filter(item => item && item.type === 'folder' && item.name && item.name.toLowerCase().startsWith('round')) : [];
     roundFolders.sort((a, b) => b.name.localeCompare(a.name));
 
     if (!chairMenuCache) {
+        updateProgressBar(15, "Fetching file manifests...");
         const [filearrayChair, filearrayClara, filearrayAllFiles, testData] = await Promise.all([
             getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at"),
             getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at"),
@@ -259,6 +295,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             getFile(DACCmembers)
         ]);
 
+        updateProgressBar(30, "Mapping rounds and consortium data...");
         // Map roundId to all files in submitterFolder
         if (filearrayAllFiles && Array.isArray(filearrayAllFiles)) {
             filearrayAllFiles.forEach(file => {
@@ -285,6 +322,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
         const filesIncompleted = [];
         
+        updateProgressBar(45, `Analyzing ${filearrayChair.length} new concepts...`);
         // Process filearrayChair in parallel
         const chairTaskPromises = (filearrayChair && Array.isArray(filearrayChair)) ? filearrayChair.map(async (obj) => {
             if (!obj || !obj.id) return [];
@@ -342,6 +380,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
         const filesClaraIncompleted = [];
         
+        updateProgressBar(65, `Analyzing ${filearrayClara.length} concepts requiring clarification...`);
         // Process filearrayClara in parallel
         const claraTaskPromises = (filearrayClara && Array.isArray(filearrayClara)) ? filearrayClara.map(async (obj) => {
             if (!obj || !obj.id) return [];
@@ -403,41 +442,82 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             }
         });
         
-        // Check for matching files in returnToSubmitterFolder and fetch response comments
-        const returnFolderFiles = await getAllFilesRecursive(returnToSubmitterFolder);
-        if (returnFolderFiles && Array.isArray(returnFolderFiles)) {
-            for (const claraFile of filesClaraIncompleted) {
-                if (!claraFile || !claraFile.name) continue;
-                const matchingFile = returnFolderFiles.find(f => f && f.name === claraFile.name);
-                if (matchingFile) {
-                    const commentsResponse = await listComments(matchingFile.id);
-                    if (commentsResponse) {
-                        const comments = JSON.parse(commentsResponse).entries;
-                        if (comments && Array.isArray(comments)) {
-                            claraFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
-                            
-                            const chairComments = comments.filter(c => {
-                                if (!c || !c.message) return false;
-                                const message = c.message;
-                                const ratingMatch = message.match(/Rating:\s*(\w+)/i);
-                                const rating = ratingMatch ? ratingMatch[1].trim() : null;
-                                const isChair = (c.created_by && chairsInfo.some(chair => chair && chair.email === c.created_by.login)) || message.startsWith('Consortium');
-                                const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
-                                return isChair && requiresResponse && !message.startsWith('Response ID:');
-                            });
-                            
-                            claraFile.isReplyCompleted = chairComments.every(chairComment => {
-                                if (!chairComment || !chairComment.message) return false;
-                                const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
-                                const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
-                                return claraFile.responseComments && claraFile.responseComments.some(resComment => resComment && resComment.message && resComment.message.includes(`Response ID: ${effectiveId}`));
-                            });
-                        }
+        updateProgressBar(85, "Locating submitter response folders...");
+        // Optimized: Instead of one giant recursive call, we'll fetch response files more granularly
+        const userFolders = await getFolderItems(returnToSubmitterFolder);
+        const responseFiles = [];
+        
+        if (userFolders && userFolders.entries) {
+            let foldersProcessed = 0;
+            const totalFolders = userFolders.entries.filter(f => f.type === 'folder').length;
+            
+            await Promise.all(userFolders.entries.map(async (userFolder) => {
+                if (userFolder.type !== 'folder') return;
+                try {
+                    const subfolders = await getFolderItems(userFolder.id);
+                    const requiringInputFolder = subfolders.entries.find(f => f.name === 'Requiring Input' && f.type === 'folder');
+                    if (requiringInputFolder) {
+                        const files = await getAllFilesRecursive(requiringInputFolder.id, "name,type,id,parent,created_at");
+                        responseFiles.push(...files);
                     }
+                } catch (e) {
+                    console.error("Error scanning user folder:", userFolder.name, e);
+                } finally {
+                    foldersProcessed++;
+                    const subPercent = 85 + Math.floor((foldersProcessed / totalFolders) * 5); // 85% to 90%
+                    updateProgressBar(subPercent, `Scanning submitter responses (${foldersProcessed}/${totalFolders})...`);
                 }
+            }));
+        }
+
+        updateProgressBar(90, "Syncing individual response histories...");
+        if (responseFiles.length > 0) {
+            let syncCount = 0;
+            const totalToSync = filesClaraIncompleted.length;
+            
+            if (totalToSync > 0) {
+                await Promise.all(filesClaraIncompleted.map(async (claraFile) => {
+                    try {
+                        if (!claraFile || !claraFile.name) return;
+                        const matchingFile = responseFiles.find(f => f && f.name === claraFile.name);
+                        if (matchingFile) {
+                            const commentsResponse = await listComments(matchingFile.id);
+                            if (commentsResponse) {
+                                const comments = JSON.parse(commentsResponse).entries;
+                                if (comments && Array.isArray(comments)) {
+                                    claraFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
+                                    
+                                    const chairComments = comments.filter(c => {
+                                        if (!c || !c.message) return false;
+                                        const message = c.message;
+                                        const ratingMatch = message.match(/Rating:\s*(\w+)/i);
+                                        const rating = ratingMatch ? ratingMatch[1].trim() : null;
+                                        const isChair = (c.created_by && chairsInfo.some(chair => chair && chair.email === c.created_by.login)) || message.startsWith('Consortium');
+                                        const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+                                        return isChair && requiresResponse && !message.startsWith('Response ID:');
+                                    });
+                                    
+                                    claraFile.isReplyCompleted = chairComments.every(chairComment => {
+                                        if (!chairComment || !chairComment.message) return false;
+                                        const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
+                                        const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
+                                        return claraFile.responseComments && claraFile.responseComments.some(resComment => resComment && resComment.message && resComment.message.includes(`Response ID: ${effectiveId}`));
+                                    });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error parsing comments for file:", claraFile.name, e);
+                    } finally {
+                        syncCount++;
+                        const subPercentage = 90 + Math.floor((syncCount / totalToSync) * 9); // 90% to 99%
+                        updateProgressBar(subPercentage, `Syncing histories (${syncCount}/${totalToSync})...`);
+                    }
+                }));
             }
         }
 
+        updateProgressBar(100, "Finalizing...");
         chairMenuCache = {
             filesIncompleted,
             filesClaraIncompleted,
@@ -629,6 +709,17 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         downloadAll('recommendation', filteredIncompleted)
         downloadAll('conceptNeedingClarification', filteredClara)
         
+        // Add listener for DACC Decision tab to lazy load the table
+        const daccTab = document.getElementById('daccDecisionTab');
+        if (daccTab) {
+            daccTab.addEventListener('click', async () => {
+                const daccPane = document.getElementById('daccDecision');
+                if (daccPane && daccPane.innerHTML.includes('Loading...')) {
+                    await viewFinalDecisionFilesTemplate(filteredAllFiles);
+                }
+            }, { once: true });
+        }
+
         if (!!filteredIncompleted.length) {
             showPreviewInPane(filteredIncompleted[0].id);
             showCommentsInPane(filteredIncompleted[0].id);
