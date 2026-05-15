@@ -468,6 +468,92 @@ export const setupDownloadComments = (entries) => {
     }
 };
 
+const normalizeConceptDocumentHtml = (html) => {
+    const valueHeadingLabels = [
+        "Revision Status",
+        "Date",
+        "Project Title",
+        "Is this an amendment",
+        "Amendment",
+        "Contact Investigator(s)",
+        "Institution(s)",
+        "Contact Email",
+        "Member of Consortia or Study / Trial Group?",
+        "Confluence Study Acronym(s) for the Contact Investigator",
+        "OTHER Investigators and their institutions",
+        "ALL Investigators (and Institutions) who require access",
+        "Consortia or Study / Trial Group data being requested",
+        "Primary Endpoint",
+        "Subtype of Breast Cancer",
+        "Other Primary Endpoint",
+        "Genotyping",
+        "Data Requested From",
+        "Carrier Status requested",
+        "Risk Factor Variables",
+        "Pathology Variables",
+        "Survival and Treatment Variables",
+        "Mammographic Density Variable",
+        "Confluence authorship requirements"
+    ];
+    const sectionHeadingLabels = [
+        "Concept Background",
+        "Concept Aims",
+        "Description of Analysis Plan",
+        "Time Plan",
+        "Any other considerations you would like the DACC to be aware of"
+    ];
+    const knownHeadingLabels = [...valueHeadingLabels, ...sectionHeadingLabels]
+        .sort((a, b) => b.length - a.length);
+    const normalizeText = (value) => value.replace(/\s+/g, " ").trim();
+    const getMatchingLabel = (text, labels = knownHeadingLabels) => {
+        const normalizedText = normalizeText(text).toLowerCase();
+        return labels.find(label => {
+            const normalizedLabel = label.toLowerCase();
+            if (!normalizedText.startsWith(normalizedLabel)) return false;
+            const nextCharacter = normalizedText.charAt(normalizedLabel.length);
+            return nextCharacter === "" || nextCharacter === ":" || (label.endsWith("?") && /\s/.test(nextCharacter));
+        });
+    };
+    const getValueAfterLabel = (text, label) => {
+        const value = normalizeText(text).slice(label.length);
+        return value.replace(/^:\s*/, "").trim();
+    };
+
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    template.content.querySelectorAll("h2, h3").forEach((heading) => {
+        if (!heading.parentNode) return;
+        const text = normalizeText(heading.textContent);
+        const label = getMatchingLabel(text, valueHeadingLabels);
+        if (!label) return;
+
+        const valueParts = [];
+        const inlineValue = getValueAfterLabel(text, label);
+        if (inlineValue) valueParts.push(inlineValue);
+
+        let nextElement = heading.nextElementSibling;
+        while (nextElement && /H[23]/.test(nextElement.tagName)) {
+            const nextText = normalizeText(nextElement.textContent);
+            if (!nextText || getMatchingLabel(nextText)) break;
+            valueParts.push(nextText);
+            const elementToRemove = nextElement;
+            nextElement = nextElement.nextElementSibling;
+            elementToRemove.remove();
+        }
+
+        const paragraph = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = label.endsWith("?") ? `${label} ` : `${label}: `;
+        paragraph.appendChild(strong);
+        valueParts.forEach((value, index) => {
+            if (index > 0) paragraph.appendChild(document.createElement("br"));
+            paragraph.appendChild(document.createTextNode(value));
+        });
+        heading.replaceWith(paragraph);
+    });
+    return template.innerHTML;
+};
+
 export const downloadCommentsAsWord = async (fileId) => {
     try {
         const [commentsResponse, originalFileResponse] = await Promise.all([
@@ -485,7 +571,7 @@ export const downloadCommentsAsWord = async (fileId) => {
         try {
             if (window.mammoth) {
                 const result = await window.mammoth.convertToHtml({arrayBuffer: arrayBuffer});
-                originalContent = result.value;
+                originalContent = normalizeConceptDocumentHtml(result.value);
             } else {
                 throw new Error('Mammoth.js not available');
             }
@@ -620,8 +706,8 @@ export const parseWordDocument = (text) => {
         return match ? match[1].trim() : '';
     };
     
-    const extractFieldNoColon = (label, text) => {
-        const regex = new RegExp(label + '\\s+([^\\n]+)', 'i');
+    const extractBetweenNoColon = (startLabel, endLabel, text) => {
+        const regex = new RegExp(startLabel + '\\s*([\\s\\S]*?)(?=' + endLabel + ':|$)', 'i');
         const match = text.match(regex);
         return match ? match[1].trim() : '';
     };
@@ -645,7 +731,7 @@ export const parseWordDocument = (text) => {
     // console.log('institution:', formData.institution);
     formData.email = extractField('Contact Email', text);
     // console.log('email:', formData.email);
-    formData.memcon = extractFieldNoColon('Member of Consortia or Study \\/ Trial Group\\?', text);
+    formData.memcon = extractBetweenNoColon('Member of Consortia or Study \\/ Trial Group\\?', 'Confluence Study Acronym\\(s\\) for the Contact Investigator', text);
     // console.log('memcon:', formData.memcon);
     formData.acro = extractField('Confluence Study Acronym\\(s\\) for the Contact Investigator', text);
     // console.log('acro:', formData.acro);
