@@ -27,7 +27,7 @@ export const chairsInfo = [
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"ahearntu@nih.gov", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
-    {id: 'user_7', email:"bkopchick@deloitte.com", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
+    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
 
 export const messagesForChair = {
@@ -61,11 +61,11 @@ export const readDocFile = async (id) => {
     return Array.from(textNodes).map(node => node.textContent).join(' ');
 }
 
-export const getFolderItems = async (id, fields = "") => {
+export const getFolderItems = async (id, fields = "", limit = 100) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
-        let url = 'https://api.box.com/2.0/folders/' + id + '/items';
-        if (fields) url += '?fields=' + fields;
+        let url = `https://api.box.com/2.0/folders/${id}/items?limit=${limit}`;
+        if (fields) url += '&fields=' + fields;
         let r = await fetch(url, {
             method:'GET',
             headers:{
@@ -613,17 +613,19 @@ export const createFolder = async (folderId, folderName) => {
             redirect: "follow",
         });
         if (response.status === 401) {
-            if ((await refreshToken()) === true) return await createFolder(folderId, foldername);
+            if ((await refreshToken()) === true) return await createFolder(folderId, folderName);
         } else if (response.status === 201) {
             return response.json();
         } else {
+            const errorData = await response.json().catch(() => ({}));
             return {
                 status: response.status,
-                statusText: response.statusText
+                statusText: response.statusText,
+                ...errorData
             };
         }
     } catch (err) {
-      if ((await refreshToken()) === true) return await createFolder(folderId, foldername);
+      if ((await refreshToken()) === true) return await createFolder(folderId, folderName);
     }
 };
 
@@ -2014,6 +2016,34 @@ export async function showCommentsDCEG(id, change=false) {
     
     commentSection.innerHTML = template;
     return;
+};
+
+export const getCurrentRoundFolderId = async (parentFolderId) => {
+    try {
+        const response = await fetch('./src/data/roundSchedule.json');
+        const schedule = await response.json();
+        const now = new Date();
+        
+        const currentRound = schedule.find(round => {
+            const start = new Date(round.startDate);
+            const end = new Date(round.endDate);
+            // Normalize dates to mid-day to avoid timezone edge cases
+            start.setHours(0,0,0,0);
+            end.setHours(23,59,59,999);
+            return now >= start && now <= end;
+        });
+
+        if (!currentRound) return parentFolderId; // Fallback to base folder if no round matches
+
+        const folderName = currentRound.folderName;
+        const items = await getFolderItems(parentFolderId);
+        const folder = (items && items.entries) ? items.entries.find(f => f.name === folderName && f.type === 'folder') : null;
+        
+        return folder ? folder.id : parentFolderId;
+    } catch (e) {
+        console.error("Error identifying current round folder:", e);
+        return parentFolderId;
+    }
 };
 
 export const listComments = async (id) => {
