@@ -3,7 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, dataSubmissionForm} from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate, templateAfterLogin as dataRequestTemplateAfterLogin} from './src/pages/dataRequest.js';
-import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, testingDataGov } from './src/pages/chairmenu.js';
+import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators } from './src/shared.js';
@@ -218,42 +218,30 @@ export const confluence = async () => {
         if (chairMenuElement) {
             chairMenuElement.addEventListener('click', () => {
                 if (chairMenuElement.classList.contains('navbar-active')) return;
-                
-                const element = document.getElementById("chairMenu")
                 showAnimation();
-                assignNavbarActive(element, 2);
+                assignNavbarActive(chairMenuElement, 2);
                 document.title = 'Confluence - Chair Menu';
                 confluenceDiv.innerHTML = chairMenuTemplate();
                 generateChairMenuFiles();
-                // uploaddataForm();
-                // formFunctions();
-                // hideAnimation();
-             });
+            });
         }
         if (authTableElement) {
             authTableElement.addEventListener('click', () => {
                 if (authTableElement.classList.contains('navbar-active')) return;
-                
-                const element = document.getElementById("authTable")
                 showAnimation();
-                assignNavbarActive(element, 2);
+                assignNavbarActive(authTableElement, 2);
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
-                //authTableTemplate();
                 testingDataGov();
             });
         }
         if (acceptedFormsElement) {
             acceptedFormsElement.addEventListener('click', () => {
                 if (acceptedFormsElement.classList.contains('navbar-active')) return;
-                
-                const element = document.getElementById("acceptedForms")
                 showAnimation();
-                assignNavbarActive(element, 2);
+                assignNavbarActive(acceptedFormsElement, 2);
                 document.title = 'Confluence - Accepted Data Requests';
-                // confluenceDiv.innerHTML = authTableTemplate();
-                //console.log("accepted forms");
                 confluenceDiv.innerHTML = acceptedDocs();
                 acceptedDocsView();
             });
@@ -261,7 +249,6 @@ export const confluence = async () => {
         if (plotsTabElement) {
             plotsTabElement.addEventListener('click', () => {
                 if (plotsTabElement.classList.contains('navbar-active')) return;
-                
                 showAnimation();
                 assignNavbarActive(plotsTabElement, 2);
                 document.title = 'Confluence - Plots';
@@ -270,59 +257,9 @@ export const confluence = async () => {
             });
         }
         
-        // const folders = await getFolderItems(0);
-        // const array = filterConsortiums(folders.entries);
-        // const projectArray = filterProjects(folders.entries);
         const getCollaborators = await getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders');
         let getMyPermissionLevel = false;
         if (getCollaborators) getMyPermissionLevel = checkDataSubmissionPermissionLevel(getCollaborators, JSON.parse(localStorage.parms).login);
-        //let showProjects = false;
-        
-        // for (let obj of projectArray) {
-        //    if (showProjects === false) {
-        //        const bool = amIViewer(await getCollaboration(obj.id, `${obj.type}s`), JSON.parse(localStorage.parms).login);
-        //        if (bool === true) showProjects = true;
-        //    }
-        // }
-        // if (array.length > 0 && projectArray.length > 0 && showProjects === true) {
-        //    document.getElementById('governanceNav').innerHTML = `
-        //        ${getMyPermissionLevel ? `
-        //            <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-        //                Data Governance
-        //            </a>
-        //        `: ``}
-        //    `;
-        //    document.getElementById('myProjectsNav').innerHTML = `
-        //        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
-        //            My Projects
-        //        </a>
-        //    `;
-        //    addEventDataGovernanceNavBar(true);
-        //    addEventMyProjects();
-        // } else if (array.length > 0 && getMyPermissionLevel) {
-        //    document.getElementById('governanceNav').innerHTML = `
-        //        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links navbar-active" href="#data_governance" title="Data Governance" id="dataGovernance">
-        //            Data Governance
-        //        </a>
-        //    `;
-        //    addEventDataGovernanceNavBar(true);
-        // } else if (projectArray.length > 0 && showProjects === true) {
-        //    document.getElementById('myProjectsNav').innerHTML = `
-        //        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#my_projects" title="My Projects" id="myProjects">
-        //            My Projects
-        //        </a>
-        //    `;
-        //    addEventMyProjects();
-        // }
-        // if (getMyPermissionLevel) {
-        //    document.getElementById('governanceNav').innerHTML = `
-        //        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_governance" title="Data Governance" id="dataGovernance">
-        //            Data Governance
-        //        </a>
-        //    `;
-        //    removeActiveClass('nav-link', 'active');
-        //    addEventDataGovernanceNavBar(true);
-        // }
         
         manageHash();
     }
@@ -478,13 +415,14 @@ const manageRouter = async () => {
         const element = document.getElementById('authTable');
         if (!element) return;
         if (element.classList.contains('navbar-active')) return;
-        
+
         document.title = 'Admin Table';
         assignNavbarActive(element, 2);
-        confluenceDiv.innerHTML = AuthTableTemplate();
+        confluenceDiv.innerHTML = authTableTemplate();
         generateAuthTableFiles();
         testingDataGov();
     }
+
     else if (hash === '#accepted_forms') {
         const element = document.getElementById('acceptedForms');
         if (!element) return;
