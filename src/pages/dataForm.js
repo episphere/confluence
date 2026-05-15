@@ -1,4 +1,4 @@
-import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData} from "../shared.js"
+import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData, getCurrentRoundFolderId} from "../shared.js"
 // import * as docx from "docx";
 
 export const formtemplate = (showDownloadButton = true, resubmitTitle = null) => {
@@ -655,7 +655,7 @@ export const dataForm = async (prepopulateData = null) => {
     const form = document.querySelector(".contact-form form");
     const data = new FormData(form);
     const jsondata = Object.fromEntries(data.entries());
-    jsondata.memcon = data.getAll("mem-con");
+    jsondata.memcon = [...data.getAll("mem-con"), ...data.getAll("mem-trial")];
     jsondata.datacon = data.getAll("data-con");
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
@@ -717,7 +717,7 @@ export const dataForm = async (prepopulateData = null) => {
     const form = document.querySelector(".contact-form form");
     const data = new FormData(form);
     const jsondata = Object.fromEntries(data.entries());
-    jsondata.memcon = data.getAll("mem-con");
+    jsondata.memcon = [...data.getAll("mem-con"), ...data.getAll("mem-trial")];
     jsondata.datacon = data.getAll("data-con");
     jsondata.primend = data.getAll("prim-end");
     jsondata.genotyping = data.getAll("genotyping");
@@ -772,7 +772,7 @@ export const dataForm = async (prepopulateData = null) => {
                 else if (key === 'memcon') {
                     const values = value.split(/[,\n]+/).map(v => v.trim()).filter(v => v);
                     values.forEach(val => {
-                        const checkbox = document.querySelector(`input[name="mem-con"][value="${val}"]`);
+                        const checkbox = document.querySelector(`input[name="mem-con"][value="${val}"], input[name="mem-trial"][value="${val}"]`);
                         if (checkbox) checkbox.checked = true;
                     });
                 }
@@ -1427,17 +1427,18 @@ export const dataForm = async (prepopulateData = null) => {
       }
       
       let response;
+      const targetFolderId = await getCurrentRoundFolderId(submitterFolder);
       
       if (originalConceptId) {
         const originalFileName = prepopulateData?.originalFileName || filename;
-        response = await uploadWordFileVersion(blob, originalConceptId, originalFileName, submitterFolder);
+        response = await uploadWordFileVersion(blob, originalConceptId, originalFileName, targetFolderId);
         
         // Add comment if fileId exists
         if (fileId && response.entries) {
           await createComment(fileId, 'New version uploaded');
         }
       } else {
-        response = await uploadWordFile(blob, filename, submitterFolder);
+        response = await uploadWordFile(blob, filename, targetFolderId);
       }
       
       console.log(response);
