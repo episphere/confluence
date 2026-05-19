@@ -1934,6 +1934,7 @@ export async function showCommentsDropDown(id) {
 export async function showCommentsDCEG(id, change=false) {
     //console.log(id);
     const commentSection = document.getElementById(`file${id}Comments`);
+    if (!commentSection) return;
     const response = await listComments(id);
     
     let comments = JSON.parse(response).entries;
@@ -1970,21 +1971,25 @@ export async function showCommentsDCEG(id, change=false) {
                     }
                     
                     const inputScore = document.getElementById(`${cons}${id}`);
-                    const selectElement = inputScore.children[0];
-                    selectElement.value = `${score}`;
-
-                    // Remove any existing badge classes
-                    selectElement.className = 'form-select form-select-sm decision-dropdown disabled';
-                
-                    if (change==false) {
-                        // inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;
-                        selectElement.setAttribute('disabled', true);
-                        selectElement.classList.add(`badge-${score}`);
+                    const selectElement = inputScore ? inputScore.children[0] : null;
+                    if (!selectElement) {
+                        console.warn(`Score cell not found for consortium ${cons} and file ${id}`);
                     } else {
-                        // Add the appropriate badge class based on the score
-                        if (score !== '--') {
+                        selectElement.value = `${score}`;
+
+                        // Remove any existing badge classes
+                        selectElement.className = 'form-select form-select-sm decision-dropdown disabled';
+                    
+                        if (change==false) {
+                            // inputScore.innerHTML = `<h6 class="badge badge-pill badge-${score}">${score}</h6>`;
+                            selectElement.setAttribute('disabled', true);
                             selectElement.classList.add(`badge-${score}`);
-                            selectElement.setAttribute('data-previous-value', selectElement.value);
+                        } else {
+                            // Add the appropriate badge class based on the score
+                            if (score !== '--') {
+                                selectElement.classList.add(`badge-${score}`);
+                                selectElement.setAttribute('data-previous-value', selectElement.value);
+                            }
                         }
                     }
                 

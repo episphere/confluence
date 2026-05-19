@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -1196,6 +1196,46 @@ const generateMergedConceptBlob = async (fileId) => {
     } catch (error) { console.error('Error generating merged blob:', error); return null; }
 };
 
+export function viewFinalDecisionFilesColumns() {
+    return `
+        <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+            <div class="row-24 align-items-center position-relative">
+                <div class="col-24-5 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-1"></div>
+            </div>
+        </div>
+    `;
+};
+
+export function viewAuthFinalDecisionFilesColumns() {
+    return `
+        <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
+            <div class="row-24 align-items-center position-relative">
+                <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
+                <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Ret Date <button class="transparent-btn sort-column" data-column-name="Return Date"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">CIMBA <button class="transparent-btn sort-column" data-column-name="CIMBADecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">LAGENO <button class="transparent-btn sort-column" data-column-name="LAGENODecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">MERGE <button class="transparent-btn sort-column" data-column-name="MERGEDecision"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-1"></div>
+            </div>
+        </div>
+    `;
+};
+
 export function viewFinalDecisionFilesTemplate(files) {
     if (!files || files.length === 0) {
         const daccDecisionElement = document.getElementById("daccDecision");
@@ -1204,7 +1244,7 @@ export function viewFinalDecisionFilesTemplate(files) {
     }
 
     let template = `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
-    template += viewAuthFinalDecisionFilesColumns();
+    template += viewFinalDecisionFilesColumns();
     template += '<div id="files"> </div></div></div>';
     const daccDecisionElement = document.getElementById("daccDecision");
     if (daccDecisionElement) daccDecisionElement.innerHTML = template; else return;
@@ -1338,6 +1378,7 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
 
 export const generateAuthTableFiles = async () => {
     showAnimation();
+    testingDataGov();
     const folderItems = await getFolderItems(submitterFolder);
     const roundFolders = folderItems.entries.filter(item => item.type === 'folder' && item.name.toLowerCase().startsWith('round'));
     roundFolders.sort((a, b) => b.name.localeCompare(a.name));
@@ -1384,8 +1425,15 @@ export const generateAuthTableFiles = async () => {
 
     const roundSelectionContainer = document.getElementById('roundSelectionContainer');
     if (roundSelectionContainer && roundFolders.length > 0) {
+        const activeRoundIds = new Set([
+            ...adminDataCache.sub.map(file => file.roundId),
+            ...adminDataCache.com.map(file => file.roundId),
+            ...adminDataCache.res.map(file => file.roundId)
+        ].filter(id => id));
+        const displayRoundFolders = roundFolders.filter(folder => activeRoundIds.has(folder.id));
+
         let dropdownHtml = `<div style=\"display: flex; align-items: center; gap: 10px;\"><label for=\"roundSelect\"><b>Select Round:</b></label><select id=\"roundSelect\" class=\"form-select\" style=\"width: auto;\"><option value=\"all\">All Rounds</option>`;
-        roundFolders.forEach(folder => { dropdownHtml += `<option value="${folder.id}">${folder.name}</option>`; });
+        displayRoundFolders.forEach(folder => { dropdownHtml += `<option value="${folder.id}">${folder.name}</option>`; });
         dropdownHtml += `</select></div>`;
         roundSelectionContainer.innerHTML = dropdownHtml;
         document.getElementById('roundSelect').addEventListener('change', async (e) => {
@@ -1470,3 +1518,596 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     });
   }
 }
+
+const asBoxEntries = (items) => {
+    if (Array.isArray(items)) return items;
+    if (items && Array.isArray(items.entries)) return items.entries;
+    return [];
+};
+
+const selectedAdminConcepts = () => Array.from(document.querySelectorAll('.pl:checked'));
+
+const findFileByNameInFolders = async (fileName, folderIds) => {
+    for (const folderId of folderIds) {
+        if (!folderId) continue;
+        const files = asBoxEntries(await getAllFilesRecursive(folderId, "name,type,id,parent,parent.name,created_at"));
+        const match = files.find(file => file && file.name === fileName);
+        if (match) return match;
+    }
+    return null;
+};
+
+const getOrCreateChildFolder = async (parentId, folderName) => {
+    const existingItems = await getFolderItems(parentId, "name,type,id", 1000);
+    const existingFolder = asBoxEntries(existingItems).find(item => item.type === "folder" && item.name === folderName);
+    if (existingFolder) return existingFolder;
+
+    const createdFolder = await createFolder(parentId, folderName);
+    if (createdFolder && createdFolder.id) return createdFolder;
+
+    const refreshedItems = await getFolderItems(parentId, "name,type,id", 1000);
+    const refreshedFolder = asBoxEntries(refreshedItems).find(item => item.type === "folder" && item.name === folderName);
+    if (refreshedFolder) return refreshedFolder;
+
+    throw new Error(`Unable to create or locate folder: ${folderName}`);
+};
+
+const updateBoxFile = async (fileId, data) => {
+    const accessToken = JSON.parse(localStorage.parms).access_token;
+    const response = await fetch(`https://api.box.com/2.0/files/${fileId}`, {
+        method: "PUT",
+        headers: {
+            Authorization: "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (response.status === 401) {
+        if ((await refreshToken()) === true) return await updateBoxFile(fileId, data);
+    }
+
+    if (response.ok) return await response.json();
+
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || response.statusText || `Box update failed with status ${response.status}`);
+};
+
+const refreshAdminTable = () => {
+    adminDataCache = null;
+    generateAuthTableFiles();
+};
+
+export const returnToChairs = () => {
+    const returnChairs = async (e) => {
+        e.preventDefault();
+        const selectedFiles = selectedAdminConcepts();
+
+        if (selectedFiles.length === 0) {
+            alert("Please select at least one file to return.");
+            return;
+        }
+
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!header || !body) return;
+
+        header.innerHTML = `
+            <h5 class="modal-title">Select Chairs to Return Files To</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+
+        let template = `
+            <form id="chairSelectionForm">
+                <div class="form-group mb-3">
+                    <h6>Select which chairs to return the files to:</h6>
+        `;
+
+        chairsInfo.forEach(chair => {
+            template += `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="${escapeHtml(chair.consortium)}" id="chair_${escapeHtml(chair.consortium)}">
+                    <label class="form-check-label" for="chair_${escapeHtml(chair.consortium)}">${escapeHtml(chair.consortium)}</label>
+                </div>
+            `;
+        });
+
+        template += `
+                </div>
+                <div id="returnChairProgress" class="small mb-3"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Return to Selected Chairs</button>
+                </div>
+            </form>
+        `;
+
+        body.innerHTML = template;
+        $("#confluenceMainModal").modal("show");
+
+        document.getElementById("chairSelectionForm").addEventListener("submit", async (submitEvent) => {
+            submitEvent.preventDefault();
+            const selectedChairs = Array.from(document.querySelectorAll('#chairSelectionForm input[type="checkbox"]:checked')).map(cb => cb.value);
+
+            if (selectedChairs.length === 0) {
+                alert("Please select at least one chair.");
+                return;
+            }
+
+            const progressDiv = document.getElementById("returnChairProgress");
+            const submitButton = submitEvent.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = "Returning...";
+
+            try {
+                for (const checkbox of selectedFiles) {
+                    for (const selectedConsortium of selectedChairs) {
+                        const chair = chairsInfo.find(item => item.consortium === selectedConsortium);
+                        if (!chair) continue;
+
+                        if (progressDiv) progressDiv.innerHTML += `<p>Finding ${escapeHtml(checkbox.value)} for ${escapeHtml(selectedConsortium)}...</p>`;
+                        const chairFile = await findFileByNameInFolders(checkbox.value, [chair.boxIdNew, chair.boxIdClara, chair.boxIdComplete]);
+                        if (!chairFile) {
+                            if (progressDiv) progressDiv.innerHTML += `<p class="text-warning">No matching chair copy found for ${escapeHtml(selectedConsortium)}.</p>`;
+                            continue;
+                        }
+
+                        const task = await createCompleteTask(chairFile.id, "Returning to complete your review");
+                        if (task && task.id) await assignTask(task.id, chair.email);
+                        if (progressDiv) progressDiv.innerHTML += `<p class="text-success">Returned to ${escapeHtml(selectedConsortium)}.</p>`;
+                    }
+                }
+
+                if (progressDiv) progressDiv.innerHTML += `<p><strong>Return to chairs complete.</strong></p>`;
+                body.innerHTML += `<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="refreshAfterChairReturn">Close & Refresh</button></div>`;
+                const refreshButton = document.getElementById("refreshAfterChairReturn");
+                if (refreshButton) refreshButton.addEventListener("click", refreshAdminTable);
+            } catch (error) {
+                console.error("Error returning files to chairs:", error);
+                if (progressDiv) progressDiv.innerHTML += `<p class="text-danger">Error: ${escapeHtml(error.message)}</p>`;
+                submitButton.disabled = false;
+                submitButton.textContent = "Return to Selected Chairs";
+            }
+        });
+    };
+
+    const returnChairsButton = document.querySelector("#returnChairs");
+    if (returnChairsButton) returnChairsButton.onclick = returnChairs;
+};
+
+export const returnToSubmitter = () => {
+    const returnSubmitter = async (e) => {
+        e.preventDefault();
+        const selectedFiles = selectedAdminConcepts();
+
+        if (selectedFiles.length === 0) {
+            alert("Please select at least one file to return.");
+            return;
+        }
+
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!header || !body) return;
+
+        header.innerHTML = `
+            <h5 class="modal-title">Select Decision for File Return</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+
+        body.innerHTML = `
+            <form id="decisionSelectionForm">
+                <div class="form-group mb-3">
+                    <h6>File to be returned:</h6>
+                    <p><strong>${escapeHtml(selectedFiles[0].value)}</strong></p>
+                    <h6>Select decision:</h6>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success decision-btn" data-decision="Accepted">Accept: No comments from DACC</button>
+                        <button type="button" class="btn btn-danger decision-btn" data-decision="Denied">Deny</button>
+                        <button type="button" class="btn btn-warning decision-btn" data-decision="Requiring Input">Require Input</button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+        $("#confluenceMainModal").modal("show");
+
+        document.querySelectorAll(".decision-btn").forEach(button => {
+            button.addEventListener("click", async () => {
+                await processFileReturn(selectedFiles[0], button.dataset.decision);
+            });
+        });
+    };
+
+    const processFileReturn = async (checkbox, decision) => {
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!header || !body) return;
+
+        header.innerHTML = `<h5 class="modal-title">Processing File Return</h5>`;
+        body.innerHTML = '<div id="returnToSubmitterInfo" style="max-height: 400px; overflow-y: auto;"></div>';
+
+        const progressDiv = document.getElementById("returnToSubmitterInfo");
+        const addStatus = (message) => {
+            progressDiv.innerHTML += `<p>${message}</p>`;
+            progressDiv.scrollTop = progressDiv.scrollHeight;
+        };
+
+        try {
+            addStatus("Starting process...");
+            addStatus(`Gathering data for Box file: ${escapeHtml(checkbox.id)}`);
+
+            const fileSelected = await getFileInfo(checkbox.id);
+            const fileName = fileSelected.name;
+            const submitterEmail = fileSelected.created_by.login;
+            const userFolderName = `The_Confluence_Project_Returned_Concepts-${submitterEmail}`;
+
+            addStatus(`Locating return folder for ${escapeHtml(submitterEmail)}...`);
+            const userFolder = await getOrCreateChildFolder(returnToSubmitterFolder, userFolderName);
+
+            addStatus("Ensuring return subfolders exist...");
+            await getOrCreateChildFolder(userFolder.id, "Accepted");
+            await getOrCreateChildFolder(userFolder.id, "Denied");
+            await getOrCreateChildFolder(userFolder.id, "Requiring Input");
+
+            addStatus("Adding submitter access if needed...");
+            await addNewCollaborator(userFolder.id, "folder", submitterEmail, "viewer");
+
+            addStatus(`Finding ${escapeHtml(decision)} folder...`);
+            const targetFolder = await getOrCreateChildFolder(userFolder.id, decision);
+
+            addStatus(`Copying file to ${escapeHtml(decision)} folder...`);
+            const copiedFile = await copyFile(checkbox.id, targetFolder.id, String(checkbox.id));
+            const copiedFileId = copiedFile.id;
+
+            addStatus("Copying comments...");
+            const returnComments = await listComments(checkbox.id);
+            const commentsToCopy = JSON.parse(returnComments).entries;
+            await copyComments(commentsToCopy, copiedFileId);
+
+            if (decision === "Accepted" || decision === "Denied") {
+                for (const chair of chairsInfo) {
+                    addStatus(`Searching chair folders for same file: ${escapeHtml(chair.consortium)}`);
+                    const chairFile = await findFileByNameInFolders(fileName, [chair.boxIdNew, chair.boxIdClara]);
+                    if (chairFile) {
+                        addStatus(`Moving chair copy to completed folder: ${escapeHtml(chair.consortium)}`);
+                        await moveFileToChairFolder(chairFile.id, chair.boxIdComplete);
+                    }
+                }
+
+                addStatus("Moving submitter file to completed folder...");
+                await moveFile(checkbox.id, completedFolder);
+            }
+
+            addStatus(`Preparing email for submitter: ${escapeHtml(submitterEmail)}`);
+            addStatus('<strong class="text-success">Complete.</strong>');
+
+            header.innerHTML = `
+                <h5 class="modal-title">File Return Complete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            `;
+
+            body.innerHTML += `
+                <div class="mt-3 text-center">
+                    <button type="button" class="btn btn-primary" id="sendEmailAndRefresh">Send Email & Refresh</button>
+                </div>
+            `;
+
+            document.getElementById("sendEmailAndRefresh").addEventListener("click", () => {
+                window.location.href = `mailto:${submitterEmail}?subject=Confluence Project: DACC responses to your concept submission are ready for your review&body=Your Confluence data access submission for ${encodeURIComponent(fileName)} has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
+                setTimeout(() => {
+                    $("#confluenceMainModal").modal("hide");
+                    refreshAdminTable();
+                }, 500);
+            });
+        } catch (error) {
+            console.error("Error returning file to submitter:", error);
+            addStatus(`<span class="text-danger">Error: ${escapeHtml(error.message)}</span>`);
+        }
+    };
+
+    const returnSubmitterButton = document.querySelector("#returnSubmitter");
+    if (returnSubmitterButton) returnSubmitterButton.onclick = returnSubmitter;
+};
+
+export const copyComments = async (comments, fileId) => {
+    for (const chair of chairsInfo) {
+        const chairComments = comments.filter(comment => comment.message && comment.message.includes(`Consortium: ${chair.consortium}`));
+
+        for (const comment of chairComments) {
+            await createComment(fileId, `${comment.message} Box Comment ID: ${comment.id}`);
+        }
+    }
+};
+
+const DATA_GOV_USERS_FILE_ID = 1932355916952;
+
+const getCollaborationEmail = (collaboration) => {
+    if (collaboration && collaboration.accessible_by && collaboration.accessible_by.login) {
+        return collaboration.accessible_by.login;
+    }
+    return collaboration && collaboration.invite_email ? collaboration.invite_email : "";
+};
+
+const getCollaboratorEmailSet = (collaborations) => new Set(
+    asBoxEntries(collaborations)
+        .map(getCollaborationEmail)
+        .filter(email => email)
+        .map(email => email.toLowerCase())
+);
+
+const getAuthorizedUserEmails = (csvText) => {
+    const parsed = csv2Json(csvText);
+    return parsed.data
+        .map(user => user.Email || user.email || user.EMAIL)
+        .filter(email => email)
+        .map(email => email.trim().toLowerCase())
+        .filter((email, index, emails) => emails.indexOf(email) === index);
+};
+
+const isSuccessfulCollaboratorResponse = (response) => response && response.status >= 200 && response.status < 300;
+
+export const testingDataGov = () => {
+    const testform = document.getElementById("submitID");
+    if (!testform) return;
+
+    testform.onclick = async (e) => {
+        e.preventDefault();
+        await dataGovTest();
+    };
+};
+
+export const dataGovTest = async () => {
+    const submitButton = document.getElementById("submitID");
+    if (submitButton) {
+        submitButton.classList.add("buttonsubmit--loading");
+        submitButton.disabled = true;
+    }
+
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+
+    try {
+        const [authorizedUserCsv, authorizedUserFileInfo, metadataCollaborators, eventsCollaborators, uploadCollaborators] = await Promise.all([
+            getFile(DATA_GOV_USERS_FILE_ID),
+            getFileInfo(DATA_GOV_USERS_FILE_ID),
+            getCollaboration(Confluence_Data_Platform_Metadata_Shared_with_Investigators, 'folders', 1000),
+            getCollaboration(Confluence_Data_Platform_Events_Page_Shared_with_Investigators, 'folders', 1000),
+            getCollaboration(submitterFolder, 'folders', 1000)
+        ]);
+
+        const allEmails = getAuthorizedUserEmails(authorizedUserCsv);
+        const metadataEmails = getCollaboratorEmailSet(metadataCollaborators);
+        const eventsEmails = getCollaboratorEmailSet(eventsCollaborators);
+        const uploadEmails = getCollaboratorEmailSet(uploadCollaborators);
+
+        const notIncludedEmailsMetadata = allEmails.filter(email => !metadataEmails.has(email));
+        const notIncludedEmailsEvents = allEmails.filter(email => !eventsEmails.has(email));
+        const notIncludedEmailsUpload = allEmails.filter(email => !uploadEmails.has(email));
+        const hasUsersToAdd = notIncludedEmailsMetadata.length > 0 || notIncludedEmailsEvents.length > 0 || notIncludedEmailsUpload.length > 0;
+
+        if (!header || !body) {
+            if (!hasUsersToAdd) alert("No users need to be added.");
+            return;
+        }
+
+        header.innerHTML = `
+            <h5 class="modal-title">Confirm Adding Collaborators</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        `;
+
+        let confirmationList = "";
+        if (authorizedUserFileInfo && authorizedUserFileInfo.modified_at) {
+            confirmationList += `<p class="small text-muted">Authorized user list last modified: ${new Date(authorizedUserFileInfo.modified_at).toLocaleString()}</p>`;
+        }
+
+        if (hasUsersToAdd) {
+            confirmationList += "<p><strong>The following users will be added:</strong></p>";
+            notIncludedEmailsMetadata.forEach(email => {
+                confirmationList += `<p>User: ${escapeHtml(email)}, Folder: Metadata, Permission: viewer</p>`;
+            });
+            notIncludedEmailsEvents.forEach(email => {
+                confirmationList += `<p>User: ${escapeHtml(email)}, Folder: Events, Permission: previewer</p>`;
+            });
+            notIncludedEmailsUpload.forEach(email => {
+                confirmationList += `<p>User: ${escapeHtml(email)}, Folder: Upload, Permission: uploader</p>`;
+            });
+        } else {
+            confirmationList += "<p>No users need to be added.</p>";
+        }
+
+        body.innerHTML = `
+            <div style="height: ${Math.floor(window.innerHeight * 2/3)}px; overflow-y: auto; padding-right: 15px;">
+                ${confirmationList}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmAddCollaborators" ${!hasUsersToAdd ? "disabled" : ""}>OK - Add Collaborators</button>
+            </div>
+        `;
+
+        $("#confluenceMainModal").modal("show");
+
+        if (!hasUsersToAdd) return;
+
+        document.getElementById("confirmAddCollaborators").onclick = async () => {
+            body.innerHTML = '<div id="collaboratorList" style="max-height: 400px; overflow-y: auto;"><p>Adding collaborators...</p></div>';
+            const listElement = document.getElementById("collaboratorList");
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+            let requestCount = 0;
+            let issueCount = 0;
+
+            const addCollaboratorWithStatus = async (email, folderId, folderName, role) => {
+                if (requestCount >= 50) {
+                    listElement.innerHTML += "<p>Rate limit reached, waiting 60 seconds...</p>";
+                    await delay(60000);
+                    requestCount = 0;
+                }
+
+                listElement.innerHTML += `<p>Adding User: ${escapeHtml(email)}, Folder: ${escapeHtml(folderName)}, Permission: ${escapeHtml(role)}</p>`;
+                listElement.scrollTop = listElement.scrollHeight;
+
+                const response = await addNewCollaborator(folderId, 'folder', email, role);
+                requestCount++;
+
+                if (isSuccessfulCollaboratorResponse(response)) {
+                    listElement.innerHTML += `<p><span style="color: green;">Successful</span>: ${escapeHtml(email)}, Folder: ${escapeHtml(folderName)}, Permission: ${escapeHtml(role)}</p>`;
+                } else {
+                    issueCount += 1;
+                    const status = response && response.status ? ` (${response.status})` : "";
+                    listElement.innerHTML += `<p><span style="color: red;">Failed${status}</span>: ${escapeHtml(email)}, Folder: ${escapeHtml(folderName)}, Permission: ${escapeHtml(role)}</p>`;
+                }
+                listElement.scrollTop = listElement.scrollHeight;
+            };
+
+            for (const email of notIncludedEmailsMetadata) {
+                await addCollaboratorWithStatus(email, Confluence_Data_Platform_Metadata_Shared_with_Investigators, "Metadata", "viewer");
+            }
+            for (const email of notIncludedEmailsEvents) {
+                await addCollaboratorWithStatus(email, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, "Events", "previewer");
+            }
+            for (const email of notIncludedEmailsUpload) {
+                await addCollaboratorWithStatus(email, submitterFolder, "Upload", "uploader");
+            }
+
+            if (issueCount > 0) {
+                listElement.innerHTML += `<p><strong>${issueCount} issues detected. Please review list or try again.</strong></p>`;
+            } else {
+                listElement.innerHTML += "<p><strong>All collaborators added successfully.</strong></p>";
+            }
+        };
+    } catch (error) {
+        console.error("Error updating data governance collaborators:", error);
+        if (header && body) {
+            header.innerHTML = `
+                <h5 class="modal-title">Update Users Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            `;
+            body.innerHTML = `<p class="text-danger">Unable to update users: ${escapeHtml(error.message)}</p>`;
+            $("#confluenceMainModal").modal("show");
+        } else {
+            alert(`Unable to update users: ${error.message}`);
+        }
+    } finally {
+        if (submitButton) {
+            submitButton.classList.remove("buttonsubmit--loading");
+            submitButton.disabled = false;
+        }
+    }
+};
+
+export const addRenameFilesEvent = (files) => {
+    const renameBtn = document.getElementById("renameFilesBtn");
+    if (renameBtn) renameBtn.onclick = () => showRenameFilesPopup(files);
+};
+
+export const showRenameFilesPopup = (files) => {
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    if (!header || !body) return;
+
+    const sortedFiles = [...files].sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+
+    header.innerHTML = `
+        <h5 class="modal-title">Rename Files with Round Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    `;
+
+    let template = `
+        <form id="renameFilesForm">
+            <div class="form-group mb-3">
+                <label for="roundNumber">Enter Round Number (X):</label>
+                <input type="text" class="form-control" id="roundNumber" placeholder="e.g., 01" required>
+            </div>
+            <div class="form-group mb-3">
+                <h6>Files to be renamed:</h6>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+    `;
+
+    sortedFiles.forEach((file, index) => {
+        template += `
+            <div class="mb-2">
+                <strong>Current:</strong> ${escapeHtml(file.name)}<br>
+                <strong>New:</strong> <span id="preview${index}">${escapeHtml(buildRoundFileName(file.name, "X", index))}</span>
+            </div>
+            <hr>
+        `;
+    });
+
+    template += `
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Confirm Rename</button>
+            </div>
+        </form>
+    `;
+
+    body.innerHTML = template;
+    $("#confluenceMainModal").modal("show");
+
+    document.getElementById("roundNumber").addEventListener("input", (e) => {
+        const roundValue = e.target.value || "X";
+        sortedFiles.forEach((file, index) => {
+            const preview = document.getElementById(`preview${index}`);
+            if (preview) preview.textContent = buildRoundFileName(file.name, roundValue, index);
+        });
+    });
+
+    document.getElementById("renameFilesForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const roundNumber = document.getElementById("roundNumber").value;
+        if (!roundNumber) {
+            alert("Please enter a round number");
+            return;
+        }
+        await renameFilesWithRound(sortedFiles, roundNumber);
+    });
+};
+
+const buildRoundFileName = (fileName, roundNumber, index) => {
+    const dotIndex = fileName.lastIndexOf(".");
+    const currentTitle = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
+    const extension = dotIndex > 0 ? fileName.substring(dotIndex) : "";
+    return `${currentTitle}_R${roundNumber}_${String(index + 1).padStart(3, "0")}${extension}`;
+};
+
+export const renameFilesWithRound = async (files, roundNumber) => {
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    if (!header || !body) return;
+
+    header.innerHTML = `<h5 class="modal-title">Renaming Files...</h5>`;
+    body.innerHTML = '<div id="renameProgress" style="max-height: 400px; overflow-y: auto;"><p>Starting file rename process...</p></div>';
+    $("#confluenceMainModal").modal("show");
+
+    const progressDiv = document.getElementById("renameProgress");
+
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const newFileName = buildRoundFileName(file.name, roundNumber, i);
+
+            progressDiv.innerHTML += `<p>Renaming: ${escapeHtml(file.name)} -> ${escapeHtml(newFileName)}</p>`;
+            await updateBoxFile(file.id, { name: newFileName });
+            progressDiv.innerHTML += `<p class="text-success">Renamed in submitter folder: ${escapeHtml(newFileName)}</p>`;
+
+            for (const chair of chairsInfo) {
+                const chairFile = await findFileByNameInFolders(file.name, [chair.boxIdNew, chair.boxIdClara, chair.boxIdComplete]);
+                if (chairFile) {
+                    await updateBoxFile(chairFile.id, { name: newFileName });
+                    progressDiv.innerHTML += `<p class="text-primary">Renamed in ${escapeHtml(chair.consortium)} folder: ${escapeHtml(newFileName)}</p>`;
+                }
+            }
+        }
+
+        progressDiv.innerHTML += '<p><strong>All files renamed successfully.</strong></p>';
+        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="refreshAfterRename">Close & Refresh</button></div>';
+        const refreshButton = document.getElementById("refreshAfterRename");
+        if (refreshButton) refreshButton.addEventListener("click", refreshAdminTable);
+    } catch (error) {
+        console.error("Error renaming files:", error);
+        progressDiv.innerHTML += `<p class="text-danger">Error: ${escapeHtml(error.message)}</p>`;
+        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>';
+    }
+};

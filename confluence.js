@@ -233,7 +233,6 @@ export const confluence = async () => {
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
-                testingDataGov();
             });
         }
         if (acceptedFormsElement) {
@@ -420,7 +419,6 @@ const manageRouter = async () => {
         assignNavbarActive(element, 2);
         confluenceDiv.innerHTML = authTableTemplate();
         generateAuthTableFiles();
-        testingDataGov();
     }
 
     else if (hash === '#accepted_forms') {
