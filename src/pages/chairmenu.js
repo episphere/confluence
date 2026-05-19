@@ -4,6 +4,7 @@ import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractC
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
+    const showReplyStatus = tab === "conceptNeedingClarification";
     
     if (!Array.isArray(files)) { return template; }
     if (files.length != 0) {
@@ -16,7 +17,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
           <div class='card-title' style='display: flex; gap: 20px; align-items: flex-start;'>
             <div>
               <label for='${tab}selectedDoc'>
-                  <b>Select Concept Form:</b> 🔵 = Replied
+                  <b>Select Concept Form:</b>${showReplyStatus ? " 🔵 = Replied" : ""}
               </label>
               <br>
               <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
@@ -26,7 +27,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         let lastUnderscoreIndex = filename.lastIndexOf('_');
         let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
         
-        const replyStatus = file.isReplyCompleted ? "🔵 " : "";
+        const replyStatus = showReplyStatus && file.isReplyCompleted ? "🔵 " : "";
         template += `
             <option value='${fileId}'>
             ${replyStatus}${titlename}</option>`;
