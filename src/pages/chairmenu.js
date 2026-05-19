@@ -513,7 +513,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         // Fetch Chair's personal folders and DACC members list
         const [filearrayChair, filearrayClara, filearrayComplete, testData] = await Promise.all([
             getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at"),
-            getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at"),
+            getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at,parent.name"),
             getAllFilesRecursive(userChairItem.boxIdComplete, "name,type,id,parent,created_at"),
             getFile(DACCmembers)
         ]);
@@ -545,6 +545,12 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             if (!filearrayAllFiles || !Array.isArray(filearrayAllFiles)) return null;
             const match = filearrayAllFiles.find(f => f && f.name && f.name.trim() === fileName.trim());
             return match ? match.roundId : null;
+        };
+
+        const findRoundIdByFolderName = (folderName) => {
+            if (!folderName) return null;
+            const match = roundFolders.find(round => round && round.name === folderName);
+            return match ? match.id : null;
         };
 
         const filesIncompleted = [];
@@ -595,54 +601,16 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
         const filesClaraIncompleted = [];
         updateProgressBar(65, `Analyzing ${filearrayClara.length} concepts requiring clarification...`);
-        const claraTaskPromises = (filearrayClara && Array.isArray(filearrayClara)) ? filearrayClara.map(async (obj) => {
-            if (!obj || !obj.id) return [];
-            const [tasks, comments] = await Promise.all([getTaskList(obj.id), listComments(obj.id)]);
-            const incompleteItems = [];
-            
-            let hasIncompleteTask = false;
-            if (tasks && tasks.entries && tasks.entries.length != 0) {
-                for (let items of tasks.entries) {
-                    if (items && items.task_assignment_collection && items.task_assignment_collection.entries) {
-                        for (let itemtasks of items.task_assignment_collection.entries) {
-                            if (itemtasks && itemtasks.status === 'incomplete') {
-                                hasIncompleteTask = true;
-                                if (itemtasks.item) incompleteItems.push(itemtasks.item);
-                                break;
-                            }
-                        }
-                    }
-                    if (hasIncompleteTask) break;
+        if (filearrayClara && Array.isArray(filearrayClara)) {
+            filearrayClara.forEach(item => {
+                if (item && item.id && filesClaraIncompleted.findIndex(element => element && element.id === item.id) === -1) {
+                    const parentFolderName = item.parent && item.parent.name ? item.parent.name : null;
+                    item.roundId = findRoundId(item.name) || findRoundIdByFolderName(parentFolderName);
+                    if (!item.roundName && parentFolderName && parentFolderName.toLowerCase().startsWith('round')) item.roundName = parentFolderName;
+                    filesClaraIncompleted.push(item);
                 }
-            }
-            
-            let commentsObj = comments;
-            if (typeof comments === 'string') {
-                try { commentsObj = JSON.parse(comments); } catch (e) { commentsObj = null; }
-            }
-            const hasComments = commentsObj && commentsObj.entries && Array.isArray(commentsObj.entries) && commentsObj.entries.length > 0;
-            if (!hasIncompleteTask && !hasComments) {
-                incompleteItems.push(obj);
-            }
-            return incompleteItems;
-        }) : [];
-        
-        const claraResults = await Promise.all(claraTaskPromises);
-        claraResults.forEach(items => {
-            if (items && Array.isArray(items)) {
-                items.forEach(item => {
-                    if (item && item.id && filesClaraIncompleted.findIndex(element => element && element.id === item.id) === -1) {
-                        const submitterFile = (filearrayAllFiles && Array.isArray(filearrayAllFiles)) ? filearrayAllFiles.find(f => f && f.name === item.name) : null;
-                        if (submitterFile) {
-                            filesClaraIncompleted.push(submitterFile);
-                        } else {
-                            item.roundId = findRoundId(item.name);
-                            filesClaraIncompleted.push(item);
-                        }
-                    }
-                });
-            }
-        });
+            });
+        }
 
         const filesComplete = [];
         updateProgressBar(75, `Analyzing ${filearrayComplete.length} archived concepts...`);
@@ -737,7 +705,12 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         };
     }
 
-    const renderSelectedRound = async (selectedRoundId) => {
+    const getActiveChairTabId = () => {
+        const activePane = document.querySelector("#selectedTab .tab-pane.active");
+        return activePane && activePane.id ? activePane.id : "recommendation";
+    };
+
+    const renderSelectedRound = async (selectedRoundId, activeTabId = "recommendation") => {
         showAnimation();
         
         const filesIncompleted = (chairMenuCache && chairMenuCache.filesIncompleted) ? chairMenuCache.filesIncompleted : [];
@@ -890,7 +863,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             roundSelectionContainer.innerHTML = dropdownHtml;
 
             document.getElementById('roundSelect').addEventListener('change', async (e) => {
-                await renderSelectedRound(e.target.value);
+                await renderSelectedRound(e.target.value, getActiveChairTabId());
             });
         }
 
@@ -1005,7 +978,10 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             filteredIncompleted
         );
 
-        document.getElementById("recommendationTab").click();
+        const chairTabIds = ["recommendation", "conceptNeedingClarification", "completedConcepts", "daccDecision"];
+        const tabToActivate = chairTabIds.includes(activeTabId) ? activeTabId : "recommendation";
+        const tabElement = document.getElementById(`${tabToActivate}Tab`) || document.getElementById("recommendationTab");
+        if (tabElement) tabElement.click();
         hideAnimation();
     };
 
