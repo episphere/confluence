@@ -874,6 +874,18 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                 const daccPane = document.getElementById('daccDecision');
                 if (daccPane && daccPane.innerHTML.includes('Loading...')) {
                     await viewFinalDecisionFilesTemplate(filteredAllFiles);
+
+                    // Pre-load DACC scores/comments for all files (like Admin table does)
+                    try {
+                        // Parallelize preloading in small chunks to avoid rate limits
+                        const CHUNK_SIZE = 10;
+                        for (let i = 0; i < filteredAllFiles.length; i += CHUNK_SIZE) {
+                            const chunk = filteredAllFiles.slice(i, i + CHUNK_SIZE);
+                            await Promise.all(chunk.map(f => f && f.id ? showCommentsDCEG(f.id, true) : Promise.resolve()));
+                        }
+                    } catch (e) {
+                        console.error('Error preloading DACC scores:', e);
+                    }
                 }
             }, { once: true });
         }
