@@ -1869,18 +1869,19 @@ export function switchTabs(show, hide, files) {
                         }
                     }
                     
-                    document.getElementById(show + "selectedDoc").value = files[0].id;
-                    showPreview(files[0].id);
+                    const selectedFile = files[0];
+                    const commentSourceId = selectedFile.commentsFileId || selectedFile.masterFileId || selectedFile.id;
+                    document.getElementById(show + "selectedDoc").value = selectedFile.id;
+                    showPreview(selectedFile.id);
                     
                     if (show !== "recommendation") {
                         document.getElementById("boxFilePreview").classList.add("col-8");
-                        if (show === "conceptNeedingClarification") {
-                            console.log("Showing response comments for conceptNeedingClarification");
+                        if (show === "conceptNeedingClarification" || show === "completedConcepts") {
                             switchFilesWithComments(show, files);
-                            showCommentsWithResponses(files[0].id, files[0].responseComments);
+                            showCommentsWithResponses(commentSourceId, selectedFile.responseComments || []);
                         } else {
                             switchFiles(show);
-                            showComments(files[0].id);
+                            showComments(commentSourceId);
                         }
                     } else {
                         switchFiles(show);

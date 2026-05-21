@@ -262,7 +262,7 @@ export const setupDownloadSelect = (tab, files) => {
                 for (let index = 0; index < selectedFiles.length; index++) {
                     const file = selectedFiles[index];
                     if (status) status.textContent = `Preparing ${index + 1} of ${selectedFiles.length}: ${getDownloadFileTitle(file)}`;
-                    const mergedBlob = await generateMergedConceptBlob(file.id);
+                    const mergedBlob = await generateMergedConceptBlob(file.id, getChairCommentSourceId(file, file.id));
                     if (!mergedBlob) throw new Error(`Unable to prepare ${file.name || file.id}.`);
                     downloadBlob(mergedBlob, getMergedConceptDownloadName(file));
                 }
@@ -321,6 +321,88 @@ const showProgressContainer = () => {
     }
 };
 
+const normalizeBoxFileName = (fileName) => String(fileName || "").trim();
+
+const findMatchingFileByName = (files, fileName) => {
+    const normalizedFileName = normalizeBoxFileName(fileName);
+    if (!normalizedFileName || !Array.isArray(files)) return null;
+    return files.find(file => file && normalizeBoxFileName(file.name) === normalizedFileName) || null;
+};
+
+const getChairCommentSourceId = (file, fallbackId = null) => {
+    if (!file) return fallbackId;
+    return file.commentsFileId || file.masterFileId || fallbackId || file.id;
+};
+
+const showCommentsForChairTab = (file, tab, fallbackId = null) => {
+    const selectedFileId = fallbackId || (file && file.id);
+    const commentsFileId = getChairCommentSourceId(file, selectedFileId);
+    if (!commentsFileId) return;
+
+    if (tab === "conceptNeedingClarification" || tab === "completedConcepts") {
+        showCommentsWithResponses(commentsFileId, (file && file.responseComments) || []);
+        return;
+    }
+
+    showComments(selectedFileId);
+};
+
+const getCommentTime = (comment) => {
+    const parsedTime = Date.parse(comment && comment.created_at ? comment.created_at : "");
+    return Number.isNaN(parsedTime) ? 0 : parsedTime;
+};
+
+const getCommentConsortium = (comment) => {
+    if (!comment || !comment.message) return "";
+    const messageMatch = comment.message.match(/Consortium:\s*([^,]+)/i);
+    if (messageMatch) return messageMatch[1].trim();
+    return (comment.created_by && chairsInfo.find(chair => chair && chair.email === comment.created_by.login)?.consortium) || "";
+};
+
+const isChairDecisionComment = (comment, consortium = null) => {
+    if (!comment || !comment.message || comment.message.startsWith('Response ID:')) return false;
+    const isChairComment = (comment.created_by && chairsInfo.some(chair => chair && chair.email === comment.created_by.login))
+        || comment.message.startsWith('Consortium');
+    if (!isChairComment) return false;
+    if (!consortium) return true;
+    return getCommentConsortium(comment).toLowerCase() === String(consortium).toLowerCase();
+};
+
+const requiresSubmitterResponse = (comment) => {
+    if (!comment || !comment.message) return false;
+    const ratingMatch = comment.message.match(/Rating:\s*(\w+)/i);
+    const rating = ratingMatch ? ratingMatch[1].trim() : null;
+    return rating && rating !== '1' && rating.toUpperCase() !== 'NA';
+};
+
+const getResponseTargetId = (chairComment) => {
+    const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
+    return boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
+};
+
+const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consortium = null) => {
+    const chairEntries = Array.isArray(chairSourceComments) ? chairSourceComments : [];
+    const responseEntries = Array.isArray(responseComments) ? responseComments : [];
+    const scopedChairComments = chairEntries.filter(comment => isChairDecisionComment(comment, consortium));
+    const chairComments = scopedChairComments.filter(comment => requiresSubmitterResponse(comment));
+    const chairCommentResponseIds = new Set(chairComments.map(getResponseTargetId));
+    const scopedResponseEntries = responseEntries.filter(responseComment => {
+        if (!responseComment || !responseComment.message) return false;
+        return Array.from(chairCommentResponseIds).some(responseId => responseComment.message.includes(`Response ID: ${responseId}`));
+    });
+    const latestResponseTime = scopedResponseEntries.reduce((latest, responseComment) => Math.max(latest, getCommentTime(responseComment)), 0);
+    const hasChairCommentAfterLatestResponse = latestResponseTime > 0
+        && scopedChairComments.some(comment => getCommentTime(comment) > latestResponseTime);
+
+    return chairComments.length > 0
+        && scopedResponseEntries.length > 0
+        && !hasChairCommentAfterLatestResponse
+        && chairComments.every(chairComment => {
+            const effectiveId = getResponseTargetId(chairComment);
+            return responseEntries.some(responseComment => responseComment && responseComment.message && responseComment.message.includes(`Response ID: ${effectiveId}`));
+        });
+};
+
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
     const results = [];
     const CHUNK_SIZE = 10;
@@ -368,22 +450,8 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
 
                 if (comments) {
                     const commentEntries = JSON.parse(comments).entries;
-                    const chairComments = commentEntries.filter(c => {
-                        const message = c.message;
-                        const ratingMatch = message.match(/Rating:\s*(\w+)/i);
-                        const rating = ratingMatch ? ratingMatch[1].trim() : null;
-                        const isChair = chairsInfo.some(chair => chair.email === c.created_by.login) || message.startsWith('Consortium');
-                        const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
-                        return isChair && requiresResponse && !message.startsWith('Response ID:');
-                    });
-                    
                     const responseComments = commentEntries.filter(c => c.message.startsWith('Response ID:'));
-                    
-                    isReplyCompleted = chairComments.every(chairComment => {
-                        const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
-                        const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
-                        return responseComments.some(resComment => resComment.message.includes(`Response ID: ${effectiveId}`));
-                    });
+                    isReplyCompleted = areChairCommentsRepliedTo(commentEntries, responseComments);
                 }
             }
 
@@ -477,17 +545,8 @@ export const switchFilesWithComments = (tab, files = []) => {
             
             showPreviewInPane(file_id);
             
-            // Check if this file has response comments
-            const file = files.find(f => f && f.id === file_id);
-            if (file && file.responseComments) {
-                console.log("Using showCommentsWithResponses for file:", file.name, file.responseComments); 
-                showCommentsWithResponses(file_id, file.responseComments);
-            } else if (tab === 'conceptNeedingClarification') {
-                console.log("Using showCommentsSub for file:", file.name);
-                showCommentsWithResponses(file_id, file_id.responseComments);
-            } else {
-                showComments(file_id);
-            }
+            const file = files.find(f => f && String(f.id) === String(file_id));
+            showCommentsForChairTab(file, tab, file_id);
         });
     }
 };
@@ -512,10 +571,11 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         updateProgressBar(15, "Fetching file manifests...");
         
         // Fetch Chair's personal folders and DACC members list
-        const [filearrayChair, filearrayClara, filearrayComplete, testData] = await Promise.all([
-            getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at"),
+        const [filearrayChair, filearrayClara, filearrayComplete, completedMasterFiles, testData] = await Promise.all([
+            getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at,parent.name"),
             getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at,parent.name"),
-            getAllFilesRecursive(userChairItem.boxIdComplete, "name,type,id,parent,created_at"),
+            getAllFilesRecursive(userChairItem.boxIdComplete, "name,type,id,parent,created_at,parent.name"),
+            getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at,parent.name"),
             getFile(DACCmembers)
         ]);
 
@@ -544,7 +604,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
         const findRoundId = (fileName) => {
             if (!filearrayAllFiles || !Array.isArray(filearrayAllFiles)) return null;
-            const match = filearrayAllFiles.find(f => f && f.name && f.name.trim() === fileName.trim());
+            const match = findMatchingFileByName(filearrayAllFiles, fileName);
             return match ? match.roundId : null;
         };
 
@@ -552,6 +612,32 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             if (!folderName) return null;
             const match = roundFolders.find(round => round && round.name === folderName);
             return match ? match.id : null;
+        };
+
+        (completedMasterFiles || []).forEach(file => {
+            const parentFolderName = file && file.parent && file.parent.name ? file.parent.name : null;
+            if (parentFolderName && parentFolderName.toLowerCase().startsWith('round')) {
+                file.roundName = parentFolderName;
+                file.roundId = findRoundIdByFolderName(parentFolderName);
+            }
+        });
+
+        const completedMasterFileArray = (completedMasterFiles && Array.isArray(completedMasterFiles)) ? completedMasterFiles : [];
+        const filearrayMasterFiles = [
+            ...filearrayAllFiles,
+            ...completedMasterFileArray
+        ];
+
+        const attachMasterCommentSource = (item, preferredMasterFiles = []) => {
+            const preferredMatch = item && item.name ? findMatchingFileByName(preferredMasterFiles, item.name) : null;
+            const masterFile = preferredMatch || (item && item.name ? findMatchingFileByName(filearrayMasterFiles, item.name) : null);
+            if (masterFile && masterFile.id) {
+                item.masterFileId = masterFile.id;
+                item.commentsFileId = masterFile.id;
+                if (!item.roundId && masterFile.roundId) item.roundId = masterFile.roundId;
+                if (!item.roundName && masterFile.roundName) item.roundName = masterFile.roundName;
+            }
+            return item;
         };
 
         const filesIncompleted = [];
@@ -608,6 +694,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                     const parentFolderName = item.parent && item.parent.name ? item.parent.name : null;
                     item.roundId = findRoundId(item.name) || findRoundIdByFolderName(parentFolderName);
                     if (!item.roundName && parentFolderName && parentFolderName.toLowerCase().startsWith('round')) item.roundName = parentFolderName;
+                    attachMasterCommentSource(item);
                     filesClaraIncompleted.push(item);
                 }
             });
@@ -618,7 +705,10 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         if (filearrayComplete && Array.isArray(filearrayComplete)) {
             filearrayComplete.forEach(item => {
                 if (item && item.id && filesComplete.findIndex(element => element && element.id === item.id) === -1) {
-                    item.roundId = findRoundId(item.name);
+                    const parentFolderName = item.parent && item.parent.name ? item.parent.name : null;
+                    item.roundId = findRoundId(item.name) || findRoundIdByFolderName(parentFolderName);
+                    if (!item.roundName && parentFolderName && parentFolderName.toLowerCase().startsWith('round')) item.roundName = parentFolderName;
+                    attachMasterCommentSource(item, completedMasterFileArray);
                     filesComplete.push(item);
                 }
             });
@@ -657,28 +747,21 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                 await Promise.all(filesClaraIncompleted.map(async (claraFile) => {
                     try {
                         if (!claraFile || !claraFile.name) return;
-                        const matchingFile = responseFiles.find(f => f && f.name === claraFile.name);
+                        const matchingFile = findMatchingFileByName(responseFiles, claraFile.name);
                         if (matchingFile) {
-                            const commentsResponse = await listComments(matchingFile.id);
+                            claraFile.responseFileId = matchingFile.id;
+                            const commentsFileId = getChairCommentSourceId(claraFile, claraFile.id);
+                            const [commentsResponse, masterCommentsResponse] = await Promise.all([
+                                listComments(matchingFile.id),
+                                commentsFileId && String(commentsFileId) !== String(matchingFile.id) ? listComments(commentsFileId) : Promise.resolve(null)
+                            ]);
                             if (commentsResponse) {
                                 const comments = JSON.parse(commentsResponse).entries;
                                 if (comments && Array.isArray(comments)) {
                                     claraFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
-                                    const chairComments = comments.filter(c => {
-                                        if (!c || !c.message) return false;
-                                        const message = c.message;
-                                        const ratingMatch = message.match(/Rating:\s*(\w+)/i);
-                                        const rating = ratingMatch ? ratingMatch[1].trim() : null;
-                                        const isChair = (c.created_by && chairsInfo.some(chair => chair && chair.email === c.created_by.login)) || message.startsWith('Consortium');
-                                        const requiresResponse = rating && rating !== '1' && rating.toUpperCase() !== 'NA';
-                                        return isChair && requiresResponse && !message.startsWith('Response ID:');
-                                    });
-                                    claraFile.isReplyCompleted = chairComments.every(chairComment => {
-                                        if (!chairComment || !chairComment.message) return false;
-                                        const boxCommentIdMatch = chairComment.message.match(/Box Comment ID:\s*(\w+)/);
-                                        const effectiveId = boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
-                                        return claraFile.responseComments && claraFile.responseComments.some(resComment => resComment && resComment.message && resComment.message.includes(`Response ID: ${effectiveId}`));
-                                    });
+                                    const masterComments = masterCommentsResponse ? JSON.parse(masterCommentsResponse).entries : null;
+                                    const chairSourceComments = Array.isArray(masterComments) ? masterComments : comments;
+                                    claraFile.isReplyCompleted = areChairCommentsRepliedTo(chairSourceComments, claraFile.responseComments, consortium);
                                 }
                             }
                         }
@@ -699,6 +782,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             filesClaraIncompleted,
             filesComplete,
             filearrayAllFiles,
+            filearrayMasterFiles,
             daccEmails,
             consortium,
             roundFolders,
@@ -875,16 +959,19 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                 if (daccPane && daccPane.innerHTML.includes('Loading...')) {
                     await viewFinalDecisionFilesTemplate(filteredAllFiles);
 
-                    // Pre-load DACC scores/comments for all files (like Admin table does)
+                    // Pre-load DACC scores/comments and investigators for all files (like Admin table does)
                     try {
                         // Parallelize preloading in small chunks to avoid rate limits
                         const CHUNK_SIZE = 10;
                         for (let i = 0; i < filteredAllFiles.length; i += CHUNK_SIZE) {
                             const chunk = filteredAllFiles.slice(i, i + CHUNK_SIZE);
-                            await Promise.all(chunk.map(f => f && f.id ? showCommentsDCEG(f.id, true) : Promise.resolve()));
+                            await Promise.all(chunk.map(f => f && f.id ? Promise.all([
+                                showCommentsDCEG(f.id, true),
+                                loadDaccDecisionInvestigators(f.id)
+                            ]) : Promise.resolve()));
                         }
                     } catch (e) {
-                        console.error('Error preloading DACC scores:', e);
+                        console.error('Error preloading DACC decision details:', e);
                     }
                 }
             }, { once: true });
@@ -939,7 +1026,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
         if (!!filteredIncompleted.length) {
             showPreviewInPane(filteredIncompleted[0].id);
-            showCommentsInPane(filteredIncompleted[0].id);
+            showCommentsForChairTab(filteredIncompleted[0], "recommendation", filteredIncompleted[0].id);
             switchFilesWithComments("recommendation", filteredIncompleted);
             document.getElementById("recommendationselectedDoc").children[0].selected = true;
             setTimeout(() => {
@@ -950,16 +1037,12 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             }, 200);
         } else if (!!filteredClara.length) {
             showPreviewInPane(filteredClara[0].id);
-            if (filteredClara[0].responseComments) {
-                showCommentsWithResponses(filteredClara[0].id, filteredClara[0].responseComments);
-            } else {
-                showCommentsSub(filteredClara[0].id);
-            }
+            showCommentsForChairTab(filteredClara[0], "conceptNeedingClarification", filteredClara[0].id);
             switchFilesWithComments("conceptNeedingClarification", filteredClara);
             document.getElementById("conceptNeedingClarificationTab").click();
         } else if (!!filteredComplete.length) {
             showPreviewInPane(filteredComplete[0].id);
-            showCommentsInPane(filteredComplete[0].id);
+            showCommentsForChairTab(filteredComplete[0], "completedConcepts", filteredComplete[0].id);
             switchFilesWithComments("completedConcepts", filteredComplete);
             document.getElementById("completedConceptsTab").click();
         } else {
@@ -1093,13 +1176,33 @@ async function handleChairCommentSubmit(e) {
         
         const fileinfo = await getFileInfo(fileId);
         const filename = fileinfo.name.trim();
-        let allFiles = (chairMenuCache && chairMenuCache.filearrayAllFiles) ? chairMenuCache.filearrayAllFiles : await getAllFilesRecursive(submitterFolder, "name,id,parent,parent.name,created_at");
-        const allFileMatch = allFiles.find(element => element && element.name && element.name.trim() === filename);
+        const cachedTabFiles = activeTabPane.id === 'conceptNeedingClarification'
+            ? chairMenuCache && chairMenuCache.filesClaraIncompleted
+            : activeTabPane.id === 'completedConcepts'
+                ? chairMenuCache && chairMenuCache.filesComplete
+                : chairMenuCache && chairMenuCache.filesIncompleted;
+        const cachedSelectedFile = Array.isArray(cachedTabFiles)
+            ? cachedTabFiles.find(file => file && String(file.id) === String(fileId))
+            : null;
+        let allFiles = chairMenuCache && chairMenuCache.filearrayMasterFiles ? chairMenuCache.filearrayMasterFiles : null;
+        if (!allFiles) {
+            const [submitterFiles, completedFiles] = await Promise.all([
+                getAllFilesRecursive(submitterFolder, "name,id,parent,parent.name,created_at"),
+                getAllFilesRecursive(completedFolder, "name,id,parent,parent.name,created_at")
+            ]);
+            allFiles = [
+                ...((submitterFiles && Array.isArray(submitterFiles)) ? submitterFiles : []),
+                ...((completedFiles && Array.isArray(completedFiles)) ? completedFiles : [])
+            ];
+        }
+        const cachedCommentSourceId = cachedSelectedFile && (cachedSelectedFile.commentsFileId || cachedSelectedFile.masterFileId);
+        const allFileMatch = (cachedCommentSourceId && allFiles.find(file => file && String(file.id) === String(cachedCommentSourceId)))
+            || findMatchingFileByName(allFiles, filename);
 
         await createComment(fileId, message);
         let roundNameForMove = null;
         if (allFileMatch && allFileMatch.id) {
-            await createComment(allFileMatch.id, message);
+            if (String(allFileMatch.id) !== String(fileId)) await createComment(allFileMatch.id, message);
             if (allFileMatch.roundName) {
                 roundNameForMove = allFileMatch.roundName;
             } else if (allFileMatch.parent) {
@@ -1180,10 +1283,10 @@ export const commentSubmit = async (consortium) => {
     }
 };
 
-const generateMergedConceptBlob = async (fileId) => {
+const generateMergedConceptBlob = async (fileId, commentsFileId = fileId) => {
     try {
         const [commentsResponse, originalFileResponse] = await Promise.all([
-            listComments(fileId),
+            listComments(commentsFileId),
             downloadFile(fileId)
         ]);
         const comments = JSON.parse(commentsResponse).entries;
@@ -1197,7 +1300,7 @@ const generateMergedConceptBlob = async (fileId) => {
             } else { originalContent = '<p>Mammoth.js not available.</p>'; }
         } catch (docxError) { originalContent = '<p>Could not extract content.</p>'; }
         
-        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>File ID:</strong> ${fileId}</p>`;
+        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>File ID:</strong> ${commentsFileId}</p>`;
         if (comments.length === 0) { mergedContent += `<p>No comments found.</p>`; } else {
             comments.forEach((comment, index) => {
                 mergedContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; page-break-inside: avoid;"><h3>Comment ${index + 1}:</h3><div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div><p><strong>Response (if applicable):</strong></p><div style="border: 1px solid #ddd; min-height: 50px; padding: 10px; background-color: white;"></div></div>`;
@@ -1284,6 +1387,19 @@ export function viewFinalDecisionFilesTemplate(files) {
     }
 };
 
+const loadDaccDecisionInvestigators = async (fileId) => {
+  const investigatorsDiv = document.getElementById(`investigators${fileId}`);
+  if (!investigatorsDiv || !investigatorsDiv.innerHTML.includes('Click accordion to load')) return;
+
+  investigatorsDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+  try {
+    const docContent = await readDocFile(fileId);
+    investigatorsDiv.innerHTML = extractContactInvestigators(docContent);
+  } catch (e) {
+    investigatorsDiv.innerHTML = '<span class="text-danger">Error loading details</span>';
+  }
+};
+
 export function viewFinalDecisionFiles(files) {
   let template = `<div class="row m-0 align-left allow-overflow w-100"><div class="accordion accordion-flush col-md-12 px-0" id="daccAccordian">`;
   for (const fileInfo of files) {
@@ -1308,12 +1424,8 @@ export function viewFinalDecisionFiles(files) {
           this.setAttribute('aria-expanded', 'true');
           const investigatorsDiv = document.getElementById(`investigators${fileId}`);
           if (investigatorsDiv && investigatorsDiv.innerHTML.includes('Click accordion to load')) {
-              investigatorsDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-              try {
-                  const docContent = await readDocFile(fileId);
-                  investigatorsDiv.innerHTML = extractContactInvestigators(docContent);
-                  showCommentsDCEG(fileId, false);
-              } catch (e) { investigatorsDiv.innerHTML = '<span class="text-danger">Error loading details</span>'; }
+              await loadDaccDecisionInvestigators(fileId);
+              showCommentsDCEG(fileId, false);
           }
         } else {
           icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
