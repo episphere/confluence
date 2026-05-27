@@ -380,6 +380,14 @@ const getResponseTargetId = (chairComment) => {
     return boxCommentIdMatch ? boxCommentIdMatch[1] : chairComment.id;
 };
 
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const responseMatchesComment = (responseComment, commentId) => {
+    if (!responseComment || !responseComment.message || !commentId) return false;
+    const responseIdPattern = new RegExp(`Response ID:\\s*${escapeRegExp(commentId)}(?:\\s*,|\\s|$)`);
+    return responseIdPattern.test(responseComment.message);
+};
+
 const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consortium = null) => {
     const chairEntries = Array.isArray(chairSourceComments) ? chairSourceComments : [];
     const responseEntries = Array.isArray(responseComments) ? responseComments : [];
@@ -388,7 +396,7 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
     const chairCommentResponseIds = new Set(chairComments.map(getResponseTargetId));
     const scopedResponseEntries = responseEntries.filter(responseComment => {
         if (!responseComment || !responseComment.message) return false;
-        return Array.from(chairCommentResponseIds).some(responseId => responseComment.message.includes(`Response ID: ${responseId}`));
+        return Array.from(chairCommentResponseIds).some(responseId => responseMatchesComment(responseComment, responseId));
     });
     const latestResponseTime = scopedResponseEntries.reduce((latest, responseComment) => Math.max(latest, getCommentTime(responseComment)), 0);
     const hasChairCommentAfterLatestResponse = latestResponseTime > 0
@@ -399,7 +407,7 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
         && !hasChairCommentAfterLatestResponse
         && chairComments.every(chairComment => {
             const effectiveId = getResponseTargetId(chairComment);
-            return responseEntries.some(responseComment => responseComment && responseComment.message && responseComment.message.includes(`Response ID: ${effectiveId}`));
+            return responseEntries.some(responseComment => responseMatchesComment(responseComment, effectiveId));
         });
 };
 
@@ -440,13 +448,17 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
             let submissionDate = fileInfo.created_at;
             let returnedDate = null;
             let isReplyCompleted = false;
+            let commentsFileId = fileId;
+            let responseFileId = null;
 
             if (type === 'res') {
                 returnedDate = fileInfo.created_at;
-                const originalFile = allSubFiles.find(f => f.name === filename);
+                const originalFile = findMatchingFileByName(allSubFiles, filename);
                 if (originalFile) {
                     submissionDate = originalFile.created_at;
+                    commentsFileId = originalFile.id;
                 }
+                responseFileId = fileId;
 
                 if (comments) {
                     const commentEntries = JSON.parse(comments).entries;
@@ -457,7 +469,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
 
             let roundId = fileInfo.parent ? fileInfo.parent.id : null;
             if (type === 'res' || type === 'com') {
-                const originalFile = allSubFiles.find(f => f.name === filename);
+                const originalFile = findMatchingFileByName(allSubFiles, filename);
                 if (originalFile && originalFile.parent) {
                     roundId = originalFile.parent.id;
                 }
@@ -468,6 +480,8 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
                 submissionDate, returnedDate, isReplyCompleted,
                 parentId: fileInfo.parent.id,
                 roundId: roundId,
+                commentsFileId,
+                responseFileId,
                 name: fileInfo.name,
                 type: type
             };
@@ -739,6 +753,13 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             }));
         }
 
+        filearrayAllFiles.forEach(masterFile => {
+            if (!masterFile || !masterFile.id) return;
+            masterFile.commentsFileId = masterFile.id;
+            const responseFile = findMatchingFileByName(responseFiles, masterFile.name);
+            if (responseFile && responseFile.id) masterFile.responseFileId = responseFile.id;
+        });
+
         updateProgressBar(90, "Syncing individual response histories...");
         if (responseFiles.length > 0) {
             let syncCount = 0;
@@ -966,7 +987,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                         for (let i = 0; i < filteredAllFiles.length; i += CHUNK_SIZE) {
                             const chunk = filteredAllFiles.slice(i, i + CHUNK_SIZE);
                             await Promise.all(chunk.map(f => f && f.id ? Promise.all([
-                                showCommentsDCEG(f.id, true),
+                                showAuthCommentsWithResponses(f.id, f.commentsFileId || f.id, f.responseFileId, true),
                                 loadDaccDecisionInvestigators(f.id)
                             ]) : Promise.resolve()));
                         }
@@ -1570,6 +1591,109 @@ export const generateAuthTableFiles = async () => {
     hideAnimation();
 };
 
+const updateAdminDecisionScoreFromComment = (comment, rowFileId, change = true) => {
+    if (!comment || !comment.message || !comment.message.startsWith("Consortium")) return;
+
+    const cons = getCommentConsortium(comment);
+    const ratingMatch = comment.message.match(/Rating:\s*([^,]+)/i);
+    const score = ratingMatch ? ratingMatch[1].trim() : "--";
+    if (!cons) return;
+
+    const inputScore = document.getElementById(`${cons}${rowFileId}`);
+    const selectElement = inputScore ? inputScore.children[0] : null;
+    if (!selectElement) {
+        console.warn(`Score cell not found for consortium ${cons} and file ${rowFileId}`);
+        return;
+    }
+
+    selectElement.value = score;
+    selectElement.className = "form-select form-select-sm decision-dropdown disabled";
+    if (change === false) {
+        selectElement.setAttribute("disabled", true);
+        selectElement.classList.add(`badge-${score}`);
+    } else if (score !== "--") {
+        selectElement.classList.add(`badge-${score}`);
+        selectElement.setAttribute("data-previous-value", selectElement.value);
+    }
+};
+
+const getResponseText = (responseComment) => {
+    const message = responseComment && responseComment.message ? responseComment.message : "";
+    const commaIndex = message.indexOf(",");
+    return commaIndex >= 0 ? message.substring(commaIndex + 1).trim() : message;
+};
+
+const showAuthCommentsWithResponses = async (rowFileId, commentsFileId, responseFileId = null, change = true) => {
+    const commentSection = document.getElementById(`file${rowFileId}Comments`);
+    if (!commentSection) return;
+
+    try {
+        const [commentsResponse, responseCommentsResponse] = await Promise.all([
+            listComments(commentsFileId || rowFileId),
+            responseFileId ? listComments(responseFileId) : Promise.resolve(null)
+        ]);
+
+        const comments = commentsResponse ? JSON.parse(commentsResponse).entries : [];
+        const responseComments = responseCommentsResponse
+            ? JSON.parse(responseCommentsResponse).entries.filter(comment => comment && comment.message && comment.message.startsWith("Response ID:"))
+            : comments.filter(comment => comment && comment.message && comment.message.startsWith("Response ID:"));
+        const sourceComments = comments.filter(comment => comment && comment.message && !comment.message.startsWith("Response ID:"));
+
+        if (sourceComments.length === 0) {
+            commentSection.innerHTML = "No Comments to show.";
+            return;
+        }
+
+        let template = "<div class='container-fluid'>";
+        for (const comment of sourceComments) {
+            updateAdminDecisionScoreFromComment(comment, rowFileId, change);
+            const commentDate = new Date(comment.created_at);
+            const date = commentDate.toLocaleDateString();
+            const time = commentDate.toLocaleTimeString();
+            const responseId = getResponseTargetId(comment);
+            const matchingResponses = responseComments.filter(responseComment => responseMatchesComment(responseComment, responseId));
+
+            template += `
+                <div>
+                    <div class='row'>
+                        <div class='col-8 p-0'>
+                            <p class='text-primary small mb-0 align-left'>${escapeHtml(comment.created_by.name)}</p>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <p class='my-0' id='comment${comment.id}'>${escapeHtml(comment.message)}</p>
+                    </div>
+                    <div class='row'>
+                        <p class='small mb-0 font-weight-light'>${date} at ${time}</p>
+                    </div>
+            `;
+
+            matchingResponses.forEach(responseComment => {
+                const responseDate = new Date(responseComment.created_at);
+                template += `
+                    <div class='row mt-2'>
+                        <div class='col-12 p-2' style='background-color: #e7f3ff; border-left: 3px solid #007bff;'>
+                            <small class='font-weight-bold'>Response from ${escapeHtml(responseComment.created_by.name)} (${responseDate.toLocaleDateString()} at ${responseDate.toLocaleTimeString()}):</small>
+                            <p class='my-0'>${escapeHtml(getResponseText(responseComment))}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            template += `
+                    <hr class='my-1'>
+                </div>
+            `;
+        }
+
+        template += "</div>";
+        commentSection.innerHTML = template;
+    } catch (error) {
+        console.error("Error loading admin comments with responses:", error);
+        commentSection.innerHTML = "<span class='text-danger'>Error loading comments.</span>";
+    }
+};
+
 export async function viewAuthFinalDecisionFilesTemplate(processedSub, processedCom, processedRes) {
     let template = "";
     const resFileNames = processedRes.map(file => file.name);
@@ -1593,7 +1717,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
         document.querySelectorAll('.pl').forEach(checkbox => { checkbox.addEventListener('change', updateButtonStates); });
         for (const file of filteredSub) await showCommentsDCEG(file.fileId, true);
         for (const file of processedCom) await showCommentsDCEG(file.fileId, true);
-        for (const file of processedRes) await showCommentsDCEG(file.fileId, true);
+        for (const file of processedRes) await showAuthCommentsWithResponses(file.fileId, file.commentsFileId, file.responseFileId, true);
         Array.from(document.querySelectorAll(".preview-file")).forEach((btn) => {
             btn.addEventListener("click", (e) => {
                 const header = document.getElementById("confluencePreviewerModalHeader");
