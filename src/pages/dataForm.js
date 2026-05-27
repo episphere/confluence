@@ -516,7 +516,7 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                             <p><u>3. ADDITIONAL INFORMATION</u></p>
 
                             <div class="input-group">
-                              <label for="analdesc"><b>Concept Analysis Plans</b> <i>  Please provide a concise description of your analysis plan. The analysis plan should be consistent with the data that is being requested.</i><span class='required-label'>*</span></label>
+                              <label for="analdesc"><b>Concept Analysis Plans</b> <i>  Please provide a concise description of your analysis plan. The analysis plan should be consistent with the data that is being requested. If needed, please note and explain any differences in the data being requested from the consortia (e.g., only GWAS summary results are requested from CIMBA and individual level imputed data from other consortia).</i><span class='required-label'>*</span></label>
                               <textarea id="analdesc" name="analdesc" rows="6" cols="65" class="form-text-input" required></textarea>
                             </div>
 
