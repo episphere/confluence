@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Masking Prototype</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+        .container { max-width: 900px; margin: auto; }
+        .section { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #f9f9f9; }
+        h2 { margin-top: 0; color: #0056b3; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #0056b3; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #004494; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #eee; }
+        .collision { background: #fee; color: #b00; font-weight: bold; }
+        .success { color: #080; font-weight: bold; }
+        .stats { margin-top: 10px; font-style: italic; }
+        .trace-result { margin-top: 10px; padding: 10px; border: 1px dashed #0056b3; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ID Masking Prototype (HMAC-SHA256)</h1>
+        <p>This tool demonstrates deterministic ID masking using a secret key. The same ID + same key always produces the same 12-character mask.</p>
+
+        <div class="section">
+            <h2>1. Secret Key</h2>
+            <label for="secretKey">Define your key (or generate one):</label>
+            <input type="text" id="secretKey" placeholder="Enter a secret key..." value="my-secret-confluence-key-2026">
+            <button id="genKeyBtn">Generate Random Key</button>
+        </div>
+
+        <div class="section">
+            <h2>2. Tracing Tool</h2>
+            <p>Enter an original ID to see its mask with the current key. Use this to "trace back" a masked ID.</p>
+            <label for="traceId">Original ID:</label>
+            <input type="text" id="traceId" placeholder="e.g. 1001">
+            <div id="traceResult" class="trace-result"></div>
+        </div>
+
+        <div class="section">
+            <h2>3. Bulk Process CSV</h2>
+            <p>Upload a CSV (id, name) to mask all IDs and check for collisions.</p>
+            <input type="file" id="csvFile" accept=".csv">
+            <button id="processBtn">Process CSV</button>
+            <div id="stats" class="stats"></div>
+            
+            <div id="resultsTableContainer">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Original ID</th>
+                            <th>Name</th>
+                            <th>Masked ID (12-char Base64)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Results will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { maskId, generateRandomKey } from './masking.js';
+
+        const secretKeyInput = document.getElementById('secretKey');
+        const genKeyBtn = document.getElementById('genKeyBtn');
+        const traceIdInput = document.getElementById('traceId');
+        const traceResult = document.getElementById('traceResult');
+        const csvFileInput = document.getElementById('csvFile');
+        const processBtn = document.getElementById('processBtn');
+        const resultsTableBody = document.querySelector('#resultsTable tbody');
+        const statsDiv = document.getElementById('stats');
+
+        // Generate key button
+        genKeyBtn.addEventListener('click', () => {
+            secretKeyInput.value = generateRandomKey();
+        });
+
+        // Live Tracing
+        traceIdInput.addEventListener('input', async () => {
+            const id = traceIdInput.value.trim();
+            const key = secretKeyInput.value.trim();
+            if (id && key) {
+                const mask = await maskId(id, key);
+                traceResult.style.display = 'block';
+                traceResult.innerHTML = `<strong>Masked ID:</strong> <code class="success">${mask}</code>`;
+            } else {
+                traceResult.style.display = 'none';
+            }
+        });
+
+        // Process CSV
+        processBtn.addEventListener('click', async () => {
+            const file = csvFileInput.files[0];
+            const key = secretKeyInput.value.trim();
+
+            if (!file) return alert('Please select a CSV file.');
+            if (!key) return alert('Please enter a secret key.');
+
+            const text = await file.text();
+            const lines = text.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',');
+            const rows = lines.slice(1);
+
+            resultsTableBody.innerHTML = '';
+            const maskMap = new Map(); // mask -> [originalIds]
+            const results = [];
+
+            for (let line of rows) {
+                const parts = line.split(',');
+                if (parts.length < 1) continue;
+                
+                const originalId = parts[0].trim();
+                const name = parts[1] ? parts[1].trim() : '';
+                const maskedId = await maskId(originalId, key);
+
+                if (!maskMap.has(maskedId)) {
+                    maskMap.set(maskedId, new Set());
+                }
+                maskMap.get(maskedId).add(originalId);
+
+                results.push({ originalId, name, maskedId });
+            }
+
+            let collisions = 0;
+            results.forEach(res => {
+                const tr = document.createElement('tr');
+                const isCollision = maskMap.get(res.maskedId).size > 1;
+                if (isCollision) collisions++;
+
+                tr.innerHTML = `
+                    <td>${res.originalId}</td>
+                    <td>${res.name}</td>
+                    <td><code>${res.maskedId}</code></td>
+                    <td class="${isCollision ? 'collision' : 'success'}">
+                        ${isCollision ? 'COLLISION DETECTED' : 'Unique'}
+                    </td>
+                `;
+                resultsTableBody.appendChild(tr);
+            });
+
+            statsDiv.innerText = `Processed ${results.length} rows. Collisions found: ${collisions}.`;
+        });
+    </script>
+</body>
+</html>
