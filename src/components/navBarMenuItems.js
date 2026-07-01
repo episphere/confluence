@@ -134,6 +134,11 @@ export const navBarMenutemplate = () => {
                                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable">
                                             Admin Table
                                         </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#opt_in_out" title="Admin Opt-In Table" id="optInOutMenu">
+                                            Admin Opt-In Table
+                                        </a>
                                     </li>`
                                 ) : ''
                             }

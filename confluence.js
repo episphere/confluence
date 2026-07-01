@@ -3,7 +3,7 @@ import { infoDeck, infoDeckAfterLoggedIn } from './src/pages/homePage.js';
 import { dataSubmissionTemplate, dataSubmissionForm} from './src/pages/dataSubmission.js';
 import { dataSummary, dataSummaryMissingTemplate, dataSummaryStatisticsTemplate } from './src/pages/dataExploration.js';
 import { template as dataRequestTemplate, templateAfterLogin as dataRequestTemplateAfterLogin} from './src/pages/dataRequest.js';
-import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
+import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles, optInOutTemplate, loadOptInOutTable } from './src/pages/chairmenu.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators } from './src/shared.js';
@@ -91,6 +91,7 @@ export const confluence = async () => {
         // const uploaddataFormElement = document.getElementById('uploaddataForm');
         const chairMenuElement = document.getElementById('chairMenu');
         const authTableElement = document.getElementById('authTable');
+        const optInOutElement = document.getElementById('optInOutMenu');
         const acceptedFormsElement = document.getElementById('acceptedForms');
         const plotsTabElement = document.getElementById('plotsTab');
 
@@ -233,6 +234,17 @@ export const confluence = async () => {
                 document.title = 'Confluence - Admin Table';
                 confluenceDiv.innerHTML = authTableTemplate();
                 generateAuthTableFiles();
+            });
+        }
+        if (optInOutElement) {
+            optInOutElement.addEventListener('click', async () => {
+                if (optInOutElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(optInOutElement, 2);
+                document.title = 'Confluence - Opt-In Opt-Out';
+                confluenceDiv.innerHTML = optInOutTemplate();
+                await loadOptInOutTable();
+                hideAnimation();
             });
         }
         if (acceptedFormsElement) {
@@ -420,6 +432,17 @@ const manageRouter = async () => {
         confluenceDiv.innerHTML = authTableTemplate();
         generateAuthTableFiles();
     }
+    else if (hash === '#opt_in_out') {
+        const element = document.getElementById('optInOutMenu');
+        if (!element) return;
+        if (element.classList.contains('navbar-active')) return;
+
+        document.title = 'Confluence - Opt-In Opt-Out';
+        assignNavbarActive(element, 2);
+        confluenceDiv.innerHTML = optInOutTemplate();
+        await loadOptInOutTable();
+        hideAnimation();
+    }
 
     else if (hash === '#accepted_forms') {
         const element = document.getElementById('acceptedForms');
@@ -515,6 +538,11 @@ const manageHash = async () => {
     }
     else if (hash === '#auth_table') {
         const element = document.getElementById('authTable');
+        element.click();
+    }
+    else if (hash === '#opt_in_out') {
+        const element = document.getElementById('optInOutMenu');
+        if (!element) return;
         element.click();
     }
     else if (hash === '#accepted_forms') {

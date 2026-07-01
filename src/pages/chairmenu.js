@@ -66,6 +66,199 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
+const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
+
+const TRUTHY_VALUES = new Set(["true", "yes", "y", "1", "checked", "opt-out", "opt out", "optout"]);
+
+const normalizeHeaderValue = (value) => String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const getCellValue = (row, aliases = []) => {
+    if (!row) return "";
+
+    for (const alias of aliases) {
+        const normalizedAlias = normalizeHeaderValue(alias);
+        const match = Object.entries(row).find(([key]) => normalizeHeaderValue(key) === normalizedAlias);
+        if (match) return match[1];
+    }
+
+    return "";
+};
+
+const isTruthyCellValue = (value) => TRUTHY_VALUES.has(String(value ?? "").trim().toLowerCase());
+
+const getStudyStatusSelect = (value = "in") => {
+    const isOut = String(value).trim().toLowerCase() === "out";
+    return `
+        <select class="form-select form-select-sm study-status-select ${isOut ? "border-danger text-danger" : "border-success text-success"}" style="${isOut ? "background-color: #f8d7da; color: #842029;" : "background-color: #d1e7dd; color: #0f5132;"}" aria-label="Study status">
+            <option value="in" ${!isOut ? "selected" : ""} style="background-color: #d1e7dd; color: #0f5132;">In</option>
+            <option value="out" ${isOut ? "selected" : ""} style="background-color: #f8d7da; color: #842029;">Out</option>
+        </select>
+    `;
+};
+
+const loadOptInOutWorkbookRows = async () => {
+    if (typeof XLSX === "undefined") {
+        throw new Error("XLSX library not loaded");
+    }
+
+    const response = await fetch(OPT_IN_OUT_DATA_PATH);
+    if (!response.ok) throw new Error(`Unable to load ${OPT_IN_OUT_DATA_PATH}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    return XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+};
+
+export const loadOptInOutTable = async () => {
+    const container = document.getElementById("optInOutTableContainer");
+    if (!container || container.dataset.loaded === "true") return;
+
+    container.innerHTML = `<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
+    try {
+        const data = await loadOptInOutWorkbookRows();
+        const rows = (data || []).filter((row) => row && Object.values(row).some((value) => String(value ?? "").trim() !== ""));
+        if (!rows.length) {
+            container.innerHTML = "<p>No opt-in/opt-out records to show.</p>";
+            container.dataset.loaded = "true";
+            return;
+        }
+
+        const tableRows = rows.map((row, index) => {
+            const rowId = `optOut-${index}`;
+            const name = getCellValue(row, ["Name", "name", "PI Name", "pi name", "principal investigator", "principal investigator name", "investigator"]);
+            const email = getCellValue(row, ["Email", "email"]);
+            const studies = [
+                { label: "Study 1", name: getCellValue(row, ["Study_1", "study 1"]), acronym: getCellValue(row, ["Study_1 Acronym", "study 1 acronym"]) },
+                { label: "Study 2", name: getCellValue(row, ["Study_2", "study 2"]), acronym: getCellValue(row, ["Study_2 Acronym", "study 2 acronym"]) },
+                { label: "Study 3", name: getCellValue(row, ["Study_3", "study 3"]), acronym: getCellValue(row, ["Study_3 Acronym", "study 3 acronym"]) }
+            ];
+            const filledStudies = studies.filter((study) => String(study.name ?? "").trim() !== "" || String(study.acronym ?? "").trim() !== "");
+            const detailsId = `studyDetails-${index}`;
+            const studyCells = studies.map((study) => {
+                const hasStudyData = String(study.name ?? "").trim() !== "" || String(study.acronym ?? "").trim() !== "";
+                return `
+                    <td class="text-center" style="min-width: 110px; width: 120px;">
+                        ${hasStudyData ? getStudyStatusSelect("in") : ""}
+                    </td>
+                `;
+            }).join("");
+
+            return `
+                <tr class="align-middle">
+                    <td style="min-width: 180px; max-width: 260px;">
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold text-wrap">${escapeHtml(name)}</div>
+                        </div>
+                    </td>
+                    <td style="min-width: 180px; max-width: 260px;">${escapeHtml(email)}</td>
+                    ${studyCells}
+                    <td class="text-center" style="width: 60px;">
+                        ${filledStudies.length > 0 ? `<button class="transparent-btn p-0" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-expanded="false" aria-controls="${detailsId}" title="Show study details">
+                            <i class="fas fa-chevron-down text-muted"></i>
+                        </button>` : ""}
+                    </td>
+                </tr>
+                ${filledStudies.length > 0 ? `
+                <tr>
+                    <td colspan="6" class="p-0">
+                        <div class="collapse" id="${detailsId}">
+                            <div class="p-3 bg-light border-top">
+                                <div class="fw-semibold mb-2">Study details</div>
+                                <table class="table table-sm table-bordered align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Study</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Acronym</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${filledStudies.map((study) => `
+                                            <tr>
+                                                <td>${escapeHtml(study.label)}</td>
+                                                <td>${escapeHtml(study.name)}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                                        <span>${escapeHtml(study.acronym)}</span>
+                                                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Opted In</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>` : ""}
+            `;
+        }).join("");
+
+        container.innerHTML = `
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="table-layout: auto; border-collapse: separate; border-spacing: 0;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="min-width: 180px; max-width: 260px;">Name</th>
+                                    <th scope="col" style="min-width: 180px; max-width: 260px;">Email</th>
+                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 1</th>
+                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 2</th>
+                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 3</th>
+                                    <th scope="col" style="width: 60px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.querySelectorAll('.study-status-select').forEach((select) => {
+            select.addEventListener('change', () => {
+                const isOut = select.value === 'out';
+                select.classList.toggle('border-danger', isOut);
+                select.classList.toggle('text-danger', isOut);
+                select.classList.toggle('border-success', !isOut);
+                select.classList.toggle('text-success', !isOut);
+                select.style.backgroundColor = isOut ? '#f8d7da' : '#d1e7dd';
+                select.style.color = isOut ? '#842029' : '#0f5132';
+            });
+        });
+        container.dataset.loaded = "true";
+    } catch (error) {
+        console.error("Error loading opt-in/opt-out workbook data:", error);
+        container.innerHTML = "<p class='text-danger'>Error loading opt-in/opt-out workbook data.</p>";
+    }
+};
+
+export const optInOutTemplate = () => {
+    const userEmail = JSON.parse(localStorage.parms).login;
+    if (!emailsAllowedToUpdateData.includes(userEmail)) return "";
+
+    return `
+        <div class="general-bg padding-bottom-1rem">
+            <div class="container body-min-height">
+                <div class="main-summary-row">
+                    <div class="align-left">
+                        <h1 class="page-header">Admin Opt-In Table</h1>
+                    </div>
+                </div>
+                <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                    <div id="optInOutTableContainer">Loading...</div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
 const getDownloadFileTitle = (file) => {
     const filename = file && file.name ? file.name : "Untitled file";
     const lastUnderscoreIndex = filename.lastIndexOf('_');
