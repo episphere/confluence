@@ -26,7 +26,7 @@ export const chairsInfo = [
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
-    {id: 'user_7', email:"ahearntu@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
+    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
 
 export const messagesForChair = {
@@ -115,6 +115,19 @@ export const extractContactInvestigators = (text) => {
     const endIndex = text.indexOf(endPattern, startIndex);
     if (endIndex === -1) return "";
     
+    return text.substring(startIndex + startPattern.length, endIndex).trim();
+}
+
+export const extractRequestedConsortia = (text) => {
+    const startPattern = "Consortia or Study / Trial Group data being requested";
+    const endPattern = "Primary Endpoint";
+
+    const startIndex = text.indexOf(startPattern);
+    if (startIndex === -1) return "";
+
+    const endIndex = text.indexOf(endPattern, startIndex);
+    if (endIndex === -1) return "";
+
     return text.substring(startIndex + startPattern.length, endIndex).trim();
 }
 
@@ -1086,8 +1099,7 @@ export const removeActiveClass = (className, activeClass) => {
 };
 
 export const sessionExpired = () => {
-    delete localStorage.parms;
-    location.reload();
+    console.warn("Session refresh failed; keeping the current session active for debugging.");
 };
 
 export const showAnimation = () => {
@@ -1368,25 +1380,54 @@ export const tsv2Json = (tsv) => {
 };
 
 export const csv2Json = (csv) => {
-    const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
+    const parseCsvLine = (line) => {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let index = 0; index < line.length; index += 1) {
+            const char = line[index];
+            if (char === '"') {
+                if (inQuotes && line[index + 1] === '"') {
+                    current += '"';
+                    index += 1;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                values.push(current);
+                current = "";
+            } else if (char === '\t' && !inQuotes) {
+                values.push(current);
+                current = "";
+            } else {
+                current += char;
+            }
+        }
+
+        values.push(current);
+        return values.map((value) => value.trim());
+    };
+
+    const lines = csv.split(/[\r\n]+/g).filter((line) => line.trim().length > 0);
     const result = [];
-    const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
-    
-    for (let i=1; i < lines.length; i++) {
+    const headers = parseCsvLine(lines[0]).map((value) => value.replace(/^"|"$/g, ""));
+
+    for (let i = 1; i < lines.length; i += 1) {
         const obj = {};
-        const currentline = lines[i].split(/[,\t]/g);
-        for (let j = 0; j<headers.length; j++) {
-            if (currentline[j]) {
+        const currentline = parseCsvLine(lines[i]);
+        for (let j = 0; j < headers.length; j += 1) {
+            if (currentline[j] !== undefined) {
                 let value = headers[j];
                 if (value === 'StudyDesign') value = 'studyDesign';
                 obj[value] = currentline[j];
             }
         }
-        
-        if(Object.keys(obj).length > 0) result.push(obj);
+
+        if (Object.keys(obj).length > 0) result.push(obj);
     }
-    
-    return {data:result, headers};
+
+    return { data: result, headers };
 };
 
 export const array2Json = (array) => {

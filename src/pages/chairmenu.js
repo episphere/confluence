@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -58,13 +58,6 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     
     return template;
 };
-
-const escapeHtml = (value) => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 
 const getDownloadFileTitle = (file) => {
     const filename = file && file.name ? file.name : "Untitled file";
@@ -411,6 +404,31 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
         });
 };
 
+const CONSORTIUM_EXPORT_VALUES = ["AABCG", "CIMBA", "LAGENO", "BCAC", "C-NCI", "MERGE"];
+
+const parseRequestedConsortiaValues = (text) => {
+    const section = extractRequestedConsortia(text || "");
+    if (!section) return [];
+
+    const normalized = section.replace(/\s+/g, " ").trim();
+    if (!normalized) return [];
+
+    return CONSORTIUM_EXPORT_VALUES.filter(consortium => new RegExp(`\\b${escapeRegExp(consortium)}\\b`, "i").test(normalized));
+};
+
+const downloadCsvFile = (rows, filename) => {
+    const csvContent = rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
     const results = [];
     const CHUNK_SIZE = 10;
@@ -421,9 +439,9 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
             const fileId = file.id;
             const promises = {
                 fileInfo: getFileInfo(fileId),
-                completion_date: getChairApprovalDate(fileId)
+                completion_date: getChairApprovalDate(fileId),
+                docContent: readDocFile(fileId)
             };
-            if (type !== 'com') promises.docContent = readDocFile(fileId);
             if (type === 'res') promises.comments = listComments(fileId);
             
             const keys = Object.keys(promises);
@@ -434,6 +452,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
             const { fileInfo, completion_date, docContent, comments } = resolvedResults;
             
             const contacts = docContent ? extractContactInvestigators(docContent) : "";
+            const requestedConsortia = docContent ? parseRequestedConsortiaValues(docContent) : [];
             const filename = fileInfo.name;
             const lastUnderscoreIndex = filename.lastIndexOf('_');
             
@@ -482,6 +501,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
                 roundId: roundId,
                 commentsFileId,
                 responseFileId,
+                requestedConsortia,
                 name: fileInfo.name,
                 type: type
             };
@@ -1500,7 +1520,7 @@ export const authTableTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
-    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button><button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Export Consortia CSV </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     return template;
 };
 
@@ -1588,6 +1608,42 @@ export const generateAuthTableFiles = async () => {
         });
     }
     await renderAuthSelectedRound('all');
+
+    const exportButton = document.getElementById('exportConsortiaCsvBtn');
+    if (exportButton) {
+        exportButton.addEventListener('click', () => {
+            const visibleRows = Array.from(document.querySelectorAll('#adminAccordian .admin-table-row:not(.d-none)'));
+            const visibleFileIds = new Set(visibleRows
+                .map(row => row.querySelector('.admin-checkbox')?.id)
+                .filter(Boolean));
+
+            const exportItems = [
+                ...adminDataCache.sub,
+                ...adminDataCache.com,
+                ...adminDataCache.res
+            ].filter(item => visibleFileIds.size === 0 || visibleFileIds.has(String(item.fileId)));
+
+            if (!exportItems.length) {
+                alert('No concepts are currently visible to export.');
+                return;
+            }
+
+            const rows = [["Concept", "Requested Consortia/Study"]];
+            exportItems.forEach(item => {
+                const selections = Array.isArray(item.requestedConsortia) ? item.requestedConsortia : [];
+                if (!selections.length) return;
+                selections.forEach(selection => rows.push([item.name || item.filename || '', selection]));
+            });
+
+            if (rows.length === 1) {
+                alert('No requested consortia or study selections were found in the visible concepts.');
+                return;
+            }
+
+            downloadCsvFile(rows, 'admin_consortia_requests.csv');
+        });
+    }
+
     hideAnimation();
 };
 
