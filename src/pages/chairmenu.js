@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -57,206 +57,6 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     }
     
     return template;
-};
-
-const escapeHtml = (value) => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
-
-const TRUTHY_VALUES = new Set(["true", "yes", "y", "1", "checked", "opt-out", "opt out", "optout"]);
-
-const normalizeHeaderValue = (value) => String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-
-const getCellValue = (row, aliases = []) => {
-    if (!row) return "";
-
-    for (const alias of aliases) {
-        const normalizedAlias = normalizeHeaderValue(alias);
-        const match = Object.entries(row).find(([key]) => normalizeHeaderValue(key) === normalizedAlias);
-        if (match) return match[1];
-    }
-
-    return "";
-};
-
-const isTruthyCellValue = (value) => TRUTHY_VALUES.has(String(value ?? "").trim().toLowerCase());
-
-const getStudyStatusSelect = (value = "in") => {
-    const isOut = String(value).trim().toLowerCase() === "out";
-    return `
-        <select class="form-select form-select-sm study-status-select ${isOut ? "border-danger text-danger" : "border-success text-success"}" style="${isOut ? "background-color: #f8d7da; color: #842029;" : "background-color: #d1e7dd; color: #0f5132;"}" aria-label="Study status">
-            <option value="in" ${!isOut ? "selected" : ""} style="background-color: #d1e7dd; color: #0f5132;">In</option>
-            <option value="out" ${isOut ? "selected" : ""} style="background-color: #f8d7da; color: #842029;">Out</option>
-        </select>
-    `;
-};
-
-const loadOptInOutWorkbookRows = async () => {
-    if (typeof XLSX === "undefined") {
-        throw new Error("XLSX library not loaded");
-    }
-
-    const response = await fetch(OPT_IN_OUT_DATA_PATH);
-    if (!response.ok) throw new Error(`Unable to load ${OPT_IN_OUT_DATA_PATH}`);
-
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-};
-
-export const loadOptInOutTable = async () => {
-    const container = document.getElementById("optInOutTableContainer");
-    if (!container || container.dataset.loaded === "true") return;
-
-    container.innerHTML = `<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
-    try {
-        const data = await loadOptInOutWorkbookRows();
-        const rows = (data || []).filter((row) => row && Object.values(row).some((value) => String(value ?? "").trim() !== ""));
-        if (!rows.length) {
-            container.innerHTML = "<p>No opt-in/opt-out records to show.</p>";
-            container.dataset.loaded = "true";
-            return;
-        }
-
-        const tableRows = rows.map((row, index) => {
-            const rowId = `optOut-${index}`;
-            const name = getCellValue(row, ["Name", "name", "PI Name", "pi name", "principal investigator", "principal investigator name", "investigator"]);
-            const email = getCellValue(row, ["Email", "email"]);
-            const studies = [
-                { label: "Study 1", name: getCellValue(row, ["Study_1", "study 1"]), acronym: getCellValue(row, ["Study_1 Acronym", "study 1 acronym"]) },
-                { label: "Study 2", name: getCellValue(row, ["Study_2", "study 2"]), acronym: getCellValue(row, ["Study_2 Acronym", "study 2 acronym"]) },
-                { label: "Study 3", name: getCellValue(row, ["Study_3", "study 3"]), acronym: getCellValue(row, ["Study_3 Acronym", "study 3 acronym"]) }
-            ];
-            const filledStudies = studies.filter((study) => String(study.name ?? "").trim() !== "" || String(study.acronym ?? "").trim() !== "");
-            const detailsId = `studyDetails-${index}`;
-            const studyCells = studies.map((study) => {
-                const hasStudyData = String(study.name ?? "").trim() !== "" || String(study.acronym ?? "").trim() !== "";
-                return `
-                    <td class="text-center" style="min-width: 110px; width: 120px;">
-                        ${hasStudyData ? getStudyStatusSelect("in") : ""}
-                    </td>
-                `;
-            }).join("");
-
-            return `
-                <tr class="align-middle">
-                    <td style="min-width: 180px; max-width: 260px;">
-                        <div class="flex-grow-1">
-                            <div class="fw-semibold text-wrap">${escapeHtml(name)}</div>
-                        </div>
-                    </td>
-                    <td style="min-width: 180px; max-width: 260px;">${escapeHtml(email)}</td>
-                    ${studyCells}
-                    <td class="text-center" style="width: 60px;">
-                        ${filledStudies.length > 0 ? `<button class="transparent-btn p-0" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-expanded="false" aria-controls="${detailsId}" title="Show study details">
-                            <i class="fas fa-chevron-down text-muted"></i>
-                        </button>` : ""}
-                    </td>
-                </tr>
-                ${filledStudies.length > 0 ? `
-                <tr>
-                    <td colspan="6" class="p-0">
-                        <div class="collapse" id="${detailsId}">
-                            <div class="p-3 bg-light border-top">
-                                <div class="fw-semibold mb-2">Study details</div>
-                                <table class="table table-sm table-bordered align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">Study</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Acronym</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${filledStudies.map((study) => `
-                                            <tr>
-                                                <td>${escapeHtml(study.label)}</td>
-                                                <td>${escapeHtml(study.name)}</td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between gap-2">
-                                                        <span>${escapeHtml(study.acronym)}</span>
-                                                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Opted In</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        `).join("")}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </td>
-                </tr>` : ""}
-            `;
-        }).join("");
-
-        container.innerHTML = `
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" style="table-layout: auto; border-collapse: separate; border-spacing: 0;">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col" style="min-width: 180px; max-width: 260px;">Name</th>
-                                    <th scope="col" style="min-width: 180px; max-width: 260px;">Email</th>
-                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 1</th>
-                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 2</th>
-                                    <th scope="col" style="min-width: 110px; width: 120px;">Study 3</th>
-                                    <th scope="col" style="width: 60px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        container.querySelectorAll('.study-status-select').forEach((select) => {
-            select.addEventListener('change', () => {
-                const isOut = select.value === 'out';
-                select.classList.toggle('border-danger', isOut);
-                select.classList.toggle('text-danger', isOut);
-                select.classList.toggle('border-success', !isOut);
-                select.classList.toggle('text-success', !isOut);
-                select.style.backgroundColor = isOut ? '#f8d7da' : '#d1e7dd';
-                select.style.color = isOut ? '#842029' : '#0f5132';
-            });
-        });
-        container.dataset.loaded = "true";
-    } catch (error) {
-        console.error("Error loading opt-in/opt-out workbook data:", error);
-        container.innerHTML = "<p class='text-danger'>Error loading opt-in/opt-out workbook data.</p>";
-    }
-};
-
-export const optInOutTemplate = () => {
-    const userEmail = JSON.parse(localStorage.parms).login;
-    if (!emailsAllowedToUpdateData.includes(userEmail)) return "";
-
-    return `
-        <div class="general-bg padding-bottom-1rem">
-            <div class="container body-min-height">
-                <div class="main-summary-row">
-                    <div class="align-left">
-                        <h1 class="page-header">Admin Opt-In Table</h1>
-                    </div>
-                </div>
-                <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                    <div id="optInOutTableContainer">Loading...</div>
-                </div>
-            </div>
-        </div>
-    `;
 };
 
 const getDownloadFileTitle = (file) => {
@@ -604,6 +404,31 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
         });
 };
 
+const CONSORTIUM_EXPORT_VALUES = ["AABCG", "CIMBA", "LAGENO", "BCAC", "C-NCI", "MERGE"];
+
+const parseRequestedConsortiaValues = (text) => {
+    const section = extractRequestedConsortia(text || "");
+    if (!section) return [];
+
+    const normalized = section.replace(/\s+/g, " ").trim();
+    if (!normalized) return [];
+
+    return CONSORTIUM_EXPORT_VALUES.filter(consortium => new RegExp(`\\b${escapeRegExp(consortium)}\\b`, "i").test(normalized));
+};
+
+const downloadCsvFile = (rows, filename) => {
+    const csvContent = rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
 const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
     const results = [];
     const CHUNK_SIZE = 10;
@@ -614,9 +439,9 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
             const fileId = file.id;
             const promises = {
                 fileInfo: getFileInfo(fileId),
-                completion_date: getChairApprovalDate(fileId)
+                completion_date: getChairApprovalDate(fileId),
+                docContent: readDocFile(fileId)
             };
-            if (type !== 'com') promises.docContent = readDocFile(fileId);
             if (type === 'res') promises.comments = listComments(fileId);
             
             const keys = Object.keys(promises);
@@ -627,6 +452,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
             const { fileInfo, completion_date, docContent, comments } = resolvedResults;
             
             const contacts = docContent ? extractContactInvestigators(docContent) : "";
+            const requestedConsortia = docContent ? parseRequestedConsortiaValues(docContent) : [];
             const filename = fileInfo.name;
             const lastUnderscoreIndex = filename.lastIndexOf('_');
             
@@ -675,6 +501,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
                 roundId: roundId,
                 commentsFileId,
                 responseFileId,
+                requestedConsortia,
                 name: fileInfo.name,
                 type: type
             };
@@ -1693,7 +1520,7 @@ export const authTableTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
-    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button><button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Export Consortia CSV </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     return template;
 };
 
@@ -1781,6 +1608,42 @@ export const generateAuthTableFiles = async () => {
         });
     }
     await renderAuthSelectedRound('all');
+
+    const exportButton = document.getElementById('exportConsortiaCsvBtn');
+    if (exportButton) {
+        exportButton.addEventListener('click', () => {
+            const visibleRows = Array.from(document.querySelectorAll('#adminAccordian .admin-table-row:not(.d-none)'));
+            const visibleFileIds = new Set(visibleRows
+                .map(row => row.querySelector('.admin-checkbox')?.id)
+                .filter(Boolean));
+
+            const exportItems = [
+                ...adminDataCache.sub,
+                ...adminDataCache.com,
+                ...adminDataCache.res
+            ].filter(item => visibleFileIds.size === 0 || visibleFileIds.has(String(item.fileId)));
+
+            if (!exportItems.length) {
+                alert('No concepts are currently visible to export.');
+                return;
+            }
+
+            const rows = [["Concept", "Requested Consortia/Study"]];
+            exportItems.forEach(item => {
+                const selections = Array.isArray(item.requestedConsortia) ? item.requestedConsortia : [];
+                if (!selections.length) return;
+                selections.forEach(selection => rows.push([item.name || item.filename || '', selection]));
+            });
+
+            if (rows.length === 1) {
+                alert('No requested consortia or study selections were found in the visible concepts.');
+                return;
+            }
+
+            downloadCsvFile(rows, 'admin_consortia_requests.csv');
+        });
+    }
+
     hideAnimation();
 };
 

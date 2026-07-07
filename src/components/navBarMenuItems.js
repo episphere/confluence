@@ -134,11 +134,6 @@ export const navBarMenutemplate = () => {
                                         <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable">
                                             Admin Table
                                         </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#opt_in_out" title="Admin Opt-In Table" id="optInOutMenu">
-                                            Admin Opt-In Table
-                                        </a>
                                     </li>`
                                 ) : ''
                             }
@@ -154,6 +149,27 @@ export const navBarMenutemplate = () => {
                         </ul>
                     </li>
                 `) :''
+            }
+            ${
+                authAdmin ? (
+                    `<li class="nav-item dropdown grid-elements">
+                        <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown6" role="button" title="Study Opt-In/Out" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Study Opt-In/Out
+                        </a>
+                        <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#study_access_admin" title="Study Access Admin" id="studyAccessAdminMenu">
+                                    Study Access Admin
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#opt_in_out" title="Study Opt-In/Out" id="optInOutMenu">
+                                    Study Opt-In/Out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>`
+                ) : ''
             }
             <li class="grid-elements">
                 <a class="nav-link nav-menu-links white-font" href="#data_submission" title="Data Submitted" id="dataSubmission"> 

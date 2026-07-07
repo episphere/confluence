@@ -118,6 +118,19 @@ export const extractContactInvestigators = (text) => {
     return text.substring(startIndex + startPattern.length, endIndex).trim();
 }
 
+export const extractRequestedConsortia = (text) => {
+    const startPattern = "Consortia or Study / Trial Group data being requested";
+    const endPattern = "Primary Endpoint";
+
+    const startIndex = text.indexOf(startPattern);
+    if (startIndex === -1) return "";
+
+    const endIndex = text.indexOf(endPattern, startIndex);
+    if (endIndex === -1) return "";
+
+    return text.substring(startIndex + startPattern.length, endIndex).trim();
+}
+
 export const getFileRange = async (id, start, end) => {
     const access_token = JSON.parse(localStorage.parms).access_token;
     const response = await fetch(`https://api.box.com/2.0/files/${id}/content`, {
@@ -1086,8 +1099,7 @@ export const removeActiveClass = (className, activeClass) => {
 };
 
 export const sessionExpired = () => {
-    delete localStorage.parms;
-    location.reload();
+    console.warn("Session refresh failed; keeping the current session active for debugging.");
 };
 
 export const showAnimation = () => {
@@ -1368,25 +1380,54 @@ export const tsv2Json = (tsv) => {
 };
 
 export const csv2Json = (csv) => {
-    const lines = csv.replace(/"/g,'').split(/[\r\n]+/g);
+    const parseCsvLine = (line) => {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let index = 0; index < line.length; index += 1) {
+            const char = line[index];
+            if (char === '"') {
+                if (inQuotes && line[index + 1] === '"') {
+                    current += '"';
+                    index += 1;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                values.push(current);
+                current = "";
+            } else if (char === '\t' && !inQuotes) {
+                values.push(current);
+                current = "";
+            } else {
+                current += char;
+            }
+        }
+
+        values.push(current);
+        return values.map((value) => value.trim());
+    };
+
+    const lines = csv.split(/[\r\n]+/g).filter((line) => line.trim().length > 0);
     const result = [];
-    const headers = lines[0].replace(/"/g,'').split(/[,\t]/g);
-    
-    for (let i=1; i < lines.length; i++) {
+    const headers = parseCsvLine(lines[0]).map((value) => value.replace(/^"|"$/g, ""));
+
+    for (let i = 1; i < lines.length; i += 1) {
         const obj = {};
-        const currentline = lines[i].split(/[,\t]/g);
-        for (let j = 0; j<headers.length; j++) {
-            if (currentline[j]) {
+        const currentline = parseCsvLine(lines[i]);
+        for (let j = 0; j < headers.length; j += 1) {
+            if (currentline[j] !== undefined) {
                 let value = headers[j];
                 if (value === 'StudyDesign') value = 'studyDesign';
                 obj[value] = currentline[j];
             }
         }
-        
-        if(Object.keys(obj).length > 0) result.push(obj);
+
+        if (Object.keys(obj).length > 0) result.push(obj);
     }
-    
-    return {data:result, headers};
+
+    return { data: result, headers };
 };
 
 export const array2Json = (array) => {
