@@ -73,9 +73,17 @@ const getDownloadFileTitle = (file) => {
 };
 
 const getMergedConceptDownloadName = (file) => {
-    const filename = getDownloadFileTitle(file).replace(/\.[^/.]+$/, "");
-    const safeName = filename.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "") || file.id;
-    return `${safeName}_with_comments.doc`;
+    const filename = file && file.name ? file.name : "";
+    const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
+    const titleAndDate = filenameWithoutExtension.match(/^(.*)_(\d{4}-\d{2}-\d{2})$/);
+
+    if (!titleAndDate) {
+        const fallbackName = getDownloadFileTitle(file).replace(/\.[^/.]+$/, "");
+        return `${fallbackName || file.id || "concept"}.doc`;
+    }
+
+    const shortTitle = titleAndDate[1].trim().split(/\s+/).slice(0, 5).join(" ");
+    return `${shortTitle}_${titleAndDate[2]}.doc`;
 };
 
 const downloadBlob = (blob, filename) => {
