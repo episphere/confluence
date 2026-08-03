@@ -1,6 +1,13 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData } from "../shared.js";
+
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -1377,9 +1384,10 @@ export function viewAuthFinalDecisionFilesColumns() {
             <div class="row-24 align-items-center position-relative">
                 <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
                 <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
-                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Ret Date <button class="transparent-btn sort-column" data-column-name="Return Date"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Ret Date <button class="transparent-btn sort-column" data-column-name="Return Date"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-center font-bold text-wrap header-sortable responsive-text">Action Required <button class="transparent-btn sort-column" data-column-name="Action Required"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">C-NCI <button class="transparent-btn sort-column" data-column-name="C-NCIDecision"><i class="fas fa-sort"></i></button></div>
@@ -1520,7 +1528,7 @@ export const authTableTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
-    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     return template;
 };
 
@@ -1747,6 +1755,65 @@ const showAuthCommentsWithResponses = async (rowFileId, commentsFileId, response
     }
 };
 
+const sortAdminTableByColumn = (table, columnIndex, ascending = true) => {
+    const rowsContainer = table.querySelector("#adminAccordian");
+    if (!rowsContainer) return;
+
+    const rows = Array.from(rowsContainer.querySelectorAll(":scope > .admin-table-row"));
+    const direction = ascending ? 1 : -1;
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+    const getCellValue = (row) => {
+        const cell = row.firstElementChild && row.firstElementChild.children[columnIndex];
+        if (!cell) return { empty: true, value: "" };
+
+        const select = cell.querySelector("select");
+        const value = String(select ? select.value : cell.textContent).trim();
+        if (value === "" || value === "--") return { empty: true, value: "" };
+
+        if (columnIndex === 2 || columnIndex === 3) {
+            const timestamp = Date.parse(value);
+            if (!Number.isNaN(timestamp)) return { empty: false, value: timestamp, type: "number" };
+        }
+
+        if (/^-?\d+(?:\.\d+)?$/.test(value)) {
+            return { empty: false, value: Number(value), type: "number" };
+        }
+
+        return { empty: false, value, type: "text" };
+    };
+
+    rows.sort((a, b) => {
+        const aCell = getCellValue(a);
+        const bCell = getCellValue(b);
+        if (aCell.empty && bCell.empty) return 0;
+        if (aCell.empty) return 1;
+        if (bCell.empty) return -1;
+
+        if (aCell.type === "number" && bCell.type === "number") {
+            return (aCell.value - bCell.value) * direction;
+        }
+
+        return collator.compare(String(aCell.value), String(bCell.value)) * direction;
+    });
+
+    rows.forEach(row => rowsContainer.appendChild(row));
+
+    table.querySelectorAll(".header-sortable").forEach(header => {
+        header.classList.remove("header-sort-asc", "header-sort-desc");
+        const icon = header.querySelector(".sort-column i");
+        if (icon) icon.className = "fas fa-sort";
+    });
+
+    const headerRow = table.querySelector(".div-sticky > .row-24");
+    const activeHeader = headerRow && headerRow.children[columnIndex];
+    if (activeHeader) {
+        activeHeader.classList.add(ascending ? "header-sort-asc" : "header-sort-desc");
+        const icon = activeHeader.querySelector(".sort-column i");
+        if (icon) icon.className = ascending ? "fas fa-sort-up" : "fas fa-sort-down";
+    }
+};
+
 export async function viewAuthFinalDecisionFilesTemplate(processedSub, processedCom, processedRes) {
     let template = "";
     const resFileNames = processedRes.map(file => file.name);
@@ -1780,20 +1847,23 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
             });
         });
         const table = document.getElementById("decidedFiles");
-        const headers = table.querySelector(`.div-sticky`);
-        Array.from(headers.children).forEach((header, index) => {
-            header.addEventListener("click", (e) => {
-                const sortDirection = header.classList.contains("header-sort-asc");
-                sortTableByColumn(table, index, !sortDirection);
+        const headerRow = table.querySelector(".div-sticky > .row-24");
+        if (headerRow) {
+            Array.from(headerRow.children).forEach((header, index) => {
+                if (!header.classList.contains("header-sortable")) return;
+                header.addEventListener("click", () => {
+                    const ascending = !header.classList.contains("header-sort-asc");
+                    sortAdminTableByColumn(table, index, ascending);
+                });
             });
-        });
+        }
     }
 };
 
 export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles, processedResFiles) {
   let template = `<div class="row m-0 align-left allow-overflow w-100"><div class="accordion accordion-flush col-md-12" id="adminAccordian">`;
   const renderRow = (fInfo, fId, name, titlename, stn, subD, retD, rId) => {
-    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-4 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-2 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-2 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
+    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-3 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
   };
   for (const f of processedSubFiles) template += renderRow(f.fileInfo, f.fileId, f.filename, f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
   for (const f of processedComFiles) template += renderRow(f.fileInfo, f.fileId, f.filename, f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
@@ -1801,6 +1871,19 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
   template += `</div></div>`;
   if (document.getElementById("files") != null) {
     document.getElementById("files").innerHTML = template;
+    document.querySelectorAll(".admin-table-row > .row-24").forEach(row => {
+      const conceptCell = row.children[1];
+      const actionCell = row.querySelector(".action-required-dropdown")?.parentElement;
+      if (conceptCell) {
+        conceptCell.classList.remove("col-24-3");
+        conceptCell.classList.add("col-24-4");
+      }
+      if (actionCell) {
+        actionCell.classList.remove("col-24-3");
+        actionCell.classList.add("col-24-2");
+        row.insertBefore(actionCell, row.children[5]);
+      }
+    });
     document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
       dropdown.addEventListener('change', async function() {
         const val = this.value;
