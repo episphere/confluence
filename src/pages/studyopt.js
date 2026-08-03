@@ -1,5 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, getAllFilesRecursive, emailsAllowedToUpdateData, submitterFolder, completedFolder, acceptedFolder, archivedFolder } from "../shared.js";
+import { csv2Json, emailsAllowedToUpdateData } from "../shared.js";
+import { exportAdminConsortiaCsv } from "./chairmenu.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -7,6 +8,9 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
+const getConceptDisplayName = (value) => String(value ?? "")
+    .replace(/_\d{4}-\d{2}-\d{2}\.docx?$/i, "");
 
 const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
 const OPT_IN_OUT_CONCEPTS_CSV_PATH = "./src/data/admin_consortia_requests.csv";
@@ -55,31 +59,71 @@ const loadStudyAccessAdminRows = async () => {
     const requestedStudyMap = new Map();
 
     conceptRows.forEach((row) => {
-        const requestedStudy = String(row["Requested Consortia/Study"] || row["Requested Consortia"] || row["Requested Consortia/Study"] || "").trim();
-        if (!requestedStudy) return;
+        const conceptName = String(row.Concept || row.concept || row["Concept Name"] || "").trim();
+        const conceptBoxId = String(getCellValue(row, ["Concept Box ID", "Box ID", "File ID", "fileId"]) || "").trim();
+        const requestedValues = String(row["Requested Consortia/Study"] || row["Requested Consortia"] || "")
+            .split(/[;,]/)
+            .map((value) => value.trim())
+            .filter(Boolean);
 
-        const existing = requestedStudyMap.get(requestedStudy) || { label: requestedStudy, conceptCount: 0 };
-        existing.conceptCount += 1;
-        requestedStudyMap.set(requestedStudy, existing);
+        requestedValues.forEach((requestedStudy) => {
+            const key = normalizeStudyFilterValue(requestedStudy);
+            const existing = requestedStudyMap.get(key) || { label: requestedStudy, concepts: new Map() };
+            if (conceptName) {
+                const conceptKey = conceptName.toLowerCase();
+                const previousConcept = existing.concepts.get(conceptKey);
+                existing.concepts.set(conceptKey, {
+                    name: conceptName,
+                    boxId: conceptBoxId || previousConcept?.boxId || ""
+                });
+            }
+            requestedStudyMap.set(key, existing);
+        });
     });
 
-    const requestedStudies = Array.from(requestedStudyMap.values()).sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+    const users = workbookRows.map((row) => ({
+        name: String(getCellValue(row, ["Name", "name"]) || "Unnamed user").trim(),
+        email: String(getCellValue(row, ["Email", "email"]) || "").trim(),
+        studies: getWorkbookStudyEntries(row)
+    })).filter((user) => user.name || user.email);
 
-    return requestedStudies.map((study) => {
-        const normalizedRequestedStudy = normalizeStudyFilterValue(study.label);
-        const shouldShowUsers = normalizedRequestedStudy === "cnci";
-
-        const matchingUsers = shouldShowUsers ? workbookRows.filter((row) => {
-            const name = String(getCellValue(row, ["Name", "name"]) ?? "").trim();
-            const email = String(getCellValue(row, ["Email", "email"]) ?? "").trim();
-            return Boolean(name || email);
-        }) : [];
-
-        return {
-            ...study,
-            users: matchingUsers
-        };
+    const allStudyMap = new Map();
+    users.forEach((user) => {
+        user.studies.forEach((study) => {
+            const key = normalizeStudyFilterValue(study.acronym || study.name);
+            if (!key) return;
+            if (!allStudyMap.has(key)) allStudyMap.set(key, study);
+        });
     });
+    const allStudies = Array.from(allStudyMap.values()).sort((a, b) =>
+        (a.acronym || a.name).localeCompare(b.acronym || b.name, undefined, { sensitivity: "base" })
+    );
+
+    return Array.from(requestedStudyMap.values())
+        .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }))
+        .map((request) => {
+            const normalizedRequest = normalizeStudyFilterValue(request.label);
+            const studies = normalizedRequest === "cnci"
+                ? allStudies
+                : allStudies.filter((study) => [study.name, study.acronym]
+                    .map(normalizeStudyFilterValue)
+                    .filter(Boolean)
+                    .some((value) => value === normalizedRequest || value.includes(normalizedRequest) || normalizedRequest.includes(value)));
+            const studyKeys = new Set(studies.map((study) => normalizeStudyFilterValue(study.acronym || study.name)));
+            const associatedUsers = users.map((user) => ({
+                ...user,
+                studies: normalizedRequest === "cnci"
+                    ? user.studies
+                    : user.studies.filter((study) => studyKeys.has(normalizeStudyFilterValue(study.acronym || study.name)))
+            })).filter((user) => user.studies.length);
+
+            return {
+                label: request.label,
+                concepts: Array.from(request.concepts.values()).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })),
+                studies,
+                users: associatedUsers
+            };
+        });
 };
 
 const loadOptInOutWorkbookRows = async () => {
@@ -112,28 +156,6 @@ const getWorkbookStudyEntries = (row) => {
         }
     }
     return studies;
-};
-
-const getConceptFileMatch = async (conceptName) => {
-    const candidateNames = [
-        conceptName,
-        String(conceptName ?? "").replace(/\.docx?$/i, ""),
-        String(conceptName ?? "").replace(/_\d{4}-\d{2}-\d{2}(?:\.docx?)?$/i, "")
-    ].filter(Boolean);
-
-    const searchFolders = [submitterFolder, completedFolder, acceptedFolder, archivedFolder].filter(Boolean);
-    for (const folderId of searchFolders) {
-        const files = await getAllFilesRecursive(folderId, "name,type,id,parent,created_at");
-        for (const candidateName of candidateNames) {
-            const match = files.find((file) => file && file.name && (
-                file.name === candidateName ||
-                file.name.toLowerCase() === `${candidateName}`.toLowerCase() ||
-                file.name.toLowerCase().includes(candidateName.toLowerCase())
-            ));
-            if (match) return match;
-        }
-    }
-    return null;
 };
 
 export const loadOptInOutTable = async () => {
@@ -171,30 +193,29 @@ export const loadOptInOutTable = async () => {
             return values.some((value) => String(value).trim().toUpperCase() === "C-NCI");
         });
 
-        const uniqueConcepts = [];
-        const seenConcepts = new Set();
+        const uniqueConceptMap = new Map();
         relevantConcepts.forEach((row) => {
             const conceptName = String(row.Concept || row.concept || row["Concept Name"] || "").trim();
-            if (!conceptName || seenConcepts.has(conceptName)) return;
-            seenConcepts.add(conceptName);
-            uniqueConcepts.push({ conceptName });
+            const boxId = String(getCellValue(row, ["Concept Box ID", "Box ID", "File ID", "fileId"]) || "").trim();
+            if (!conceptName) return;
+            const conceptKey = conceptName.toLowerCase();
+            const previousConcept = uniqueConceptMap.get(conceptKey);
+            uniqueConceptMap.set(conceptKey, {
+                conceptName,
+                boxId: boxId || previousConcept?.boxId || ""
+            });
         });
+        const uniqueConcepts = Array.from(uniqueConceptMap.values());
 
         if (!uniqueConcepts.length) {
             container.innerHTML = "<p>No C-NCI concepts were found in the export file.</p>";
             return;
         }
 
-        // TODO: Re-enable file matching once Box folder access is optimized
-        // const conceptRowsWithFiles = await Promise.all(uniqueConcepts.map(async (concept) => {
-        //     const fileMatch = await getConceptFileMatch(concept.conceptName);
-        //     return { ...concept, fileMatch };
-        // }));
-        const conceptRowsWithFiles = uniqueConcepts.map((concept) => ({ ...concept, fileMatch: null }));
-
-        const tableRows = conceptRowsWithFiles.map((concept, index) => {
+        const tableRows = uniqueConcepts.map((concept, index) => {
             const detailsId = `conceptDetails-${index}`;
             const previewId = `conceptPreview-${index}`;
+            const conceptDisplayName = getConceptDisplayName(concept.conceptName);
             const studyCells = studies.map((study) => `
                 <td class="text-center" style="min-width: 160px; width: 180px;">
                     <div class="d-flex flex-column align-items-center gap-2">
@@ -207,11 +228,11 @@ export const loadOptInOutTable = async () => {
             return `
                 <tr class="align-middle">
                     <td style="min-width: 240px; max-width: 320px;">
-                        <div class="text-wrap">${escapeHtml(concept.conceptName)}</div>
+                        <div class="text-wrap">${escapeHtml(conceptDisplayName)}</div>
                     </td>
                     ${studyCells}
                     <td class="text-center" style="width: 60px;">
-                        <button class="transparent-btn p-0 concept-preview-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-expanded="false" aria-controls="${detailsId}" title="Show concept details" data-file-id="${concept.fileMatch ? concept.fileMatch.id : ""}" data-preview-id="${previewId}" data-loaded="false">
+                        <button class="transparent-btn p-0 concept-preview-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-expanded="false" aria-controls="${detailsId}" title="Show concept details" data-file-id="${escapeHtml(concept.boxId)}" data-preview-id="${previewId}" data-loaded="false">
                             <i class="fas fa-chevron-down text-muted"></i>
                         </button>
                     </td>
@@ -221,9 +242,9 @@ export const loadOptInOutTable = async () => {
                         <div class="collapse" id="${detailsId}">
                             <div class="p-3 bg-light border-top">
                                 <div class="fw-semibold mb-2">Concept details</div>
-                                <p class="mb-3">${escapeHtml(concept.conceptName)}</p>
-                                <div id="${previewId}" class="mb-3"${concept.fileMatch ? " style=\"min-height: 220px;\"" : ""}>
-                                    ${concept.fileMatch ? "<div class='text-muted'>Loading preview...</div>" : "<div class='text-muted'>No concept file preview is available.</div>"}
+                                <p class="mb-3">${escapeHtml(conceptDisplayName)}</p>
+                                <div id="${previewId}" class="mb-3"${concept.boxId ? " style=\"min-height: 220px;\"" : ""}>
+                                    ${concept.boxId ? "<div class='text-muted'>Loading preview...</div>" : "<div class='text-muted'>No Concept Box ID is available in the CSV.</div>"}
                                 </div>
                                 <div class="fw-semibold mb-2">Study names</div>
                                 <table class="table table-sm table-bordered mb-0" style="width: auto;">
@@ -288,14 +309,23 @@ export const loadOptInOutTable = async () => {
             button.addEventListener('click', () => {
                 if (!button.dataset.fileId || button.dataset.loaded === 'true') return;
                 const previewElement = document.getElementById(button.dataset.previewId);
-                if (!previewElement) return;
-                try {
-                    showPreview(button.dataset.fileId, button.dataset.previewId);
-                    button.dataset.loaded = 'true';
-                } catch (error) {
-                    console.error("Unable to preview concept file:", error);
-                    previewElement.innerHTML = "<div class='text-danger'>Unable to preview concept file.</div>";
-                }
+                const detailsElement = document.getElementById(button.getAttribute('aria-controls'));
+                if (!previewElement || !detailsElement) return;
+
+                const loadPreview = () => {
+                    if (button.dataset.loaded === 'true') return;
+                    try {
+                        previewElement.innerHTML = "";
+                        showPreview(button.dataset.fileId, button.dataset.previewId);
+                        button.dataset.loaded = 'true';
+                    } catch (error) {
+                        console.error("Unable to preview concept file:", error);
+                        previewElement.innerHTML = "<div class='text-danger'>Unable to preview concept file.</div>";
+                    }
+                };
+
+                if (detailsElement.classList.contains('show')) loadPreview();
+                else detailsElement.addEventListener('shown.bs.collapse', loadPreview, { once: true });
             });
         });
 
@@ -339,13 +369,18 @@ export const studyAccessAdminTemplate = () => {
     return `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
-                <div class="main-summary-row">
+                <div class="main-summary-row d-flex justify-content-between align-items-center">
                     <div class="align-left">
                         <h1 class="page-header">Study Access Admin</h1>
                     </div>
+                    <div class="align-right">
+                        <button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red">
+                            <span class="buttonsubmit__text">Export Consortia CSV</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                    <p class="mb-3">This table lists every requested consortia/study from the admin request export and expands to show the opt-in/out users from the workbook.</p>
+                    <p class="mb-3">Expand a requested consortia/study to review its concepts by individual study. All selections currently default to Opt-In; expand a concept name to see its users and associated studies.</p>
                     <div id="studyAccessAdminTableContainer">Loading...</div>
                 </div>
             </div>
@@ -371,79 +406,138 @@ export const loadStudyAccessAdminTable = async () => {
             return;
         }
 
+        const exportButton = document.getElementById("exportConsortiaCsvBtn");
+        if (exportButton && exportButton.dataset.bound !== "true") {
+            exportButton.dataset.bound = "true";
+            exportButton.addEventListener("click", async () => {
+                const buttonText = exportButton.querySelector(".buttonsubmit__text");
+                exportButton.disabled = true;
+                exportButton.classList.add("buttonsubmit--loading");
+                if (buttonText) buttonText.textContent = "Exporting...";
+                try {
+                    await exportAdminConsortiaCsv();
+                } catch (error) {
+                    console.error("Unable to export consortia CSV:", error);
+                    alert("Unable to export the consortia CSV from Box.");
+                } finally {
+                    exportButton.disabled = false;
+                    exportButton.classList.remove("buttonsubmit--loading");
+                    if (buttonText) buttonText.textContent = "Export Consortia CSV";
+                }
+            });
+        }
+
         const requestedStudies = await loadStudyAccessAdminRows();
         if (!requestedStudies.length) {
             container.innerHTML = "<p class='text-warning'>No requested consortia or study values were found.</p>";
             return;
         }
 
-        const rows = requestedStudies.map((study, index) => {
-            const users = study.users || [];
-            const usersLabel = `${users.length} user${users.length === 1 ? "" : "s"}`;
-            const userRows = users.map((row) => {
-                const studyEntries = getWorkbookStudyEntries(row);
-                const userName = String(row.Name || row.name || "Unnamed user").trim();
-                const userEmailValue = String(row.Email || row.email || "").trim();
-                const studyEntriesMarkup = studyEntries.length ? (() => {
-                    const studyCells = studyEntries.map((entry) => {
-                        const normalizedRequestedStudy = normalizeStudyFilterValue(study.label);
-                        const hasMatchingStudy = [entry.name, entry.acronym]
-                            .map((value) => normalizeStudyFilterValue(value))
-                            .filter(Boolean)
-                            .some((value) => value === normalizedRequestedStudy || normalizedRequestedStudy.includes(value) || value.includes(normalizedRequestedStudy));
-                        const statusValue = hasMatchingStudy ? "in" : "in";
-                        return `
-                            <div class="col-12 col-md-4">
-                                <div class="d-flex flex-column gap-2 py-2 px-3 border rounded bg-white h-100">
-                                    <div class="small text-muted">
-                                        <div class="fw-semibold text-dark">${escapeHtml(entry.acronym || entry.name || "Study")}</div>
-                                        <div class="text-wrap">${escapeHtml(entry.name || entry.acronym || "")}</div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        ${getStudyStatusSelect(statusValue)}
-                                    </div>
+        const rows = requestedStudies.map((request, requestIndex) => {
+            const studies = request.studies || [];
+            const concepts = request.concepts || [];
+            const users = request.users || [];
+            const requestDetailsId = `studyAccessRequest-${requestIndex}`;
+            const conceptColumnCount = Math.max(1, studies.length + 1);
+
+            const studyHeaders = studies.map((study) => `
+                <th scope="col" class="text-center align-middle" style="min-width: 130px;" title="${escapeHtml(study.name || study.acronym)}">
+                    <div class="small fw-semibold text-wrap">${escapeHtml(study.acronym || study.name)}</div>
+                </th>
+            `).join("");
+
+            const userRows = users.map((user) => `
+                <tr>
+                    <td>
+                        <div class="fw-semibold">${escapeHtml(user.name)}</div>
+                        ${user.email ? `<div class="small text-muted">${escapeHtml(user.email)}</div>` : ""}
+                    </td>
+                    <td>${user.studies.map((study) => `
+                        <div>${escapeHtml(study.acronym || study.name)}${study.acronym && study.name ? ` <span class="text-muted">&mdash; ${escapeHtml(study.name)}</span>` : ""}</div>
+                    `).join("")}</td>
+                </tr>
+            `).join("");
+
+            const conceptRows = concepts.map((concept, conceptIndex) => {
+                const conceptName = concept.name;
+                const conceptDisplayName = getConceptDisplayName(conceptName);
+                const conceptBoxId = concept.boxId;
+                const conceptDetailsId = `studyAccessConcept-${requestIndex}-${conceptIndex}`;
+                const statusCells = studies.map((study) => `
+                    <td class="text-center align-middle" data-study="${escapeHtml(study.acronym || study.name)}">
+                        <div class="d-flex justify-content-center">${getStudyStatusSelect("in")}</div>
+                    </td>
+                `).join("");
+
+                return `
+                    <tr class="align-middle">
+                        <td style="min-width: 300px; max-width: 440px;">
+                            <div class="d-flex align-items-start gap-2">
+                                <button class="btn btn-link p-0 text-start text-decoration-none concept-user-toggle flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#${conceptDetailsId}" aria-expanded="false" aria-controls="${conceptDetailsId}">
+                                    <i class="fas fa-chevron-down text-muted me-2"></i><span class="text-wrap">${escapeHtml(conceptDisplayName)}</span>
+                                </button>
+                                <button class="btn btn-sm custom-btn study-concept-preview flex-shrink-0" type="button" data-file-id="${escapeHtml(conceptBoxId)}" title="${conceptBoxId ? "Preview concept" : "Concept Box ID is not available"}" aria-label="Preview ${escapeHtml(conceptDisplayName)}" ${conceptBoxId ? "" : "disabled"}>
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                        ${statusCells}
+                    </tr>
+                    <tr class="bg-light">
+                        <td colspan="${conceptColumnCount}" class="p-0">
+                            <div class="collapse" id="${conceptDetailsId}">
+                                <div class="p-3 border-top border-bottom">
+                                    <div class="fw-semibold mb-2">Users and associated studies</div>
+                                    ${userRows ? `
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered bg-white mb-0">
+                                                <thead class="table-light"><tr><th scope="col" style="min-width: 220px;">User</th><th scope="col">Associated study/studies</th></tr></thead>
+                                                <tbody>${userRows}</tbody>
+                                            </table>
+                                        </div>
+                                    ` : '<p class="text-muted mb-0">No user-to-study associations are available for this requested group.</p>'}
                                 </div>
                             </div>
-                        `;
-                    }).join("");
-
-                    const placeholderCount = Math.max(0, 3 - studyEntries.length);
-                    const placeholders = Array.from({ length: placeholderCount }, () => '<div class="col-12 col-md-4"></div>').join("");
-
-                    return `<div class="row g-2">${studyCells}${placeholders}</div>`;
-                })() : '<div class="text-muted small px-3 py-2 border rounded bg-white">No study entries available.</div>';
-                return `
-                    <li class="list-group-item border-0 px-0 py-3">
-                        <div class="rounded border bg-light p-3">
-                            <div class="fw-semibold">${escapeHtml(userName)}</div>
-                            <div class="small text-muted">${escapeHtml(userEmailValue)}</div>
-                            <div class="mt-3">
-                                <div class="small fw-semibold text-uppercase text-muted mb-2">Study Data</div>
-                                <div class="d-flex flex-column gap-2">${studyEntriesMarkup}</div>
-                            </div>
-                        </div>
-                    </li>
+                        </td>
+                    </tr>
                 `;
             }).join("");
 
+            const matrixMarkup = studies.length ? `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle mb-0" style="width: max-content; min-width: 100%;">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="min-width: 300px; max-width: 440px;">Concept Name</th>
+                                ${studyHeaders}
+                            </tr>
+                        </thead>
+                        <tbody>${conceptRows}</tbody>
+                    </table>
+                </div>
+            ` : `
+                <div class="p-3">
+                    <p class="text-muted mb-3">No individual study mappings are currently available for this requested group.</p>
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead class="table-light"><tr><th scope="col">Concept Name</th></tr></thead>
+                        <tbody>${conceptRows}</tbody>
+                    </table>
+                </div>
+            `;
+
             return `
-                <tr class="align-middle study-access-main-row" data-study-label="${escapeHtml(study.label)}">
-                    <td class="fw-semibold">${escapeHtml(study.label)}</td>
-                    <td class="text-center">${study.conceptCount}</td>
-                    <td class="text-center">
-                        <button class="btn btn-link btn-sm p-0" type="button" data-bs-toggle="collapse" data-bs-target="#studyUsers-${index}" aria-expanded="false" aria-controls="studyUsers-${index}">
-                            ${usersLabel}
+                <tr class="align-middle study-access-main-row" data-study-label="${escapeHtml(request.label)}">
+                    <td class="fw-semibold">
+                        <button class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#${requestDetailsId}" aria-expanded="false" aria-controls="${requestDetailsId}">
+                            <i class="fas fa-chevron-down text-muted me-2"></i>${escapeHtml(request.label)}
                         </button>
                     </td>
+                    <td class="text-center">${concepts.length}</td>
+                    <td class="text-center">${studies.length}</td>
                 </tr>
                 <tr class="study-access-detail-row">
                     <td colspan="3" class="p-0">
-                        <div class="collapse" id="studyUsers-${index}">
-                            <div class="p-3 bg-light border-top">
-                                <div class="fw-semibold mb-3">Opt-in/opt-out users</div>
-                                ${userRows ? `<div class="d-flex flex-column gap-3">${userRows}</div>` : '<p class="text-muted mb-0">No users were found for this requested value.</p>'}
-                            </div>
-                        </div>
+                        <div class="collapse" id="${requestDetailsId}">${matrixMarkup}</div>
                     </td>
                 </tr>
             `;
@@ -459,8 +553,8 @@ export const loadStudyAccessAdminTable = async () => {
                                     Requested Consortia/Study <i class="fas fa-sort ms-1"></i>
                                 </button>
                             </th>
-                            <th scope="col" class="text-center">Concept Count</th>
-                            <th scope="col" class="text-center">Users</th>
+                            <th scope="col" class="text-center">Concepts</th>
+                            <th scope="col" class="text-center">Individual Studies</th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>
@@ -489,6 +583,43 @@ export const loadStudyAccessAdminTable = async () => {
                 });
             });
         }
+
+        container.querySelectorAll(".study-status-select").forEach((select) => {
+            select.addEventListener("change", () => {
+                const isOut = select.value === "out";
+                select.classList.toggle("border-danger", isOut);
+                select.classList.toggle("text-danger", isOut);
+                select.classList.toggle("border-success", !isOut);
+                select.classList.toggle("text-success", !isOut);
+                select.style.backgroundColor = isOut ? "#f8d7da" : "#d1e7dd";
+                select.style.color = isOut ? "#842029" : "#0f5132";
+            });
+        });
+
+        container.querySelectorAll(".study-concept-preview").forEach((button) => {
+            button.addEventListener("click", () => {
+                const modal = document.getElementById("confluencePreviewerModal");
+                const header = document.getElementById("confluencePreviewerModalHeader");
+                const body = document.getElementById("confluencePreviewerModalBody");
+                if (!modal || !header || !body) return;
+
+                header.innerHTML = '<h5 class="modal-title">Concept preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+                body.innerHTML = "";
+
+                if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                } else if (typeof $ !== "undefined") {
+                    $("#confluencePreviewerModal").modal("show");
+                }
+
+                try {
+                    showPreview(button.dataset.fileId, "confluencePreviewerModalBody");
+                } catch (error) {
+                    console.error("Unable to load concept preview:", error);
+                    body.innerHTML = '<p class="text-danger mb-0">Unable to load the concept preview from Box.</p>';
+                }
+            });
+        });
         container.dataset.loaded = "true";
     } catch (error) {
         console.error("Error loading study access admin table:", error);
