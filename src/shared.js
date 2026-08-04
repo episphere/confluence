@@ -16,6 +16,7 @@ export const returnToSubmitterFolder = 200908340220;
 export const completedFolder = 200926990513;
 export const DACCmembers = 1221222994319;
 export const conceptForm = 1935758730875;
+export const Confluence_Opt_In_Out = 406144866126;
 export const Confluence_Data_Platform_Events_Page_Shared_with_Investigators = 155546882525;
 export const Confluence_Data_Platform_Metadata_Shared_with_Investigators = 137304373658;
 
@@ -743,7 +744,8 @@ export const uploadFile = async (data, fileName, folderId, html) => {
         const form = new FormData();
         
         let blobData = '';
-        if (html) blobData = new Blob([data], { type: 'text/html'});
+        if (typeof html === 'string' && html.startsWith('text/')) blobData = new Blob([data], { type: html });
+        else if (html) blobData = new Blob([data], { type: 'text/html'});
         else blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
         
         form.append('file', blobData);
@@ -782,7 +784,7 @@ export const uploadFileVersion = async (data, fileId, type) => {
         const form = new FormData();
         
         let blobData = '';
-        if (type === 'text/html' || type === 'text/csv') blobData = new Blob([data], { type: type});
+        if (typeof type === 'string' && type.startsWith('text/')) blobData = new Blob([data], { type: type});
         else blobData = new Blob([JSON.stringify(data)], { type: type});
         
         form.append('file', blobData);
@@ -807,7 +809,7 @@ export const uploadFileVersion = async (data, fileId, type) => {
         };
     }
     catch (err) {
-        if ((await refreshToken()) === true) return await uploadFileVersion(data, fileId, 'text/html');
+        if ((await refreshToken()) === true) return await uploadFileVersion(data, fileId, type);
     }
 };
 

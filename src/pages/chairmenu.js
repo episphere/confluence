@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -303,6 +303,11 @@ const getCurrentUserAuth = () => {
 
 let adminDataCache = null;
 let chairMenuCache = null;
+const ADMIN_ACTION_REQUIRED_FILE_NAME = "Admin_Action_Required.tsv";
+const ADMIN_ACTION_REQUIRED_VALUES = new Set(["Move to Accepted", "Move to Declined", "Needs Resending"]);
+let adminActionRequiredByFileId = new Map();
+let adminActionRequiredByFileName = new Map();
+let adminActionRequiredStorage = null;
 
 const updateProgressBar = (percentage, text) => {
     const progressBar = document.getElementById('chairMenuProgressBar');
@@ -1546,7 +1551,7 @@ export const authTableTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
-    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="submit" id="submitID" class="buttonsubmit button-glow-red" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     return template;
 };
 
@@ -1618,7 +1623,13 @@ export const generateAuthTableFiles = async () => {
     const roundFolders = folderItems.entries.filter(item => item.type === 'folder' && item.name.toLowerCase().startsWith('round'));
     roundFolders.sort((a, b) => b.name.localeCompare(a.name));
 
-    await loadAdminDataCache();
+    await Promise.all([
+        loadAdminDataCache(),
+        loadAdminActionRequiredSelections().catch(error => {
+            adminActionRequiredStorage = null;
+            console.warn("Unable to load saved Action Required selections from Box:", error);
+        })
+    ]);
 
     const renderAuthSelectedRound = async (selectedFolderId) => {
         const tableContainer = document.getElementById('adminAccordian');
@@ -1773,6 +1784,151 @@ const showAuthCommentsWithResponses = async (rowFileId, commentsFileId, response
     }
 };
 
+const parseAdminActionRequiredTsv = (contents = "") => {
+    const lines = String(contents).replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").split("\n").filter(line => line.trim() !== "");
+    if (lines.length < 2) return [];
+    const headers = lines[0].split("\t").map(header => header.trim().toLowerCase());
+    const fileIdIndex = headers.indexOf("file_id");
+    const fileNameIndex = headers.indexOf("file_name");
+    const actionIndex = headers.indexOf("action_required");
+    if (fileIdIndex < 0 || actionIndex < 0) return [];
+
+    return lines.slice(1).map(line => {
+        const columns = line.split("\t");
+        return {
+            fileId: (columns[fileIdIndex] || "").trim(),
+            fileName: fileNameIndex >= 0 ? (columns[fileNameIndex] || "").trim() : "",
+            actionRequired: (columns[actionIndex] || "").trim()
+        };
+    }).filter(row => row.fileId && ADMIN_ACTION_REQUIRED_VALUES.has(row.actionRequired));
+};
+
+const setAdminActionRequiredState = (rows) => {
+    adminActionRequiredByFileId = new Map();
+    adminActionRequiredByFileName = new Map();
+    rows.forEach(row => {
+        adminActionRequiredByFileId.set(String(row.fileId), row.actionRequired);
+        if (row.fileName) adminActionRequiredByFileName.set(row.fileName, row.actionRequired);
+    });
+};
+
+const loadAdminActionRequiredSelections = async () => {
+    setAdminActionRequiredState([]);
+    const daccMembersInfo = await getFileInfo(DACCmembers);
+    const parentId = daccMembersInfo?.parent?.id;
+    if (!parentId) throw new Error("Unable to locate the DACC admin configuration folder in Box.");
+
+    const folderItems = await getFolderItems(parentId, "name,type,id", 1000);
+    const existingFile = (folderItems?.entries || []).find(item => item.type === "file" && item.name.toLowerCase() === ADMIN_ACTION_REQUIRED_FILE_NAME.toLowerCase());
+    adminActionRequiredStorage = { parentId, fileId: existingFile?.id || null };
+    if (!existingFile) return;
+
+    const contents = await getFile(existingFile.id);
+    setAdminActionRequiredState(parseAdminActionRequiredTsv(contents));
+};
+
+const getSavedAdminActionRequired = (fileId, fileName) => {
+    return adminActionRequiredByFileId.get(String(fileId)) || adminActionRequiredByFileName.get(fileName) || "";
+};
+
+const sanitizeTsvValue = (value) => String(value || "").replace(/[\t\r\n]+/g, " ").trim();
+
+const getAdminActionRequiredRows = () => Array.from(document.querySelectorAll(".action-required-dropdown"))
+    .filter(dropdown => ADMIN_ACTION_REQUIRED_VALUES.has(dropdown.value))
+    .map(dropdown => ({
+        fileId: dropdown.dataset.fileId,
+        fileName: dropdown.dataset.fileName,
+        actionRequired: dropdown.value
+    }));
+
+const serializeAdminActionRequiredTsv = (rows) => {
+    const output = ["file_id\tfile_name\taction_required"];
+    rows.sort((a, b) => a.fileName.localeCompare(b.fileName)).forEach(row => {
+        output.push([row.fileId, row.fileName, row.actionRequired].map(sanitizeTsvValue).join("\t"));
+    });
+    return `${output.join("\r\n")}\r\n`;
+};
+
+const updateSaveActionRequiredButton = () => {
+    const button = document.getElementById("saveActionRequiredBtn");
+    if (!button) return;
+    const hasChanges = Array.from(document.querySelectorAll(".action-required-dropdown"))
+        .some(dropdown => dropdown.value !== (dropdown.dataset.savedValue || ""));
+    button.disabled = !hasChanges;
+    button.style.opacity = hasChanges ? "1" : "0.5";
+};
+
+const saveAdminActionRequiredSelections = async (rows) => {
+    if (!adminActionRequiredStorage?.parentId) await loadAdminActionRequiredSelections();
+    const tsv = serializeAdminActionRequiredTsv(rows);
+    let result;
+
+    if (adminActionRequiredStorage.fileId) {
+        result = await uploadFileVersion(tsv, adminActionRequiredStorage.fileId, "text/tab-separated-values");
+    } else {
+        result = await uploadFile(tsv, ADMIN_ACTION_REQUIRED_FILE_NAME, adminActionRequiredStorage.parentId, "text/tab-separated-values");
+        if (result?.status === 409) {
+            await loadAdminActionRequiredSelections();
+            if (!adminActionRequiredStorage.fileId) throw new Error("The Box file already exists but could not be located.");
+            result = await uploadFileVersion(tsv, adminActionRequiredStorage.fileId, "text/tab-separated-values");
+        } else if (result?.entries?.[0]?.id) {
+            adminActionRequiredStorage.fileId = result.entries[0].id;
+        }
+    }
+
+    if (!result?.entries?.length) throw new Error(result?.statusText || "Box did not confirm the save.");
+    setAdminActionRequiredState(rows);
+};
+
+const initializeAdminActionRequiredControls = () => {
+    document.querySelectorAll(".action-required-dropdown").forEach(dropdown => {
+        if (!dropdown.dataset.fileName) dropdown.dataset.fileName = dropdown.closest(".admin-table-row")?.querySelector(".admin-checkbox")?.value || "";
+        dropdown.value = getSavedAdminActionRequired(dropdown.dataset.fileId, dropdown.dataset.fileName);
+        dropdown.dataset.savedValue = dropdown.value;
+        dropdown.addEventListener("change", updateSaveActionRequiredButton);
+    });
+    updateSaveActionRequiredButton();
+
+    const saveButton = document.getElementById("saveActionRequiredBtn");
+    if (!saveButton) return;
+    saveButton.onclick = () => {
+        const modalElement = document.getElementById("confluenceMainModal");
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!modalElement || !header || !body) return;
+
+        const changedCount = Array.from(document.querySelectorAll(".action-required-dropdown"))
+            .filter(dropdown => dropdown.value !== (dropdown.dataset.savedValue || "")).length;
+        header.innerHTML = `<h5 class="modal-title">Save Action Required</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+        body.innerHTML = `<form id="saveActionRequiredForm"><p>Save ${changedCount} changed Action Required selection${changedCount === 1 ? "" : "s"} to Box?</p><div id="saveActionRequiredStatus" class="alert d-none" role="alert"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Save</button></div></form>`;
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+        document.getElementById("saveActionRequiredForm").addEventListener("submit", async event => {
+            event.preventDefault();
+            const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+            const status = document.getElementById("saveActionRequiredStatus");
+            submitButton.disabled = true;
+            submitButton.textContent = "Saving...";
+            try {
+                const rows = getAdminActionRequiredRows();
+                await saveAdminActionRequiredSelections(rows);
+                document.querySelectorAll(".action-required-dropdown").forEach(dropdown => { dropdown.dataset.savedValue = dropdown.value; });
+                updateSaveActionRequiredButton();
+                status.className = "alert alert-success";
+                status.textContent = `Action Required selections were saved to ${ADMIN_ACTION_REQUIRED_FILE_NAME} in Box.`;
+                submitButton.remove();
+                event.currentTarget.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
+            } catch (error) {
+                console.error("Unable to save Action Required selections:", error);
+                status.className = "alert alert-danger";
+                status.textContent = "Unable to save Action Required selections to Box. Please try again.";
+                submitButton.disabled = false;
+                submitButton.textContent = "Save";
+            }
+        });
+    };
+};
+
 const sortAdminTableByColumn = (table, columnIndex, ascending = true) => {
     const rowsContainer = table.querySelector("#adminAccordian");
     if (!rowsContainer) return;
@@ -1844,6 +2000,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     document.getElementById("authTableView").innerHTML = template;
     if (filteredSub.length !== 0 || processedCom.length !== 0 || processedRes.length !== 0) {
         viewAuthFinalDecisionFiles(filteredSub, processedCom, processedRes);
+        initializeAdminActionRequiredControls();
         const updateButtonStates = () => {
             const anyChecked = document.querySelectorAll('.pl:checked').length > 0;
             const rs = document.getElementById('returnSubmitter');
@@ -1889,6 +2046,11 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
   template += `</div></div>`;
   if (document.getElementById("files") != null) {
     document.getElementById("files").innerHTML = template;
+    const adminFileNamesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
+      .map(file => [String(file.fileId), file.fileInfo?.name || file.filename || ""]));
+    document.querySelectorAll(".action-required-dropdown").forEach(dropdown => {
+      dropdown.dataset.fileName = adminFileNamesById.get(dropdown.dataset.fileId) || "";
+    });
     document.querySelectorAll(".admin-table-row > .row-24").forEach(row => {
       const conceptCell = row.children[1];
       const actionCell = row.querySelector(".action-required-dropdown")?.parentElement;
