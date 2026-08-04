@@ -1,6 +1,6 @@
 import { getFileInfo, returnToSubmitterFolder, showComments, showCommentsSub, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile, createComment, emailsAllowedToUpdateData } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
-import { renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
+import { getMergedConceptDownloadName, renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabsDataSubmission, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
 
@@ -556,9 +556,10 @@ const normalizeConceptDocumentHtml = (html) => {
 
 export const downloadCommentsAsWord = async (fileId) => {
     try {
-        const [commentsResponse, originalFileResponse] = await Promise.all([
+        const [commentsResponse, originalFileResponse, fileInfo] = await Promise.all([
             listComments(fileId),
-            downloadFile(fileId)
+            downloadFile(fileId),
+            getFileInfo(fileId)
         ]);
         
         const comments = JSON.parse(commentsResponse).entries;
@@ -626,7 +627,7 @@ export const downloadCommentsAsWord = async (fileId) => {
         const mergedUrl = URL.createObjectURL(mergedBlob);
         const mergedLink = document.createElement('a');
         mergedLink.href = mergedUrl;
-        mergedLink.download = `document-with-comments-${fileId}.doc`;
+        mergedLink.download = getMergedConceptDownloadName(fileInfo);
         document.body.appendChild(mergedLink);
         mergedLink.click();
         document.body.removeChild(mergedLink);
