@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -72,14 +72,14 @@ const getDownloadFileTitle = (file) => {
     return lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename;
 };
 
-const getMergedConceptDownloadName = (file) => {
+export const getMergedConceptDownloadName = (file) => {
     const filename = file && file.name ? file.name : "";
     const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
     const titleAndDate = filenameWithoutExtension.match(/^(.*)_(\d{4}-\d{2}-\d{2})$/);
 
     if (!titleAndDate) {
         const fallbackName = getDownloadFileTitle(file).replace(/\.[^/.]+$/, "");
-        return `${fallbackName || file.id || "concept"}.doc`;
+        return `${fallbackName || (file && file.id) || "concept"}.doc`;
     }
 
     const shortTitle = titleAndDate[1].trim().split(/\s+/).slice(0, 5).join(" ");
@@ -270,7 +270,11 @@ export const setupDownloadSelect = (tab, files) => {
                 for (let index = 0; index < selectedFiles.length; index++) {
                     const file = selectedFiles[index];
                     if (status) status.textContent = `Preparing ${index + 1} of ${selectedFiles.length}: ${getDownloadFileTitle(file)}`;
-                    const mergedBlob = await generateMergedConceptBlob(file.id, getChairCommentSourceId(file, file.id));
+                    const mergedBlob = await generateMergedConceptBlob(
+                        file.id,
+                        getChairCommentSourceId(file, file.id),
+                        file.responseComments || []
+                    );
                     if (!mergedBlob) throw new Error(`Unable to prepare ${file.name || file.id}.`);
                     downloadBlob(mergedBlob, getMergedConceptDownloadName(file));
                 }
@@ -1339,7 +1343,7 @@ export const commentSubmit = async (consortium) => {
     }
 };
 
-const generateMergedConceptBlob = async (fileId, commentsFileId = fileId) => {
+const generateMergedConceptBlob = async (fileId, commentsFileId = fileId, responseComments = []) => {
     try {
         const [commentsResponse, originalFileResponse] = await Promise.all([
             listComments(commentsFileId),
@@ -1359,7 +1363,10 @@ const generateMergedConceptBlob = async (fileId, commentsFileId = fileId) => {
         let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>File ID:</strong> ${commentsFileId}</p>`;
         if (comments.length === 0) { mergedContent += `<p>No comments found.</p>`; } else {
             comments.forEach((comment, index) => {
-                mergedContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; page-break-inside: avoid;"><h3>Comment ${index + 1}:</h3><div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div><p><strong>Response (if applicable):</strong></p><div style="border: 1px solid #ddd; min-height: 50px; padding: 10px; background-color: white;"></div></div>`;
+                const matchingResponse = findResponseForComment(comment, responseComments);
+                const responseText = extractResponseText(matchingResponse);
+
+                mergedContent += `<div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; page-break-inside: avoid;"><h3>Comment ${index + 1}:</h3><div style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">${comment.message}</div><p><strong>Response (if applicable):</strong></p><div style="border: 1px solid #ddd; min-height: 50px; padding: 10px; background-color: white;">${responseText}</div></div>`;
             });
         }
         mergedContent += `</div></body></html>`;
