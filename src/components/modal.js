@@ -1,12 +1,12 @@
 import { getFolderItems, filterConsortiums, getCollaboration, checkDataSubmissionPermissionLevel, applicationURLs } from "../shared.js"
 
 export const uploadInStudy = async (id) => {
-    return `<div class="modal fade" id="${id}" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="${id}" aria-hidden="true">
+    return `<div class="modal fade" id="${id}" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="${id}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header allow-overflow">
                 <h5 class="modal-title">Submit data</h5>
-                    <button type="button" title="Close" class="close modal-close-btn" title="Close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -38,7 +38,7 @@ export const uploadInStudy = async (id) => {
                     </div>
                     <div class="modal-footer">
                         <button type="submit" title="Submit" class="btn btn-light" id="submitBtn">${location.origin.match(applicationURLs.local) || location.origin.match(applicationURLs.dev) ? 'run QAQC' : 'Submit'}</button>
-                        <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
+                        <button type="button" title="Close" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -48,12 +48,12 @@ export const uploadInStudy = async (id) => {
 
 
 export const createProjectModal = () => {
-    return `<div class="modal fade" id="createProjectModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    return `<div class="modal fade" id="createProjectModal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header allow-overflow">
                     <strong><i class="fas fa-project-diagram"></i> Create project</strong>
-                    <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+                    <button type="button" title="Close" class="close modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -65,13 +65,13 @@ export const createProjectModal = () => {
 
 
 export const fileVersionsModal = () => {
-    return `<div class="modal fade" id="modalFileVersions" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    return `<div class="modal fade" id="modalFileVersions" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header allow-overflow" id="modalFVHeader"></div>
                 <div class="modal-body allow-overflow" id="modalFVBody"></div>
                 <div class="modal-footer">
-                    <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <button type="button" title="Close" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

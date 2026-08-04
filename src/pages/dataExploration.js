@@ -68,7 +68,7 @@ export const dataSummary = ( pageHeader, showPages, showUpdateButton, publicAcce
                 ${
                     showUpdateButton && localStorage.parms && JSON.parse(localStorage.parms).login && emailsAllowedToUpdateData.indexOf(JSON.parse(localStorage.parms).login) !== -1 ? `
                         <div class="main-summary-row">
-                            <button id="updateSummaryStatsData" class="col-auto btn btn-primary mt-3 mb-3" aria-label="Update summary stats data" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal">Update Data</button>
+                            <button id="updateSummaryStatsData" class="col-auto btn btn-primary mt-3 mb-3" aria-label="Update summary stats data" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Update Data</button>
                         </div>
                     ` : ``
                 }
@@ -431,7 +431,7 @@ const midset = (data, acceptedVariables) => {
         template += `
             <tr class="midset-header">
                 <th class="missing-column">
-                    <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" data-variable='midsetTopBars'>
+                    <button class="info-btn variable-definition" aria-label="More info" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluenceMainModal" data-variable='midsetTopBars'>
                         <i class="fas fa-question-circle cursor-pointer"></i>
                     </button>
                 </th>
@@ -460,7 +460,7 @@ const midset = (data, acceptedVariables) => {
         template += `
             <th class="missing-column"></th>
             <th class="missing-column">
-                <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='midsetSideBars'>
+                <button class="info-btn variable-definition" aria-label="More info" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluenceMainModal"  data-variable='midsetSideBars'>
                     <i class="fas fa-question-circle cursor-pointer"></i>
                 </button>
             </th>
@@ -470,7 +470,7 @@ const midset = (data, acceptedVariables) => {
         <tr>
             <td class="missing-column set-label">
                 All subjects 
-                <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal"  data-variable='allSubjects'>
+                <button class="info-btn variable-definition" aria-label="More info" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluenceMainModal"  data-variable='allSubjects'>
                     <i class="fas fa-question-circle cursor-pointer"></i>
                 </button>
             </td>
@@ -493,7 +493,7 @@ const midset = (data, acceptedVariables) => {
             <tr>
                 <td class="missing-column set-label">
                     Complete set 
-                    <button class="info-btn variable-definition" aria-label="More info" data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluenceMainModal" data-variable='completeSet'>
+                    <button class="info-btn variable-definition" aria-label="More info" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluenceMainModal" data-variable='completeSet'>
                         <i class="fas fa-question-circle cursor-pointer"></i>
                     </button>
                 </td>

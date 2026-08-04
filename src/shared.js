@@ -1126,7 +1126,7 @@ export const notificationTemplate = (top, header, body) => {
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">${header}</strong>
-                    <button title="Close" type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                    <button title="Close" type="button" class="ml-2 mb-1 close hideNotification" data-bs-dismiss="toast" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1245,11 +1245,8 @@ export const inactivityTime = () => {
                 logOut();
             }, 300000);
             
-            const button = document.createElement('button');
-            button.dataset.toggle = 'modal';
-            button.dataset.target = '#confluenceMainModal'
-            document.body.appendChild(button);
-            button.click();
+            const inactivityModal = document.getElementById('confluenceMainModal');
+            bootstrap.Modal.getOrCreateInstance(inactivityModal).show();
             
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
@@ -1257,8 +1254,8 @@ export const inactivityTime = () => {
             body.innerHTML = `
                 You were inactive for 20 minutes, would you like to extend your session?
                 <div class="modal-footer">
-                    <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
-                    <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
+                    <button type="button" title="Close" class="btn btn-dark log-out-user" data-bs-dismiss="modal">Log Out</button>
+                    <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-bs-dismiss="modal">Continue</button>
                 </div>
             `
             

@@ -29,7 +29,7 @@ export const template = async () => {
         
         template += `
             <li class="collapsible-items">
-                <button class="${liClass}" data-toggle="collapse" href="#toggle${ID}">
+                <button class="${liClass}" data-bs-toggle="collapse" data-bs-target="#toggle${ID}">
                     <i title="${title}" data-type="${type}" data-id="${ID}" data-folder-name="${consortiaName}" data-status="pending" class="lazy-loading-spinner"></i>
                 </button> ${consortiaName}
             </li>
@@ -75,7 +75,7 @@ export const dataGovernanceProjects = async () => {
                 
                 template += `
                     <li class="collapsible-items">
-                        <button class="${liClass}" data-toggle="collapse" href="#toggle${projectArray[obj].id}">
+                        <button class="${liClass}" data-bs-toggle="collapse" data-bs-target="#toggle${projectArray[obj].id}">
                             <i title="${title}" data-folder-name="${projectName}" data-type="${type}" data-id="${projectArray[obj].id}" data-folder-name="${projectName}" data-status="pending" class="lazy-loading-spinner"></i>
                         </button> ${projectName}
                     </li>
@@ -105,8 +105,8 @@ export const dataGovernanceLazyLoad = (element) => {
             
             if (bool === true) {
                 const button = document.createElement('button');
-                button.dataset.toggle = 'modal';
-                button.dataset.target = '#modalShareFolder'
+                button.dataset.bsToggle = 'modal';
+                button.dataset.bsTarget = '#modalShareFolder'
                 button.classList = ['share-folder'];
                 button.dataset.permissionType = 'restrict';
                 button.dataset.folderId = id;
@@ -150,15 +150,15 @@ export const dataGovernanceLazyLoad = (element) => {
                 let title = type === 'folder' ? 'Expand / Collapse' : '';
                 
                 li.innerHTML = `
-                    <button class="${liClass}" data-toggle="collapse" href="#toggle${obj.id}">
+                    <button class="${liClass}" data-bs-toggle="collapse" data-bs-target="#toggle${obj.id}">
                         <i title="${title}" data-folder-name="${obj.name}" data-id="${obj.id}" ${element.dataset.sharable && element.dataset.sharable === 'no' ? `data-sharable = "no"` : ``} data-status="pending" class="lazy-loading-spinner"></i>
                     </button> ${obj.name}
                 `;
 
                 if (!element.dataset.sharable) {
                     const button = document.createElement('button');
-                    button.dataset.toggle = 'modal';
-                    button.dataset.target = '#modalShareFolder';
+                    button.dataset.bsToggle = 'modal';
+                    button.dataset.bsTarget = '#modalShareFolder';
                     button.classList = ['share-folder'];
                     button.dataset.folderId = obj.id;
                     button.dataset.folderName = obj.name;
@@ -194,8 +194,8 @@ export const dataGovernanceLazyLoad = (element) => {
 
                 if (!element.dataset.sharable) {
                     const button1 = document.createElement('button');
-                    button1.dataset.toggle = 'modal';
-                    button1.dataset.target = '#modalShareFolder';
+                    button1.dataset.bsToggle = 'modal';
+                    button1.dataset.bsTarget = '#modalShareFolder';
                     button1.classList = ['share-folder'];
                     button1.dataset.folderId = obj.id;
                     button1.dataset.folderName = obj.name;
@@ -206,8 +206,8 @@ export const dataGovernanceLazyLoad = (element) => {
                     shareData(button1);
 
                     const button2 = document.createElement('button');
-                    button2.dataset.toggle = 'modal';
-                    button2.dataset.target = '#modalFileAccessStats';
+                    button2.dataset.bsToggle = 'modal';
+                    button2.dataset.bsTarget = '#modalFileAccessStats';
                     button2.classList = ['file-access-stats'];
                     button2.dataset.fileId = obj.id;
                     button2.dataset.fileName = obj.name;

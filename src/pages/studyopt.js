@@ -606,11 +606,7 @@ export const loadStudyAccessAdminTable = async () => {
                 header.innerHTML = '<h5 class="modal-title">Concept preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
                 body.innerHTML = "";
 
-                if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
-                    bootstrap.Modal.getOrCreateInstance(modal).show();
-                } else if (typeof $ !== "undefined") {
-                    $("#confluencePreviewerModal").modal("show");
-                }
+                bootstrap.Modal.getOrCreateInstance(modal).show();
 
                 try {
                     showPreview(button.dataset.fileId, "confluencePreviewerModalBody");

@@ -40,19 +40,19 @@ export const confluenceResources = () => {
             <div class="col font-size-18 align-left">
                 <div>The following breast cancer consortia are participating in Confluence:</div>
                 <div class="consortia-desc">
-                    <a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
+                    <a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</br>
                     The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                 </div>
                 <div class="consortia-desc">
-                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://aabcg.app.vumc.org" data-toggle="modal" data-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
+                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://aabcg.app.vumc.org" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
                     The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                 </div>
                 <div class="consortia-desc">
-                    <a href= "https://www.lageno-bc.org/about/" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
+                    <a href= "https://www.lageno-bc.org/about/" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.lageno-bc.org/about/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
                     LAGENO-BC is a collaborative effort including a multinational team of investigators sharing knowledge and materials to facilitate breast cancer genetics research relevant to the diverse populations of Latin America and its diaspora.
                 </div>
                 <div class="consortia-desc">
-                    <a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
+                    <a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</br>
                     The CIMBA was formed by a collaborative group of researchers working on genetic modifiers of cancer risk in BRCA1 and BRCA2 mutation carriers. The aim of CIMBA is to provide sufficient sample sizes to allow large scale studies in order to evaluate reliably the effects of genetic modifiers.
                 </div>
                 <div class="consortia-desc">
@@ -99,7 +99,7 @@ const handleExternalLinks = () => {
                 </div>
             `;
             
-            $("#confluenceMainModal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
         })
     });
 };
@@ -114,7 +114,7 @@ export const confluenceResourcesDes = () => {
         <div class="main-summary-row white-bg div-border">
             <div class="font-size-18 align-left modal-body">
                 The following Data Access Coordinating Committees (DACCs) provide governance of the data shared with the Confluence Project. A description of the coordination between the DACCs
-                participating in Confluence is described in the: <button class="btn preview-file" data-file-id="1079250442743" data-toggle="modal" data-target="#confluencePreviewerModal" style="background: none; border: none; color: #0d6efd; text-decoration: underline; padding: 0; font: inherit; cursor: pointer; vertical-align: baseline; display: inline;">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</button>
+                participating in Confluence is described in the: <button class="btn preview-file" data-file-id="1079250442743" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal" style="background: none; border: none; color: #0d6efd; text-decoration: underline; padding: 0; font: inherit; cursor: pointer; vertical-align: baseline; display: inline;">Document of Understanding Across Consortium Data Access Committees for the Confluence Project.</button>
             </div>
             <div class="table-responsive text-start modal-body">
                 <table class="table table-striped table-hover">
@@ -128,28 +128,28 @@ export const confluenceResourcesDes = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td><a href="https://aabcg.app.vumc.org/" class="external-url" data-href="https://aabcg.app.vumc.org/" data-toggle="modal" data-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
-                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104917145" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
+                            <td><a href="https://aabcg.app.vumc.org/" class="external-url" data-href="https://aabcg.app.vumc.org/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104917145" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
-                            <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-toggle="modal" data-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
+                            <td><a href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/breast-cancer-association-consortium-bcac" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Breast Cancer Association Consortium</a> (BCAC)</td>
                             <td style="text-align: center">Not Available</td>
                         </tr>
                         <tr>
-                            <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-toggle="modal" data-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
-                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104914745" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
+                            <td><a href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" class="external-url" data-href="https://www.ccge.medschl.cam.ac.uk/consortium-investigators-modifiers-brca12-cimba" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Consortium of Investigators of Modifiers of BRCA1/2</a> (CIMBA)</td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104914745" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                             <tr>
-                            <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-toggle="modal" data-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
-                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104919545" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
+                            <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104919545" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
                             <td>Male Breast Cancer Genetics Consortium (MERGE)</td>
-                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104912345" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104912345" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
                             <td>Confluence National Cancer Institute Studies (C-NCI)</td>
-                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104924345" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-toggle="modal" data-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
+                            <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104924345" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                     </tbody>
                 </table>

@@ -195,9 +195,12 @@ export const setupDownloadSelect = (tab, files) => {
     }
 
     downloadButton.addEventListener("click", () => {
+        const modalElement = document.getElementById("confluenceMainModal");
         const header = document.getElementById("confluenceModalHeader");
         const body = document.getElementById("confluenceModalBody");
-        if (!header || !body) return;
+        if (!modalElement || !header || !body) return;
+
+        const downloadModal = bootstrap.Modal.getOrCreateInstance(modalElement);
 
         header.innerHTML = `
             <h5 class="modal-title">Download Selected Concepts</h5>
@@ -234,7 +237,7 @@ export const setupDownloadSelect = (tab, files) => {
             </form>
         `;
 
-        $("#confluenceMainModal").modal("show");
+        downloadModal.show();
 
         const selectAll = document.getElementById(`${tab}DownloadSelectAll`);
         const selectedCheckboxes = Array.from(body.querySelectorAll(".download-selection-checkbox"));
@@ -278,7 +281,7 @@ export const setupDownloadSelect = (tab, files) => {
                     if (!mergedBlob) throw new Error(`Unable to prepare ${file.name || file.id}.`);
                     downloadBlob(mergedBlob, getMergedConceptDownloadName(file));
                 }
-                $("#confluenceMainModal").modal("hide");
+                downloadModal.hide();
             } catch (error) {
                 console.error("Error downloading selected files:", error);
                 alert("Unable to download selected files. Please try again.");
@@ -1431,11 +1434,11 @@ export function viewFinalDecisionFilesTemplate(files) {
     let btns = Array.from(document.querySelectorAll("#daccDecision .preview-file"));
     btns.forEach((btn) => {
         btn.addEventListener("click", (e) => {
-            btn.dataset.target = "#confluencePreviewerModal";
+            btn.dataset.bsTarget = "#confluencePreviewerModal";
             const header = document.getElementById("confluencePreviewerModalHeader");
             header.innerHTML = `<h5 class="modal-title">File preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
             const fileId = btn.dataset.fileId;
-            $("#confluencePreviewerModal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("confluencePreviewerModal")).show();
             showPreview(fileId, "confluencePreviewerModalBody");
         });
     });
@@ -1505,7 +1508,7 @@ export const createAllRoundFolders = async () => {
     const body = document.getElementById("confluenceModalBody");
     header.innerHTML = `<h5 class="modal-title">Initializing 10-Year Round Folders</h5>`;
     body.innerHTML = '<div id="initRoundsProgress" style="max-height: 400px; overflow-y: auto;"><p>Loading schedule...</p></div>';
-    $("#confluenceMainModal").modal("show");
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
     const progressDiv = document.getElementById('initRoundsProgress');
     const addStatus = (msg, color = 'black') => {
         progressDiv.innerHTML += `<p style="color: ${color}">${msg}</p>`;
@@ -1857,7 +1860,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
             btn.addEventListener("click", (e) => {
                 const header = document.getElementById("confluencePreviewerModalHeader");
                 header.innerHTML = `<h5 class="modal-title">File preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
-                $("#confluencePreviewerModal").modal("show");
+                bootstrap.Modal.getOrCreateInstance(document.getElementById("confluencePreviewerModal")).show();
                 showPreview(btn.dataset.fileId, "confluencePreviewerModalBody");
             });
         });
@@ -1910,7 +1913,7 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
         const header = document.getElementById('confluenceModalHeader');
         header.innerHTML = `<h5 class="modal-title">Changing Score for ${fid}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
         document.getElementById('confluenceModalBody').innerHTML = '<form id="changeScore"><div class="form-group"><label for="scoreMessage">Comment</label><textarea class="form-control" id="scoreMessage" rows="3">Changed by admin</textarea></div><div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update score</button></div></form>';
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
         addEventUpdateScore(fid, val, cons, () => { adminDataCache = null; generateAuthTableFiles(); });
         this.setAttribute('data-previous-value', val);
       });
@@ -2022,7 +2025,7 @@ export const returnToChairs = () => {
         `;
 
         body.innerHTML = template;
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
         document.getElementById("chairSelectionForm").addEventListener("submit", async (submitEvent) => {
             submitEvent.preventDefault();
@@ -2108,7 +2111,7 @@ export const returnToSubmitter = () => {
             </form>
         `;
 
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
         document.querySelectorAll(".decision-btn").forEach(button => {
             button.addEventListener("click", async () => {
@@ -2194,7 +2197,7 @@ export const returnToSubmitter = () => {
             document.getElementById("sendEmailAndRefresh").addEventListener("click", () => {
                 window.location.href = `mailto:${submitterEmail}?subject=Confluence Project: DACC responses to your concept submission are ready for your review&body=Your Confluence data access submission for ${encodeURIComponent(fileName)} has been returned. Please review the comments at https://epidataplatforms.cancer.gov/confluence/#data_submissions`;
                 setTimeout(() => {
-                    $("#confluenceMainModal").modal("hide");
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).hide();
                     refreshAdminTable();
                 }, 500);
             });
@@ -2324,7 +2327,7 @@ export const dataGovTest = async () => {
             </div>
         `;
 
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
         if (!hasUsersToAdd) return;
 
@@ -2382,7 +2385,7 @@ export const dataGovTest = async () => {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             `;
             body.innerHTML = `<p class="text-danger">Unable to update users: ${escapeHtml(error.message)}</p>`;
-            $("#confluenceMainModal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
         } else {
             alert(`Unable to update users: ${error.message}`);
         }
@@ -2443,7 +2446,7 @@ export const showRenameFilesPopup = (files) => {
     `;
 
     body.innerHTML = template;
-    $("#confluenceMainModal").modal("show");
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
     document.getElementById("roundNumber").addEventListener("input", (e) => {
         const roundValue = e.target.value || "X";
@@ -2478,7 +2481,7 @@ export const renameFilesWithRound = async (files, roundNumber) => {
 
     header.innerHTML = `<h5 class="modal-title">Renaming Files...</h5>`;
     body.innerHTML = '<div id="renameProgress" style="max-height: 400px; overflow-y: auto;"><p>Starting file rename process...</p></div>';
-    $("#confluenceMainModal").modal("show");
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
     const progressDiv = document.getElementById("renameProgress");
 

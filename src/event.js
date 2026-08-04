@@ -282,7 +282,7 @@ const performQAQC = async (textFromFileLoaded, fileName) => {
     downloadAndClose.innerHTML = 'Download Report and Close';
     newBtn.type = 'button';
 
-    const closeBtn = submitBtn.parentNode.querySelectorAll('[data-dismiss="modal"]')[0];
+    const closeBtn = submitBtn.parentNode.querySelectorAll('[data-bs-dismiss="modal"]')[0];
     closeBtn.parentNode.replaceChild(downloadAndClose, closeBtn)
     submitBtn.parentNode.replaceChild(newBtn, submitBtn);
     
@@ -314,7 +314,7 @@ const replaceBtns = () => {
     closeBtn.title = 'Close';
     closeBtn.innerHTML = 'Close';
     closeBtn.type = 'button';
-    closeBtn.dataset.dismiss = 'modal';
+    closeBtn.dataset.bsDismiss = 'modal';
 
     element.parentNode.replaceChild(closeBtn, element);
 
@@ -457,8 +457,8 @@ export const addEventShowAllCollaborator = () => {
         collaboratorModalBody.innerHTML = `
             <div class="modal-body allow-overflow max-height-collaboration-list">${table}</div>
             <div class="modal-footer">
-                <button type="button" id="extendCollaborations" title="Extend" class="btn btn-light" data-dismiss="modal">Extend Collaboration</button>
-                <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
+                <button type="button" id="extendCollaborations" title="Extend" class="btn btn-light" data-bs-dismiss="modal">Extend Collaboration</button>
+                <button type="button" title="Close" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
             </div>
         `;
         
@@ -758,7 +758,7 @@ export const addEventAddNewCollaborator = () => {
                 </div>
                 <div class="modal-footer">
                     <button type="submit" title="Submit" class="btn btn-light">Submit</button>
-                    <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <button type="button" title="Close" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         `;
@@ -846,7 +846,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
         //     const btnDiv = document.createElement('div');
         //     btnDiv.classList = ['align-left create-project-btn'];
         //     btnDiv.innerHTML = `
-        //         <button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+        //         <button id="createProjectBtn" title="Create project" data-bs-toggle="modal" data-bs-target="#createProjectModal" class="btn btn-light">
         //             <i class="fas fa-project-diagram"></i> Create project
         //         </button>
         //         ${createProjectModal()}
@@ -881,7 +881,7 @@ export const addEventDataGovernanceNavBar = (bool) => {
             // const btnDiv = document.createElement('div');
             // btnDiv.classList = ['align-left create-project-btn'];
             // btnDiv.innerHTML = `
-            //     <button id="createProjectBtn" title="Create project" data-toggle="modal" data-target="#createProjectModal" class="btn btn-light">
+            //     <button id="createProjectBtn" title="Create project" data-bs-toggle="modal" data-bs-target="#createProjectModal" class="btn btn-light">
             //         <i class="fas fa-project-diagram"></i> Create project
             //     </button>
             //     ${createProjectModal()}`;
@@ -928,7 +928,7 @@ const addEventCreateProjectBtn = () => {
             </div>
             <div class="modal-footer">
                 <button type="submit" title="Submit" class="btn btn-light">Submit</button>
-                <button type="button" title="Close" class="btn btn-dark" data-dismiss="modal">Close</button>
+                <button type="button" title="Close" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
             </form>
         `
         const addMoreEmail = document.getElementById('addMoreEmail');
@@ -1133,7 +1133,7 @@ export const addEventFileStats = (element) => {
         document.getElementById('modalFileStatsBody').innerHTML = '';
         document.getElementById('modalFileStatsHeader').innerHTML = `
             <h5 class="modal-title">${name}</h5>
-            <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+            <button type="button" title="Close" class="close modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         `;
@@ -1262,7 +1262,7 @@ export const addEventUpdateSummaryStatsData = () => {
         body.innerHTML = template;
         
         document.getElementById('confluenceMainModal').style.display = "block";
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
         addEventDataTypeRadio();
         addEventUpdateSummaryStatsForm();
     });
@@ -1421,7 +1421,7 @@ export const addEventUpdateScore = async (fileId, selectedValue, consortium, ref
             if (commentReturn.status === 201) {
                 form.querySelectorAll('[type="submit"]')[0].innerHTML = 'Complete';
                 setTimeout(() => {
-                    $("#confluenceMainModal").modal("hide");
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).hide();
                     if (refreshCallback) refreshCallback();
                 }, 500);
             } else {
