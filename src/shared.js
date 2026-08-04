@@ -26,7 +26,7 @@ export const chairsInfo = [
     {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
-    {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
+    //{id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
 
 export const messagesForChair = {
@@ -2252,6 +2252,22 @@ export const addMetaData = async (file, meta) => {
 };
 
 
+export const findResponseForComment = (comment, responseComments = []) => {
+    if (!comment || !comment.id || !Array.isArray(responseComments)) return null;
+    return responseComments.find(responseComment =>
+        responseComment && responseComment.message
+        && responseComment.message.includes(`Response ID: ${comment.id},`)
+    ) || null;
+};
+
+export const extractResponseText = (responseComment) => {
+    if (!responseComment || !responseComment.message) return "";
+    const commaIndex = responseComment.message.indexOf(',');
+    return commaIndex >= 0
+        ? responseComment.message.substring(commaIndex + 1).trim()
+        : responseComment.message.trim();
+};
+
 export async function showCommentsWithResponses(id, responseComments = []) {
     const commentSection = document.getElementById("fileComments");
     const response = await listComments(id);
@@ -2297,12 +2313,12 @@ export async function showCommentsWithResponses(id, responseComments = []) {
         
         // Find and display corresponding response
         console.log(comment.id);
-        const matchingResponse = responseComments.find(r => r.message.includes(`Response ID: ${comment.id},`));
+        const matchingResponse = findResponseForComment(comment, responseComments);
         //console.log(comment);
         console.log(matchingResponse);
        console.log(responseComments);
         if (matchingResponse) {
-            const responseText = matchingResponse.message.substring(matchingResponse.message.indexOf(',') + 1).trim();
+            const responseText = extractResponseText(matchingResponse);
             template += `
                 <div class='row mt-2'>
                     <div class='col-12 p-2' style='background-color: #e7f3ff; border-left: 3px solid #007bff;'>
