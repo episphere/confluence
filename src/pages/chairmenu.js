@@ -456,7 +456,7 @@ const downloadCsvFile = (rows, filename) => {
     URL.revokeObjectURL(url);
 };
 
-const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
+const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => {
     const results = [];
     const CHUNK_SIZE = 10;
     
@@ -518,6 +518,9 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = []) => {
                 const originalFile = findMatchingFileByName(allSubFiles, filename);
                 if (originalFile && originalFile.parent) {
                     roundId = originalFile.parent.id;
+                } else if (type === 'com' && fileInfo.parent?.name) {
+                    const matchingRound = submitterRoundFolders.find(round => round.name === fileInfo.parent.name);
+                    if (matchingRound) roundId = matchingRound.id;
                 }
             }
 
@@ -1575,18 +1578,50 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
 const loadAdminDataCache = async () => {
     if (adminDataCache) return adminDataCache;
 
-    const [allFilesSub, allFilesCom, allFilesRes] = await Promise.all([
+    const [allFilesSub, allFilesCom, allFilesRes, submitterFolderItems] = await Promise.all([
         getAllFilesRecursive(submitterFolder, "name,type,id,parent,created_at"),
         getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at"),
-        getRequiringInputFiles(returnToSubmitterFolder)
+        getRequiringInputFiles(returnToSubmitterFolder),
+        getFolderItems(submitterFolder, "name,type,id", 1000)
     ]);
+    const submitterRoundFolders = (submitterFolderItems?.entries || [])
+        .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"));
     const [processedSub, processedCom, processedRes] = await Promise.all([
         getProcessedAdminFiles(allFilesSub, 'sub'),
-        getProcessedAdminFiles(allFilesCom, 'com', allFilesSub),
+        getProcessedAdminFiles(allFilesCom, 'com', allFilesSub, submitterRoundFolders),
         getProcessedAdminFiles(allFilesRes, 'res', allFilesSub)
     ]);
     adminDataCache = { sub: processedSub, com: processedCom, res: processedRes };
     return adminDataCache;
+};
+
+export const loadAcceptedAdminConceptRounds = async () => {
+    const [data, folderItems] = await Promise.all([
+        loadAdminDataCache(),
+        getFolderItems(submitterFolder, "name,type,id", 1000)
+    ]);
+    const roundFolders = (folderItems?.entries || [])
+        .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"))
+        .sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true, sensitivity: "base" }));
+    const roundNamesById = new Map(roundFolders.map(folder => [String(folder.id), folder.name]));
+    const conceptsByRound = new Map(roundFolders.map(folder => [String(folder.id), []]));
+
+    data.com.forEach(file => {
+        const roundId = String(file.roundId || "");
+        if (!roundNamesById.has(roundId)) return;
+        conceptsByRound.get(roundId).push({
+            fileId: String(file.fileId),
+            fileName: file.filename,
+            title: file.titlename || file.filename,
+            requestedConsortia: Array.isArray(file.requestedConsortia) ? file.requestedConsortia : []
+        });
+    });
+
+    return roundFolders.map(folder => ({
+        id: String(folder.id),
+        name: folder.name,
+        concepts: conceptsByRound.get(String(folder.id)) || []
+    }));
 };
 
 export const exportAdminConsortiaCsv = async () => {
@@ -1905,7 +1940,8 @@ const initializeAdminActionRequiredControls = () => {
 
         document.getElementById("saveActionRequiredForm").addEventListener("submit", async event => {
             event.preventDefault();
-            const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+            const form = event.currentTarget;
+            const submitButton = form.querySelector('button[type="submit"]');
             const status = document.getElementById("saveActionRequiredStatus");
             submitButton.disabled = true;
             submitButton.textContent = "Saving...";
@@ -1917,7 +1953,8 @@ const initializeAdminActionRequiredControls = () => {
                 status.className = "alert alert-success";
                 status.textContent = `Action Required selections were saved to ${ADMIN_ACTION_REQUIRED_FILE_NAME} in Box.`;
                 submitButton.remove();
-                event.currentTarget.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
+                const closeButton = form.querySelector('[data-bs-dismiss="modal"]');
+                if (closeButton) closeButton.textContent = "Close";
             } catch (error) {
                 console.error("Unable to save Action Required selections:", error);
                 status.className = "alert alert-danger";
@@ -2051,6 +2088,7 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     document.querySelectorAll(".action-required-dropdown").forEach(dropdown => {
       dropdown.dataset.fileName = adminFileNamesById.get(dropdown.dataset.fileId) || "";
     });
+    const completedAdminFileIds = new Set(processedComFiles.map(file => String(file.fileId)));
     document.querySelectorAll(".admin-table-row > .row-24").forEach(row => {
       const conceptCell = row.children[1];
       const actionCell = row.querySelector(".action-required-dropdown")?.parentElement;
@@ -2062,6 +2100,15 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
         actionCell.classList.remove("col-24-3");
         actionCell.classList.add("col-24-2");
         row.insertBefore(actionCell, row.children[5]);
+      }
+      const rowFileId = row.querySelector(".admin-checkbox")?.id;
+      if (completedAdminFileIds.has(String(rowFileId))) {
+        const statusBadge = row.querySelector(".badge");
+        if (statusBadge) {
+          statusBadge.classList.remove("bg-warning", "bg-danger");
+          statusBadge.classList.add("bg-success");
+          statusBadge.textContent = "Accepted";
+        }
       }
     });
     document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
@@ -2304,6 +2351,15 @@ export const returnToSubmitter = () => {
             const fileName = fileSelected.name;
             const submitterEmail = fileSelected.created_by.login;
             const userFolderName = `The_Confluence_Project_Returned_Concepts-${submitterEmail}`;
+            const rowRoundId = checkbox.closest(".admin-table-row")?.dataset.roundId;
+            let roundName = fileSelected.parent?.name?.toLowerCase().startsWith("round") ? fileSelected.parent.name : "";
+            if (!roundName && rowRoundId) {
+                const roundInfo = await getFolderInfo(rowRoundId);
+                if (roundInfo?.name?.toLowerCase().startsWith("round")) roundName = roundInfo.name;
+            }
+            if ((decision === "Accepted" || decision === "Denied") && !roundName) {
+                throw new Error("Unable to determine the submission round for this concept.");
+            }
 
             addStatus(`Locating return folder for ${escapeHtml(submitterEmail)}...`);
             const userFolder = await getOrCreateChildFolder(returnToSubmitterFolder, userFolderName);
@@ -2338,8 +2394,10 @@ export const returnToSubmitter = () => {
                     }
                 }
 
-                addStatus("Moving submitter file to completed folder...");
-                await moveFile(checkbox.id, completedFolder);
+                addStatus(`Ensuring completed round folder exists: ${escapeHtml(roundName)}...`);
+                const completedRoundFolder = await getOrCreateChildFolder(completedFolder, roundName);
+                addStatus(`Moving submitter file to completed/${escapeHtml(roundName)}...`);
+                await moveFile(checkbox.id, completedRoundFolder.id);
             }
 
             addStatus(`Preparing email for submitter: ${escapeHtml(submitterEmail)}`);
