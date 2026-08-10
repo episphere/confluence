@@ -349,6 +349,18 @@ const findMatchingFileByName = (files, fileName) => {
     return files.find(file => file && normalizeBoxFileName(file.name) === normalizedFileName) || null;
 };
 
+const findRoundByConceptDate = (roundFolders, fileName) => {
+    const dateMatch = String(fileName || "").match(/_(\d{4}-\d{2}-\d{2})(?:\.[^.]+)?$/);
+    if (!dateMatch) return null;
+    const conceptDate = Date.parse(`${dateMatch[1]}T00:00:00`);
+    if (!Number.isFinite(conceptDate)) return null;
+    return roundFolders.find(round => {
+        const startDate = Date.parse(round.startDate);
+        const endDate = Date.parse(round.endDate);
+        return Number.isFinite(startDate) && Number.isFinite(endDate) && conceptDate >= startDate && conceptDate <= endDate;
+    }) || null;
+};
+
 const getChairCommentSourceId = (file, fallbackId = null) => {
     if (!file) return fallbackId;
     return file.commentsFileId || file.masterFileId || fallbackId || file.id;
@@ -521,6 +533,10 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
                 } else if (type === 'com' && fileInfo.parent?.name) {
                     const matchingRound = submitterRoundFolders.find(round => round.name === fileInfo.parent.name);
                     if (matchingRound) roundId = matchingRound.id;
+                }
+                if (type === 'com' && (!roundId || !submitterRoundFolders.some(round => String(round.id) === String(roundId)))) {
+                    const datedRound = findRoundByConceptDate(submitterRoundFolders, filename);
+                    if (datedRound) roundId = datedRound.id;
                 }
             }
 
@@ -1578,14 +1594,17 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
 const loadAdminDataCache = async () => {
     if (adminDataCache) return adminDataCache;
 
-    const [allFilesSub, allFilesCom, allFilesRes, submitterFolderItems] = await Promise.all([
+    const [allFilesSub, allFilesCom, allFilesRes, submitterFolderItems, roundSchedule] = await Promise.all([
         getAllFilesRecursive(submitterFolder, "name,type,id,parent,created_at"),
         getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at"),
         getRequiringInputFiles(returnToSubmitterFolder),
-        getFolderItems(submitterFolder, "name,type,id", 1000)
+        getFolderItems(submitterFolder, "name,type,id", 1000),
+        fetch("./src/data/roundSchedule.json").then(response => response.ok ? response.json() : []).catch(() => [])
     ]);
+    const scheduleByFolderName = new Map((roundSchedule || []).map(round => [round.folderName, round]));
     const submitterRoundFolders = (submitterFolderItems?.entries || [])
-        .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"));
+        .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"))
+        .map(item => ({ ...item, ...(scheduleByFolderName.get(item.name) || {}) }));
     const [processedSub, processedCom, processedRes] = await Promise.all([
         getProcessedAdminFiles(allFilesSub, 'sub'),
         getProcessedAdminFiles(allFilesCom, 'com', allFilesSub, submitterRoundFolders),
@@ -1595,7 +1614,8 @@ const loadAdminDataCache = async () => {
     return adminDataCache;
 };
 
-export const loadAcceptedAdminConceptRounds = async () => {
+export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
+    if (forceRefresh) adminDataCache = null;
     const [data, folderItems] = await Promise.all([
         loadAdminDataCache(),
         getFolderItems(submitterFolder, "name,type,id", 1000)

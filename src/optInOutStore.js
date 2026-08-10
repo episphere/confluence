@@ -9,6 +9,8 @@ import {
 
 const TSV_MIME_TYPE = "text/tab-separated-values";
 const CONFIG_FOLDER_NAME = "_config";
+const DEMO_ROOT_FOLDER_NAME = "_demo";
+const DEMO_STUDY_ID = "Demo_Study";
 const ROUNDS_FILE_NAME = "rounds.tsv";
 const STUDY_MANIFEST_FILE_NAME = "_study_manifest.tsv";
 const CONSORTIUM_ID = "C-NCI";
@@ -16,7 +18,7 @@ const CONSORTIUM_ID = "C-NCI";
 const ROUND_COLUMNS = ["round_id", "round_name", "source_box_folder_id", "status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email"];
 const ROUND_MANIFEST_COLUMNS = ["round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "study_folder_id", "round_folder_id", "selection_file_id", "provision_status", "provision_error"];
 const STUDY_MANIFEST_COLUMNS = ["round_id", "round_name", "round_status", "opens_at_utc", "closes_at_utc", "concept_box_id", "concept_title", "selection_file_id"];
-const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "concept_file_name", "decision", "submitted", "submitted_by_name", "submitted_by_email", "submitted_at_utc", "updated_at_utc"];
+const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "concept_file_name", "decision", "submitted", "submitted_by_name", "submitted_by_email", "submitted_at_utc", "updated_at_utc", "is_demo", "demo_created_by", "demo_created_at_utc"];
 
 const cleanTsvValue = (value) => String(value ?? "").replace(/[\t\r\n]+/g, " ").trim();
 const cleanBoxName = (value) => cleanTsvValue(value).replace(/[\\/]+/g, "-");
@@ -93,7 +95,7 @@ const upsertRows = (existingRows, newRows, keyForRow) => {
 const getStudyId = (study) => cleanBoxName(study.acronym || study.name);
 const getConceptSelectionFileName = (conceptBoxId) => `concept_${cleanTsvValue(conceptBoxId)}.tsv`;
 
-const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now }) => {
+const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now, isDemo = false, demoCreatedBy = "" }) => {
     const fileName = getConceptSelectionFileName(concept.fileId);
     const existing = await findFile(roundFolderId, fileName);
     if (existing) return existing;
@@ -114,7 +116,10 @@ const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now }
         submitted_by_name: "",
         submitted_by_email: "",
         submitted_at_utc: "",
-        updated_at_utc: now
+        updated_at_utc: now,
+        is_demo: String(isDemo),
+        demo_created_by: isDemo ? demoCreatedBy : "",
+        demo_created_at_utc: isDemo ? now : ""
     };
     return writeTsv(roundFolderId, fileName, SELECTION_COLUMNS, [row]);
 };
@@ -201,6 +206,61 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
     return { createdAssignments: roundManifestRows.length - failures.length, failures, totalAssignments: roundManifestRows.length };
 };
 
+export const provisionDemoOptInOutRound = async ({ demoName, sourceRound, concepts, opensAt, closesAt, initiatedBy, onProgress }) => {
+    const now = new Date().toISOString();
+    const report = message => { if (typeof onProgress === "function") onProgress(message); };
+    const safeDemoName = cleanBoxName(demoName);
+    if (!safeDemoName) throw new Error("A demo name is required.");
+    const demoRoot = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, DEMO_ROOT_FOLDER_NAME);
+    const demoFolder = await getOrCreateOptInOutFolder(demoRoot.id, safeDemoName);
+    const consortiumFolder = await getOrCreateOptInOutFolder(demoFolder.id, CONSORTIUM_ID);
+    const study = { acronym: DEMO_STUDY_ID, name: "Administrative Demo Study" };
+    const studyFolder = await getOrCreateOptInOutFolder(consortiumFolder.id, DEMO_STUDY_ID);
+    const roundFolder = await getOrCreateOptInOutFolder(studyFolder.id, safeDemoName);
+    const demoRound = { id: `demo-${sourceRound.id}-${safeDemoName}`, name: safeDemoName };
+    const studyManifestRows = [];
+    const manifestRows = [];
+
+    for (const concept of concepts) {
+        report(`Preparing demo concept: ${concept.title}`);
+        const selectionFile = await ensureSelectionFile({
+            roundFolderId: roundFolder.id,
+            round: demoRound,
+            study,
+            concept,
+            now,
+            isDemo: true,
+            demoCreatedBy: initiatedBy
+        });
+        const assignment = {
+            round_id: demoRound.id,
+            round_name: safeDemoName,
+            round_status: "open",
+            opens_at_utc: opensAt,
+            closes_at_utc: closesAt,
+            concept_box_id: concept.fileId,
+            concept_title: concept.title,
+            selection_file_id: selectionFile.id
+        };
+        studyManifestRows.push(assignment);
+        manifestRows.push({
+            ...assignment,
+            consortium_id: CONSORTIUM_ID,
+            study_id: DEMO_STUDY_ID,
+            study_acronym: DEMO_STUDY_ID,
+            study_name: study.name,
+            study_folder_id: studyFolder.id,
+            round_folder_id: roundFolder.id,
+            provision_status: "ready",
+            provision_error: ""
+        });
+    }
+
+    await writeTsv(studyFolder.id, STUDY_MANIFEST_FILE_NAME, STUDY_MANIFEST_COLUMNS, studyManifestRows);
+    await writeTsv(demoFolder.id, "demo_manifest.tsv", ROUND_MANIFEST_COLUMNS, manifestRows);
+    return { demoName: safeDemoName, createdAssignments: manifestRows.length };
+};
+
 const resolveStudyFolder = async (study) => {
     const studyId = getStudyId(study);
     try {
@@ -217,32 +277,56 @@ const resolveStudyFolder = async (study) => {
     return boxEntries(collaborationRoots).find(item => item.type === "folder" && normalizeName(item.name) === normalizeName(studyId)) || null;
 };
 
+const loadAssignmentsFromStudyFolder = async (studyFolder, now = Date.now()) => {
+    const assignments = [];
+    const manifest = await readTsvInFolder(studyFolder.id, STUDY_MANIFEST_FILE_NAME);
+    const openAssignments = manifest.rows.filter(row => {
+        const opensAt = Date.parse(row.opens_at_utc);
+        const closesAt = Date.parse(row.closes_at_utc);
+        return row.round_status === "open"
+            && row.selection_file_id
+            && (!Number.isFinite(opensAt) || opensAt <= now)
+            && (!Number.isFinite(closesAt) || closesAt >= now);
+    });
+    for (const assignment of openAssignments) {
+        const selectionRows = await readTsv(assignment.selection_file_id);
+        const selection = selectionRows[0];
+        if (!selection) continue;
+        assignments.push({
+            ...assignment,
+            ...selection,
+            selectionFileId: assignment.selection_file_id,
+            studyFolderId: studyFolder.id
+        });
+    }
+    return assignments;
+};
+
 export const loadOptInOutAssignments = async (studies) => {
     const assignments = [];
     const now = Date.now();
     for (const study of studies) {
         const studyFolder = await resolveStudyFolder(study);
         if (!studyFolder) continue;
-        const manifest = await readTsvInFolder(studyFolder.id, STUDY_MANIFEST_FILE_NAME);
-        const openAssignments = manifest.rows.filter(row => {
-            const opensAt = Date.parse(row.opens_at_utc);
-            const closesAt = Date.parse(row.closes_at_utc);
-            return row.round_status === "open"
-                && row.selection_file_id
-                && (!Number.isFinite(opensAt) || opensAt <= now)
-                && (!Number.isFinite(closesAt) || closesAt >= now);
-        });
-        for (const assignment of openAssignments) {
-            const selectionRows = await readTsv(assignment.selection_file_id);
-            const selection = selectionRows[0];
-            if (!selection) continue;
-            assignments.push({
-                ...assignment,
-                ...selection,
-                selectionFileId: assignment.selection_file_id,
-                studyFolderId: studyFolder.id
-            });
-        }
+        assignments.push(...await loadAssignmentsFromStudyFolder(studyFolder, now));
+    }
+    return assignments;
+};
+
+export const loadDemoOptInOutAssignments = async () => {
+    const demoRoot = await findFolder(Confluence_Opt_In_Out, DEMO_ROOT_FOLDER_NAME);
+    if (!demoRoot) return [];
+    const demoItems = await getFolderItems(demoRoot.id, "name,type,id,parent", 1000);
+    const demoFolders = boxEntries(demoItems).filter(item => item.type === "folder");
+    const assignments = [];
+    for (const demoFolder of demoFolders) {
+        const consortiumFolder = await findFolder(demoFolder.id, CONSORTIUM_ID);
+        if (!consortiumFolder) continue;
+        const studyFolder = await findFolder(consortiumFolder.id, DEMO_STUDY_ID);
+        if (!studyFolder) continue;
+        const demoAssignments = await loadAssignmentsFromStudyFolder(studyFolder);
+        demoAssignments.forEach(assignment => { assignment.is_demo = "true"; });
+        assignments.push(...demoAssignments);
     }
     return assignments;
 };

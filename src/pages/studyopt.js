@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { csv2Json, emailsAllowedToUpdateData } from "../shared.js";
-import { loadOptInOutAssignments, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
+import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
 
 const escapeHtml = (value) => String(value ?? "")
@@ -451,14 +451,19 @@ export const loadOptInOutTable = async () => {
             container.innerHTML = "<p class='text-warning'>Please sign in to view this page.</p>";
             return;
         }
+        const isAdmin = emailsAllowedToUpdateData.includes(userEmail);
         const workbookRows = await loadOptInOutWorkbookRows();
         const userRow = workbookRows.find(row => String(getCellValue(row, ["Email", "email"])).trim().toLowerCase() === userEmail.toLowerCase());
-        if (!userRow) {
+        if (!userRow && !isAdmin) {
             container.innerHTML = "<p class='text-warning'>Your email was not found in the study access roster.</p>";
             return;
         }
-        const studies = getWorkbookStudyEntries(userRow);
-        const assignments = await loadOptInOutAssignments(studies);
+        const studies = userRow ? getWorkbookStudyEntries(userRow) : [];
+        const [productionAssignments, demoAssignments] = await Promise.all([
+            studies.length ? loadOptInOutAssignments(studies) : Promise.resolve([]),
+            isAdmin ? loadDemoOptInOutAssignments() : Promise.resolve([])
+        ]);
+        const assignments = [...demoAssignments, ...productionAssignments];
         if (!assignments.length) {
             container.innerHTML = "<p class='text-warning'>No open Opt-In/Opt-Out assignments were found for your studies. An administrator may need to initiate the round first.</p>";
             return;
@@ -467,7 +472,7 @@ export const loadOptInOutTable = async () => {
         assignments.sort((a, b) => `${a.round_name}|${a.concept_title}|${a.study_acronym}`.localeCompare(`${b.round_name}|${b.concept_title}|${b.study_acronym}`, undefined, { sensitivity: "base" }));
         const rows = assignments.map(assignment => `
             <tr class="align-middle">
-                <td>${escapeHtml(assignment.round_name)}</td>
+                <td>${assignment.is_demo === "true" ? '<span class="badge bg-info text-dark me-2">Demo</span>' : ""}${escapeHtml(assignment.round_name)}</td>
                 <td>
                     <div class="d-flex align-items-start gap-2">
                         <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))}</span>
@@ -480,7 +485,9 @@ export const loadOptInOutTable = async () => {
             </tr>
         `).join("");
 
+        const hasDemoAssignments = assignments.some(assignment => assignment.is_demo === "true");
         container.innerHTML = `
+            ${hasDemoAssignments ? '<div class="alert alert-info"><strong>Demo Mode:</strong> Demo selections are isolated from production study and round files.</div>' : ""}
             <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -506,7 +513,7 @@ export const loadOptInOutTable = async () => {
                 updateOptInOutSubmitButtons(container);
             });
         });
-        const user = { name: String(getCellValue(userRow, ["Name", "name"])), email: userEmail };
+        const user = { name: userRow ? String(getCellValue(userRow, ["Name", "name"])) : "Administrative Demo User", email: userEmail };
         container.querySelectorAll(".opt-in-out-submit-action").forEach(button => button.addEventListener("click", () => openOptInOutSubmitModal(container, user)));
         container.querySelectorAll(".opt-in-out-concept-preview").forEach(button => {
             button.addEventListener("click", () => {
@@ -564,7 +571,10 @@ export const studyAccessAdminTemplate = () => {
                         <h1 class="page-header">Study Access Admin</h1>
                     </div>
                     <div class="align-right">
-                        <button type="button" id="initiateOptInOutRoundBtn" class="buttonsubmit button-glow-red">
+                        <button type="button" id="createDemoOptInOutRoundBtn" class="buttonsubmit button-glow-red">
+                            <span class="buttonsubmit__text">Create Demo Round</span>
+                        </button>
+                        <button type="button" id="initiateOptInOutRoundBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
                             <span class="buttonsubmit__text">Initiate Opt-In/Out Round</span>
                         </button>
                         <button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
@@ -593,6 +603,122 @@ const getCnciWorkbookStudies = async () => {
     return Array.from(studiesById.values()).sort((a, b) => String(a.acronym || a.name).localeCompare(String(b.acronym || b.name), undefined, { sensitivity: "base" }));
 };
 
+const getAcceptedCnciRounds = async () => {
+    const rounds = await loadAcceptedAdminConceptRounds(true);
+    const acceptedConceptCount = rounds.reduce((total, round) => total + round.concepts.length, 0);
+    const cnciRounds = rounds.map(round => ({
+        ...round,
+        concepts: round.concepts.filter(concept => concept.requestedConsortia.some(value => String(value).trim().toUpperCase() === "C-NCI"))
+    })).filter(round => round.concepts.length);
+    return { rounds: cnciRounds, acceptedConceptCount };
+};
+
+const bindCreateDemoOptInOutRoundButton = () => {
+    const button = document.getElementById("createDemoOptInOutRoundBtn");
+    if (!button || button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", async () => {
+        const modalElement = document.getElementById("confluenceMainModal");
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!modalElement || !header || !body) return;
+        header.innerHTML = '<h5 class="modal-title">Create Opt-In/Opt-Out Demo</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        body.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading accepted C-NCI concepts...</div>';
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        button.disabled = true;
+
+        try {
+            const { rounds, acceptedConceptCount } = await getAcceptedCnciRounds();
+            if (!rounds.length) {
+                body.innerHTML = acceptedConceptCount > 0
+                    ? `<div class="alert alert-warning mb-0">${acceptedConceptCount} accepted concept${acceptedConceptCount === 1 ? " was" : "s were"} matched to an Admin Chair round, but none were identified as requesting C-NCI. Confirm the Word document's Requested Consortia/Study section contains C-NCI.</div>`
+                    : '<div class="alert alert-warning mb-0">No files in the completed round folders could be matched to an Admin Chair round. Confirm the completed and submitter round folder names are identical.</div>';
+                return;
+            }
+            const now = new Date();
+            const closeDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const toLocalInput = date => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            const defaultDemoName = `Demo_${rounds[0].name}_${now.toISOString().slice(0, 10)}`;
+            body.innerHTML = `
+                <form id="createDemoOptInOutRoundForm">
+                    <div class="alert alert-info"><strong>Demo Mode:</strong> This creates isolated files under <code>_demo</code> and does not alter production study or round files.</div>
+                    <div class="mb-3"><label for="demoOptInOutName" class="form-label">Demo name</label><input id="demoOptInOutName" class="form-control" value="${escapeHtml(defaultDemoName)}" required></div>
+                    <div class="mb-3"><label for="demoOptInOutRoundSelect" class="form-label">Source round</label><select id="demoOptInOutRoundSelect" class="form-select">${rounds.map(round => `<option value="${escapeHtml(round.id)}">${escapeHtml(round.name)}</option>`).join("")}</select></div>
+                    <div class="mb-3"><label class="form-label">Concepts <span class="text-muted">(choose 1–3)</span></label><div id="demoOptInOutConcepts" class="border rounded p-2" style="max-height: 220px; overflow-y: auto;"></div></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label for="demoOptInOutOpensAt" class="form-label">Opens</label><input id="demoOptInOutOpensAt" type="datetime-local" class="form-control" value="${toLocalInput(now)}" required></div><div class="col-md-6 mb-3"><label for="demoOptInOutClosesAt" class="form-label">Closes</label><input id="demoOptInOutClosesAt" type="datetime-local" class="form-control" value="${toLocalInput(closeDate)}" required></div></div>
+                    <div id="demoOptInOutStatus" class="alert d-none" role="alert"></div>
+                    <div id="demoOptInOutProgress" class="small mb-3"></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Create Demo</button></div>
+                </form>
+            `;
+            const form = document.getElementById("createDemoOptInOutRoundForm");
+            const roundSelect = document.getElementById("demoOptInOutRoundSelect");
+            const conceptsContainer = document.getElementById("demoOptInOutConcepts");
+            const renderConcepts = () => {
+                const round = rounds.find(item => String(item.id) === roundSelect.value);
+                conceptsContainer.innerHTML = (round?.concepts || []).map((concept, index) => `
+                    <div class="form-check mb-2"><input class="form-check-input demo-concept-checkbox" type="checkbox" id="demoConcept-${escapeHtml(concept.fileId)}" value="${escapeHtml(concept.fileId)}" ${index < 3 ? "checked" : ""}><label class="form-check-label" for="demoConcept-${escapeHtml(concept.fileId)}">${escapeHtml(concept.title)}</label></div>
+                `).join("");
+                conceptsContainer.querySelectorAll(".demo-concept-checkbox").forEach(checkbox => checkbox.addEventListener("change", () => {
+                    const checked = conceptsContainer.querySelectorAll(".demo-concept-checkbox:checked");
+                    if (checked.length > 3) checkbox.checked = false;
+                }));
+            };
+            roundSelect.addEventListener("change", renderConcepts);
+            renderConcepts();
+
+            form.addEventListener("submit", async event => {
+                event.preventDefault();
+                const submitButton = form.querySelector('button[type="submit"]');
+                const status = document.getElementById("demoOptInOutStatus");
+                const progress = document.getElementById("demoOptInOutProgress");
+                const sourceRound = rounds.find(item => String(item.id) === roundSelect.value);
+                const selectedIds = new Set(Array.from(conceptsContainer.querySelectorAll(".demo-concept-checkbox:checked")).map(checkbox => checkbox.value));
+                const concepts = (sourceRound?.concepts || []).filter(concept => selectedIds.has(String(concept.fileId)));
+                const opensAt = new Date(document.getElementById("demoOptInOutOpensAt").value);
+                const closesAt = new Date(document.getElementById("demoOptInOutClosesAt").value);
+                if (concepts.length < 1 || concepts.length > 3 || Number.isNaN(opensAt.getTime()) || Number.isNaN(closesAt.getTime()) || closesAt <= opensAt) {
+                    status.className = "alert alert-danger";
+                    status.textContent = "Choose between one and three concepts and provide a valid demo period.";
+                    return;
+                }
+                submitButton.disabled = true;
+                submitButton.textContent = "Creating...";
+                status.className = "alert d-none";
+                progress.innerHTML = "";
+                try {
+                    const initiatedBy = String(JSON.parse(localStorage.parms || "{}").login || "");
+                    const result = await provisionDemoOptInOutRound({
+                        demoName: document.getElementById("demoOptInOutName").value,
+                        sourceRound,
+                        concepts,
+                        opensAt: opensAt.toISOString(),
+                        closesAt: closesAt.toISOString(),
+                        initiatedBy,
+                        onProgress: message => { progress.insertAdjacentHTML("beforeend", `<div>${escapeHtml(message)}</div>`); }
+                    });
+                    status.className = "alert alert-success";
+                    status.textContent = `${result.createdAssignments} demo assignment(s) are ready. Open Study Opt-In/Out to present the demo.`;
+                    submitButton.remove();
+                    const closeButton = form.querySelector('[data-bs-dismiss="modal"]');
+                    if (closeButton) closeButton.textContent = "Close";
+                } catch (error) {
+                    console.error("Unable to create Opt-In/Out demo:", error);
+                    status.className = "alert alert-danger";
+                    status.textContent = error.message || "Unable to create the demo files in Box.";
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Create Demo";
+                }
+            });
+        } catch (error) {
+            console.error("Unable to prepare Opt-In/Out demo:", error);
+            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load accepted C-NCI concepts for the demo.</div>';
+        } finally {
+            button.disabled = false;
+        }
+    });
+};
+
 const bindInitiateOptInOutRoundButton = () => {
     const button = document.getElementById("initiateOptInOutRoundBtn");
     if (!button || button.dataset.bound === "true") return;
@@ -610,13 +736,11 @@ const bindInitiateOptInOutRoundButton = () => {
         bootstrap.Modal.getOrCreateInstance(modalElement).show();
 
         try {
-            const [rounds, studies] = await Promise.all([loadAcceptedAdminConceptRounds(), getCnciWorkbookStudies()]);
-            const availableRounds = rounds.map(round => ({
-                ...round,
-                concepts: round.concepts.filter(concept => concept.requestedConsortia.some(value => String(value).trim().toUpperCase() === "C-NCI"))
-            })).filter(round => round.concepts.length);
+            const [{ rounds: availableRounds, acceptedConceptCount }, studies] = await Promise.all([getAcceptedCnciRounds(), getCnciWorkbookStudies()]);
             if (!availableRounds.length) {
-                body.innerHTML = '<div class="alert alert-warning mb-0">No accepted C-NCI concepts were found in any Admin Chair round.</div>';
+                body.innerHTML = acceptedConceptCount > 0
+                    ? `<div class="alert alert-warning mb-0">${acceptedConceptCount} accepted concept${acceptedConceptCount === 1 ? " was" : "s were"} matched to an Admin Chair round, but none were identified as requesting C-NCI.</div>`
+                    : '<div class="alert alert-warning mb-0">No files in the completed round folders could be matched to an Admin Chair round.</div>';
                 return;
             }
 
@@ -727,6 +851,7 @@ export const loadStudyAccessAdminTable = async () => {
             return;
         }
 
+        bindCreateDemoOptInOutRoundButton();
         bindInitiateOptInOutRoundButton();
 
         const exportButton = document.getElementById("exportConsortiaCsvBtn");
