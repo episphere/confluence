@@ -1,6 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
 import { csv2Json, emailsAllowedToUpdateData } from "../shared.js";
-import { exportAdminConsortiaCsv } from "./chairmenu.js";
+import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
+import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -158,7 +159,7 @@ const getWorkbookStudyEntries = (row) => {
     return studies;
 };
 
-export const loadOptInOutTable = async () => {
+const loadLegacyOptInOutTable = async () => {
     const container = document.getElementById("optInOutTableContainer");
     if (!container || container.dataset.loaded === "true") return;
 
@@ -348,6 +349,202 @@ export const loadOptInOutTable = async () => {
     }
 };
 
+const getSavedStudyStatusSelect = (assignment) => {
+    const decision = ["opt_in", "opt_out"].includes(assignment.decision) ? assignment.decision : "pending";
+    return `
+        <select class="form-select form-select-sm saved-study-status-select" data-selection-file-id="${escapeHtml(assignment.selectionFileId)}" data-original-value="${decision}" aria-label="Opt-In or Opt-Out selection">
+            <option value="pending" ${decision === "pending" ? "selected" : ""} disabled>Choose...</option>
+            <option value="opt_in" ${decision === "opt_in" ? "selected" : ""}>Opt-In</option>
+            <option value="opt_out" ${decision === "opt_out" ? "selected" : ""}>Opt-Out</option>
+        </select>
+    `;
+};
+
+const updateStudyStatusStyle = (select) => {
+    const isOut = select.value === "opt_out";
+    const isIn = select.value === "opt_in";
+    select.classList.toggle("border-danger", isOut);
+    select.classList.toggle("text-danger", isOut);
+    select.classList.toggle("border-success", isIn);
+    select.classList.toggle("text-success", isIn);
+    select.style.backgroundColor = isOut ? "#f8d7da" : isIn ? "#d1e7dd" : "";
+    select.style.color = isOut ? "#842029" : isIn ? "#0f5132" : "";
+};
+
+const getChangedOptInOutSelections = (container) => Array.from(container.querySelectorAll(".saved-study-status-select"))
+    .filter(select => select.value !== "pending" && select.value !== select.dataset.originalValue)
+    .map(select => ({ selectionFileId: select.dataset.selectionFileId, decision: select.value, select }));
+
+const updateOptInOutSubmitButtons = (container) => {
+    const disabled = getChangedOptInOutSelections(container).length === 0;
+    container.querySelectorAll(".opt-in-out-submit-action").forEach(button => { button.disabled = disabled; });
+};
+
+const openOptInOutSubmitModal = (container, user) => {
+    const changes = getChangedOptInOutSelections(container);
+    if (!changes.length) return;
+    const modalElement = document.getElementById("confluenceMainModal");
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    if (!modalElement || !header || !body) return;
+
+    header.innerHTML = '<h5 class="modal-title">Submit Opt-In/Opt-Out Selections</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+    body.innerHTML = `
+        <form id="submitOptInOutSelectionsForm">
+            <p>Submit ${changes.length} changed selection${changes.length === 1 ? "" : "s"} to Box?</p>
+            <div class="alert alert-warning">These selections apply to the study, including any other representatives associated with it.</div>
+            <div id="optInOutSubmissionStatus" class="alert d-none" role="alert"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-outline-primary">Submit Selections</button>
+            </div>
+        </form>
+    `;
+    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+    document.getElementById("submitOptInOutSelectionsForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const status = document.getElementById("optInOutSubmissionStatus");
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+        try {
+            const pendingChanges = getChangedOptInOutSelections(container);
+            const result = await saveOptInOutSelections(pendingChanges, user);
+            result.saved.forEach(saved => {
+                saved.select.dataset.originalValue = saved.decision;
+                const savedStatus = saved.select.closest("tr")?.querySelector(".saved-selection-status");
+                if (savedStatus) savedStatus.textContent = `Saved by ${user.email || user.name}`;
+            });
+            updateOptInOutSubmitButtons(container);
+            if (result.failed.length) {
+                status.className = "alert alert-warning";
+                status.textContent = `${result.saved.length} selection(s) saved. ${result.failed.length} failed and can be retried.`;
+                submitButton.disabled = false;
+                submitButton.textContent = "Retry Failed Selections";
+            } else {
+                status.className = "alert alert-success";
+                status.textContent = "Your Opt-In/Opt-Out selections were saved in Box.";
+                submitButton.remove();
+                const closeButton = form.querySelector('[data-bs-dismiss="modal"]');
+                if (closeButton) closeButton.textContent = "Close";
+            }
+        } catch (error) {
+            console.error("Unable to submit Opt-In/Opt-Out selections:", error);
+            status.className = "alert alert-danger";
+            status.textContent = "Unable to save the selections in Box. Please try again.";
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit Selections";
+        }
+    });
+};
+
+export const loadOptInOutTable = async () => {
+    const container = document.getElementById("optInOutTableContainer");
+    if (!container || container.dataset.loaded === "true") return;
+    container.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading selections from Box...</div>';
+
+    try {
+        const userEmail = String(JSON.parse(localStorage.parms || "{}").login || "").trim();
+        if (!userEmail) {
+            container.innerHTML = "<p class='text-warning'>Please sign in to view this page.</p>";
+            return;
+        }
+        const isAdmin = emailsAllowedToUpdateData.includes(userEmail);
+        const workbookRows = await loadOptInOutWorkbookRows();
+        const userRow = workbookRows.find(row => String(getCellValue(row, ["Email", "email"])).trim().toLowerCase() === userEmail.toLowerCase());
+        if (!userRow && !isAdmin) {
+            container.innerHTML = "<p class='text-warning'>Your email was not found in the study access roster.</p>";
+            return;
+        }
+        const studies = userRow ? getWorkbookStudyEntries(userRow) : [];
+        const [productionAssignments, demoAssignments] = await Promise.all([
+            studies.length ? loadOptInOutAssignments(studies) : Promise.resolve([]),
+            isAdmin ? loadDemoOptInOutAssignments() : Promise.resolve([])
+        ]);
+        const assignments = [...demoAssignments, ...productionAssignments];
+        if (!assignments.length) {
+            container.innerHTML = "<p class='text-warning'>No open Opt-In/Opt-Out assignments were found for your studies. An administrator may need to initiate the round first.</p>";
+            return;
+        }
+
+        assignments.sort((a, b) => `${a.round_name}|${a.concept_title}|${a.study_acronym}`.localeCompare(`${b.round_name}|${b.concept_title}|${b.study_acronym}`, undefined, { sensitivity: "base" }));
+        const rows = assignments.map(assignment => `
+            <tr class="align-middle">
+                <td>${assignment.is_demo === "true" ? '<span class="badge bg-info text-dark me-2">Demo</span>' : ""}${escapeHtml(assignment.round_name)}</td>
+                <td>
+                    <div class="d-flex align-items-start gap-2">
+                        <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))}</span>
+                        <button class="btn btn-sm custom-btn opt-in-out-concept-preview" type="button" data-file-id="${escapeHtml(assignment.concept_box_id)}" title="Preview concept"><i class="fas fa-external-link-alt"></i></button>
+                    </div>
+                </td>
+                <td><div class="fw-semibold">${escapeHtml(assignment.study_acronym || assignment.study_id)}</div><div class="small text-muted">${escapeHtml(assignment.study_name)}</div></td>
+                <td style="min-width: 130px;">${getSavedStudyStatusSelect(assignment)}</td>
+                <td><span class="small text-muted saved-selection-status">${assignment.submitted === "true" ? `Saved by ${escapeHtml(assignment.submitted_by_email || assignment.submitted_by_name)}` : "Not submitted"}</span></td>
+            </tr>
+        `).join("");
+
+        const hasDemoAssignments = assignments.some(assignment => assignment.is_demo === "true");
+        container.innerHTML = `
+            ${hasDemoAssignments ? '<div class="alert alert-info"><strong>Demo Mode:</strong> Demo selections are isolated from production study and round files.</div>' : ""}
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light"><tr><th>Round</th><th>Concept Name</th><th>Study</th><th>Selection</th><th>Status</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end">
+                <button type="button" id="optInOutSubmitBtn" class="btn btn-primary opt-in-out-submit-action" disabled>Submit Opt-In/Opt-Out Selections</button>
+            </div>
+            <div id="optInOutSubmitBtnFloating" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 1050; display: none;">
+                <button type="button" class="btn btn-primary shadow opt-in-out-submit-action" disabled>Submit Opt-In/Opt-Out Selections</button>
+            </div>
+        `;
+
+        container.querySelectorAll(".saved-study-status-select").forEach(select => {
+            updateStudyStatusStyle(select);
+            select.addEventListener("change", () => {
+                updateStudyStatusStyle(select);
+                updateOptInOutSubmitButtons(container);
+            });
+        });
+        const user = { name: userRow ? String(getCellValue(userRow, ["Name", "name"])) : "Administrative Demo User", email: userEmail };
+        container.querySelectorAll(".opt-in-out-submit-action").forEach(button => button.addEventListener("click", () => openOptInOutSubmitModal(container, user)));
+        container.querySelectorAll(".opt-in-out-concept-preview").forEach(button => {
+            button.addEventListener("click", () => {
+                const modal = document.getElementById("confluencePreviewerModal");
+                const header = document.getElementById("confluencePreviewerModalHeader");
+                const body = document.getElementById("confluencePreviewerModalBody");
+                if (!modal || !header || !body) return;
+                header.innerHTML = '<h5 class="modal-title">Concept preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+                body.innerHTML = "";
+                bootstrap.Modal.getOrCreateInstance(modal).show();
+                showPreview(button.dataset.fileId, "confluencePreviewerModalBody");
+            });
+        });
+
+        const staticButton = document.getElementById("optInOutSubmitBtn");
+        const floatingContainer = document.getElementById("optInOutSubmitBtnFloating");
+        if (staticButton && floatingContainer) {
+            const onScroll = () => {
+                const rect = staticButton.getBoundingClientRect();
+                floatingContainer.style.display = rect.top < window.innerHeight && rect.bottom > 0 ? "none" : "block";
+            };
+            window.addEventListener("scroll", onScroll);
+            onScroll();
+        }
+        container.dataset.loaded = "true";
+    } catch (error) {
+        console.error("Error loading Box-backed Opt-In/Opt-Out data:", error);
+        container.innerHTML = "<p class='text-danger'>Error loading Opt-In/Opt-Out assignments from Box.</p>";
+    }
+};
+
 export const optInOutTemplate = () => {
     return `
         <div class="general-bg padding-bottom-1rem">
@@ -374,18 +571,266 @@ export const studyAccessAdminTemplate = () => {
                         <h1 class="page-header">Study Access Admin</h1>
                     </div>
                     <div class="align-right">
-                        <button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red">
+                        <button type="button" id="createDemoOptInOutRoundBtn" class="buttonsubmit button-glow-red">
+                            <span class="buttonsubmit__text">Create Demo Round</span>
+                        </button>
+                        <button type="button" id="initiateOptInOutRoundBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
+                            <span class="buttonsubmit__text">Initiate Opt-In/Out Round</span>
+                        </button>
+                        <button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
                             <span class="buttonsubmit__text">Export Consortia CSV</span>
                         </button>
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                    <p class="mb-3">Expand a requested consortia/study to review its concepts by individual study. All selections currently default to Opt-In; expand a concept name to see its users and associated studies.</p>
+                    <p class="mb-3">Expand a requested consortia/study to review its accepted concepts and individual studies. Initiating a round creates pending selection files in Box; expand a concept name to see its users and associated studies.</p>
                     <div id="studyAccessAdminTableContainer">Loading...</div>
                 </div>
             </div>
         </div>
     `;
+};
+
+const getCnciWorkbookStudies = async () => {
+    const workbookRows = await loadOptInOutWorkbookRows();
+    const studiesById = new Map();
+    workbookRows.forEach(row => {
+        getWorkbookStudyEntries(row).forEach(study => {
+            const studyId = String(study.acronym || study.name).trim().toLowerCase();
+            if (studyId && !studiesById.has(studyId)) studiesById.set(studyId, study);
+        });
+    });
+    return Array.from(studiesById.values()).sort((a, b) => String(a.acronym || a.name).localeCompare(String(b.acronym || b.name), undefined, { sensitivity: "base" }));
+};
+
+const getAcceptedCnciRounds = async () => {
+    const rounds = await loadAcceptedAdminConceptRounds(true);
+    const acceptedConceptCount = rounds.reduce((total, round) => total + round.concepts.length, 0);
+    const cnciRounds = rounds.map(round => ({
+        ...round,
+        concepts: round.concepts.filter(concept => concept.requestedConsortia.some(value => String(value).trim().toUpperCase() === "C-NCI"))
+    })).filter(round => round.concepts.length);
+    return { rounds: cnciRounds, acceptedConceptCount };
+};
+
+const bindCreateDemoOptInOutRoundButton = () => {
+    const button = document.getElementById("createDemoOptInOutRoundBtn");
+    if (!button || button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", async () => {
+        const modalElement = document.getElementById("confluenceMainModal");
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!modalElement || !header || !body) return;
+        header.innerHTML = '<h5 class="modal-title">Create Opt-In/Opt-Out Demo</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        body.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading accepted C-NCI concepts...</div>';
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        button.disabled = true;
+
+        try {
+            const { rounds, acceptedConceptCount } = await getAcceptedCnciRounds();
+            if (!rounds.length) {
+                body.innerHTML = acceptedConceptCount > 0
+                    ? `<div class="alert alert-warning mb-0">${acceptedConceptCount} accepted concept${acceptedConceptCount === 1 ? " was" : "s were"} matched to an Admin Chair round, but none were identified as requesting C-NCI. Confirm the Word document's Requested Consortia/Study section contains C-NCI.</div>`
+                    : '<div class="alert alert-warning mb-0">No files in the completed round folders could be matched to an Admin Chair round. Confirm the completed and submitter round folder names are identical.</div>';
+                return;
+            }
+            const now = new Date();
+            const closeDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const toLocalInput = date => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            const defaultDemoName = `Demo_${rounds[0].name}_${now.toISOString().slice(0, 10)}`;
+            body.innerHTML = `
+                <form id="createDemoOptInOutRoundForm">
+                    <div class="alert alert-info"><strong>Demo Mode:</strong> This creates isolated files under <code>_demo</code> and does not alter production study or round files.</div>
+                    <div class="mb-3"><label for="demoOptInOutName" class="form-label">Demo name</label><input id="demoOptInOutName" class="form-control" value="${escapeHtml(defaultDemoName)}" required></div>
+                    <div class="mb-3"><label for="demoOptInOutRoundSelect" class="form-label">Source round</label><select id="demoOptInOutRoundSelect" class="form-select">${rounds.map(round => `<option value="${escapeHtml(round.id)}">${escapeHtml(round.name)}</option>`).join("")}</select></div>
+                    <div class="mb-3"><label class="form-label">Concepts <span class="text-muted">(choose 1–3)</span></label><div id="demoOptInOutConcepts" class="border rounded p-2" style="max-height: 220px; overflow-y: auto;"></div></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label for="demoOptInOutOpensAt" class="form-label">Opens</label><input id="demoOptInOutOpensAt" type="datetime-local" class="form-control" value="${toLocalInput(now)}" required></div><div class="col-md-6 mb-3"><label for="demoOptInOutClosesAt" class="form-label">Closes</label><input id="demoOptInOutClosesAt" type="datetime-local" class="form-control" value="${toLocalInput(closeDate)}" required></div></div>
+                    <div id="demoOptInOutStatus" class="alert d-none" role="alert"></div>
+                    <div id="demoOptInOutProgress" class="small mb-3"></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Create Demo</button></div>
+                </form>
+            `;
+            const form = document.getElementById("createDemoOptInOutRoundForm");
+            const roundSelect = document.getElementById("demoOptInOutRoundSelect");
+            const conceptsContainer = document.getElementById("demoOptInOutConcepts");
+            const renderConcepts = () => {
+                const round = rounds.find(item => String(item.id) === roundSelect.value);
+                conceptsContainer.innerHTML = (round?.concepts || []).map((concept, index) => `
+                    <div class="form-check mb-2"><input class="form-check-input demo-concept-checkbox" type="checkbox" id="demoConcept-${escapeHtml(concept.fileId)}" value="${escapeHtml(concept.fileId)}" ${index < 3 ? "checked" : ""}><label class="form-check-label" for="demoConcept-${escapeHtml(concept.fileId)}">${escapeHtml(concept.title)}</label></div>
+                `).join("");
+                conceptsContainer.querySelectorAll(".demo-concept-checkbox").forEach(checkbox => checkbox.addEventListener("change", () => {
+                    const checked = conceptsContainer.querySelectorAll(".demo-concept-checkbox:checked");
+                    if (checked.length > 3) checkbox.checked = false;
+                }));
+            };
+            roundSelect.addEventListener("change", renderConcepts);
+            renderConcepts();
+
+            form.addEventListener("submit", async event => {
+                event.preventDefault();
+                const submitButton = form.querySelector('button[type="submit"]');
+                const status = document.getElementById("demoOptInOutStatus");
+                const progress = document.getElementById("demoOptInOutProgress");
+                const sourceRound = rounds.find(item => String(item.id) === roundSelect.value);
+                const selectedIds = new Set(Array.from(conceptsContainer.querySelectorAll(".demo-concept-checkbox:checked")).map(checkbox => checkbox.value));
+                const concepts = (sourceRound?.concepts || []).filter(concept => selectedIds.has(String(concept.fileId)));
+                const opensAt = new Date(document.getElementById("demoOptInOutOpensAt").value);
+                const closesAt = new Date(document.getElementById("demoOptInOutClosesAt").value);
+                if (concepts.length < 1 || concepts.length > 3 || Number.isNaN(opensAt.getTime()) || Number.isNaN(closesAt.getTime()) || closesAt <= opensAt) {
+                    status.className = "alert alert-danger";
+                    status.textContent = "Choose between one and three concepts and provide a valid demo period.";
+                    return;
+                }
+                submitButton.disabled = true;
+                submitButton.textContent = "Creating...";
+                status.className = "alert d-none";
+                progress.innerHTML = "";
+                try {
+                    const initiatedBy = String(JSON.parse(localStorage.parms || "{}").login || "");
+                    const result = await provisionDemoOptInOutRound({
+                        demoName: document.getElementById("demoOptInOutName").value,
+                        sourceRound,
+                        concepts,
+                        opensAt: opensAt.toISOString(),
+                        closesAt: closesAt.toISOString(),
+                        initiatedBy,
+                        onProgress: message => { progress.insertAdjacentHTML("beforeend", `<div>${escapeHtml(message)}</div>`); }
+                    });
+                    status.className = "alert alert-success";
+                    status.textContent = `${result.createdAssignments} demo assignment(s) are ready. Open Study Opt-In/Out to present the demo.`;
+                    submitButton.remove();
+                    const closeButton = form.querySelector('[data-bs-dismiss="modal"]');
+                    if (closeButton) closeButton.textContent = "Close";
+                } catch (error) {
+                    console.error("Unable to create Opt-In/Out demo:", error);
+                    status.className = "alert alert-danger";
+                    status.textContent = error.message || "Unable to create the demo files in Box.";
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Create Demo";
+                }
+            });
+        } catch (error) {
+            console.error("Unable to prepare Opt-In/Out demo:", error);
+            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load accepted C-NCI concepts for the demo.</div>';
+        } finally {
+            button.disabled = false;
+        }
+    });
+};
+
+const bindInitiateOptInOutRoundButton = () => {
+    const button = document.getElementById("initiateOptInOutRoundBtn");
+    if (!button || button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", async () => {
+        const modalElement = document.getElementById("confluenceMainModal");
+        const header = document.getElementById("confluenceModalHeader");
+        const body = document.getElementById("confluenceModalBody");
+        if (!modalElement || !header || !body) return;
+
+        button.disabled = true;
+        button.classList.add("buttonsubmit--loading");
+        header.innerHTML = '<h5 class="modal-title">Initiate Opt-In/Opt-Out Round</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        body.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading accepted concepts from the Admin Chair data...</div>';
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+        try {
+            const [{ rounds: availableRounds, acceptedConceptCount }, studies] = await Promise.all([getAcceptedCnciRounds(), getCnciWorkbookStudies()]);
+            if (!availableRounds.length) {
+                body.innerHTML = acceptedConceptCount > 0
+                    ? `<div class="alert alert-warning mb-0">${acceptedConceptCount} accepted concept${acceptedConceptCount === 1 ? " was" : "s were"} matched to an Admin Chair round, but none were identified as requesting C-NCI.</div>`
+                    : '<div class="alert alert-warning mb-0">No files in the completed round folders could be matched to an Admin Chair round.</div>';
+                return;
+            }
+
+            const now = new Date();
+            const closeDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const toLocalInput = date => {
+                const offset = date.getTimezoneOffset() * 60000;
+                return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+            };
+            const roundOptions = availableRounds.map(round => `<option value="${escapeHtml(round.id)}">${escapeHtml(round.name)} (${round.concepts.length} accepted C-NCI concept${round.concepts.length === 1 ? "" : "s"})</option>`).join("");
+            body.innerHTML = `
+                <form id="initiateOptInOutRoundForm">
+                    <div class="mb-3"><label for="optInOutRoundSelect" class="form-label">Round</label><select id="optInOutRoundSelect" class="form-select" required>${roundOptions}</select></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label for="optInOutOpensAt" class="form-label">Opens</label><input id="optInOutOpensAt" type="datetime-local" class="form-control" value="${toLocalInput(now)}" required></div>
+                        <div class="col-md-6 mb-3"><label for="optInOutClosesAt" class="form-label">Closes</label><input id="optInOutClosesAt" type="datetime-local" class="form-control" value="${toLocalInput(closeDate)}" required></div>
+                    </div>
+                    <div id="optInOutRoundSummary" class="alert alert-info"></div>
+                    <div class="alert alert-warning">Existing selection TSVs will be preserved. Missing folders and files will be created for the current C-NCI workbook studies.</div>
+                    <div id="optInOutRoundProgress" class="small mb-3" style="max-height: 180px; overflow-y: auto;"></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Initiate Round</button></div>
+                </form>
+            `;
+            const form = document.getElementById("initiateOptInOutRoundForm");
+            const roundSelect = document.getElementById("optInOutRoundSelect");
+            const summary = document.getElementById("optInOutRoundSummary");
+            const updateSummary = () => {
+                const selectedRound = availableRounds.find(round => String(round.id) === roundSelect.value);
+                const assignments = (selectedRound?.concepts.length || 0) * studies.length;
+                summary.textContent = `${selectedRound?.concepts.length || 0} accepted concepts × ${studies.length} C-NCI studies = ${assignments} study/concept TSV files.`;
+            };
+            roundSelect.addEventListener("change", updateSummary);
+            updateSummary();
+
+            form.addEventListener("submit", async event => {
+                event.preventDefault();
+                const selectedRound = availableRounds.find(round => String(round.id) === roundSelect.value);
+                const opensAt = new Date(document.getElementById("optInOutOpensAt").value);
+                const closesAt = new Date(document.getElementById("optInOutClosesAt").value);
+                const submitButton = form.querySelector('button[type="submit"]');
+                const progress = document.getElementById("optInOutRoundProgress");
+                if (!selectedRound || Number.isNaN(opensAt.getTime()) || Number.isNaN(closesAt.getTime()) || closesAt <= opensAt) {
+                    progress.innerHTML = '<div class="text-danger">Select a valid round and a closing time after the opening time.</div>';
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Initiating...";
+                progress.innerHTML = "";
+                const addProgress = message => {
+                    progress.insertAdjacentHTML("beforeend", `<div>${escapeHtml(message)}</div>`);
+                    progress.scrollTop = progress.scrollHeight;
+                };
+                try {
+                    const initiatedBy = String(JSON.parse(localStorage.parms || "{}").login || "");
+                    const result = await provisionOptInOutRound({
+                        round: selectedRound,
+                        concepts: selectedRound.concepts,
+                        studies,
+                        opensAt: opensAt.toISOString(),
+                        closesAt: closesAt.toISOString(),
+                        initiatedBy,
+                        onProgress: addProgress
+                    });
+                    if (result.failures.length) {
+                        summary.className = "alert alert-warning";
+                        summary.textContent = `${result.createdAssignments} files are ready; ${result.failures.length} failed. Run initiation again to retry missing files.`;
+                        submitButton.disabled = false;
+                        submitButton.textContent = "Retry Initiation";
+                    } else {
+                        summary.className = "alert alert-success";
+                        summary.textContent = `${result.createdAssignments} study/concept assignments are ready in Box.`;
+                        submitButton.remove();
+                        form.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
+                    }
+                } catch (error) {
+                    console.error("Unable to initiate Opt-In/Opt-Out round:", error);
+                    progress.insertAdjacentHTML("beforeend", `<div class="text-danger">${escapeHtml(error.message || "Unable to initiate the round.")}</div>`);
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Retry Initiation";
+                }
+            });
+        } catch (error) {
+            console.error("Unable to prepare Opt-In/Opt-Out initiation:", error);
+            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load the accepted Admin Chair concepts or C-NCI studies.</div>';
+        } finally {
+            button.disabled = false;
+            button.classList.remove("buttonsubmit--loading");
+        }
+    });
 };
 
 export const loadStudyAccessAdminTable = async () => {
@@ -405,6 +850,9 @@ export const loadStudyAccessAdminTable = async () => {
             container.innerHTML = "<p class='text-warning'>You do not have access to this admin page.</p>";
             return;
         }
+
+        bindCreateDemoOptInOutRoundButton();
+        bindInitiateOptInOutRoundButton();
 
         const exportButton = document.getElementById("exportConsortiaCsvBtn");
         if (exportButton && exportButton.dataset.bound !== "true") {
@@ -606,11 +1054,7 @@ export const loadStudyAccessAdminTable = async () => {
                 header.innerHTML = '<h5 class="modal-title">Concept preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
                 body.innerHTML = "";
 
-                if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
-                    bootstrap.Modal.getOrCreateInstance(modal).show();
-                } else if (typeof $ !== "undefined") {
-                    $("#confluencePreviewerModal").modal("show");
-                }
+                bootstrap.Modal.getOrCreateInstance(modal).show();
 
                 try {
                     showPreview(button.dataset.fileId, "confluencePreviewerModalBody");

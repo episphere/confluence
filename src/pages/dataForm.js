@@ -706,7 +706,7 @@ export const dataForm = async (prepopulateData = null) => {
             <h5>Response Required</h5>
             <p>Please respond to all required comments before resubmitting the form.</p>
           </div>`;
-        $("#popUpModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
         return;
       }
     }
@@ -1445,21 +1445,21 @@ export const dataForm = async (prepopulateData = null) => {
       if (response.status === 401) {
         document.getElementById("modalBody").innerHTML = `
             <p>Error detected, please upload again.</p>`;
-        $("#popUpModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
       } else if (response.status === 409){
         document.getElementById("modalBody").innerHTML = `
         <p>Conflict detected, please upload again.</p>`;
-        $("#popUpModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
       } else if (response.status === 'error') {
         document.getElementById("modalBody").innerHTML = `
         <p>Error: ${response.statusText}</p>`;
-        $("#popUpModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
       } else {
         fileid = response.entries[0].id;
         document.getElementById("modalBody").innerHTML = `
             <p>File was successfully uploaded.</p>
             <p>Document ID: ${fileid}</p>`;
-            $("#popUpModal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
             let popup = document.getElementById('popUpModal');
             let btns = popup.querySelectorAll('button');
             for (let button of btns) {

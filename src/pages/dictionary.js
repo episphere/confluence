@@ -467,7 +467,7 @@ export const updateDict = () => {
         template += "</form>";
         body.innerHTML = template;
         
-        $("#confluenceMainModal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
         // URL.revokeObjectURL(url);
         const form = document.getElementById('updateDictionaryForm');
         form.addEventListener('submit', async e => {

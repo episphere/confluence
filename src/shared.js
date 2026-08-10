@@ -16,6 +16,7 @@ export const returnToSubmitterFolder = 200908340220;
 export const completedFolder = 200926990513;
 export const DACCmembers = 1221222994319;
 export const conceptForm = 1935758730875;
+export const Confluence_Opt_In_Out = 406144866126;
 export const Confluence_Data_Platform_Events_Page_Shared_with_Investigators = 155546882525;
 export const Confluence_Data_Platform_Metadata_Shared_with_Investigators = 137304373658;
 
@@ -23,7 +24,7 @@ export const chairsInfo = [
     {id: 'user_1', email:"wei.zheng@vumc.org", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
     {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146, boxIdNew: 199271619056,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:[]}, 
     {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:[]}, 
-    {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
+    {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
     //{id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
@@ -743,7 +744,8 @@ export const uploadFile = async (data, fileName, folderId, html) => {
         const form = new FormData();
         
         let blobData = '';
-        if (html) blobData = new Blob([data], { type: 'text/html'});
+        if (typeof html === 'string' && html.startsWith('text/')) blobData = new Blob([data], { type: html });
+        else if (html) blobData = new Blob([data], { type: 'text/html'});
         else blobData = new Blob([JSON.stringify(data)], { type: 'application/json'});
         
         form.append('file', blobData);
@@ -782,7 +784,7 @@ export const uploadFileVersion = async (data, fileId, type) => {
         const form = new FormData();
         
         let blobData = '';
-        if (type === 'text/html' || type === 'text/csv') blobData = new Blob([data], { type: type});
+        if (typeof type === 'string' && type.startsWith('text/')) blobData = new Blob([data], { type: type});
         else blobData = new Blob([JSON.stringify(data)], { type: type});
         
         form.append('file', blobData);
@@ -807,7 +809,7 @@ export const uploadFileVersion = async (data, fileId, type) => {
         };
     }
     catch (err) {
-        if ((await refreshToken()) === true) return await uploadFileVersion(data, fileId, 'text/html');
+        if ((await refreshToken()) === true) return await uploadFileVersion(data, fileId, type);
     }
 };
 
@@ -1126,7 +1128,7 @@ export const notificationTemplate = (top, header, body) => {
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <strong class="mr-auto">${header}</strong>
-                    <button title="Close" type="button" class="ml-2 mb-1 close hideNotification" data-dismiss="toast" aria-label="Close">
+                    <button title="Close" type="button" class="ml-2 mb-1 close hideNotification" data-bs-dismiss="toast" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1245,11 +1247,8 @@ export const inactivityTime = () => {
                 logOut();
             }, 300000);
             
-            const button = document.createElement('button');
-            button.dataset.toggle = 'modal';
-            button.dataset.target = '#confluenceMainModal'
-            document.body.appendChild(button);
-            button.click();
+            const inactivityModal = document.getElementById('confluenceMainModal');
+            bootstrap.Modal.getOrCreateInstance(inactivityModal).show();
             
             const header = document.getElementById('confluenceModalHeader');
             const body = document.getElementById('confluenceModalBody');
@@ -1257,8 +1256,8 @@ export const inactivityTime = () => {
             body.innerHTML = `
                 You were inactive for 20 minutes, would you like to extend your session?
                 <div class="modal-footer">
-                    <button type="button" title="Close" class="btn btn-dark log-out-user" data-dismiss="modal">Log Out</button>
-                    <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-dismiss="modal">Continue</button>
+                    <button type="button" title="Close" class="btn btn-dark log-out-user" data-bs-dismiss="modal">Log Out</button>
+                    <button type="button" title="Continue" class="btn btn-primary extend-user-session" data-bs-dismiss="modal">Continue</button>
                 </div>
             `
             

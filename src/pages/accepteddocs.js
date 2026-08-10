@@ -123,7 +123,7 @@ export async function viewAcceptedFilesTemplate(filesInfo) {
         let btns = Array.from(document.querySelectorAll(".preview-file"));
         btns.forEach((btn) => {
             btn.addEventListener("click", (e) => {
-                btn.dataset.target = "#confluencePreviewerModal";
+                btn.dataset.bsTarget = "#confluencePreviewerModal";
                 const header = document.getElementById("confluencePreviewerModalHeader");
                 const body = document.getElementById("confluencePreviewerModalBody");
                 
@@ -133,7 +133,7 @@ export async function viewAcceptedFilesTemplate(filesInfo) {
                 `;
                 
                 const fileId = btn.dataset.fileId;
-                $("#confluencePreviewerModal").modal("show");
+                bootstrap.Modal.getOrCreateInstance(document.getElementById("confluencePreviewerModal")).show();
                 showPreview(fileId, "confluencePreviewerModalBody");
             });
         });
@@ -193,7 +193,7 @@ export async function viewAcceptedFiles(files) {
                 <div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
                     <div class="accordion-body">
                     <div class="col-12">
-                        <b>Concept:</b> ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"  data-keyboard="false" data-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
+                        <b>Concept:</b> ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
                     </div>
                     </div>
                 </div>

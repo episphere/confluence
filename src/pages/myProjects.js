@@ -33,7 +33,7 @@ export const myProjectsTemplate = async () => {
             
             const li = document.createElement('li');
             li.innerHTML = `
-                <button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-toggle="collapse" href="#toggle${data[i].id}">
+                <button class="${type === 'folder' ? 'collapsible consortia-folder' : ''} allow-overflow" data-bs-toggle="collapse" data-bs-target="#toggle${data[i].id}">
                     <i title="${title}" data-folder-name="${name}" class="${expandClass}"></i>
                 </button> ${name}
             `;
@@ -87,7 +87,7 @@ export const myProjectsTemplate = async () => {
                         <td>${fileInfo.modified_by.name || fileInfo.modified_by.login}</td>
                         <td>${new Date(fileInfo.modified_at).toLocaleString()}</td>
                         <td>${fileInfo.file_version.id} <button class="copy-file-api" title="Copy version id" data-version-id="${fileInfo.file_version.id}"><i class="far fa-copy"></i></button></td>
-                        <td><button data-toggle="modal" data-target="#modalFileVersions" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</button></td>
+                        <td><button data-bs-toggle="modal" data-bs-target="#modalFileVersions" class="getAllFileversions" data-file-id="${obj.id}" data-file-name="${name}">See old versions</button></td>
                     `;
                     tbody.appendChild(tbodyTR);
                 }
@@ -114,7 +114,7 @@ export const myProjectsTemplate = async () => {
             const versions = await getFileVersions(ID);
             document.getElementById('modalFVHeader').innerHTML = `
                 <h5 class="modal-title">${element.dataset.fileName}</h5>
-                <button type="button" title="Close" class="close modal-close-btn" data-dismiss="modal" aria-label="Close">
+                <button type="button" title="Close" class="close modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             `;

@@ -71,7 +71,7 @@ export const parameterListTemplate = (jsonData) => {
 export const alertTemplate = (className, message) => {
     return `
         <div class="alert ${className} alert-dismissible">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <a href="#" class="close" data-bs-dismiss="alert" aria-label="close">&times;</a>
             ${message}
         </div>
     `;
