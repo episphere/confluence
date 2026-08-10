@@ -829,15 +829,16 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         updateProgressBar(90, "Syncing individual response histories...");
         if (responseFiles.length > 0) {
             let syncCount = 0;
-            const totalToSync = filesClaraIncompleted.length;
+            const filesWithResponseHistories = [...filesClaraIncompleted, ...filesComplete];
+            const totalToSync = filesWithResponseHistories.length;
             if (totalToSync > 0) {
-                await Promise.all(filesClaraIncompleted.map(async (claraFile) => {
+                await Promise.all(filesWithResponseHistories.map(async (chairFile) => {
                     try {
-                        if (!claraFile || !claraFile.name) return;
-                        const matchingFile = findMatchingFileByName(responseFiles, claraFile.name);
+                        if (!chairFile || !chairFile.name) return;
+                        const matchingFile = findMatchingFileByName(responseFiles, chairFile.name);
                         if (matchingFile) {
-                            claraFile.responseFileId = matchingFile.id;
-                            const commentsFileId = getChairCommentSourceId(claraFile, claraFile.id);
+                            chairFile.responseFileId = matchingFile.id;
+                            const commentsFileId = getChairCommentSourceId(chairFile, chairFile.id);
                             const [commentsResponse, masterCommentsResponse] = await Promise.all([
                                 listComments(matchingFile.id),
                                 commentsFileId && String(commentsFileId) !== String(matchingFile.id) ? listComments(commentsFileId) : Promise.resolve(null)
@@ -845,15 +846,15 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                             if (commentsResponse) {
                                 const comments = JSON.parse(commentsResponse).entries;
                                 if (comments && Array.isArray(comments)) {
-                                    claraFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
+                                    chairFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
                                     const masterComments = masterCommentsResponse ? JSON.parse(masterCommentsResponse).entries : null;
                                     const chairSourceComments = Array.isArray(masterComments) ? masterComments : comments;
-                                    claraFile.isReplyCompleted = areChairCommentsRepliedTo(chairSourceComments, claraFile.responseComments, consortium);
+                                    chairFile.isReplyCompleted = areChairCommentsRepliedTo(chairSourceComments, chairFile.responseComments, consortium);
                                 }
                             }
                         }
                     } catch (e) {
-                        console.error("Error parsing comments for file:", claraFile.name, e);
+                        console.error("Error parsing comments for file:", chairFile.name, e);
                     } finally {
                         syncCount++;
                         const subPercentage = 90 + Math.floor((syncCount / totalToSync) * 9);
