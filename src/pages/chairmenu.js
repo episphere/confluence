@@ -97,6 +97,45 @@ const downloadBlob = (blob, filename) => {
     URL.revokeObjectURL(url);
 };
 
+let jsZipPromise = null;
+
+const loadJSZip = async () => {
+    if (!jsZipPromise) {
+        jsZipPromise = import("https://cdn.skypack.dev/jszip")
+            .then(module => module.default)
+            .catch(error => {
+                jsZipPromise = null;
+                throw error;
+            });
+    }
+    return jsZipPromise;
+};
+
+const getSelectedConceptsZipName = () => {
+    const date = new Date();
+    const localDate = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+    return `DACC_Selected_Concepts_${localDate}.zip`;
+};
+
+const getUniqueZipEntryName = (filename, usedNames) => {
+    let uniqueName = filename;
+    let suffix = 2;
+    const extensionIndex = filename.lastIndexOf(".");
+    const baseName = extensionIndex > 0 ? filename.slice(0, extensionIndex) : filename;
+    const extension = extensionIndex > 0 ? filename.slice(extensionIndex) : "";
+
+    while (usedNames.has(uniqueName.toLowerCase())) {
+        uniqueName = `${baseName} (${suffix})${extension}`;
+        suffix++;
+    }
+    usedNames.add(uniqueName.toLowerCase());
+    return uniqueName;
+};
+
 const normalizeConceptDocumentHtml = (html) => {
     const valueHeadingLabels = [
         "Revision Status",
@@ -231,7 +270,8 @@ export const setupDownloadSelect = (tab, files) => {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Download Concept and Comments</button>
+                    <button type="submit" name="downloadMode" value="individual" class="btn btn-outline-primary">Download Individually</button>
+                    <button type="submit" name="downloadMode" value="zip" class="btn btn-primary">Download as ZIP</button>
                 </div>
                 <div id="${tab}DownloadSelectionStatus" class="text-muted small mt-2"></div>
             </form>
@@ -263,13 +303,16 @@ export const setupDownloadSelect = (tab, files) => {
                 return;
             }
 
-            const submitButton = event.target.querySelector("button[type='submit']");
+            const downloadMode = event.submitter && event.submitter.value === "zip" ? "zip" : "individual";
+            const submitButtons = Array.from(event.target.querySelectorAll("button[type='submit']"));
             const status = document.getElementById(`${tab}DownloadSelectionStatus`);
-            submitButton.disabled = true;
-            submitButton.textContent = "Preparing...";
+            submitButtons.forEach(button => { button.disabled = true; });
             showAnimation();
 
             try {
+                const zip = downloadMode === "zip" ? new (await loadJSZip())() : null;
+                const usedZipEntryNames = new Set();
+
                 for (let index = 0; index < selectedFiles.length; index++) {
                     const file = selectedFiles[index];
                     if (status) status.textContent = `Preparing ${index + 1} of ${selectedFiles.length}: ${getDownloadFileTitle(file)}`;
@@ -279,7 +322,28 @@ export const setupDownloadSelect = (tab, files) => {
                         file.responseComments || []
                     );
                     if (!mergedBlob) throw new Error(`Unable to prepare ${file.name || file.id}.`);
-                    downloadBlob(mergedBlob, getMergedConceptDownloadName(file));
+
+                    const downloadName = getMergedConceptDownloadName(file);
+                    if (zip) {
+                        zip.file(getUniqueZipEntryName(downloadName, usedZipEntryNames), mergedBlob);
+                    } else {
+                        downloadBlob(mergedBlob, downloadName);
+                    }
+                }
+
+                if (zip) {
+                    if (status) status.textContent = "Creating ZIP archive...";
+                    const zipBlob = await zip.generateAsync(
+                        {
+                            type: "blob",
+                            compression: "DEFLATE",
+                            compressionOptions: { level: 6 }
+                        },
+                        metadata => {
+                            if (status) status.textContent = `Creating ZIP archive: ${Math.round(metadata.percent)}%`;
+                        }
+                    );
+                    downloadBlob(zipBlob, getSelectedConceptsZipName());
                 }
                 downloadModal.hide();
             } catch (error) {
@@ -287,8 +351,7 @@ export const setupDownloadSelect = (tab, files) => {
                 alert("Unable to download selected files. Please try again.");
             } finally {
                 hideAnimation();
-                submitButton.disabled = false;
-                submitButton.textContent = "Download Concept and Comments";
+                submitButtons.forEach(button => { button.disabled = false; });
                 if (status) status.textContent = "";
             }
         });
