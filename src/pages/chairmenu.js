@@ -1531,40 +1531,311 @@ export function viewFinalDecisionFiles(files) {
 export const createAllRoundFolders = async () => {
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
-    header.innerHTML = `<h5 class="modal-title">Initializing 10-Year Round Folders</h5>`;
-    body.innerHTML = '<div id="initRoundsProgress" style="max-height: 400px; overflow-y: auto;"><p>Loading schedule...</p></div>';
-    bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
-    const progressDiv = document.getElementById('initRoundsProgress');
-    const addStatus = (msg, color = 'black') => {
-        progressDiv.innerHTML += `<p style="color: ${color}">${msg}</p>`;
-        progressDiv.scrollTop = progressDiv.scrollHeight;
+    const modalElement = document.getElementById("confluenceMainModal");
+    if (!header || !body || !modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    const modalDialog = modalElement.querySelector('.modal-dialog');
+    const widenReviewDialog = () => {
+        if (!modalDialog || modalDialog.dataset.roundReviewWide === 'true') return;
+        modalDialog.dataset.roundReviewWide = 'true';
+        modalDialog.dataset.previousWidth = modalDialog.style.width || '';
+        modalDialog.dataset.previousMaxWidth = modalDialog.style.maxWidth || '';
+        modalDialog.style.width = '50vw';
+        modalDialog.style.maxWidth = '50vw';
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            modalDialog.style.width = modalDialog.dataset.previousWidth || '';
+            modalDialog.style.maxWidth = modalDialog.dataset.previousMaxWidth || '';
+            delete modalDialog.dataset.previousWidth;
+            delete modalDialog.dataset.previousMaxWidth;
+            delete modalDialog.dataset.roundReviewWide;
+        }, { once: true });
     };
+    header.innerHTML = `<h5 class="modal-title">Initiate Review Round</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+    body.innerHTML = '<p>Loading completed round schedule...</p>';
+    modal.show();
+
     try {
         const response = await fetch('./src/data/roundSchedule.json');
+        if (!response.ok) throw new Error(`Unable to load the round schedule (${response.status}).`);
         const schedule = await response.json();
-        const baseLocations = [ { id: submitterFolder, name: 'Main Submitter Folder' } ];
-        chairsInfo.forEach(chair => {
-            baseLocations.push({ id: chair.boxIdNew, name: `${chair.consortium} - New` });
-            baseLocations.push({ id: chair.boxIdClara, name: `${chair.consortium} - Clarification` });
-            baseLocations.push({ id: chair.boxIdComplete, name: `${chair.consortium} - Complete` });
-        });
-        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-        for (const round of schedule) {
-            addStatus(`--- Processing ${round.folderName} ---`, 'blue');
-            for (const loc of baseLocations) {
-                if (!loc.id) continue;
-                const items = await getFolderItems(loc.id);
-                const existing = items.entries.find(f => f.name === round.folderName && f.type === 'folder');
-                if (!existing) {
-                    addStatus(`Creating in ${loc.name}...`);
-                    await createFolder(loc.id, round.folderName);
-                    await delay(200);
-                }
-            }
+        const now = new Date();
+        const previousRounds = schedule
+            .filter(round => {
+                const endDate = new Date(round.endDate);
+                endDate.setHours(23, 59, 59, 999);
+                return Number.isFinite(endDate.getTime()) && endDate < now;
+            })
+            .sort((a, b) => Number(b.round) - Number(a.round));
+
+        if (!previousRounds.length) {
+            body.innerHTML = '<div class="alert alert-info mb-0">No review rounds have passed their configured end date.</div>';
+            return;
         }
-        addStatus('<strong>All folders initialized successfully!</strong>', 'green');
-        progressDiv.innerHTML += '<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button></div>';
-    } catch (e) { addStatus(`Error: ${e.message}`, 'red'); }
+
+        body.innerHTML = `
+            <form id="initRoundSelectionForm">
+                <div class="mb-3">
+                    <label for="initRoundSelect" class="form-label"><b>Round to initiate</b></label>
+                    <select id="initRoundSelect" class="form-select" required>
+                        ${previousRounds.map(round => `<option value="${escapeHtml(round.folderName)}">Round ${escapeHtml(round.round)} — ended ${escapeHtml(round.endDate)}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="initRoundTestMode">
+                    <label class="form-check-label" for="initRoundTestMode">
+                        <b>Test mode</b> — read and tag normally, but copy each document only to TEST and assign the TEST chair.
+                    </label>
+                </div>
+                <div class="alert alert-warning small">Only rounds whose configured end date has passed are available. No Box files will be changed until you confirm the reviewed file list.</div>
+                <div class="modal-footer px-0 pb-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Review Files</button>
+                </div>
+            </form>`;
+
+        document.getElementById('initRoundSelectionForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Reading files...';
+
+            const folderName = document.getElementById('initRoundSelect').value;
+            const selectedRound = previousRounds.find(round => round.folderName === folderName);
+            const testMode = document.getElementById('initRoundTestMode').checked;
+
+            try {
+                const submitterItems = await getFolderItems(submitterFolder, 'name,type,id', 1000);
+                const roundFolder = (submitterItems?.entries || []).find(item => item.type === 'folder' && item.name === folderName);
+                if (!roundFolder) throw new Error(`The folder ${folderName} was not found under Box folder ${submitterFolder}.`);
+
+                const roundFiles = await getAllFilesRecursive(roundFolder.id, 'name,type,id,parent,created_at');
+                const wordFiles = roundFiles.filter(file => file && /\.docx$/i.test(file.name || ''));
+                if (!wordFiles.length) throw new Error(`No Word documents were found in ${folderName}.`);
+
+                const fileReviews = await Promise.all(wordFiles.map(async file => {
+                    try {
+                        const docText = await readDocFile(file.id);
+                        const requestedConsortia = parseRequestedConsortiaValues(docText);
+                        return { file, requestedConsortia, error: '' };
+                    } catch (error) {
+                        return { file, requestedConsortia: [], error: error.message || 'Unable to read this document.' };
+                    }
+                }));
+
+                const checkExistingChairRounds = async destinationConsortia => (await Promise.all(destinationConsortia.map(async consortium => {
+                    const chair = chairsInfo.find(item => item.consortium.toLowerCase() === consortium.toLowerCase());
+                    if (!chair) throw new Error(`No chair configuration exists for ${consortium}.`);
+
+                    const chairNewItems = await getFolderItems(chair.boxIdNew, 'name,type,id', 1000);
+                    if (!chairNewItems?.entries) throw new Error(`Unable to check the ${consortium} New folder.`);
+                    const chairRoundFolder = chairNewItems.entries.find(item => item.type === 'folder' && item.name === selectedRound.folderName);
+                    if (!chairRoundFolder) return null;
+
+                    const existingItems = await getFolderItems(chairRoundFolder.id, 'name,type,id', 1000);
+                    if (!existingItems?.entries) throw new Error(`Unable to check ${consortium}/New/${selectedRound.folderName}.`);
+                    return existingItems.entries.length > 0
+                        ? { consortium, itemCount: existingItems.entries.length }
+                        : null;
+                }))).filter(Boolean);
+                const initiallyRoutableFiles = fileReviews.filter(review => review.requestedConsortia.length > 0);
+                const initialDestinationConsortia = [...new Set(
+                    initiallyRoutableFiles.flatMap(review => testMode ? ['TEST'] : review.requestedConsortia)
+                )];
+                const existingChairRounds = await checkExistingChairRounds(initialDestinationConsortia);
+                const restartWarning = existingChairRounds.length
+                    ? `<div class="alert alert-danger mt-3">
+                        <b>Round restart warning:</b> The following chair round folders already contain items:
+                        <ul class="mb-1 mt-2">${existingChairRounds.map(entry => `<li>${escapeHtml(entry.consortium)} — ${entry.itemCount} item(s)</li>`).join('')}</ul>
+                        Continuing will restart this round for those chairs. Existing files will be reused where their names match, and a new task may be assigned when no incomplete task exists.
+                    </div>`
+                    : '';
+                widenReviewDialog();
+                header.innerHTML = `<h5 class="modal-title">Confirm ${escapeHtml(selectedRound.folderName)}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+                body.innerHTML = `
+                    <p><b>${fileReviews.length}</b> Word document(s) found. ${testMode ? '<span class="badge bg-warning text-dark">TEST MODE</span>' : ''}</p>
+                    <p class="small text-muted">All documents are selected initially. Open a document in Box to review it, then correct or add its metadata tags before initiating.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle" style="table-layout: fixed; width: 100%;">
+                            <colgroup>
+                                <col style="width: 8%;">
+                                <col style="width: 22%;">
+                                <col style="width: 38%;">
+                                <col style="width: 14%;">
+                                <col style="width: 18%;">
+                            </colgroup>
+                            <thead><tr><th class="text-center">Initiate</th><th>Document</th><th>Metadata tags</th><th>Review destination</th><th>Status</th></tr></thead>
+                            <tbody>
+                                ${fileReviews.map(review => {
+                                    const ready = review.requestedConsortia.length > 0;
+                                    const status = review.error
+                                        ? 'Document could not be read; select metadata manually'
+                                        : ready ? 'Ready' : 'No recognized requested consortium found';
+                                    return `<tr class="init-round-file-row" data-file-id="${escapeHtml(review.file.id)}">
+                                        <td class="text-center"><input type="checkbox" class="form-check-input init-round-file-selected" checked aria-label="Initiate ${escapeHtml(review.file.name)}"></td>
+                                        <td style="white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"><a href="https://nih.app.box.com/file/${encodeURIComponent(review.file.id)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(review.file.name)}" style="display: -webkit-box; width: 100%; max-width: 100%; white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">${escapeHtml(review.file.name)}</a></td>
+                                        <td>
+                                            <div class="d-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 0.75rem; row-gap: 0.35rem;">
+                                                ${CONSORTIUM_EXPORT_VALUES.map(consortium => `<label class="form-check-label text-nowrap"><input type="checkbox" class="form-check-input init-round-metadata-tag me-1" value="${escapeHtml(consortium)}" ${review.requestedConsortia.includes(consortium) ? 'checked' : ''}>${escapeHtml(consortium)}</label>`).join('')}
+                                            </div>
+                                        </td>
+                                        <td>${ready ? escapeHtml(testMode ? 'TEST' : review.requestedConsortia.join(', ')) : '—'}</td>
+                                        <td class="${ready ? 'text-success' : 'text-danger'}">${escapeHtml(status)}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ${restartWarning}
+                    <div class="alert alert-info small mt-3">Initiating will apply the reviewed NIH_NCI_DCEG_Confluence metadata tags, copy each selected document to the indicated chair New folder under ${escapeHtml(selectedRound.folderName)}, and assign a General Task.</div>
+                    <div id="initRoundSelectionStatus" class="small text-danger mb-2"></div>
+                    <div class="modal-footer px-0 pb-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmInitRoundBtn" class="btn ${existingChairRounds.length ? 'btn-danger' : 'btn-primary'}">${existingChairRounds.length ? 'Restart / Initiate' : 'Initiate'} ${escapeHtml(selectedRound.folderName)}</button>
+                    </div>`;
+
+                const confirmButton = document.getElementById('confirmInitRoundBtn');
+                if (!confirmButton) return;
+                const collectReviewedFiles = () => fileReviews.map(review => {
+                    const row = document.querySelector(`.init-round-file-row[data-file-id="${review.file.id}"]`);
+                    const selected = !!row?.querySelector('.init-round-file-selected')?.checked;
+                    const requestedConsortia = Array.from(row?.querySelectorAll('.init-round-metadata-tag:checked') || []).map(input => input.value);
+                    return { ...review, detectedConsortia: review.requestedConsortia, selected, requestedConsortia };
+                });
+                const updateReviewSelection = () => {
+                    const reviewedFiles = collectReviewedFiles();
+                    reviewedFiles.forEach(review => {
+                        const row = document.querySelector(`.init-round-file-row[data-file-id="${review.file.id}"]`);
+                        if (!row) return;
+                        row.style.opacity = review.selected ? '1' : '0.55';
+                        const destinationCell = row.children[3];
+                        const statusCell = row.children[4];
+                        const hasMetadata = review.requestedConsortia.length > 0;
+                        destinationCell.textContent = hasMetadata ? (testMode ? 'TEST' : review.requestedConsortia.join(', ')) : '—';
+                        statusCell.textContent = !review.selected
+                            ? 'Not selected'
+                            : hasMetadata
+                                ? (review.error || review.requestedConsortia.join(', ') !== review.detectedConsortia.join(', ') ? 'Ready (manually reviewed)' : 'Ready')
+                                : review.error ? 'Document could not be read; select metadata manually' : 'No recognized requested consortium found';
+                        statusCell.className = review.selected && !hasMetadata ? 'text-danger' : review.selected ? 'text-success' : 'text-muted';
+                    });
+
+                    const selectedFiles = reviewedFiles.filter(review => review.selected);
+                    const unresolvedFiles = selectedFiles.filter(review => review.requestedConsortia.length === 0);
+                    const selectionStatus = document.getElementById('initRoundSelectionStatus');
+                    confirmButton.disabled = selectedFiles.length === 0 || unresolvedFiles.length > 0;
+                    selectionStatus.textContent = selectedFiles.length === 0
+                        ? 'Select at least one document to initiate.'
+                        : unresolvedFiles.length
+                            ? `Select metadata for ${unresolvedFiles.length} selected document(s), or uncheck those documents.`
+                            : `${selectedFiles.length} document(s) selected and ready.`;
+                    selectionStatus.className = unresolvedFiles.length || selectedFiles.length === 0 ? 'small text-danger mb-2' : 'small text-success mb-2';
+                };
+                document.querySelectorAll('.init-round-file-selected, .init-round-metadata-tag').forEach(input => {
+                    input.addEventListener('change', updateReviewSelection);
+                });
+                updateReviewSelection();
+
+                confirmButton.addEventListener('click', async () => {
+                    const reviewedFiles = collectReviewedFiles();
+                    const selectedReviews = reviewedFiles.filter(review => review.selected);
+                    if (!selectedReviews.length || selectedReviews.some(review => review.requestedConsortia.length === 0)) {
+                        updateReviewSelection();
+                        return;
+                    }
+
+                    confirmButton.disabled = true;
+                    const finalDestinationConsortia = [...new Set(
+                        selectedReviews.flatMap(review => testMode ? ['TEST'] : review.requestedConsortia)
+                    )];
+                    try {
+                        const finalExistingChairRounds = await checkExistingChairRounds(finalDestinationConsortia);
+                        if (finalExistingChairRounds.length) {
+                            const restartList = finalExistingChairRounds.map(entry => `${entry.consortium} (${entry.itemCount} item(s))`).join('\n');
+                            if (!confirm(`The following chair round folders already contain items:\n\n${restartList}\n\nContinuing will restart this round for those chairs. Continue?`)) {
+                                confirmButton.disabled = false;
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        alert(`Unable to verify the selected chair folders: ${error.message || error}`);
+                        confirmButton.disabled = false;
+                        return;
+                    }
+
+                    header.innerHTML = `<h5 class="modal-title">Initiating ${escapeHtml(selectedRound.folderName)}</h5>`;
+                    body.innerHTML = '<div id="initRoundsProgress" style="max-height: 500px; overflow-y: auto;"></div>';
+                    const progressDiv = document.getElementById('initRoundsProgress');
+                    const addStatus = (message, className = '') => {
+                        progressDiv.insertAdjacentHTML('beforeend', `<p class="mb-1 ${className}">${escapeHtml(message)}</p>`);
+                        progressDiv.scrollTop = progressDiv.scrollHeight;
+                    };
+
+                    let completedRoutes = 0;
+                    let failureCount = 0;
+                    for (const review of selectedReviews) {
+                        addStatus(`Processing ${review.file.name}...`, 'fw-bold');
+                        try {
+                            await addMetaData(review.file.id, review.requestedConsortia);
+                            addStatus(`Applied metadata: ${review.requestedConsortia.join(', ')}`, 'text-success');
+
+                            const targetConsortia = testMode ? ['TEST'] : review.requestedConsortia;
+                            for (const consortium of targetConsortia) {
+                                try {
+                                    const chair = chairsInfo.find(item => item.consortium.toLowerCase() === consortium.toLowerCase());
+                                    if (!chair) throw new Error(`No chair configuration exists for ${consortium}.`);
+
+                                    const targetRoundFolder = await getOrCreateChildFolder(chair.boxIdNew, selectedRound.folderName);
+                                    const targetItems = await getFolderItems(targetRoundFolder.id, 'name,type,id', 1000);
+                                    let copiedFile = (targetItems?.entries || []).find(item => item.type === 'file' && item.name === review.file.name);
+                                    if (copiedFile) {
+                                        addStatus(`${consortium}: existing copy reused.`, 'text-muted');
+                                    } else {
+                                        copiedFile = await copyFile(review.file.id, targetRoundFolder.id, String(review.file.id));
+                                        if (!copiedFile?.id) throw new Error(`Unable to copy the document${copiedFile?.status ? ` (${copiedFile.status})` : ''}.`);
+                                        addStatus(`${consortium}: copied to New/${selectedRound.folderName}.`, 'text-success');
+                                    }
+
+                                    const existingTasks = await getTaskList(copiedFile.id);
+                                    const hasOpenAssignment = (existingTasks?.entries || []).some(task =>
+                                        (task.task_assignment_collection?.entries || []).some(assignment =>
+                                            assignment.status === 'incomplete'
+                                            && assignment.assigned_to?.login?.toLowerCase() === chair.email.toLowerCase()
+                                        )
+                                    );
+                                    if (hasOpenAssignment) {
+                                        addStatus(`${consortium}: existing incomplete task retained.`, 'text-muted');
+                                    } else {
+                                        const task = await createCompleteTask(copiedFile.id, 'Please complete your review after reviewing with DACC');
+                                        if (!task?.id) throw new Error('Unable to create the General Task.');
+                                        const assignment = await assignTask(task.id, chair.email);
+                                        if (!assignment?.ok) throw new Error(`Unable to assign the task to ${chair.email}.`);
+                                        addStatus(`${consortium}: task assigned to ${chair.email}.`, 'text-success');
+                                    }
+                                    completedRoutes += 1;
+                                } catch (error) {
+                                    failureCount += 1;
+                                    addStatus(`${consortium}: ${error.message || error}`, 'text-danger');
+                                }
+                            }
+                        } catch (error) {
+                            failureCount += 1;
+                            addStatus(`${review.file.name}: ${error.message || error}`, 'text-danger');
+                        }
+                    }
+
+                    addStatus(`Finished: ${completedRoutes} review route(s) completed; ${failureCount} error(s).`, failureCount ? 'text-warning fw-bold' : 'text-success fw-bold');
+                    body.insertAdjacentHTML('beforeend', '<div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="refreshAfterRoundInit">Close & Refresh</button></div>');
+                    document.getElementById('refreshAfterRoundInit').addEventListener('click', refreshAdminTable);
+                });
+            } catch (error) {
+                header.innerHTML = `<h5 class="modal-title">Unable to Review Round</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+                body.innerHTML = `<div class="alert alert-danger mb-0">${escapeHtml(error.message || error)}</div>`;
+            }
+        });
+    } catch (error) {
+        body.innerHTML = `<div class="alert alert-danger mb-0">${escapeHtml(error.message || error)}</div>`;
+    }
 };
 
 export const authTableTemplate = () => {
@@ -1572,6 +1843,10 @@ export const authTableTemplate = () => {
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
     let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Rename Files </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    template = template.replace(
+        '<button type="button" id="renameFilesBtn"',
+        '<button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"><span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn"'
+    );
     return template;
 };
 

@@ -2223,14 +2223,16 @@ export const createZip = async (files, name) => {
 export const addMetaData = async (file, meta) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
-        let r = await fetch(`https://api.box.com/2.0/files/${file}/metadata/enterprise_355526/nihncidceg`,{
+        const metadataUrl = `https://api.box.com/2.0/files/${file}/metadata/enterprise_355526/nihncidceg`;
+        const requestedValues = Array.isArray(meta) ? [...new Set(meta.filter(Boolean))] : meta;
+        let r = await fetch(metadataUrl,{
             method:'POST',
             headers:{
                 Authorization:"Bearer "+access_token,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                nihncidceg:meta
+                nihncidceg:requestedValues
             })
         });
         
@@ -2240,13 +2242,48 @@ export const addMetaData = async (file, meta) => {
         else if (r.status === 201) {
             return r.json();
         }
+        else if (r.status === 409) {
+            const existingResponse = await fetch(metadataUrl, {
+                headers: { Authorization: "Bearer " + access_token }
+            });
+            if (!existingResponse.ok) throw new Error(`Unable to read existing metadata (${existingResponse.status})`);
+
+            const existingMetadata = await existingResponse.json();
+            const existingValues = Array.isArray(existingMetadata.nihncidceg)
+                ? existingMetadata.nihncidceg
+                : existingMetadata.nihncidceg ? [existingMetadata.nihncidceg] : [];
+            const incomingValues = Array.isArray(requestedValues) ? requestedValues : [requestedValues].filter(Boolean);
+            const mergedValues = [...new Set([...existingValues, ...incomingValues])];
+            if (mergedValues.length === existingValues.length && mergedValues.every(value => existingValues.includes(value))) {
+                return existingMetadata;
+            }
+
+            const updateResponse = await fetch(metadataUrl, {
+                method: 'PUT',
+                headers: {
+                    Authorization: "Bearer " + access_token,
+                    "Content-Type": "application/json-patch+json"
+                },
+                body: JSON.stringify([{
+                    op: Object.prototype.hasOwnProperty.call(existingMetadata, 'nihncidceg') ? 'replace' : 'add',
+                    path: '/nihncidceg',
+                    value: mergedValues
+                }])
+            });
+            if (updateResponse.status === 401) {
+                if ((await refreshToken()) === true) return await addMetaData(file, meta);
+            }
+            if (!updateResponse.ok) throw new Error(`Unable to update metadata (${updateResponse.status})`);
+            return updateResponse.json();
+        }
         else {
-            hideAnimation();
-            console.error(r);
+            const errorData = await r.json().catch(() => ({}));
+            throw new Error(errorData.message || `Unable to add metadata (${r.status})`);
         }
     }
     catch (err) {
-        if ((await refreshToken()) === true) return await addMetaData(file, meta);
+        console.error("Error adding Confluence metadata:", err);
+        throw err;
     }
 };
 
