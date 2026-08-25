@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile } from "../shared.js";
+import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getRoundNumberFromFileName, removeRoundSuffixFromFileName } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
 
@@ -10,7 +10,7 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const getConceptDisplayName = (value) => String(value ?? "")
+const getConceptDisplayName = (value) => removeRoundSuffixFromFileName(value)
     .replace(/_\d{4}-\d{2}-\d{2}\.docx?$/i, "");
 
 const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
@@ -75,7 +75,8 @@ const loadStudyAccessAdminRows = async () => {
                 const previousConcept = existing.concepts.get(conceptKey);
                 existing.concepts.set(conceptKey, {
                     name: conceptName,
-                    boxId: conceptBoxId || previousConcept?.boxId || ""
+                    boxId: conceptBoxId || previousConcept?.boxId || "",
+                    roundNumber: getRoundNumberFromFileName(conceptName) || previousConcept?.roundNumber || null
                 });
             }
             requestedStudyMap.set(key, existing);
@@ -908,7 +909,7 @@ export const loadStudyAccessAdminTable = async () => {
             const concepts = request.concepts || [];
             const users = request.users || [];
             const requestDetailsId = `studyAccessRequest-${requestIndex}`;
-            const conceptColumnCount = Math.max(1, studies.length + 1);
+            const conceptColumnCount = Math.max(2, studies.length + 2);
 
             const studyHeaders = studies.map((study) => `
                 <th scope="col" class="text-center align-middle" style="min-width: 130px;" title="${escapeHtml(study.name || study.acronym)}">
@@ -932,6 +933,8 @@ export const loadStudyAccessAdminTable = async () => {
                 const conceptName = concept.name;
                 const conceptDisplayName = getConceptDisplayName(conceptName);
                 const conceptBoxId = concept.boxId;
+                const roundNumber = concept.roundNumber || getRoundNumberFromFileName(conceptName);
+                const roundLabel = roundNumber ? `R${roundNumber}` : "--";
                 const conceptDetailsId = `studyAccessConcept-${requestIndex}-${conceptIndex}`;
                 const statusCells = studies.map((study) => `
                     <td class="text-center align-middle" data-study="${escapeHtml(study.acronym || study.name)}">
@@ -940,7 +943,7 @@ export const loadStudyAccessAdminTable = async () => {
                 `).join("");
 
                 return `
-                    <tr class="align-middle study-access-concept-row" data-concept-index="${conceptIndex}">
+                    <tr class="align-middle study-access-concept-row" data-concept-index="${conceptIndex}" data-round-number="${roundNumber || ""}">
                         <td style="min-width: 300px; max-width: 440px;">
                             <div class="d-flex align-items-start gap-2">
                                 <button class="btn btn-link p-0 text-start text-decoration-none concept-user-toggle flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#${conceptDetailsId}" aria-expanded="false" aria-controls="${conceptDetailsId}">
@@ -951,13 +954,14 @@ export const loadStudyAccessAdminTable = async () => {
                                 </button>
                             </div>
                         </td>
+                        <td class="text-center align-middle text-nowrap">${roundLabel}</td>
                         ${statusCells}
                     </tr>
                     <tr class="bg-light study-access-concept-detail-row" data-concept-index="${conceptIndex}">
                         <td colspan="${conceptColumnCount}" class="p-0">
                             <div class="collapse" id="${conceptDetailsId}">
                                 <div class="p-3 border-top border-bottom">
-                                    <div class="small text-muted mb-2"><strong>Concept ID:</strong> ${escapeHtml(conceptBoxId || "Not available")}</div>
+                                    <div class="small text-muted mb-2"><strong>Concept ID:</strong> ${escapeHtml(conceptBoxId || "Not available")} <span class="ms-3"><strong>Round:</strong> ${roundLabel}</span></div>
                                     <div class="fw-semibold mb-2">Users and associated studies</div>
                                     ${userRows ? `
                                         <div class="table-responsive">
@@ -980,6 +984,9 @@ export const loadStudyAccessAdminTable = async () => {
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" style="min-width: 300px; max-width: 440px;">Concept Name</th>
+                                <th scope="col" class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-round-sort" data-sort-direction="desc">Round <i class="fas fa-sort ms-1"></i></button>
+                                </th>
                                 ${studyHeaders}
                             </tr>
                         </thead>
@@ -990,7 +997,7 @@ export const loadStudyAccessAdminTable = async () => {
                 <div class="p-3">
                     <p class="text-muted mb-3">No individual study mappings are currently available for this requested group.</p>
                     <table class="table table-bordered table-hover mb-0">
-                        <thead class="table-light"><tr><th scope="col">Concept Name</th></tr></thead>
+                        <thead class="table-light"><tr><th scope="col">Concept Name</th><th scope="col" class="text-center"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-round-sort" data-sort-direction="desc">Round <i class="fas fa-sort ms-1"></i></button></th></tr></thead>
                         <tbody>${conceptRows}</tbody>
                     </table>
                 </div>
@@ -1061,6 +1068,35 @@ export const loadStudyAccessAdminTable = async () => {
                 });
             });
         }
+
+        container.querySelectorAll(".study-access-round-sort").forEach((roundSortButton) => {
+            roundSortButton.addEventListener("click", () => {
+                const nestedBody = roundSortButton.closest("table")?.querySelector("tbody");
+                if (!nestedBody) return;
+                const direction = roundSortButton.dataset.sortDirection === "asc" ? "desc" : "asc";
+                roundSortButton.dataset.sortDirection = direction;
+                const conceptRows = Array.from(nestedBody.querySelectorAll(":scope > .study-access-concept-row"));
+                const detailRowsByIndex = new Map(Array.from(nestedBody.querySelectorAll(":scope > .study-access-concept-detail-row"))
+                    .map(row => [row.dataset.conceptIndex, row]));
+                const pairs = conceptRows.map(row => ({ main: row, detail: detailRowsByIndex.get(row.dataset.conceptIndex) }));
+                pairs.sort((left, right) => {
+                    const leftRound = Number(left.main.dataset.roundNumber);
+                    const rightRound = Number(right.main.dataset.roundNumber);
+                    const leftMissing = !Number.isFinite(leftRound) || leftRound <= 0;
+                    const rightMissing = !Number.isFinite(rightRound) || rightRound <= 0;
+                    if (leftMissing && rightMissing) return 0;
+                    if (leftMissing) return 1;
+                    if (rightMissing) return -1;
+                    return direction === "asc" ? leftRound - rightRound : rightRound - leftRound;
+                });
+                pairs.forEach(({ main, detail }) => {
+                    nestedBody.appendChild(main);
+                    if (detail) nestedBody.appendChild(detail);
+                });
+                const icon = roundSortButton.querySelector("i");
+                if (icon) icon.className = direction === "asc" ? "fas fa-sort-up ms-1" : "fas fa-sort-down ms-1";
+            });
+        });
 
         const searchInput = document.getElementById("studyAccessConceptSearch");
         const searchStatus = document.getElementById("studyAccessConceptSearchStatus");

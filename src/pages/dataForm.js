@@ -1,4 +1,4 @@
-import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData, getCurrentRoundFolderId} from "../shared.js"
+import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData, getCurrentRoundContext, addRoundSuffixToFileName } from "../shared.js"
 // import * as docx from "docx";
 
 export const formtemplate = (showDownloadButton = true, resubmitTitle = null) => {
@@ -1427,10 +1427,13 @@ export const dataForm = async (prepopulateData = null) => {
       }
       
       let response;
-      const targetFolderId = await getCurrentRoundFolderId(submitterFolder);
+      let uploadedFileName = filename;
+      const roundContext = await getCurrentRoundContext(submitterFolder);
+      const targetFolderId = roundContext.folderId;
       
       if (originalConceptId) {
         const originalFileName = prepopulateData?.originalFileName || filename;
+        uploadedFileName = originalFileName;
         response = await uploadWordFileVersion(blob, originalConceptId, originalFileName, targetFolderId);
         
         // Add comment if fileId exists
@@ -1438,7 +1441,14 @@ export const dataForm = async (prepopulateData = null) => {
           await createComment(fileId, 'New version uploaded');
         }
       } else {
-        response = await uploadWordFile(blob, filename, targetFolderId);
+        if (!roundContext.round || !roundContext.roundFolderFound) {
+          document.getElementById("modalBody").innerHTML = `
+            <p>${roundContext.round ? `The Box folder for Round ${roundContext.round.round} was not found.` : "No active review round is configured for today."} The concept was not uploaded because its round folder and filename suffix could not be assigned consistently.</p>`;
+          bootstrap.Modal.getOrCreateInstance(document.getElementById("popUpModal")).show();
+          return;
+        }
+        uploadedFileName = addRoundSuffixToFileName(filename, roundContext.round.round);
+        response = await uploadWordFile(blob, uploadedFileName, targetFolderId);
       }
       
       console.log(response);
@@ -1471,7 +1481,7 @@ export const dataForm = async (prepopulateData = null) => {
       const downloadLink = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = downloadLink;
-      a.download = filename;
+      a.download = uploadedFileName;
       a.click();
       }
     )

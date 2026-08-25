@@ -61,11 +61,12 @@ export const readDocFile = async (id) => {
     return Array.from(textNodes).map(node => node.textContent).join(' ');
 }
 
-export const getFolderItems = async (id, fields = "", limit = 100) => {
+export const getFolderItems = async (id, fields = "", limit = 100, offset = 0) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
         let url = `https://api.box.com/2.0/folders/${id}/items?limit=${limit}`;
         if (fields) url += '&fields=' + fields;
+        if (offset) url += '&offset=' + offset;
         let r = await fetch(url, {
             method:'GET',
             headers:{
@@ -74,7 +75,12 @@ export const getFolderItems = async (id, fields = "", limit = 100) => {
         })
         
         if (r.status === 401) {
-            if ((await refreshToken()) === true) return await getFolderItems(id, fields);
+            if ((await refreshToken()) === true) return await getFolderItems(id, fields, limit, offset);
+        }
+        else if (r.status === 429) {
+            const retryAfter = Number(r.headers.get('retry-after')) || 1;
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            return await getFolderItems(id, fields, limit, offset);
         }
         else if (r.status === 200) {
             return r.json();
@@ -91,17 +97,26 @@ export const getFolderItems = async (id, fields = "", limit = 100) => {
 
 export const getAllFilesRecursive = async (folderId, fields = "") => {
     const allFiles = [];
-    const items = await getFolderItems(folderId, fields);
-    //console.log(items);
-    
-    for (const item of items.entries) {
-        if (item.type === 'file') {
-            allFiles.push(item);
-        } else if (item.type === 'folder') {
-            const subFiles = await getAllFilesRecursive(item.id, fields);
-            allFiles.push(...subFiles);
+    let offset = 0;
+    let totalCount = 0;
+
+    do {
+        const items = await getFolderItems(folderId, fields, 1000, offset);
+        if (!items || !Array.isArray(items.entries)) throw new Error(`Unable to list Box folder ${folderId}.`);
+        totalCount = Number(items.total_count) || items.entries.length;
+
+        for (const item of items.entries) {
+            if (item.type === 'file') {
+                allFiles.push(item);
+            } else if (item.type === 'folder') {
+                const subFiles = await getAllFilesRecursive(item.id, fields);
+                allFiles.push(...subFiles);
+            }
         }
-    }
+        offset += items.entries.length;
+        if (!items.entries.length) break;
+    } while (offset < totalCount);
+
     //console.log(allFiles);
     return allFiles;
 };
@@ -2062,9 +2077,38 @@ export async function showCommentsDCEG(id, change=false) {
     return;
 };
 
-export const getCurrentRoundFolderId = async (parentFolderId) => {
+export const removeRoundSuffixFromFileName = (fileName) => {
+    const value = String(fileName || "");
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
+    return `${stem.replace(/_R\d+(?:_\d{3})?$/i, "")}${extension}`;
+};
+
+export const getRoundNumberFromFileName = (fileName) => {
+    const value = String(fileName || "");
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const match = stem.match(/_R(\d+)(?:_\d{3})?$/i);
+    return match ? Number(match[1]) : null;
+};
+
+export const addRoundSuffixToFileName = (fileName, roundNumber) => {
+    const roundMatch = String(roundNumber ?? "").match(/\d+/);
+    if (!roundMatch) return String(fileName || "");
+
+    const normalizedRoundNumber = String(Number(roundMatch[0]));
+    const value = removeRoundSuffixFromFileName(fileName);
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
+    return `${stem}_R${normalizedRoundNumber}${extension}`;
+};
+
+export const getCurrentRoundContext = async (parentFolderId) => {
     try {
         const response = await fetch('./src/data/roundSchedule.json');
+        if (!response.ok) throw new Error(`Unable to load the round schedule (${response.status}).`);
         const schedule = await response.json();
         const now = new Date();
         
@@ -2077,17 +2121,22 @@ export const getCurrentRoundFolderId = async (parentFolderId) => {
             return now >= start && now <= end;
         });
 
-        if (!currentRound) return parentFolderId; // Fallback to base folder if no round matches
+        if (!currentRound) return { folderId: parentFolderId, round: null, roundFolderFound: false };
 
         const folderName = currentRound.folderName;
-        const items = await getFolderItems(parentFolderId);
+        const items = await getFolderItems(parentFolderId, "name,type,id", 1000);
         const folder = (items && items.entries) ? items.entries.find(f => f.name === folderName && f.type === 'folder') : null;
         
-        return folder ? folder.id : parentFolderId;
+        return { folderId: folder ? folder.id : parentFolderId, round: currentRound, roundFolderFound: Boolean(folder) };
     } catch (e) {
         console.error("Error identifying current round folder:", e);
-        return parentFolderId;
+        return { folderId: parentFolderId, round: null, roundFolderFound: false };
     }
+};
+
+export const getCurrentRoundFolderId = async (parentFolderId) => {
+    const context = await getCurrentRoundContext(parentFolderId);
+    return context.folderId;
 };
 
 export const listComments = async (id) => {
