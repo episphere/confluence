@@ -38,13 +38,14 @@ const getConceptRoundLabel = (file) => {
 const getChairConceptMetadataLabel = (file, fallbackId = "") =>
     `Round: ${getConceptRoundLabel(file)} | Concept ID: ${getConceptId(file, fallbackId) || "Not available"}`;
 
-const renderConceptSearch = (inputId, statusId) => `
-    <div class="main-summary-row mb-2">
+const renderConceptSearch = (inputId, statusId, actionsHtml = "") => `
+    <div class="main-summary-row align-items-center gap-2 mb-2">
         <div class="input-group" style="max-width: 520px;">
             <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search concepts, IDs, or investigators (min. 3 characters)" aria-label="Search concepts, IDs, or investigators" id="${inputId}" aria-describedby="${statusId}">
             <span class="input-group-text border-0"><i class="fas fa-search"></i></span>
         </div>
         <div id="${statusId}" class="small text-muted ms-2 align-self-center" aria-live="polite"></div>
+        ${actionsHtml}
     </div>`;
 
 const setupConceptSearch = (inputId, statusId, rowSelector) => {
@@ -613,6 +614,7 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
 };
 
 const CONSORTIUM_EXPORT_VALUES = ["AABCG", "CIMBA", "LAGENO", "BCAC", "C-NCI", "MERGE"];
+const DACC_TABLE_CONSORTIA = ["AABCG", "BCAC", "C-NCI", "CIMBA", "LAGENO", "MERGE"];
 
 const parseRequestedConsortiaValues = (text) => {
     const section = extractRequestedConsortia(text || "");
@@ -635,6 +637,131 @@ const downloadCsvFile = (rows, filename) => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+};
+
+const parseBoxCommentEntries = (response) => {
+    if (!response) return [];
+    try {
+        const parsed = typeof response === "string" ? JSON.parse(response) : response;
+        return Array.isArray(parsed?.entries) ? parsed.entries : [];
+    } catch (error) {
+        console.warn("Unable to parse Box comments for export:", error);
+        return [];
+    }
+};
+
+const getDaccExportState = (file) => {
+    if (String(file?.parent?.id || "") === String(completedFolder)) return "Accepted";
+    if (String(file?.parent?.id || "") === String(deniedFolder)) return "Denied";
+    return "Ongoing";
+};
+
+const formatDaccExportComments = (comments) => comments
+    .slice()
+    .sort((a, b) => getCommentTime(a) - getCommentTime(b))
+    .map(comment => {
+        const author = comment?.created_by?.name || comment?.created_by?.login || "Unknown author";
+        const createdAt = comment?.created_at ? new Date(comment.created_at).toLocaleString() : "Unknown date";
+        return `${author} (${createdAt}): ${comment?.message || ""}`;
+    })
+    .join("\n\n");
+
+const getDaccExportScores = (comments) => {
+    const scores = new Map(DACC_TABLE_CONSORTIA.map(consortium => [consortium, "--"]));
+    comments
+        .slice()
+        .sort((a, b) => getCommentTime(a) - getCommentTime(b))
+        .forEach(comment => {
+            if (!comment?.message?.startsWith("Consortium")) return;
+            const consortium = getCommentConsortium(comment);
+            const rating = comment.message.match(/Rating:\s*([^,]+)/i)?.[1]?.trim();
+            if (scores.has(consortium) && rating) scores.set(consortium, rating);
+        });
+    return scores;
+};
+
+const getDaccExportConceptData = async (file) => {
+    const commentsFileId = getChairCommentSourceId(file, file.id);
+    const responseFileId = file.responseFileId;
+    const commentRequests = [listComments(commentsFileId || file.id)];
+    if (responseFileId && String(responseFileId) !== String(commentsFileId || file.id)) {
+        commentRequests.push(listComments(responseFileId));
+    }
+
+    const [documentResult, commentResults] = await Promise.all([
+        readDocFile(file.id)
+            .then(content => extractContactInvestigators(content) || "Not provided")
+            .catch(error => {
+                console.warn(`Unable to read investigators for ${file.id}:`, error);
+                return "Unable to load";
+            }),
+        Promise.allSettled(commentRequests)
+    ]);
+    const comments = commentResults.flatMap(result => result.status === "fulfilled" ? parseBoxCommentEntries(result.value) : []);
+    const uniqueComments = Array.from(new Map(comments.map(comment => [String(comment?.id || `${comment?.created_at}-${comment?.message}`), comment])).values());
+
+    return {
+        investigators: documentResult,
+        comments: formatDaccExportComments(uniqueComments),
+        scores: getDaccExportScores(uniqueComments)
+    };
+};
+
+const exportDaccDecisionTable = async (files, button) => {
+    if (!Array.isArray(files) || !files.length) return;
+    const originalButtonHtml = button.innerHTML;
+    const status = document.getElementById("daccDecisionDownloadStatus");
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    if (status) {
+        status.className = "small text-muted";
+        status.textContent = `Preparing ${files.length} concept${files.length === 1 ? "" : "s"} for download...`;
+    }
+
+    try {
+        const headers = [
+            "Concept Name", "File Name", "Concept ID", "Round", "Submission Date", "State",
+            ...DACC_TABLE_CONSORTIA, "Investigator(s)", "Comments"
+        ];
+        const rows = [headers];
+        const CHUNK_SIZE = 6;
+
+        for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+            const chunk = files.slice(i, i + CHUNK_SIZE);
+            button.textContent = `Preparing ${Math.min(i + chunk.length, files.length)}/${files.length}...`;
+            const details = await Promise.all(chunk.map(getDaccExportConceptData));
+            chunk.forEach((file, index) => {
+                const detail = details[index];
+                rows.push([
+                    getConceptTitleFromFileName(file.name || ""),
+                    file.name || "",
+                    getConceptId(file, file.id),
+                    getConceptRoundLabel(file),
+                    file.created_at ? new Date(file.created_at).toLocaleString() : "",
+                    getDaccExportState(file),
+                    ...DACC_TABLE_CONSORTIA.map(consortium => detail.scores.get(consortium) || "--"),
+                    detail.investigators,
+                    detail.comments || "No comments"
+                ]);
+            });
+        }
+
+        downloadCsvFile(rows, `dacc_menu_table_${new Date().toISOString().slice(0, 10)}.csv`);
+        if (status) {
+            status.className = "small text-success";
+            status.textContent = `Downloaded ${files.length} concept${files.length === 1 ? "" : "s"}.`;
+        }
+    } catch (error) {
+        console.error("Unable to export the DACC Menu table:", error);
+        if (status) {
+            status.className = "small text-danger";
+            status.textContent = "Unable to prepare the download. Please try again.";
+        }
+    } finally {
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        button.innerHTML = originalButtonHtml;
+    }
 };
 
 const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => files.map(fileInfo => {
@@ -1746,13 +1873,36 @@ export function viewFinalDecisionFilesTemplate(files) {
     }
 
     let template = `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
-    template += renderConceptSearch("daccDecisionConceptSearch", "daccDecisionConceptSearchStatus");
+    template += renderConceptSearch(
+        "daccDecisionConceptSearch",
+        "daccDecisionConceptSearchStatus",
+        `<div class="d-flex flex-wrap align-items-center gap-2 ms-auto"><span id="daccDecisionDownloadStatus" class="small text-muted" aria-live="polite"></span><button type="button" id="downloadDaccDecisionTable" class="btn btn-dark dacc-download-button"><i class="fas fa-download me-1" aria-hidden="true"></i> Download Current Table</button></div>`
+    );
     template += viewFinalDecisionFilesColumns();
     template += '<div id="files"> </div></div></div>';
     const daccDecisionElement = document.getElementById("daccDecision");
     if (daccDecisionElement) daccDecisionElement.innerHTML = template; else return;
     viewFinalDecisionFiles(files);
     setupConceptSearch("daccDecisionConceptSearch", "daccDecisionConceptSearchStatus", "#daccAccordian > .accordian-item");
+    const downloadButton = document.getElementById("downloadDaccDecisionTable");
+    if (downloadButton) {
+        downloadButton.addEventListener("click", () => {
+            const visibleFileIds = new Set(Array.from(document.querySelectorAll("#daccAccordian > .accordian-item:not(.d-none)"))
+                .map(row => row.querySelector(".accordion-toggle-btn")?.dataset.fileId)
+                .filter(Boolean)
+                .map(String));
+            const visibleFiles = files.filter(file => visibleFileIds.has(String(file.id)));
+            if (!visibleFiles.length) {
+                const status = document.getElementById("daccDecisionDownloadStatus");
+                if (status) {
+                    status.className = "small text-muted";
+                    status.textContent = "There are no visible concepts to download for the current round and search.";
+                }
+                return;
+            }
+            void exportDaccDecisionTable(visibleFiles, downloadButton);
+        });
+    }
     let btns = Array.from(document.querySelectorAll("#daccDecision .preview-file"));
     btns.forEach((btn) => {
         btn.addEventListener("click", (e) => {

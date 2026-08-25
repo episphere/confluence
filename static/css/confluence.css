@@ -1558,6 +1558,26 @@ form {
     background-color: #A41652 !important;
 }
 
+.dacc-download-button:focus-visible {
+    outline: 3px solid #0053AD;
+    outline-offset: 3px;
+    box-shadow: none;
+}
+
+.dacc-download-button .fa-download {
+    color: #ffffff;
+}
+
+@media (forced-colors: active) {
+    .dacc-download-button:focus-visible {
+        outline-color: CanvasText;
+    }
+
+    .dacc-download-button .fa-download {
+        color: ButtonText;
+    }
+}
+
 .links-border-right {
     border-right: 0.5px solid #000000;
 }
