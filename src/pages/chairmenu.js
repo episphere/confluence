@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
-import { switchTabs, switchFiles, addEventUpdateScore } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addRoundSuffixToFileName, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { switchTabs, switchFiles } from "../event.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addRoundSuffixToFileName, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -442,6 +442,8 @@ const getCurrentUserAuth = () => {
 }
 
 let adminDataCache = null;
+const adminDocumentDataCache = new Map();
+let adminDocumentHydrationPromise = null;
 let chairMenuCache = null;
 const ADMIN_ACTION_REQUIRED_FILE_NAME = "Admin_Action_Required.tsv";
 const ADMIN_ACTION_REQUIRED_VALUES = new Set(["Move to Accepted", "Move to Declined", "Needs Resending"]);
@@ -635,90 +637,166 @@ const downloadCsvFile = (rows, filename) => {
     URL.revokeObjectURL(url);
 };
 
-const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => {
-    const results = [];
-    const CHUNK_SIZE = 10;
-    
-    for (let i = 0; i < files.length; i += CHUNK_SIZE) {
-        const chunk = files.slice(i, i + CHUNK_SIZE);
-        const chunkResults = await Promise.all(chunk.map(async (file) => {
-            const fileId = file.id;
-            const promises = {
-                fileInfo: getFileInfo(fileId),
-                completion_date: getChairApprovalDate(fileId),
-                docContent: readDocFile(fileId)
-            };
-            if (type === 'res') promises.comments = listComments(fileId);
-            
-            const keys = Object.keys(promises);
-            const promiseResults = await Promise.all(Object.values(promises));
-            const resolvedResults = {};
-            keys.forEach((key, i) => resolvedResults[key] = promiseResults[i]);
-            
-            const { fileInfo, completion_date, docContent, comments } = resolvedResults;
-            
-            const contacts = docContent ? extractContactInvestigators(docContent) : "";
-            const requestedConsortia = docContent ? parseRequestedConsortiaValues(docContent) : [];
-            const filename = fileInfo.name;
-            const titlename = getConceptTitleFromFileName(filename);
-            const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
-            
-            let submissionDate = fileInfo.created_at;
-            let returnedDate = null;
-            let isReplyCompleted = false;
-            let commentsFileId = fileId;
-            let responseFileId = null;
-            let conceptId = fileId;
+const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => files.map(fileInfo => {
+    const fileId = fileInfo.id;
+    const filename = fileInfo.name;
+    const titlename = getConceptTitleFromFileName(filename);
+    const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
+    let submissionDate = fileInfo.created_at;
+    let returnedDate = null;
+    let commentsFileId = fileId;
+    let responseFileId = null;
+    let conceptId = fileId;
 
-            if (type === 'res') {
-                returnedDate = fileInfo.created_at;
-                const originalFile = findMatchingFileByName(allSubFiles, filename);
-                if (originalFile) {
-                    submissionDate = originalFile.created_at;
-                    commentsFileId = originalFile.id;
-                    conceptId = originalFile.id;
-                }
-                responseFileId = fileId;
-
-                if (comments) {
-                    const commentEntries = JSON.parse(comments).entries;
-                    const responseComments = commentEntries.filter(c => c.message.startsWith('Response ID:'));
-                    isReplyCompleted = areChairCommentsRepliedTo(commentEntries, responseComments);
-                }
-            }
-
-            let roundId = fileInfo.parent ? fileInfo.parent.id : null;
-            if (type === 'res' || type === 'com') {
-                const originalFile = findMatchingFileByName(allSubFiles, filename);
-                if (originalFile && originalFile.parent) {
-                    roundId = originalFile.parent.id;
-                    conceptId = originalFile.id;
-                } else if (type === 'com' && fileInfo.parent?.name) {
-                    const matchingRound = submitterRoundFolders.find(round => round.name === fileInfo.parent.name);
-                    if (matchingRound) roundId = matchingRound.id;
-                }
-                if (type === 'com' && (!roundId || !submitterRoundFolders.some(round => String(round.id) === String(roundId)))) {
-                    const datedRound = findRoundByConceptDate(submitterRoundFolders, filename);
-                    if (datedRound) roundId = datedRound.id;
-                }
-            }
-
-            return { 
-                fileInfo, fileId, contacts, filename, titlename, shorttitlename, completion_date, 
-                submissionDate, returnedDate, isReplyCompleted,
-                parentId: fileInfo.parent.id,
-                roundId: roundId,
-                commentsFileId,
-                responseFileId,
-                conceptId,
-                requestedConsortia,
-                name: fileInfo.name,
-                type: type
-            };
-        }));
-        results.push(...chunkResults);
+    if (type === 'res') {
+        returnedDate = fileInfo.created_at;
+        const originalFile = findMatchingFileByName(allSubFiles, filename);
+        if (originalFile) {
+            submissionDate = originalFile.created_at;
+            commentsFileId = originalFile.id;
+            conceptId = originalFile.id;
+        }
+        responseFileId = fileId;
     }
-    return results;
+
+    let roundId = fileInfo.parent ? fileInfo.parent.id : null;
+    if (type === 'res' || type === 'com') {
+        const originalFile = findMatchingFileByName(allSubFiles, filename);
+        if (originalFile && originalFile.parent) {
+            roundId = originalFile.parent.id;
+            conceptId = originalFile.id;
+        } else if (type === 'com' && fileInfo.parent?.name) {
+            const matchingRound = submitterRoundFolders.find(round => round.name === fileInfo.parent.name);
+            if (matchingRound) roundId = matchingRound.id;
+        }
+        if (type === 'com' && (!roundId || !submitterRoundFolders.some(round => String(round.id) === String(roundId)))) {
+            const datedRound = findRoundByConceptDate(submitterRoundFolders, filename);
+            if (datedRound) roundId = datedRound.id;
+        }
+    }
+
+    return {
+        fileInfo,
+        fileId,
+        contacts: "",
+        filename,
+        titlename,
+        shorttitlename,
+        submissionDate,
+        returnedDate,
+        parentId: fileInfo.parent?.id || null,
+        roundId,
+        commentsFileId,
+        responseFileId,
+        conceptId,
+        requestedConsortia: [],
+        documentDataLoaded: false,
+        name: fileInfo.name,
+        type
+    };
+});
+
+const setAdminHydrationProgress = (kind, loaded, total, failures = 0) => {
+    const status = document.getElementById("adminHydrationStatus");
+    if (!status) return;
+    status.dataset[`${kind}Loaded`] = String(loaded);
+    status.dataset[`${kind}Total`] = String(total);
+    status.dataset[`${kind}Failures`] = String(failures);
+
+    const commentsLoaded = Number(status.dataset.commentsLoaded || 0);
+    const commentsTotal = Number(status.dataset.commentsTotal || 0);
+    const documentsLoaded = Number(status.dataset.documentsLoaded || 0);
+    const documentsTotal = Number(status.dataset.documentsTotal || 0);
+    const failureCount = Number(status.dataset.commentsFailures || 0) + Number(status.dataset.documentsFailures || 0);
+    const complete = commentsLoaded >= commentsTotal && documentsLoaded >= documentsTotal;
+
+    status.classList.toggle("text-success", complete && failureCount === 0);
+    status.classList.toggle("text-warning", failureCount > 0);
+    status.textContent = complete
+        ? (failureCount ? `Background loading finished with ${failureCount} item(s) unavailable.` : "All scores, comments, and investigator search data loaded.")
+        : `Loading scores/comments ${commentsLoaded}/${commentsTotal}; investigator search data ${documentsLoaded}/${documentsTotal}...`;
+};
+
+const getAdminDocumentData = async (file) => {
+    const cacheKey = `${file.fileId}:${file.fileInfo?.modified_at || ""}`;
+    if (!adminDocumentDataCache.has(cacheKey)) {
+        const request = readDocFile(file.fileId)
+            .then(docContent => ({
+                contacts: docContent ? extractContactInvestigators(docContent) : "",
+                requestedConsortia: docContent ? parseRequestedConsortiaValues(docContent) : []
+            }))
+            .catch(error => {
+                adminDocumentDataCache.delete(cacheKey);
+                throw error;
+            });
+        adminDocumentDataCache.set(cacheKey, request);
+    }
+    return adminDocumentDataCache.get(cacheKey);
+};
+
+const updateAdminRowSearchData = (file) => {
+    const checkbox = document.getElementById(String(file.fileId));
+    const row = checkbox?.closest(".admin-table-row");
+    if (!row) return;
+    row.dataset.searchText = `${file.filename || file.fileInfo?.name || ""} ${getConceptId(file, file.conceptId || file.fileId)} ${file.contacts || ""}`;
+    const investigators = document.getElementById(`investigators${file.fileId}`);
+    if (investigators) {
+        investigators.textContent = file.contacts || "Not provided";
+        investigators.classList.remove("text-danger");
+        investigators.classList.toggle("text-muted", !file.contacts);
+    }
+};
+
+const hydrateAdminDocumentData = async (data, requireComplete = false) => {
+    const files = [...data.sub, ...data.com, ...data.res];
+    const pendingFiles = files.filter(file => !file.documentDataLoaded);
+    setAdminHydrationProgress("documents", files.length - pendingFiles.length, files.length);
+    if (!pendingFiles.length) return data;
+    if (adminDocumentHydrationPromise) {
+        await adminDocumentHydrationPromise;
+        return hydrateAdminDocumentData(data, requireComplete);
+    }
+
+    adminDocumentHydrationPromise = (async () => {
+        const CHUNK_SIZE = 6;
+        let loaded = files.length - pendingFiles.length;
+        let failures = 0;
+        for (let i = 0; i < pendingFiles.length; i += CHUNK_SIZE) {
+            const chunk = pendingFiles.slice(i, i + CHUNK_SIZE);
+            const results = await Promise.allSettled(chunk.map(async file => {
+                const documentData = await getAdminDocumentData(file);
+                file.contacts = documentData.contacts;
+                file.requestedConsortia = documentData.requestedConsortia;
+                file.documentDataLoaded = true;
+                updateAdminRowSearchData(file);
+            }));
+            loaded += results.length;
+            failures += results.filter(result => result.status === "rejected").length;
+            results.forEach((result, index) => {
+                if (result.status !== "rejected") return;
+                const investigators = document.getElementById(`investigators${chunk[index].fileId}`);
+                if (investigators) {
+                    investigators.textContent = "Unable to load investigator details.";
+                    investigators.classList.add("text-danger");
+                }
+            });
+            setAdminHydrationProgress("documents", loaded, files.length, failures);
+            refreshConceptSearch("adminConceptSearch");
+        }
+    })();
+
+    try {
+        await adminDocumentHydrationPromise;
+    } finally {
+        adminDocumentHydrationPromise = null;
+    }
+    if (requireComplete) {
+        const unavailableFiles = files.filter(file => !file.documentDataLoaded);
+        if (unavailableFiles.length) {
+            throw new Error(`Unable to read ${unavailableFiles.length} concept document(s) from Box.`);
+        }
+    }
+    return data;
 };
 
 export const showPreviewInPane = (fileId) => {
@@ -2075,28 +2153,27 @@ export const authTableTemplate = () => {
 };
 
 export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
-    const requiringInputFiles = [];
-    const userFolders = await getFolderItems(returnToSubmitterFolderId);
-    for (const userFolder of userFolders.entries) {
-        if (userFolder.type === 'folder') {
-            const subfolders = await getFolderItems(userFolder.id);
-            for (const subfolder of subfolders.entries) {
-                if (subfolder.name === 'Requiring Input' && subfolder.type === 'folder') {
-                    const files = await getAllFilesRecursive(subfolder.id, "name,type,id,parent,created_at");
-                    requiringInputFiles.push(...files);
-                }
-            }
-        }
-    }
-    return requiringInputFiles;
+    const userFolders = await getFolderItems(returnToSubmitterFolderId, "name,type,id", 1000);
+    const requiringInputByUser = await Promise.all((userFolders.entries || [])
+        .filter(userFolder => userFolder.type === 'folder')
+        .map(async userFolder => {
+            const subfolders = await getFolderItems(userFolder.id, "name,type,id", 1000);
+            const requiringInputFolders = (subfolders.entries || [])
+                .filter(subfolder => subfolder.name === 'Requiring Input' && subfolder.type === 'folder');
+            const files = await Promise.all(requiringInputFolders.map(subfolder =>
+                getAllFilesRecursive(subfolder.id, "name,type,id,parent,parent.name,created_at,modified_at")
+            ));
+            return files.flat();
+        }));
+    return requiringInputByUser.flat();
 };
 
 const loadAdminDataCache = async () => {
     if (adminDataCache) return adminDataCache;
 
     const [allFilesSub, allFilesCom, allFilesRes, submitterFolderItems, roundSchedule] = await Promise.all([
-        getAllFilesRecursive(submitterFolder, "name,type,id,parent,created_at"),
-        getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at"),
+        getAllFilesRecursive(submitterFolder, "name,type,id,parent,parent.name,created_at,modified_at"),
+        getAllFilesRecursive(completedFolder, "name,type,id,parent,parent.name,created_at,modified_at"),
         getRequiringInputFiles(returnToSubmitterFolder),
         getFolderItems(submitterFolder, "name,type,id", 1000),
         fetch("./src/data/roundSchedule.json").then(response => response.ok ? response.json() : []).catch(() => [])
@@ -2129,6 +2206,7 @@ export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
         loadAdminDataCache(),
         getFolderItems(submitterFolder, "name,type,id", 1000)
     ]);
+    await hydrateAdminDocumentData({ sub: [], com: data.com, res: [] }, true);
     const roundFolders = (folderItems?.entries || [])
         .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"))
         .sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true, sensitivity: "base" }));
@@ -2155,6 +2233,7 @@ export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
 
 export const exportAdminConsortiaCsv = async () => {
     const data = await loadAdminDataCache();
+    await hydrateAdminDocumentData(data, true);
     const exportItems = [...data.sub, ...data.com, ...data.res];
     if (!exportItems.length) {
         alert('No concepts are available to export.');
@@ -2345,6 +2424,45 @@ const showAuthCommentsWithResponses = async (rowFileId, commentsFileId, response
     } catch (error) {
         console.error("Error loading admin comments with responses:", error);
         commentSection.innerHTML = "<span class='text-danger'>Error loading comments.</span>";
+    }
+};
+
+const hydrateAdminComments = async (files) => {
+    const CHUNK_SIZE = 6;
+    let loaded = 0;
+    let failures = 0;
+    setAdminHydrationProgress("comments", loaded, files.length);
+
+    for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+        const chunk = files.slice(i, i + CHUNK_SIZE);
+        const results = await Promise.allSettled(chunk.map(async file => {
+            if (file.type === "res") {
+                await showAuthCommentsWithResponses(file.fileId, file.commentsFileId, file.responseFileId, true);
+            } else {
+                await showCommentsDCEG(file.fileId, true);
+            }
+
+            const row = document.getElementById(String(file.fileId))?.closest(".admin-table-row");
+            row?.querySelectorAll(".decision-dropdown").forEach(dropdown => {
+                dropdown.disabled = false;
+                dropdown.classList.remove("disabled");
+                dropdown.removeAttribute("aria-busy");
+                if (!dropdown.hasAttribute("data-previous-value")) {
+                    dropdown.setAttribute("data-previous-value", dropdown.value || "--");
+                }
+            });
+        }));
+
+        loaded += results.length;
+        failures += results.filter(result => result.status === "rejected").length;
+        results.forEach((result, index) => {
+            if (result.status !== "rejected") return;
+            const file = chunk[index];
+            const commentSection = document.getElementById(`file${file.fileId}Comments`);
+            if (commentSection) commentSection.innerHTML = "<span class='text-danger'>Error loading comments.</span>";
+            console.error(`Error loading admin comments for ${file.fileId}:`, result.reason);
+        });
+        setAdminHydrationProgress("comments", loaded, files.length, failures);
     }
 };
 
@@ -2564,6 +2682,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     if (filteredSub.length > 0 || processedCom.length > 0 || processedRes.length > 0) {
         template += `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted<h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate<h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
         template += renderConceptSearch("adminConceptSearch", "adminConceptSearchStatus");
+        template += `<div id="adminHydrationStatus" class="small text-muted mb-2" aria-live="polite">Preparing background data...</div>`;
         template += viewAuthFinalDecisionFilesColumns();
         template += '<div id="files"> </div></div></div>';
     } else { template += `No files to show.</div></div>`; }
@@ -2581,9 +2700,6 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
         };
         updateButtonStates();
         document.querySelectorAll('.pl').forEach(checkbox => { checkbox.addEventListener('change', updateButtonStates); });
-        for (const file of filteredSub) await showCommentsDCEG(file.fileId, true);
-        for (const file of processedCom) await showCommentsDCEG(file.fileId, true);
-        for (const file of processedRes) await showAuthCommentsWithResponses(file.fileId, file.commentsFileId, file.responseFileId, true);
         Array.from(document.querySelectorAll(".preview-file")).forEach((btn) => {
             btn.addEventListener("click", (e) => {
                 const header = document.getElementById("confluencePreviewerModalHeader");
@@ -2603,6 +2719,10 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
                 });
             });
         }
+        const allDisplayedFiles = [...filteredSub, ...processedCom, ...processedRes];
+        void hydrateAdminComments(allDisplayedFiles).catch(error => console.error("Error hydrating admin comments:", error));
+        void hydrateAdminDocumentData({ sub: filteredSub, com: processedCom, res: processedRes })
+            .catch(error => console.error("Error hydrating admin document data:", error));
     }
 };
 
@@ -2613,7 +2733,7 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     const rId = roundInfo.roundId || "";
     const roundNumber = getConceptRoundNumber(roundInfo);
     const roundLabel = roundNumber ? `R${roundNumber}` : "--";
-    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}" data-round-number="${roundNumber || ""}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-2 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
+    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}" data-round-number="${roundNumber || ""}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-2 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Investigator(s)</div><div class="col${roundInfo.contacts ? "" : " text-muted"}" id="investigators${fId}">${roundInfo.documentDataLoaded ? escapeHtml(roundInfo.contacts || "Not provided") : "Loading investigator details..."}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
   };
   for (const f of processedSubFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f);
   for (const f of processedComFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f);
@@ -2621,6 +2741,13 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
   template += `</div></div>`;
   if (document.getElementById("files") != null) {
     document.getElementById("files").innerHTML = template;
+    document.querySelectorAll("#adminAccordian .decision-dropdown").forEach(dropdown => {
+      dropdown.disabled = true;
+      dropdown.setAttribute("aria-busy", "true");
+    });
+    document.querySelectorAll("#adminAccordian [id^='file'][id$='Comments']").forEach(commentSection => {
+      commentSection.innerHTML = "<span class='text-muted'>Loading comments...</span>";
+    });
     const adminFileNamesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
       .map(file => [String(file.fileId), file.fileInfo?.name || file.filename || ""]));
     const adminSearchDataById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
@@ -2652,20 +2779,101 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
         }
       }
     });
+    const adminFilesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
+      .map(file => [String(file.fileId), file]));
     document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
-      dropdown.addEventListener('change', async function() {
-        const val = this.value;
-        const prev = this.getAttribute('data-previous-value') || '--';
-        const p = this.closest('[data-value]');
-        const cons = p.getAttribute('data-value');
-        const fid = p.id.replace(cons, '');
-        if (!confirm(`Are you sure you want to change the ${cons} score from ${prev} to ${val}?`)) { this.value = prev; return; }
+      dropdown.addEventListener('change', function() {
+        const selectedValue = this.value;
+        const previousValue = this.getAttribute('data-previous-value') || '--';
+        const scoreCell = this.closest('[data-value]');
+        const consortium = scoreCell.getAttribute('data-value');
+        const fileId = scoreCell.id.replace(consortium, '');
+        const file = adminFilesById.get(String(fileId));
+        const commentFileId = file?.commentsFileId || fileId;
+        const scoreDropdown = this;
+        const modalElement = document.getElementById("confluenceMainModal");
         const header = document.getElementById('confluenceModalHeader');
-        header.innerHTML = `<h5 class="modal-title">Changing Score for ${fid}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
-        document.getElementById('confluenceModalBody').innerHTML = '<form id="changeScore"><div class="form-group"><label for="scoreMessage">Comment</label><textarea class="form-control" id="scoreMessage" rows="3">Changed by admin</textarea></div><div class="modal-footer"><button type="submit" class="btn btn-outline-primary">Update score</button></div></form>';
-        bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
-        addEventUpdateScore(fid, val, cons, () => { adminDataCache = null; generateAuthTableFiles(); });
-        this.setAttribute('data-previous-value', val);
+        const body = document.getElementById('confluenceModalBody');
+        if (!modalElement || !header || !body) {
+          scoreDropdown.value = previousValue;
+          return;
+        }
+
+        // Keep the committed score visible until Box confirms the new comment.
+        scoreDropdown.value = previousValue;
+        header.innerHTML = `<h5 class="modal-title">Confirm Score Change</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+        body.innerHTML = `
+          <form id="changeScore">
+            <p>Change the <strong>${escapeHtml(consortium)}</strong> score from <strong>${escapeHtml(previousValue)}</strong> to <strong>${escapeHtml(selectedValue)}</strong>?</p>
+            <div class="form-group mb-3">
+              <label for="scoreMessage" class="form-label">Comment to post in Box</label>
+              <textarea class="form-control" id="scoreMessage" rows="3" required>Changed by admin</textarea>
+            </div>
+            <div id="changeScoreStatus" class="alert d-none" role="alert"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-outline-primary">Update Score</button>
+            </div>
+          </form>`;
+
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        document.getElementById('changeScore').addEventListener('submit', async event => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const submitButton = form.querySelector('button[type="submit"]');
+          const cancelButton = form.querySelector('[data-bs-dismiss="modal"]');
+          const status = document.getElementById('changeScoreStatus');
+          const comment = document.getElementById('scoreMessage').value.trim();
+          submitButton.disabled = true;
+          submitButton.textContent = 'Updating...';
+          status.className = 'alert alert-info';
+          status.textContent = 'Posting the score change to Box...';
+
+          try {
+            const submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: ${comment}`;
+            const commentResponse = await createComment(commentFileId, submitMessage);
+            if (commentResponse?.status !== 201) throw new Error('Box did not confirm the score comment.');
+
+            Array.from(scoreDropdown.classList)
+              .filter(className => className.startsWith('badge-'))
+              .forEach(className => scoreDropdown.classList.remove(className));
+            scoreDropdown.value = selectedValue;
+            scoreDropdown.setAttribute('data-previous-value', selectedValue);
+            scoreDropdown.classList.remove('disabled');
+            if (selectedValue !== '--') scoreDropdown.classList.add(`badge-${selectedValue}`);
+            scoreDropdown.disabled = false;
+
+            let commentsRefreshed = true;
+            try {
+              if (file?.type === 'res') {
+                await showAuthCommentsWithResponses(fileId, file.commentsFileId, file.responseFileId, true);
+              } else {
+                await showCommentsDCEG(fileId, true);
+              }
+            } catch (commentRefreshError) {
+              commentsRefreshed = false;
+              console.warn(`Score saved, but comments could not be refreshed for ${fileId}:`, commentRefreshError);
+            }
+            scoreDropdown.value = selectedValue;
+            scoreDropdown.setAttribute('data-previous-value', selectedValue);
+            scoreDropdown.classList.remove('disabled');
+            scoreDropdown.disabled = false;
+
+            status.className = 'alert alert-success';
+            status.textContent = commentsRefreshed
+              ? 'The score and comment were saved in Box.'
+              : 'The score and comment were saved in Box. The comments display will update the next time the table is loaded.';
+            submitButton.remove();
+            cancelButton.textContent = 'Close';
+          } catch (error) {
+            console.error(`Unable to update ${consortium} score for ${fileId}:`, error);
+            scoreDropdown.value = previousValue;
+            status.className = 'alert alert-danger';
+            status.textContent = error.message || 'Unable to update the score. Please try again.';
+            submitButton.disabled = false;
+            submitButton.textContent = 'Try Again';
+          }
+        });
       });
     });
   }
