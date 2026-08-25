@@ -82,6 +82,9 @@ const refreshConceptSearch = (inputId) => {
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
     const showReplyStatus = tab === "conceptNeedingClarification";
+    const replyStatusLegend = showReplyStatus
+        ? `<span class="d-flex flex-wrap column-gap-3 row-gap-1 small text-muted mt-1"><span class="text-nowrap">&#128309; = Submitter responses require DACC review</span><span class="text-nowrap">&#128994; = DACC reviewed responses; requires further clarification</span></span>`
+        : "";
     
     if (!Array.isArray(files)) { return template; }
     if (files.length != 0) {
@@ -94,7 +97,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
           <div class='card-title' style='display: flex; gap: 20px; align-items: flex-start;'>
             <div>
               <label for='${tab}selectedDoc'>
-                  <b>Select Concept Form:</b>${showReplyStatus ? " 🔵 = Replied" : ""}
+                  <b>Select Concept Form:</b>${replyStatusLegend}
               </label>
               <br>
               <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
@@ -104,7 +107,11 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         let filename = file.name;
         let titlename = getConceptTitleFromFileName(filename);
         
-        const replyStatus = showReplyStatus && file.isReplyCompleted ? "🔵 " : "";
+        const replyStatus = showReplyStatus && file.clarificationReplyStatus === "submitter-response"
+            ? "&#128309; "
+            : showReplyStatus && file.clarificationReplyStatus === "dacc-reviewed"
+                ? "&#128994; "
+                : "";
         template += `
             <option value='${fileId}'>
             ${replyStatus}${titlename} - Concept ID: ${escapeHtml(conceptId)}</option>`;
@@ -553,6 +560,33 @@ const responseMatchesComment = (responseComment, commentId) => {
     return responseIdPattern.test(responseComment.message);
 };
 
+const getClarificationReplyStatus = (chairSourceComments, responseComments, consortium = null) => {
+    const chairEntries = Array.isArray(chairSourceComments) ? chairSourceComments : [];
+    const responseEntries = Array.isArray(responseComments) ? responseComments : [];
+    const scopedChairComments = chairEntries
+        .filter(comment => isChairDecisionComment(comment, consortium))
+        .filter(requiresSubmitterResponse);
+    if (!scopedChairComments.length) return "none";
+
+    const responseTargetIds = new Set(scopedChairComments.map(getResponseTargetId));
+    const matchingResponses = responseEntries.filter(responseComment =>
+        responseComment && responseComment.message
+        && Array.from(responseTargetIds).some(responseId => responseMatchesComment(responseComment, responseId))
+    );
+    if (!matchingResponses.length) return "none";
+
+    const latestResponseTime = matchingResponses.reduce(
+        (latest, responseComment) => Math.max(latest, getCommentTime(responseComment)),
+        0
+    );
+    const latestChairCommentTime = scopedChairComments.reduce(
+        (latest, chairComment) => Math.max(latest, getCommentTime(chairComment)),
+        0
+    );
+
+    return latestChairCommentTime > latestResponseTime ? "dacc-reviewed" : "submitter-response";
+};
+
 const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consortium = null) => {
     const chairEntries = Array.isArray(chairSourceComments) ? chairSourceComments : [];
     const responseEntries = Array.isArray(responseComments) ? responseComments : [];
@@ -982,6 +1016,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                                     chairFile.responseComments = comments.filter(c => c && c.message && c.message.startsWith('Response ID:'));
                                     const masterComments = masterCommentsResponse ? JSON.parse(masterCommentsResponse).entries : null;
                                     const chairSourceComments = Array.isArray(masterComments) ? masterComments : comments;
+                                    chairFile.clarificationReplyStatus = getClarificationReplyStatus(chairSourceComments, chairFile.responseComments, consortium);
                                     chairFile.isReplyCompleted = areChairCommentsRepliedTo(chairSourceComments, chairFile.responseComments, consortium);
                                 }
                             }
