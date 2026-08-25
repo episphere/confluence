@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, emailsAllowedToUpdateData } from "../shared.js";
+import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
 
@@ -81,6 +81,27 @@ const loadStudyAccessAdminRows = async () => {
             requestedStudyMap.set(key, existing);
         });
     });
+
+    const conceptsByBoxId = new Map();
+    requestedStudyMap.forEach((request) => {
+        request.concepts.forEach((concept) => {
+            if (concept.boxId && !conceptsByBoxId.has(concept.boxId)) conceptsByBoxId.set(concept.boxId, []);
+            if (concept.boxId) conceptsByBoxId.get(concept.boxId).push(concept);
+        });
+    });
+    const conceptIds = Array.from(conceptsByBoxId.keys());
+    const CHUNK_SIZE = 10;
+    for (let index = 0; index < conceptIds.length; index += CHUNK_SIZE) {
+        await Promise.all(conceptIds.slice(index, index + CHUNK_SIZE).map(async (conceptId) => {
+            try {
+                const investigators = extractContactInvestigators(await readDocFile(conceptId)) || "";
+                conceptsByBoxId.get(conceptId).forEach(concept => { concept.investigators = investigators; });
+            } catch (error) {
+                console.warn(`Unable to load investigators for Concept ID ${conceptId}:`, error);
+                conceptsByBoxId.get(conceptId).forEach(concept => { concept.investigators = ""; });
+            }
+        }));
+    }
 
     const users = workbookRows.map((row) => ({
         name: String(getCellValue(row, ["Name", "name"]) || "Unnamed user").trim(),
@@ -244,6 +265,7 @@ const loadLegacyOptInOutTable = async () => {
                             <div class="p-3 bg-light border-top">
                                 <div class="fw-semibold mb-2">Concept details</div>
                                 <p class="mb-3">${escapeHtml(conceptDisplayName)}</p>
+                                <p class="small text-muted mb-3"><strong>Concept ID:</strong> ${escapeHtml(concept.boxId || "Not available")}</p>
                                 <div id="${previewId}" class="mb-3"${concept.boxId ? " style=\"min-height: 220px;\"" : ""}>
                                     ${concept.boxId ? "<div class='text-muted'>Loading preview...</div>" : "<div class='text-muted'>No Concept Box ID is available in the CSV.</div>"}
                                 </div>
@@ -475,7 +497,7 @@ export const loadOptInOutTable = async () => {
                 <td>${assignment.is_demo === "true" ? '<span class="badge bg-info text-dark me-2">Demo</span>' : ""}${escapeHtml(assignment.round_name)}</td>
                 <td>
                     <div class="d-flex align-items-start gap-2">
-                        <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))}</span>
+                        <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))} <span class="small text-muted">(Concept ID: ${escapeHtml(assignment.concept_box_id || "Not available")})</span></span>
                         <button class="btn btn-sm custom-btn opt-in-out-concept-preview" type="button" data-file-id="${escapeHtml(assignment.concept_box_id)}" title="Preview concept"><i class="fas fa-external-link-alt"></i></button>
                     </div>
                 </td>
@@ -492,7 +514,7 @@ export const loadOptInOutTable = async () => {
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light"><tr><th>Round</th><th>Concept Name</th><th>Study</th><th>Selection</th><th>Status</th></tr></thead>
+                            <thead class="table-light"><tr><th>Round</th><th>Concept / Concept ID</th><th>Study</th><th>Selection</th><th>Status</th></tr></thead>
                             <tbody>${rows}</tbody>
                         </table>
                     </div>
@@ -657,7 +679,7 @@ const bindCreateDemoOptInOutRoundButton = () => {
             const renderConcepts = () => {
                 const round = rounds.find(item => String(item.id) === roundSelect.value);
                 conceptsContainer.innerHTML = (round?.concepts || []).map((concept, index) => `
-                    <div class="form-check mb-2"><input class="form-check-input demo-concept-checkbox" type="checkbox" id="demoConcept-${escapeHtml(concept.fileId)}" value="${escapeHtml(concept.fileId)}" ${index < 3 ? "checked" : ""}><label class="form-check-label" for="demoConcept-${escapeHtml(concept.fileId)}">${escapeHtml(concept.title)}</label></div>
+                    <div class="form-check mb-2"><input class="form-check-input demo-concept-checkbox" type="checkbox" id="demoConcept-${escapeHtml(concept.fileId)}" value="${escapeHtml(concept.fileId)}" ${index < 3 ? "checked" : ""}><label class="form-check-label" for="demoConcept-${escapeHtml(concept.fileId)}">${escapeHtml(concept.title)} <span class="small text-muted">(Concept ID: ${escapeHtml(concept.fileId)})</span></label></div>
                 `).join("");
                 conceptsContainer.querySelectorAll(".demo-concept-checkbox").forEach(checkbox => checkbox.addEventListener("change", () => {
                     const checked = conceptsContainer.querySelectorAll(".demo-concept-checkbox:checked");
@@ -918,7 +940,7 @@ export const loadStudyAccessAdminTable = async () => {
                 `).join("");
 
                 return `
-                    <tr class="align-middle">
+                    <tr class="align-middle study-access-concept-row" data-concept-index="${conceptIndex}">
                         <td style="min-width: 300px; max-width: 440px;">
                             <div class="d-flex align-items-start gap-2">
                                 <button class="btn btn-link p-0 text-start text-decoration-none concept-user-toggle flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#${conceptDetailsId}" aria-expanded="false" aria-controls="${conceptDetailsId}">
@@ -931,10 +953,11 @@ export const loadStudyAccessAdminTable = async () => {
                         </td>
                         ${statusCells}
                     </tr>
-                    <tr class="bg-light">
+                    <tr class="bg-light study-access-concept-detail-row" data-concept-index="${conceptIndex}">
                         <td colspan="${conceptColumnCount}" class="p-0">
                             <div class="collapse" id="${conceptDetailsId}">
                                 <div class="p-3 border-top border-bottom">
+                                    <div class="small text-muted mb-2"><strong>Concept ID:</strong> ${escapeHtml(conceptBoxId || "Not available")}</div>
                                     <div class="fw-semibold mb-2">Users and associated studies</div>
                                     ${userRows ? `
                                         <div class="table-responsive">
@@ -974,7 +997,7 @@ export const loadStudyAccessAdminTable = async () => {
             `;
 
             return `
-                <tr class="align-middle study-access-main-row" data-study-label="${escapeHtml(request.label)}">
+                <tr class="align-middle study-access-main-row" data-request-index="${requestIndex}" data-study-label="${escapeHtml(request.label)}">
                     <td class="fw-semibold">
                         <button class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#${requestDetailsId}" aria-expanded="false" aria-controls="${requestDetailsId}">
                             <i class="fas fa-chevron-down text-muted me-2"></i>${escapeHtml(request.label)}
@@ -983,7 +1006,7 @@ export const loadStudyAccessAdminTable = async () => {
                     <td class="text-center">${concepts.length}</td>
                     <td class="text-center">${studies.length}</td>
                 </tr>
-                <tr class="study-access-detail-row">
+                <tr class="study-access-detail-row" data-request-index="${requestIndex}">
                     <td colspan="3" class="p-0">
                         <div class="collapse" id="${requestDetailsId}">${matrixMarkup}</div>
                     </td>
@@ -992,6 +1015,13 @@ export const loadStudyAccessAdminTable = async () => {
         }).join("");
 
         container.innerHTML = `
+            <div class="main-summary-row mb-2">
+                <div class="input-group" style="max-width: 520px;">
+                    <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search concepts, IDs, or investigators (min. 3 characters)" aria-label="Search concepts, IDs, or investigators" id="studyAccessConceptSearch" aria-describedby="studyAccessConceptSearchStatus">
+                    <span class="input-group-text border-0"><i class="fas fa-search"></i></span>
+                </div>
+                <div id="studyAccessConceptSearchStatus" class="small text-muted ms-2 align-self-center" aria-live="polite"></div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -1029,6 +1059,52 @@ export const loadStudyAccessAdminTable = async () => {
                     tableBody.appendChild(main);
                     tableBody.appendChild(detail);
                 });
+            });
+        }
+
+        const searchInput = document.getElementById("studyAccessConceptSearch");
+        const searchStatus = document.getElementById("studyAccessConceptSearchStatus");
+        if (searchInput) {
+            searchInput.addEventListener("input", () => {
+                const query = searchInput.value.trim().toLowerCase();
+                let matchingConceptCount = 0;
+
+                requestedStudies.forEach((request, requestIndex) => {
+                    const mainRow = tableBody?.querySelector(`.study-access-main-row[data-request-index="${requestIndex}"]`);
+                    const detailRow = tableBody?.querySelector(`.study-access-detail-row[data-request-index="${requestIndex}"]`);
+                    if (!mainRow || !detailRow) return;
+
+                    const studies = request.studies || [];
+                    const users = request.users || [];
+                    const requestSearchText = [
+                        request.label,
+                        ...studies.flatMap(study => [study.acronym, study.name]),
+                        ...users.flatMap(user => [user.name, user.email, ...(user.studies || []).flatMap(study => [study.acronym, study.name])])
+                    ].filter(Boolean).join(" ").toLowerCase();
+                    const requestMatches = query.length < 3 || requestSearchText.includes(query);
+                    let requestHasMatch = requestMatches;
+
+                    (request.concepts || []).forEach((concept, conceptIndex) => {
+                        const conceptRow = detailRow.querySelector(`.study-access-concept-row[data-concept-index="${conceptIndex}"]`);
+                        const conceptDetailRow = detailRow.querySelector(`.study-access-concept-detail-row[data-concept-index="${conceptIndex}"]`);
+                        const conceptSearchText = `${concept.name || ""} ${concept.boxId || ""} ${concept.investigators || ""} ${requestSearchText}`.toLowerCase();
+                        const conceptMatches = query.length < 3 || conceptSearchText.includes(query);
+                        conceptRow?.classList.toggle("d-none", !conceptMatches);
+                        conceptDetailRow?.classList.toggle("d-none", !conceptMatches);
+                        if (conceptMatches) {
+                            requestHasMatch = true;
+                            matchingConceptCount++;
+                        }
+                    });
+
+                    mainRow.classList.toggle("d-none", !requestHasMatch);
+                    detailRow.classList.toggle("d-none", !requestHasMatch);
+                });
+
+                if (!searchStatus) return;
+                if (query.length > 0 && query.length < 3) searchStatus.textContent = "Enter at least 3 characters.";
+                else if (query.length >= 3) searchStatus.textContent = `${matchingConceptCount} matching concept${matchingConceptCount === 1 ? "" : "s"}`;
+                else searchStatus.textContent = "";
             });
         }
 

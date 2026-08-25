@@ -9,6 +9,51 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
+const getConceptId = (file, fallbackId = "") => String(
+    (file && (file.conceptId || file.masterFileId || file.commentsFileId)) || fallbackId || (file && file.id) || ""
+);
+
+const renderConceptSearch = (inputId, statusId) => `
+    <div class="main-summary-row mb-2">
+        <div class="input-group" style="max-width: 520px;">
+            <input type="search" class="form-control rounded" autocomplete="off" placeholder="Search concepts, IDs, or investigators (min. 3 characters)" aria-label="Search concepts, IDs, or investigators" id="${inputId}" aria-describedby="${statusId}">
+            <span class="input-group-text border-0"><i class="fas fa-search"></i></span>
+        </div>
+        <div id="${statusId}" class="small text-muted ms-2 align-self-center" aria-live="polite"></div>
+    </div>`;
+
+const setupConceptSearch = (inputId, statusId, rowSelector) => {
+    const input = document.getElementById(inputId);
+    const status = document.getElementById(statusId);
+    if (!input) return;
+
+    const applySearch = () => {
+        const query = input.value.trim().toLowerCase();
+        const rows = Array.from(document.querySelectorAll(rowSelector));
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const investigators = row.querySelector('[id^="investigators"]')?.textContent || "";
+            const searchableText = `${row.dataset.searchText || ""} ${investigators}`.toLowerCase();
+            const matches = query.length < 3 || searchableText.includes(query);
+            row.classList.toggle("d-none", !matches);
+            if (matches) visibleCount++;
+        });
+
+        if (!status) return;
+        if (query.length > 0 && query.length < 3) status.textContent = "Enter at least 3 characters.";
+        else if (query.length >= 3) status.textContent = `${visibleCount} matching concept${visibleCount === 1 ? "" : "s"}`;
+        else status.textContent = "";
+    };
+
+    input.addEventListener("input", applySearch);
+    input.applyConceptSearch = applySearch;
+};
+
+const refreshConceptSearch = (inputId) => {
+    const input = document.getElementById(inputId);
+    if (input && typeof input.applyConceptSearch === "function" && input.value.trim().length >= 3) input.applyConceptSearch();
+};
+
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
     const showReplyStatus = tab === "conceptNeedingClarification";
@@ -30,6 +75,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
               <select class="form-select" aria-label="Select Document to Review" id='${tab}selectedDoc'>`;
       for (const file of files) {
         const fileId = file.id;
+        const conceptId = getConceptId(file, fileId);
         let filename = file.name;
         let lastUnderscoreIndex = filename.lastIndexOf('_');
         let titlename = lastUnderscoreIndex > 0 ? filename.substring(0, lastUnderscoreIndex) : filename; 
@@ -37,10 +83,11 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
         const replyStatus = showReplyStatus && file.isReplyCompleted ? "🔵 " : "";
         template += `
             <option value='${fileId}'>
-            ${replyStatus}${titlename}</option>`;
+            ${replyStatus}${titlename} - Concept ID: ${escapeHtml(conceptId)}</option>`;
       }
       template += `
               </select>
+              <div id="${tab}ConceptId" class="small text-muted mt-1">Concept ID: ${escapeHtml(getConceptId(files[0], files[0] && files[0].id) || "Not available")}</div>
             </div>
             <div style='display: none;' id='${tab}versionContainer'>
               <label for='${tab}versionSelect'>
@@ -571,6 +618,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
             let isReplyCompleted = false;
             let commentsFileId = fileId;
             let responseFileId = null;
+            let conceptId = fileId;
 
             if (type === 'res') {
                 returnedDate = fileInfo.created_at;
@@ -578,6 +626,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
                 if (originalFile) {
                     submissionDate = originalFile.created_at;
                     commentsFileId = originalFile.id;
+                    conceptId = originalFile.id;
                 }
                 responseFileId = fileId;
 
@@ -593,6 +642,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
                 const originalFile = findMatchingFileByName(allSubFiles, filename);
                 if (originalFile && originalFile.parent) {
                     roundId = originalFile.parent.id;
+                    conceptId = originalFile.id;
                 } else if (type === 'com' && fileInfo.parent?.name) {
                     const matchingRound = submitterRoundFolders.find(round => round.name === fileInfo.parent.name);
                     if (matchingRound) roundId = matchingRound.id;
@@ -610,6 +660,7 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
                 roundId: roundId,
                 commentsFileId,
                 responseFileId,
+                conceptId,
                 requestedConsortia,
                 name: fileInfo.name,
                 type: type
@@ -689,6 +740,8 @@ export const switchFilesWithComments = (tab, files = []) => {
             showPreviewInPane(file_id);
             
             const file = files.find(f => f && String(f.id) === String(file_id));
+            const conceptIdElement = document.getElementById(`${tab}ConceptId`);
+            if (conceptIdElement) conceptIdElement.textContent = `Concept ID: ${getConceptId(file, file_id) || "Not available"}`;
             showCommentsForChairTab(file, tab, file_id);
         });
     }
@@ -823,6 +876,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
                 items.forEach(item => {
                     if (item && item.id && filesIncompleted.findIndex(element => element && element.id === item.id) === -1) {
                         item.roundId = findRoundId(item.name);
+                        attachMasterCommentSource(item);
                         filesIncompleted.push(item);
                     }
                 });
@@ -1451,7 +1505,7 @@ const generateMergedConceptBlob = async (fileId, commentsFileId = fileId, respon
             } else { originalContent = '<p>Mammoth.js not available.</p>'; }
         } catch (docxError) { originalContent = '<p>Could not extract content.</p>'; }
         
-        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>File ID:</strong> ${commentsFileId}</p>`;
+        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>Concept ID:</strong> ${commentsFileId}</p>`;
         if (comments.length === 0) { mergedContent += `<p>No comments found.</p>`; } else {
             comments.forEach((comment, index) => {
                 const matchingResponse = findResponseForComment(comment, responseComments);
@@ -1514,11 +1568,13 @@ export function viewFinalDecisionFilesTemplate(files) {
     }
 
     let template = `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted <h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate <h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
+    template += renderConceptSearch("daccDecisionConceptSearch", "daccDecisionConceptSearchStatus");
     template += viewFinalDecisionFilesColumns();
     template += '<div id="files"> </div></div></div>';
     const daccDecisionElement = document.getElementById("daccDecision");
     if (daccDecisionElement) daccDecisionElement.innerHTML = template; else return;
     viewFinalDecisionFiles(files);
+    setupConceptSearch("daccDecisionConceptSearch", "daccDecisionConceptSearchStatus", "#daccAccordian > .accordian-item");
     let btns = Array.from(document.querySelectorAll("#daccDecision .preview-file"));
     btns.forEach((btn) => {
         btn.addEventListener("click", (e) => {
@@ -1550,6 +1606,7 @@ const loadDaccDecisionInvestigators = async (fileId) => {
   try {
     const docContent = await readDocFile(fileId);
     investigatorsDiv.innerHTML = extractContactInvestigators(docContent);
+    refreshConceptSearch("daccDecisionConceptSearch");
   } catch (e) {
     investigatorsDiv.innerHTML = '<span class="text-danger">Error loading details</span>';
   }
@@ -1569,6 +1626,12 @@ export function viewFinalDecisionFiles(files) {
   const filesContainer = document.getElementById("files");
   if (filesContainer) {
     filesContainer.innerHTML = template;
+    document.querySelectorAll("#daccAccordian > .accordian-item").forEach((row, index) => {
+      const dropdownBody = row.querySelector(".accordion-body");
+      const conceptDetails = dropdownBody?.querySelector(".row .col");
+      if (files[index]) row.dataset.searchText = `${files[index].name || ""} ${getConceptId(files[index], files[index].id)}`;
+      if (conceptDetails && files[index]) conceptDetails.insertAdjacentHTML("beforeend", ` <span class="small text-muted text-nowrap">(Concept ID: ${escapeHtml(getConceptId(files[index], files[index].id))})</span>`);
+    });
     document.querySelectorAll('#daccDecision .accordion-toggle-btn').forEach(btn => {
       btn.addEventListener('click', async function() {
         const fileId = this.dataset.fileId;
@@ -1727,7 +1790,7 @@ export const createAllRoundFolders = async () => {
                                 <col style="width: 14%;">
                                 <col style="width: 18%;">
                             </colgroup>
-                            <thead><tr><th class="text-center">Initiate</th><th>Document</th><th>Metadata tags</th><th>Review destination</th><th>Status</th></tr></thead>
+                            <thead><tr><th class="text-center">Initiate</th><th>Document / Concept ID</th><th>Metadata tags</th><th>Review destination</th><th>Status</th></tr></thead>
                             <tbody>
                                 ${fileReviews.map(review => {
                                     const ready = review.requestedConsortia.length > 0;
@@ -1736,7 +1799,7 @@ export const createAllRoundFolders = async () => {
                                         : ready ? 'Ready' : 'No recognized requested consortium found';
                                     return `<tr class="init-round-file-row" data-file-id="${escapeHtml(review.file.id)}">
                                         <td class="text-center"><input type="checkbox" class="form-check-input init-round-file-selected" checked aria-label="Initiate ${escapeHtml(review.file.name)}"></td>
-                                        <td style="white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"><a href="https://nih.app.box.com/file/${encodeURIComponent(review.file.id)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(review.file.name)}" style="display: -webkit-box; width: 100%; max-width: 100%; white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">${escapeHtml(review.file.name)}</a></td>
+                                        <td style="white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"><a href="https://nih.app.box.com/file/${encodeURIComponent(review.file.id)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(review.file.name)}" style="display: -webkit-box; width: 100%; max-width: 100%; white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">${escapeHtml(review.file.name)} (Concept ID: ${escapeHtml(review.file.id)})</a></td>
                                         <td>
                                             <div class="d-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 0.75rem; row-gap: 0.35rem;">
                                                 ${CONSORTIUM_EXPORT_VALUES.map(consortium => `<label class="form-check-label text-nowrap"><input type="checkbox" class="form-check-input init-round-metadata-tag me-1" value="${escapeHtml(consortium)}" ${review.requestedConsortia.includes(consortium) ? 'checked' : ''}>${escapeHtml(consortium)}</label>`).join('')}
@@ -1947,7 +2010,7 @@ const loadAdminDataCache = async () => {
     const [processedSub, processedCom, processedRes] = await Promise.all([
         getProcessedAdminFiles(allFilesSub, 'sub'),
         getProcessedAdminFiles(allFilesCom, 'com', allFilesSub, submitterRoundFolders),
-        getProcessedAdminFiles(allFilesRes, 'res', allFilesSub)
+        getProcessedAdminFiles(allFilesRes, 'res', [...allFilesSub, ...allFilesCom])
     ]);
     adminDataCache = { sub: processedSub, com: processedCom, res: processedRes };
     return adminDataCache;
@@ -2390,12 +2453,14 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     const filteredSub = processedSub.filter(file => !resFileNames.includes(file.name));
     if (filteredSub.length > 0 || processedCom.length > 0 || processedRes.length > 0) {
         template += `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted<h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate<h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
+        template += renderConceptSearch("adminConceptSearch", "adminConceptSearchStatus");
         template += viewAuthFinalDecisionFilesColumns();
         template += '<div id="files"> </div></div></div>';
     } else { template += `No files to show.</div></div>`; }
     document.getElementById("authTableView").innerHTML = template;
     if (filteredSub.length !== 0 || processedCom.length !== 0 || processedRes.length !== 0) {
         viewAuthFinalDecisionFiles(filteredSub, processedCom, processedRes);
+        setupConceptSearch("adminConceptSearch", "adminConceptSearchStatus", "#adminAccordian > .admin-table-row");
         initializeAdminActionRequiredControls();
         const updateButtonStates = () => {
             const anyChecked = document.querySelectorAll('.pl:checked').length > 0;
@@ -2433,17 +2498,20 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
 
 export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles, processedResFiles) {
   let template = `<div class="row m-0 align-left allow-overflow w-100"><div class="accordion accordion-flush col-md-12" id="adminAccordian">`;
+  const renderAdminConceptName = (file) => `${file.filename} <span class="badge bg-secondary ms-2">Concept ID: ${escapeHtml(getConceptId(file, file.conceptId || file.fileId) || "Not available")}</span>`;
   const renderRow = (fInfo, fId, name, titlename, stn, subD, retD, rId) => {
     return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-3 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
   };
-  for (const f of processedSubFiles) template += renderRow(f.fileInfo, f.fileId, f.filename, f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
-  for (const f of processedComFiles) template += renderRow(f.fileInfo, f.fileId, f.filename, f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
-  for (const f of processedResFiles) template += renderRow(f.fileInfo, f.fileId, f.filename, f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
+  for (const f of processedSubFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
+  for (const f of processedComFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
+  for (const f of processedResFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f.roundId);
   template += `</div></div>`;
   if (document.getElementById("files") != null) {
     document.getElementById("files").innerHTML = template;
     const adminFileNamesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
       .map(file => [String(file.fileId), file.fileInfo?.name || file.filename || ""]));
+    const adminSearchDataById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
+      .map(file => [String(file.fileId), `${file.filename || file.fileInfo?.name || ""} ${getConceptId(file, file.conceptId || file.fileId)} ${file.contacts || ""}`]));
     document.querySelectorAll(".action-required-dropdown").forEach(dropdown => {
       dropdown.dataset.fileName = adminFileNamesById.get(dropdown.dataset.fileId) || "";
     });
@@ -2461,6 +2529,7 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
         row.insertBefore(actionCell, row.children[5]);
       }
       const rowFileId = row.querySelector(".admin-checkbox")?.id;
+      row.closest(".admin-table-row").dataset.searchText = adminSearchDataById.get(String(rowFileId)) || "";
       if (completedAdminFileIds.has(String(rowFileId))) {
         const statusBadge = row.querySelector(".badge");
         if (statusBadge) {
