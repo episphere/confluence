@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -3676,7 +3676,8 @@ const getRoundNumberFromFolderName = (folderName, scheduleByFolderName = new Map
 };
 
 const getRoundNumberFromConceptDate = (fileName, schedule) => {
-    const dateMatch = removeRoundSuffixFromFileName(fileName).match(/_(\d{4}-\d{2}-\d{2})(?:\.[^.]+)?$/);
+    const normalizedFileName = normalizeConceptFileNamePunctuation(removeRoundSuffixFromFileName(fileName));
+    const dateMatch = normalizedFileName.match(/_(\d{4}-\d{2}-\d{2})(?:\.[^.]+)?$/);
     if (!dateMatch) return null;
     const conceptDate = new Date(`${dateMatch[1]}T12:00:00`);
     if (Number.isNaN(conceptDate.getTime())) return null;
@@ -3690,9 +3691,11 @@ const getRoundNumberFromConceptDate = (fileName, schedule) => {
     return matchingRound ? Number(matchingRound.round) : null;
 };
 
-const getRoundConceptKey = (fileName) => removeRoundSuffixFromFileName(fileName)
+const getRoundConceptKey = (fileName) => normalizeConceptFileNamePunctuation(removeRoundSuffixFromFileName(fileName))
     .trim()
     .toLowerCase();
+
+const shouldSkipConceptIdRename = (fileName) => /^Concept\s+\d+\b/i.test(String(fileName || "").trim());
 
 const buildRoundConceptAssignments = (files, roundNumber) => {
     const conceptsByKey = new Map();
@@ -3752,6 +3755,12 @@ const buildRoundRenamePlan = async () => {
     const sourceAssignmentsById = new Map();
     const conceptAssignmentsByRound = new Map();
     const discoveredFiles = new Map();
+    const skippedFiles = new Map();
+    const recordSkippedFile = (file, locations) => {
+        const fileId = String(file.id);
+        if (!skippedFiles.has(fileId)) skippedFiles.set(fileId, { file, locations: new Set() });
+        locations.forEach(location => skippedFiles.get(fileId).locations.add(location));
+    };
 
     const sourceRoundResults = [];
     const ROUND_CHUNK_SIZE = 4;
@@ -3764,6 +3773,10 @@ const buildRoundRenamePlan = async () => {
 
     sourceRoundResults.forEach(({ folder, files }) => {
         files.filter(file => /\.docx?$/i.test(file.name || "")).forEach(file => {
+            if (shouldSkipConceptIdRename(file.name)) {
+                recordSkippedFile(file, [`Submitter / ${folder.name}`]);
+                return;
+            }
             const roundNumber = folder.roundNumber;
             const conceptKey = getRoundConceptKey(file.name);
             if (!sourceRoundsByKey.has(conceptKey)) sourceRoundsByKey.set(conceptKey, new Set());
@@ -3804,6 +3817,10 @@ const buildRoundRenamePlan = async () => {
         })));
         rootResults.forEach(({ root, files }) => {
             files.filter(file => /\.docx?$/i.test(file.name || "")).forEach(file => {
+                if (shouldSkipConceptIdRename(file.name)) {
+                    recordSkippedFile(file, Array.from(root.labels));
+                    return;
+                }
                 const fileId = String(file.id);
                 if (!discoveredFiles.has(fileId)) discoveredFiles.set(fileId, { file, locations: new Set() });
                 root.labels.forEach(label => discoveredFiles.get(fileId).locations.add(label));
@@ -3895,7 +3912,8 @@ const buildRoundRenamePlan = async () => {
 
     safeChanges.sort((a, b) => a.roundNumber - b.roundNumber || a.conceptNumber - b.conceptNumber || a.file.name.localeCompare(b.file.name));
     const conceptCount = Array.from(sourceConceptsByRound.values()).reduce((total, concepts) => total + concepts.size, 0);
-    return { changes: safeChanges, alreadyCorrect, unmatched, ambiguous, collisions, scanned: discoveredFiles.size, rounds: roundFolders.length, concepts: conceptCount };
+    const skipped = Array.from(skippedFiles.values()).map(({ file, locations }) => ({ file, locations: Array.from(locations).sort() }));
+    return { changes: safeChanges, alreadyCorrect, unmatched, ambiguous, collisions, skipped, scanned: discoveredFiles.size + skipped.length, rounds: roundFolders.length, concepts: conceptCount };
 };
 
 export const showRenameFilesPopup = async () => {
@@ -3928,11 +3946,17 @@ export const showRenameFilesPopup = async () => {
                 ${plan.ambiguous.length} ambiguous round match(es), ${plan.unmatched.length} unmatched file(s), and ${plan.collisions.length} filename collision(s).
                 <details class="mt-2"><summary>Show files requiring review</summary><ul class="mb-0 mt-2">${issueItems.slice(0, 100).map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>${issueItems.length > 100 ? `<p class="mb-0">Showing the first 100 of ${issueItems.length}.</p>` : ""}</details>
             </div>` : "";
+        const skippedSummary = plan.skipped.length ? `
+            <div class="alert alert-secondary small">
+                <strong>${plan.skipped.length}</strong> legacy <code>Concept #</code> file${plan.skipped.length === 1 ? " was" : "s were"} skipped and will not be assigned a new concept ID.
+                <details class="mt-2"><summary>Show skipped files</summary><ul class="mb-0 mt-2">${plan.skipped.slice(0, 100).map(item => `<li>${escapeHtml(item.file.name)}${item.locations.length ? ` — ${escapeHtml(item.locations.join(", "))}` : ""}</li>`).join("")}</ul>${plan.skipped.length > 100 ? `<p class="mb-0">Showing the first 100 of ${plan.skipped.length}.</p>` : ""}</details>
+            </div>` : "";
 
         body.innerHTML = `
             <div class="alert alert-info small">Concept IDs are assigned per submitter round in creation order, starting at <code>R#_01</code>. Copies with the same concept filename or source Concept ID receive the same suffix. Existing round and numbered endings will be corrected, not duplicated.</div>
             <p><strong>${plan.scanned}</strong> concept documents scanned across <strong>${plan.rounds}</strong> submitter rounds and <strong>${plan.concepts}</strong> authoritative concepts.</p>
             <p><strong>${plan.changes.length}</strong> rename(s) ready; <strong>${plan.alreadyCorrect.length}</strong> already correct.</p>
+            ${skippedSummary}
             ${issueSummary}
             <div class="table-responsive" style="max-height: 360px; overflow-y: auto;">
                 <table class="table table-sm"><thead><tr><th>Current</th><th>New</th><th>Concept ID</th><th>Location</th></tr></thead><tbody>${previewRows}</tbody></table>

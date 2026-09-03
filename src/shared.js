@@ -2093,12 +2093,23 @@ export const getRoundNumberFromFileName = (fileName) => {
     return match ? Number(match[1]) : null;
 };
 
+export const normalizeConceptFileNamePunctuation = (fileName) => {
+    const value = String(fileName || "");
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
+    const normalizedStem = stem
+        .replace(/[.-]+_(?=\d{4}-\d{2}-\d{2}(?:$|[_-]))/g, "_")
+        .replace(/(\d{4}-\d{2}-\d{2})[.-]+$/, "$1");
+    return `${normalizedStem}${extension}`;
+};
+
 export const addRoundSuffixToFileName = (fileName, roundNumber) => {
     const roundMatch = String(roundNumber ?? "").match(/\d+/);
     if (!roundMatch) return String(fileName || "");
 
     const normalizedRoundNumber = String(Number(roundMatch[0]));
-    const value = removeRoundSuffixFromFileName(fileName);
+    const value = normalizeConceptFileNamePunctuation(removeRoundSuffixFromFileName(fileName));
     const dotIndex = value.lastIndexOf(".");
     const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
     const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
@@ -2112,7 +2123,7 @@ export const addConceptIdSuffixToFileName = (fileName, roundNumber, conceptNumbe
 
     const normalizedRoundNumber = String(Number(roundMatch[0]));
     const normalizedConceptNumber = String(Number(conceptMatch[0])).padStart(2, "0");
-    const value = removeRoundSuffixFromFileName(fileName);
+    const value = normalizeConceptFileNamePunctuation(removeRoundSuffixFromFileName(fileName));
     const dotIndex = value.lastIndexOf(".");
     const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
     const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
