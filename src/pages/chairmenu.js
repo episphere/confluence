@@ -2075,19 +2075,10 @@ export function viewFinalDecisionFiles(files) {
     document.querySelectorAll('#daccDecision .accordion-toggle-btn').forEach(btn => {
       btn.addEventListener('click', async function() {
         const fileId = this.dataset.fileId;
-        const isExpanding = this.getAttribute('aria-expanded') === 'false';
-        const icon = this.querySelector('i');
-        if (isExpanding) {
-          icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-          this.setAttribute('aria-expanded', 'true');
-          const investigatorsDiv = document.getElementById(`investigators${fileId}`);
-          if (investigatorsDiv && investigatorsDiv.innerHTML.includes('Click accordion to load')) {
-              await loadDaccDecisionInvestigators(fileId);
-              showCommentsDCEG(fileId, false);
-          }
-        } else {
-          icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-          this.setAttribute('aria-expanded', 'false');
+        const investigatorsDiv = document.getElementById(`investigators${fileId}`);
+        if (investigatorsDiv && investigatorsDiv.innerHTML.includes('Click accordion to load')) {
+            await loadDaccDecisionInvestigators(fileId);
+            showCommentsDCEG(fileId, false);
         }
       });
     });

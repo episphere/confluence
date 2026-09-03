@@ -2474,6 +2474,16 @@ ul.form {
   transition: transform 0.2s ease-in-out;
 }
 
+/* Keep table disclosure arrows synchronized with Bootstrap's collapse state. */
+[data-bs-toggle="collapse"] .fa-chevron-down {
+  transition: transform 0.2s ease-in-out;
+  transform: rotate(0deg);
+}
+
+[data-bs-toggle="collapse"][aria-expanded="true"] .fa-chevron-down {
+  transform: rotate(180deg);
+}
+
 .accordion-toggle-btn:hover {
   color: #495057;
 }
