@@ -2082,14 +2082,14 @@ export const removeRoundSuffixFromFileName = (fileName) => {
     const dotIndex = value.lastIndexOf(".");
     const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
     const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
-    return `${stem.replace(/_R\d+(?:_\d{3})?$/i, "")}${extension}`;
+    return `${stem.replace(/_R\d+(?:_\d+)?$/i, "")}${extension}`;
 };
 
 export const getRoundNumberFromFileName = (fileName) => {
     const value = String(fileName || "");
     const dotIndex = value.lastIndexOf(".");
     const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
-    const match = stem.match(/_R(\d+)(?:_\d{3})?$/i);
+    const match = stem.match(/_R(\d+)(?:_\d+)?$/i);
     return match ? Number(match[1]) : null;
 };
 
@@ -2103,6 +2103,20 @@ export const addRoundSuffixToFileName = (fileName, roundNumber) => {
     const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
     const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
     return `${stem}_R${normalizedRoundNumber}${extension}`;
+};
+
+export const addConceptIdSuffixToFileName = (fileName, roundNumber, conceptNumber) => {
+    const roundMatch = String(roundNumber ?? "").match(/\d+/);
+    const conceptMatch = String(conceptNumber ?? "").match(/\d+/);
+    if (!roundMatch || !conceptMatch) return String(fileName || "");
+
+    const normalizedRoundNumber = String(Number(roundMatch[0]));
+    const normalizedConceptNumber = String(Number(conceptMatch[0])).padStart(2, "0");
+    const value = removeRoundSuffixFromFileName(fileName);
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const extension = dotIndex > 0 ? value.slice(dotIndex) : "";
+    return `${stem}_R${normalizedRoundNumber}_${normalizedConceptNumber}${extension}`;
 };
 
 export const getCurrentRoundContext = async (parentFolderId) => {

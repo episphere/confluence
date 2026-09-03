@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addRoundSuffixToFileName, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -616,6 +616,24 @@ const areChairCommentsRepliedTo = (chairSourceComments, responseComments, consor
 const CONSORTIUM_EXPORT_VALUES = ["AABCG", "CIMBA", "LAGENO", "BCAC", "C-NCI", "MERGE"];
 const DACC_TABLE_CONSORTIA = ["AABCG", "BCAC", "C-NCI", "CIMBA", "LAGENO", "MERGE"];
 
+const DACC_EXPORT_FIELDS = [
+    { key: "requestedConsortia", label: "Consortia Data requested from", selected: true, group: "default" },
+    { key: "study", label: "Study", selected: true, group: "default" },
+    { key: "submitter", label: "Submitter", selected: true, group: "default" },
+    { key: "email", label: "Email", selected: true, group: "default" },
+    { key: "title", label: "Title", selected: true, group: "default" },
+    { key: "filename", label: "Filename", selected: true, group: "default" },
+    { key: "notes", label: "Notes", selected: true, group: "default" },
+    { key: "conceptName", label: "Concept Name", group: "table" },
+    { key: "conceptId", label: "Concept ID", group: "table" },
+    { key: "round", label: "Round", group: "table" },
+    { key: "submissionDate", label: "Submission Date", group: "table" },
+    { key: "state", label: "State", group: "table" },
+    ...DACC_TABLE_CONSORTIA.map(consortium => ({ key: `score-${consortium}`, label: consortium, group: "table" })),
+    { key: "investigators", label: "Investigator(s)", group: "table" },
+    { key: "comments", label: "Comments", group: "table" }
+];
+
 const parseRequestedConsortiaValues = (text) => {
     const section = extractRequestedConsortia(text || "");
     if (!section) return [];
@@ -624,6 +642,34 @@ const parseRequestedConsortiaValues = (text) => {
     if (!normalized) return [];
 
     return CONSORTIUM_EXPORT_VALUES.filter(consortium => new RegExp(`\\b${escapeRegExp(consortium)}\\b`, "i").test(normalized));
+};
+
+const extractDaccExportWordFields = (text) => {
+    const normalizedText = String(text || "").replace(/\s+/g, " ").trim();
+    const extractBetweenLabels = (startLabel, endLabel, searchFrom = 0) => {
+        const searchableText = normalizedText.slice(searchFrom);
+        const startMatch = new RegExp(`${escapeRegExp(startLabel)}\\s*:?\\s*`, "i").exec(searchableText);
+        if (!startMatch) return "";
+        const valueStart = startMatch.index + startMatch[0].length;
+        const remainingText = searchableText.slice(valueStart);
+        const endMatch = new RegExp(escapeRegExp(endLabel), "i").exec(remainingText);
+        return (endMatch ? remainingText.slice(0, endMatch.index) : remainingText).trim();
+    };
+    const amendmentQuestion = /Is this an amendment\s*:?/i.exec(normalizedText);
+    const amendmentSearchStart = amendmentQuestion
+        ? amendmentQuestion.index + amendmentQuestion[0].length
+        : 0;
+    const emailSection = extractBetweenLabels("Contact Email", "Member of Consortia or Study / Trial Group");
+    const emailAddresses = emailSection.match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+/gi) || [];
+
+    return {
+        requestedConsortia: parseRequestedConsortiaValues(normalizedText).join(", "),
+        study: extractBetweenLabels("Confluence Study Acronym(s) for the Contact Investigator", "OTHER Investigators and their institutions"),
+        submitter: extractBetweenLabels("Contact Investigator(s)", "Institution(s)"),
+        email: [...new Set(emailAddresses)].join(", "),
+        title: extractBetweenLabels("Project Title", "Is this an amendment"),
+        notes: extractBetweenLabels("Amendment", "Contact Investigator(s)", amendmentSearchStart)
+    };
 };
 
 const downloadCsvFile = (rows, filename) => {
@@ -680,35 +726,65 @@ const getDaccExportScores = (comments) => {
     return scores;
 };
 
-const getDaccExportConceptData = async (file) => {
+const getDaccExportConceptData = async (file, selectedFieldKeys) => {
+    const selectedKeys = new Set(selectedFieldKeys);
+    const needsDocument = ["requestedConsortia", "study", "submitter", "email", "title", "notes", "investigators"]
+        .some(key => selectedKeys.has(key));
+    const needsComments = selectedKeys.has("comments")
+        || DACC_TABLE_CONSORTIA.some(consortium => selectedKeys.has(`score-${consortium}`));
     const commentsFileId = getChairCommentSourceId(file, file.id);
     const responseFileId = file.responseFileId;
-    const commentRequests = [listComments(commentsFileId || file.id)];
-    if (responseFileId && String(responseFileId) !== String(commentsFileId || file.id)) {
+    const commentRequests = needsComments ? [listComments(commentsFileId || file.id)] : [];
+    if (needsComments && responseFileId && String(responseFileId) !== String(commentsFileId || file.id)) {
         commentRequests.push(listComments(responseFileId));
     }
 
     const [documentResult, commentResults] = await Promise.all([
-        readDocFile(file.id)
-            .then(content => extractContactInvestigators(content) || "Not provided")
+        needsDocument ? readDocFile(file.id)
+            .then(content => extractDaccExportWordFields(content))
             .catch(error => {
-                console.warn(`Unable to read investigators for ${file.id}:`, error);
-                return "Unable to load";
-            }),
-        Promise.allSettled(commentRequests)
+                console.warn(`Unable to read concept fields for ${file.id}:`, error);
+                return { documentError: true };
+            }) : Promise.resolve({}),
+        needsComments ? Promise.allSettled(commentRequests) : Promise.resolve([])
     ]);
     const comments = commentResults.flatMap(result => result.status === "fulfilled" ? parseBoxCommentEntries(result.value) : []);
     const uniqueComments = Array.from(new Map(comments.map(comment => [String(comment?.id || `${comment?.created_at}-${comment?.message}`), comment])).values());
 
     return {
-        investigators: documentResult,
+        wordFields: documentResult,
+        investigators: documentResult.documentError ? "Unable to load" : (documentResult.submitter || "Not provided"),
         comments: formatDaccExportComments(uniqueComments),
         scores: getDaccExportScores(uniqueComments)
     };
 };
 
-const exportDaccDecisionTable = async (files, button) => {
+const getDaccExportValue = (fieldKey, file, detail) => {
+    const wordFields = detail.wordFields || {};
+    const wordFieldKeys = new Set(["requestedConsortia", "study", "submitter", "email", "title", "notes"]);
+    if (wordFields.documentError && wordFieldKeys.has(fieldKey)) return "Unable to load";
+    if (Object.prototype.hasOwnProperty.call(wordFields, fieldKey)) {
+        return wordFields[fieldKey];
+    }
+    if (fieldKey.startsWith("score-")) return detail.scores.get(fieldKey.slice(6)) || "--";
+
+    const values = {
+        filename: file.name || "",
+        conceptName: getConceptTitleFromFileName(file.name || ""),
+        conceptId: getConceptId(file, file.id),
+        round: getConceptRoundLabel(file),
+        submissionDate: file.created_at ? new Date(file.created_at).toLocaleString() : "",
+        state: getDaccExportState(file),
+        investigators: detail.investigators,
+        comments: detail.comments || "No comments"
+    };
+    return values[fieldKey] ?? "";
+};
+
+const exportDaccDecisionTable = async (files, button, selectedFieldKeys) => {
     if (!Array.isArray(files) || !files.length) return;
+    const selectedFields = DACC_EXPORT_FIELDS.filter(field => selectedFieldKeys.includes(field.key));
+    if (!selectedFields.length) return;
     const originalButtonHtml = button.innerHTML;
     const status = document.getElementById("daccDecisionDownloadStatus");
     button.disabled = true;
@@ -719,30 +795,16 @@ const exportDaccDecisionTable = async (files, button) => {
     }
 
     try {
-        const headers = [
-            "Concept Name", "File Name", "Concept ID", "Round", "Submission Date", "State",
-            ...DACC_TABLE_CONSORTIA, "Investigator(s)", "Comments"
-        ];
-        const rows = [headers];
+        const rows = [selectedFields.map(field => field.label)];
         const CHUNK_SIZE = 6;
 
         for (let i = 0; i < files.length; i += CHUNK_SIZE) {
             const chunk = files.slice(i, i + CHUNK_SIZE);
             button.textContent = `Preparing ${Math.min(i + chunk.length, files.length)}/${files.length}...`;
-            const details = await Promise.all(chunk.map(getDaccExportConceptData));
+            const details = await Promise.all(chunk.map(file => getDaccExportConceptData(file, selectedFieldKeys)));
             chunk.forEach((file, index) => {
                 const detail = details[index];
-                rows.push([
-                    getConceptTitleFromFileName(file.name || ""),
-                    file.name || "",
-                    getConceptId(file, file.id),
-                    getConceptRoundLabel(file),
-                    file.created_at ? new Date(file.created_at).toLocaleString() : "",
-                    getDaccExportState(file),
-                    ...DACC_TABLE_CONSORTIA.map(consortium => detail.scores.get(consortium) || "--"),
-                    detail.investigators,
-                    detail.comments || "No comments"
-                ]);
+                rows.push(selectedFields.map(field => getDaccExportValue(field.key, file, detail)));
             });
         }
 
@@ -762,6 +824,58 @@ const exportDaccDecisionTable = async (files, button) => {
         button.removeAttribute("aria-busy");
         button.innerHTML = originalButtonHtml;
     }
+};
+
+const showDaccExportFieldSelection = (files, button) => {
+    const modalElement = document.getElementById("confluenceMainModal");
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    if (!modalElement || !header || !body) return;
+
+    const renderFields = group => DACC_EXPORT_FIELDS
+        .filter(field => field.group === group)
+        .map(field => `
+            <div class="form-check mb-2">
+                <input class="form-check-input dacc-export-field" type="checkbox" value="${escapeHtml(field.key)}" id="daccExport-${escapeHtml(field.key)}" ${field.selected ? "checked" : ""}>
+                <label class="form-check-label" for="daccExport-${escapeHtml(field.key)}">${escapeHtml(field.label)}</label>
+            </div>`)
+        .join("");
+
+    header.innerHTML = `
+        <h5 class="modal-title">Select Data Points to Download</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
+    body.innerHTML = `
+        <form id="daccExportFieldForm">
+            <p class="small text-muted">Choose the columns to include for the ${files.length} visible concept${files.length === 1 ? "" : "s"}. The standard data points are selected by default.</p>
+            <div class="row">
+                <fieldset class="col-md-6">
+                    <legend class="h6">Standard data points</legend>
+                    ${renderFields("default")}
+                </fieldset>
+                <fieldset class="col-md-6">
+                    <legend class="h6">Additional table data</legend>
+                    ${renderFields("table")}
+                </fieldset>
+            </div>
+            <div id="daccExportFieldError" class="text-danger small mt-2" aria-live="polite"></div>
+            <div class="modal-footer px-0 pb-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-download me-1" aria-hidden="true"></i> Download CSV</button>
+            </div>
+        </form>`;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+    document.getElementById("daccExportFieldForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const selectedFieldKeys = Array.from(body.querySelectorAll(".dacc-export-field:checked")).map(input => input.value);
+        if (!selectedFieldKeys.length) {
+            document.getElementById("daccExportFieldError").textContent = "Select at least one data point to download.";
+            return;
+        }
+        modal.hide();
+        void exportDaccDecisionTable(files, button, selectedFieldKeys);
+    });
 };
 
 const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => files.map(fileInfo => {
@@ -1900,7 +2014,7 @@ export function viewFinalDecisionFilesTemplate(files) {
                 }
                 return;
             }
-            void exportDaccDecisionTable(visibleFiles, downloadButton);
+            showDaccExportFieldSelection(visibleFiles, downloadButton);
         });
     }
     let btns = Array.from(document.querySelectorAll("#daccDecision .preview-file"));
@@ -2064,14 +2178,17 @@ export const createAllRoundFolders = async () => {
                 const roundFiles = await getAllFilesRecursive(roundFolder.id, 'name,type,id,parent,created_at');
                 const wordFiles = roundFiles.filter(file => file && /\.docx$/i.test(file.name || ''));
                 if (!wordFiles.length) throw new Error(`No Word documents were found in ${folderName}.`);
+                const roundAssignments = buildRoundConceptAssignments(wordFiles, selectedRound.round);
 
                 const fileReviews = await Promise.all(wordFiles.map(async file => {
+                    const assignment = roundAssignments.byFileId.get(String(file.id));
+                    const newFileName = addConceptIdSuffixToFileName(file.name, assignment.roundNumber, assignment.conceptNumber);
                     try {
                         const docText = await readDocFile(file.id);
                         const requestedConsortia = parseRequestedConsortiaValues(docText);
-                        return { file, requestedConsortia, error: '' };
+                        return { file, requestedConsortia, assignment, newFileName, error: '' };
                     } catch (error) {
-                        return { file, requestedConsortia: [], error: error.message || 'Unable to read this document.' };
+                        return { file, requestedConsortia: [], assignment, newFileName, error: error.message || 'Unable to read this document.' };
                     }
                 }));
 
@@ -2116,7 +2233,7 @@ export const createAllRoundFolders = async () => {
                                 <col style="width: 14%;">
                                 <col style="width: 18%;">
                             </colgroup>
-                            <thead><tr><th class="text-center">Initiate</th><th>Document / Concept ID</th><th>Metadata tags</th><th>Review destination</th><th>Status</th></tr></thead>
+                            <thead><tr><th class="text-center">Initiate</th><th>Current / New filename</th><th>Metadata tags</th><th>Review destination</th><th>Status</th></tr></thead>
                             <tbody>
                                 ${fileReviews.map(review => {
                                     const ready = review.requestedConsortia.length > 0;
@@ -2125,7 +2242,7 @@ export const createAllRoundFolders = async () => {
                                         : ready ? 'Ready' : 'No recognized requested consortium found';
                                     return `<tr class="init-round-file-row" data-file-id="${escapeHtml(review.file.id)}">
                                         <td class="text-center"><input type="checkbox" class="form-check-input init-round-file-selected" checked aria-label="Initiate ${escapeHtml(review.file.name)}"></td>
-                                        <td style="white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"><a href="https://nih.app.box.com/file/${encodeURIComponent(review.file.id)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(review.file.name)}" style="display: -webkit-box; width: 100%; max-width: 100%; white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">${escapeHtml(review.file.name)} (Concept ID: ${escapeHtml(review.file.id)})</a></td>
+                                        <td style="white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"><a href="https://nih.app.box.com/file/${encodeURIComponent(review.file.id)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(review.file.name)}" style="display: -webkit-box; width: 100%; max-width: 100%; white-space: normal !important; overflow: hidden; overflow-wrap: anywhere; word-break: break-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">${escapeHtml(review.file.name)}</a><div class="small text-success mt-1">&rarr; ${escapeHtml(review.newFileName)}<br>Concept ID: R${escapeHtml(review.assignment.roundNumber)}_${escapeHtml(String(review.assignment.conceptNumber).padStart(2, '0'))}</div></td>
                                         <td>
                                             <div class="d-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 0.75rem; row-gap: 0.35rem;">
                                                 ${CONSORTIUM_EXPORT_VALUES.map(consortium => `<label class="form-check-label text-nowrap"><input type="checkbox" class="form-check-input init-round-metadata-tag me-1" value="${escapeHtml(consortium)}" ${review.requestedConsortia.includes(consortium) ? 'checked' : ''}>${escapeHtml(consortium)}</label>`).join('')}
@@ -2139,7 +2256,7 @@ export const createAllRoundFolders = async () => {
                         </table>
                     </div>
                     ${restartWarning}
-                    <div class="alert alert-info small mt-3">Initiating will apply the reviewed NIH_NCI_DCEG_Confluence metadata tags, copy each selected document to the indicated chair New folder under ${escapeHtml(selectedRound.folderName)}, and assign a General Task.</div>
+                    <div class="alert alert-info small mt-3">Initiating will first rename each selected source document with its displayed Concept ID, then apply the reviewed NIH_NCI_DCEG_Confluence metadata tags, copy it to the indicated chair New folder under ${escapeHtml(selectedRound.folderName)}, and assign a General Task.</div>
                     <div id="initRoundSelectionStatus" class="small text-danger mb-2"></div>
                     <div class="modal-footer px-0 pb-0">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -2225,7 +2342,31 @@ export const createAllRoundFolders = async () => {
 
                     let completedRoutes = 0;
                     let failureCount = 0;
+                    const sourceRenameFailures = new Set();
+
+                    addStatus('Renaming selected source documents before creating chair copies...', 'fw-bold');
                     for (const review of selectedReviews) {
+                        review.originalFileName = review.file.name;
+                        try {
+                            if (review.originalFileName !== review.newFileName) {
+                                await updateBoxFile(review.file.id, { name: review.newFileName });
+                                review.file.name = review.newFileName;
+                                addStatus(`Renamed source: ${review.originalFileName} -> ${review.newFileName}`, 'text-success');
+                            } else {
+                                addStatus(`Source filename already correct: ${review.newFileName}`, 'text-muted');
+                            }
+                        } catch (error) {
+                            failureCount += 1;
+                            sourceRenameFailures.add(String(review.file.id));
+                            addStatus(`Unable to rename ${review.originalFileName}: ${error.message || error}`, 'text-danger');
+                        }
+                    }
+
+                    for (const review of selectedReviews) {
+                        if (sourceRenameFailures.has(String(review.file.id))) {
+                            addStatus(`Skipped copies for ${review.originalFileName} because its source rename failed.`, 'text-warning');
+                            continue;
+                        }
                         addStatus(`Processing ${review.file.name}...`, 'fw-bold');
                         try {
                             await addMetaData(review.file.id, review.requestedConsortia);
@@ -2239,9 +2380,17 @@ export const createAllRoundFolders = async () => {
 
                                     const targetRoundFolder = await getOrCreateChildFolder(chair.boxIdNew, selectedRound.folderName);
                                     const targetItems = await getFolderItems(targetRoundFolder.id, 'name,type,id', 1000);
-                                    let copiedFile = (targetItems?.entries || []).find(item => item.type === 'file' && item.name === review.file.name);
+                                    const targetFiles = (targetItems?.entries || []).filter(item => item.type === 'file');
+                                    let copiedFile = targetFiles.find(item => item.name === review.newFileName)
+                                        || targetFiles.find(item => getRoundConceptKey(item.name) === getRoundConceptKey(review.originalFileName));
                                     if (copiedFile) {
-                                        addStatus(`${consortium}: existing copy reused.`, 'text-muted');
+                                        if (copiedFile.name !== review.newFileName) {
+                                            await updateBoxFile(copiedFile.id, { name: review.newFileName });
+                                            copiedFile.name = review.newFileName;
+                                            addStatus(`${consortium}: existing copy renamed and reused.`, 'text-success');
+                                        } else {
+                                            addStatus(`${consortium}: existing copy reused.`, 'text-muted');
+                                        }
                                     } else {
                                         copiedFile = await copyFile(review.file.id, targetRoundFolder.id, String(review.file.id));
                                         if (!copiedFile?.id) throw new Error(`Unable to copy the document${copiedFile?.status ? ` (${copiedFile.status})` : ''}.`);
@@ -2294,7 +2443,7 @@ export const authTableTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
-    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Add Round to Filenames </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Add Concept IDs to Filenames </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     template = template.replace(
         '<button type="button" id="renameFilesBtn"',
         '<button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"><span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn"'
@@ -3554,6 +3703,38 @@ const getRoundConceptKey = (fileName) => removeRoundSuffixFromFileName(fileName)
     .trim()
     .toLowerCase();
 
+const buildRoundConceptAssignments = (files, roundNumber) => {
+    const conceptsByKey = new Map();
+    files.forEach(file => {
+        const conceptKey = getRoundConceptKey(file.name);
+        if (!conceptsByKey.has(conceptKey)) conceptsByKey.set(conceptKey, []);
+        conceptsByKey.get(conceptKey).push(file);
+    });
+
+    const orderedConcepts = Array.from(conceptsByKey.entries())
+        .map(([conceptKey, conceptFiles]) => ({
+            conceptKey,
+            files: conceptFiles,
+            createdAt: Math.min(...conceptFiles.map(file => Date.parse(file.created_at || "")).filter(Number.isFinite))
+        }))
+        .sort((a, b) => {
+            const aCreatedAt = Number.isFinite(a.createdAt) ? a.createdAt : Number.MAX_SAFE_INTEGER;
+            const bCreatedAt = Number.isFinite(b.createdAt) ? b.createdAt : Number.MAX_SAFE_INTEGER;
+            return aCreatedAt - bCreatedAt
+                || a.conceptKey.localeCompare(b.conceptKey)
+                || String(a.files[0].id).localeCompare(String(b.files[0].id), undefined, { numeric: true });
+        });
+
+    const byConceptKey = new Map();
+    const byFileId = new Map();
+    orderedConcepts.forEach((concept, index) => {
+        const assignment = { roundNumber: Number(roundNumber), conceptNumber: index + 1, conceptKey: concept.conceptKey };
+        byConceptKey.set(concept.conceptKey, assignment);
+        concept.files.forEach(file => byFileId.set(String(file.id), assignment));
+    });
+    return { byConceptKey, byFileId, conceptCount: orderedConcepts.length };
+};
+
 const addWorkflowRoot = (roots, id, label) => {
     if (!id) return;
     const key = String(id);
@@ -3575,8 +3756,10 @@ const buildRoundRenamePlan = async () => {
     if (!roundFolders.length) throw new Error("No submitter round folders were found. No files were changed.");
 
     const fileFields = "name,type,id,parent,parent.name,created_at,description";
-    const sourceFilesById = new Map();
     const sourceRoundsByKey = new Map();
+    const sourceConceptsByRound = new Map();
+    const sourceAssignmentsById = new Map();
+    const conceptAssignmentsByRound = new Map();
     const discoveredFiles = new Map();
 
     const sourceRoundResults = [];
@@ -3591,12 +3774,21 @@ const buildRoundRenamePlan = async () => {
     sourceRoundResults.forEach(({ folder, files }) => {
         files.filter(file => /\.docx?$/i.test(file.name || "")).forEach(file => {
             const roundNumber = folder.roundNumber;
-            sourceFilesById.set(String(file.id), roundNumber);
             const conceptKey = getRoundConceptKey(file.name);
             if (!sourceRoundsByKey.has(conceptKey)) sourceRoundsByKey.set(conceptKey, new Set());
             sourceRoundsByKey.get(conceptKey).add(roundNumber);
+            if (!sourceConceptsByRound.has(roundNumber)) sourceConceptsByRound.set(roundNumber, new Map());
+            const roundConcepts = sourceConceptsByRound.get(roundNumber);
+            if (!roundConcepts.has(conceptKey)) roundConcepts.set(conceptKey, []);
+            roundConcepts.get(conceptKey).push(file);
             discoveredFiles.set(String(file.id), { file, locations: new Set([`Submitter / ${folder.name}`]) });
         });
+    });
+
+    sourceConceptsByRound.forEach((roundConcepts, roundNumber) => {
+        const assignments = buildRoundConceptAssignments(Array.from(roundConcepts.values()).flat(), roundNumber);
+        assignments.byFileId.forEach((assignment, fileId) => sourceAssignmentsById.set(fileId, assignment));
+        conceptAssignmentsByRound.set(roundNumber, assignments.byConceptKey);
     });
 
     const workflowRoots = new Map();
@@ -3628,7 +3820,7 @@ const buildRoundRenamePlan = async () => {
         });
     }
 
-    const changes = [];
+    const planned = [];
     const alreadyCorrect = [];
     const unmatched = [];
     const ambiguous = [];
@@ -3638,12 +3830,21 @@ const buildRoundRenamePlan = async () => {
         const conceptKey = getRoundConceptKey(file.name);
         const possibleRounds = sourceRoundsByKey.get(conceptKey) || new Set();
         const describedSourceId = String(file.description || "").trim();
-        let roundNumber = sourceFilesById.get(fileId);
+        const sourceAssignment = sourceAssignmentsById.get(fileId);
+        const describedAssignment = sourceAssignmentsById.get(describedSourceId);
+        let roundNumber = sourceAssignment?.roundNumber;
+        let conceptNumber = sourceAssignment?.conceptNumber;
         let matchedBy = roundNumber ? "submitter round folder" : "";
 
-        if (!roundNumber && sourceFilesById.has(describedSourceId)) {
-            roundNumber = sourceFilesById.get(describedSourceId);
+        if (!roundNumber && describedAssignment) {
+            roundNumber = describedAssignment.roundNumber;
+            conceptNumber = describedAssignment.conceptNumber;
             matchedBy = "source Concept ID";
+        }
+        const filenameRound = getRoundNumberFromFileName(file.name);
+        if (!roundNumber && Number.isFinite(filenameRound) && possibleRounds.has(filenameRound)) {
+            roundNumber = filenameRound;
+            matchedBy = "existing filename round";
         }
         if (!roundNumber && possibleRounds.size === 1) {
             roundNumber = Array.from(possibleRounds)[0];
@@ -3666,32 +3867,44 @@ const buildRoundRenamePlan = async () => {
 
         const item = { file, locations: Array.from(locations).sort(), possibleRounds: Array.from(possibleRounds).sort((a, b) => a - b) };
         if (!roundNumber) {
-            if (possibleRounds.size > 1) ambiguous.push(item); else unmatched.push(item);
+            if (possibleRounds.size > 1) ambiguous.push({ ...item, reason: `matches rounds ${item.possibleRounds.join(", ")}` });
+            else unmatched.push({ ...item, reason: "round could not be determined" });
             return;
         }
 
-        const newFileName = addRoundSuffixToFileName(file.name, roundNumber);
-        const plannedItem = { ...item, roundNumber, matchedBy, newFileName };
-        if (newFileName === file.name) alreadyCorrect.push(plannedItem); else changes.push(plannedItem);
+        if (!conceptNumber) conceptNumber = conceptAssignmentsByRound.get(roundNumber)?.get(conceptKey)?.conceptNumber;
+        if (!conceptNumber) {
+            unmatched.push({ ...item, roundNumber, reason: `no authoritative concept match was found in Round ${roundNumber}` });
+            return;
+        }
+
+        const newFileName = addConceptIdSuffixToFileName(file.name, roundNumber, conceptNumber);
+        const plannedItem = { ...item, roundNumber, conceptNumber, matchedBy, newFileName };
+        planned.push(plannedItem);
+        if (newFileName === file.name) alreadyCorrect.push(plannedItem);
     });
 
-    const filesByFolderAndName = new Map();
+    const plannedById = new Map(planned.map(item => [String(item.file.id), item]));
+    const filesByFolderAndTargetName = new Map();
     discoveredFiles.forEach(({ file }) => {
-        const key = `${file.parent?.id || ""}|${String(file.name || "").toLowerCase()}`;
-        if (!filesByFolderAndName.has(key)) filesByFolderAndName.set(key, new Set());
-        filesByFolderAndName.get(key).add(String(file.id));
+        const targetName = plannedById.get(String(file.id))?.newFileName || file.name;
+        const key = `${file.parent?.id || ""}|${String(targetName || "").toLowerCase()}`;
+        if (!filesByFolderAndTargetName.has(key)) filesByFolderAndTargetName.set(key, new Set());
+        filesByFolderAndTargetName.get(key).add(String(file.id));
     });
     const collisions = [];
+    const changes = planned.filter(item => item.newFileName !== item.file.name);
     const safeChanges = changes.filter(change => {
         const key = `${change.file.parent?.id || ""}|${change.newFileName.toLowerCase()}`;
-        const conflictingIds = Array.from(filesByFolderAndName.get(key) || []).filter(id => id !== String(change.file.id));
+        const conflictingIds = Array.from(filesByFolderAndTargetName.get(key) || []).filter(id => id !== String(change.file.id));
         if (!conflictingIds.length) return true;
         collisions.push({ ...change, conflictingIds });
         return false;
     });
 
-    safeChanges.sort((a, b) => a.roundNumber - b.roundNumber || a.file.name.localeCompare(b.file.name));
-    return { changes: safeChanges, alreadyCorrect, unmatched, ambiguous, collisions, scanned: discoveredFiles.size, rounds: roundFolders.length };
+    safeChanges.sort((a, b) => a.roundNumber - b.roundNumber || a.conceptNumber - b.conceptNumber || a.file.name.localeCompare(b.file.name));
+    const conceptCount = Array.from(sourceConceptsByRound.values()).reduce((total, concepts) => total + concepts.size, 0);
+    return { changes: safeChanges, alreadyCorrect, unmatched, ambiguous, collisions, scanned: discoveredFiles.size, rounds: roundFolders.length, concepts: conceptCount };
 };
 
 export const showRenameFilesPopup = async () => {
@@ -3700,7 +3913,7 @@ export const showRenameFilesPopup = async () => {
     if (!header || !body) return;
 
     header.innerHTML = `
-        <h5 class="modal-title">Add Round to Concept Filenames</h5>
+        <h5 class="modal-title">Add Concept IDs to Filenames</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     `;
     body.innerHTML = '<p><i class="fas fa-spinner fa-spin me-2"></i>Scanning submitter, DACC, returned, completed, and chair folders...</p><p class="small text-muted">No files are changed during this scan.</p>';
@@ -3711,11 +3924,11 @@ export const showRenameFilesPopup = async () => {
         const issueCount = plan.unmatched.length + plan.ambiguous.length + plan.collisions.length;
         const previewLimit = 300;
         const previewRows = plan.changes.slice(0, previewLimit).map(change => `
-            <tr><td>${escapeHtml(change.file.name)}</td><td>${escapeHtml(change.newFileName)}</td><td>R${change.roundNumber}</td><td>${escapeHtml(change.locations.join(", ") || change.file.parent?.name || "Unknown")}</td></tr>
+            <tr><td>${escapeHtml(change.file.name)}</td><td>${escapeHtml(change.newFileName)}</td><td>R${change.roundNumber}_${String(change.conceptNumber).padStart(2, "0")}</td><td>${escapeHtml(change.locations.join(", ") || change.file.parent?.name || "Unknown")}</td></tr>
         `).join("");
         const issueItems = [
-            ...plan.ambiguous.map(item => `${item.file.name} - matches rounds ${item.possibleRounds.join(", ")}`),
-            ...plan.unmatched.map(item => `${item.file.name} - round could not be determined`),
+            ...plan.ambiguous.map(item => `${item.file.name} - ${item.reason}`),
+            ...plan.unmatched.map(item => `${item.file.name} - ${item.reason}`),
             ...plan.collisions.map(item => `${item.file.name} - target ${item.newFileName} already exists in the same folder`)
         ];
         const issueSummary = issueCount ? `
@@ -3726,12 +3939,12 @@ export const showRenameFilesPopup = async () => {
             </div>` : "";
 
         body.innerHTML = `
-            <div class="alert alert-info small">The submitter round folders and source Concept IDs determine the authoritative round. Existing <code>_R#</code> and legacy <code>_R#_###</code> endings will be corrected, not duplicated.</div>
-            <p><strong>${plan.scanned}</strong> concept documents scanned across <strong>${plan.rounds}</strong> submitter rounds.</p>
+            <div class="alert alert-info small">Concept IDs are assigned per submitter round in creation order, starting at <code>R#_01</code>. Copies with the same concept filename or source Concept ID receive the same suffix. Existing round and numbered endings will be corrected, not duplicated.</div>
+            <p><strong>${plan.scanned}</strong> concept documents scanned across <strong>${plan.rounds}</strong> submitter rounds and <strong>${plan.concepts}</strong> authoritative concepts.</p>
             <p><strong>${plan.changes.length}</strong> rename(s) ready; <strong>${plan.alreadyCorrect.length}</strong> already correct.</p>
             ${issueSummary}
             <div class="table-responsive" style="max-height: 360px; overflow-y: auto;">
-                <table class="table table-sm"><thead><tr><th>Current</th><th>New</th><th>Round</th><th>Location</th></tr></thead><tbody>${previewRows}</tbody></table>
+                <table class="table table-sm"><thead><tr><th>Current</th><th>New</th><th>Concept ID</th><th>Location</th></tr></thead><tbody>${previewRows}</tbody></table>
             </div>
             ${plan.changes.length > previewLimit ? `<p class="small text-muted">Showing the first ${previewLimit} of ${plan.changes.length} changes.</p>` : ""}
             <div class="modal-footer">
@@ -3752,7 +3965,7 @@ export const renameFilesWithRound = async (plan) => {
     const body = document.getElementById("confluenceModalBody");
     if (!header || !body) return;
 
-    header.innerHTML = `<h5 class="modal-title">Applying Round Filenames...</h5>`;
+    header.innerHTML = `<h5 class="modal-title">Applying Concept IDs...</h5>`;
     body.innerHTML = `<div id="renameProgress" style="max-height: 400px; overflow-y: auto;"><p>Starting ${plan.changes.length} file rename(s)...</p></div>`;
     bootstrap.Modal.getOrCreateInstance(document.getElementById("confluenceMainModal")).show();
 
