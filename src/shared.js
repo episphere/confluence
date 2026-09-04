@@ -2093,6 +2093,15 @@ export const getRoundNumberFromFileName = (fileName) => {
     return match ? Number(match[1]) : null;
 };
 
+export const getConceptIdFromFileName = (fileName) => {
+    const value = String(fileName || "");
+    const dotIndex = value.lastIndexOf(".");
+    const stem = dotIndex > 0 ? value.slice(0, dotIndex) : value;
+    const match = stem.match(/_R(\d+)_(\d+)$/i);
+    if (!match) return "";
+    return `R${Number(match[1])}_${String(Number(match[2])).padStart(2, "0")}`;
+};
+
 export const normalizeConceptFileNamePunctuation = (fileName) => {
     const value = String(fileName || "");
     const dotIndex = value.lastIndexOf(".");

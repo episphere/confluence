@@ -1,6 +1,13 @@
 import { showPreview } from "../components/boxPreview.js";
-import { switchTabs, switchFiles, sortTableByColumn } from "../event.js";
-import { getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, moveFile, /*createFolder,*/ addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, /*sendEmail,*/ getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments } from "../shared.js";
+import { switchTabs, switchFiles } from "../event.js";
+import { getFolderItems, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getConceptIdFromFileName, getFileInfo, moveFile, /*createFolder,*/ addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, /*sendEmail,*/ getChairApprovalDate, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, emailsAllowedToUpdateData, returnToSubmitterFolder, createFolder, completedFolder, listComments } from "../shared.js";
+
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 // Function to read Excel file
 async function readExcelFile() {
@@ -23,6 +30,7 @@ async function readExcelFile() {
                 title: row.title || row.Title || '',
                 contact: row.contact || row.Contact || '',
                 box_id: row.box_id || row['Box ID'] || '',
+                concept_id: row.concept_id || row['Concept ID'] || '',
                 accepted_group: row.accepted_group || row['Accepted Group'] || ''
             }))
         };
@@ -65,8 +73,12 @@ export const acceptedDocsView = async () => {
     const accepted_data = await readExcelFile();
     //console.log(accepted_data.files);
     //const allFiles = await getFolderItems(acceptedFolder);
-    
-    let filearrayAllFiles = accepted_data.files;
+    let canReadBox = false;
+    try { canReadBox = !!JSON.parse(localStorage.parms || "{}").access_token; } catch (error) { canReadBox = false; }
+    let filearrayAllFiles = await Promise.all(accepted_data.files.map(async file => {
+        const boxFile = canReadBox && file.box_id ? await getFileInfo(file.box_id).catch(() => null) : null;
+        return { ...file, concept_id: file.concept_id || getConceptIdFromFileName(boxFile?.name || file.title) || "--" };
+    }));
     viewAcceptedFilesTemplate(filearrayAllFiles);
     hideAnimation();
 };
@@ -76,9 +88,10 @@ export function viewAcceptedFilesColumns() {
         <div class="row pt-md-3 pb-md-3 m-0 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
             <div class="col-md-12">
                 <div class="row ps-3 pe-5">
-                    <div class="col-lg-7 text-left font-bold">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-3 text-left font-bold">Contact <button class="transparent-btn sort-column" data-column-name="Contact"><i class="fas fa-sort"></i></button></div>
-                    <div class="col-lg-2 text-left font-bold">Group <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-5 text-left font-bold header-sortable">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-2 text-left font-bold header-sortable">ID <button class="transparent-btn sort-column" data-column-name="ID"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-3 text-left font-bold header-sortable">Contact <button class="transparent-btn sort-column" data-column-name="Contact"><i class="fas fa-sort"></i></button></div>
+                    <div class="col-lg-2 text-left font-bold header-sortable">Group <button class="transparent-btn sort-column" data-column-name="Group"><i class="fas fa-sort"></i></button></div>
                 </div>
             </div>
         </div>
@@ -140,11 +153,26 @@ export async function viewAcceptedFilesTemplate(filesInfo) {
 
         //Filtering and Sorting
         const table = document.getElementById("decidedFiles");
-        const headers = table.querySelector(`.div-sticky`);
-        Array.from(headers.children).forEach((header, index) => {
-            header.addEventListener("click", (e) => {
-                const sortDirection = header.classList.contains("header-sort-asc");
-                sortTableByColumn(table, index, !sortDirection);
+        const headerRow = table.querySelector(".div-sticky .row.ps-3");
+        Array.from(headerRow?.children || []).forEach((header, index) => {
+            header.addEventListener("click", () => {
+                const ascending = !header.classList.contains("header-sort-asc");
+                const rowsContainer = table.querySelector("#acceptedAccordian");
+                const rows = Array.from(rowsContainer?.querySelectorAll(":scope > .accordion-item") || []);
+                const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+                rows.sort((left, right) => {
+                    const leftValue = left.querySelector(".accordion-button")?.children[index]?.textContent?.trim() || "";
+                    const rightValue = right.querySelector(".accordion-button")?.children[index]?.textContent?.trim() || "";
+                    return collator.compare(leftValue, rightValue) * (ascending ? 1 : -1);
+                }).forEach(row => rowsContainer.appendChild(row));
+                Array.from(headerRow.children).forEach(item => {
+                    item.classList.remove("header-sort-asc", "header-sort-desc");
+                    const icon = item.querySelector("i");
+                    if (icon) icon.className = "fas fa-sort";
+                });
+                header.classList.add(ascending ? "header-sort-asc" : "header-sort-desc");
+                const icon = header.querySelector("i");
+                if (icon) icon.className = ascending ? "fas fa-sort-up" : "fas fa-sort-down";
             });
         });
 
@@ -185,7 +213,8 @@ export async function viewAcceptedFiles(files) {
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingOne">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}">
-                    <div class="col-lg-7">${shortfilename}</div>
+                    <div class="col-lg-5">${shortfilename}</div>
+                    <div class="col-lg-2">${fileInfo.concept_id || "--"}</div>
                     <div class="col-lg-3">${fileInfo.contact}</div>
                     <div class="col-lg-2">${fileInfo.accepted_group}</div>
                     </button>
@@ -195,6 +224,7 @@ export async function viewAcceptedFiles(files) {
                     <div class="col-12">
                         <b>Concept:</b> ${filename} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fileId}" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#bcrppPreviewerModal"><i class="fas fa-external-link-alt"></i></button>
                     </div>
+                    <div class="col-12"><b>Box ID:</b> ${escapeHtml(fileInfo.box_id || "Not available")}</div>
                     </div>
                 </div>
             </div>

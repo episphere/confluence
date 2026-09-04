@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getRoundNumberFromFileName, removeRoundSuffixFromFileName } from "../shared.js";
+import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
 
@@ -12,6 +12,9 @@ const escapeHtml = (value) => String(value ?? "")
 
 const getConceptDisplayName = (value) => removeRoundSuffixFromFileName(value)
     .replace(/_\d{4}-\d{2}-\d{2}\.docx?$/i, "");
+
+const getAssignedConceptId = (value) => getConceptIdFromFileName(value) || "--";
+const compareConceptIds = (left, right) => new Intl.Collator(undefined, { numeric: true, sensitivity: "base" }).compare(left, right);
 
 const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
 const OPT_IN_OUT_CONCEPTS_CSV_PATH = "./src/data/admin_consortia_requests.csv";
@@ -239,6 +242,7 @@ const loadLegacyOptInOutTable = async () => {
             const detailsId = `conceptDetails-${index}`;
             const previewId = `conceptPreview-${index}`;
             const conceptDisplayName = getConceptDisplayName(concept.conceptName);
+            const conceptId = getAssignedConceptId(concept.conceptName);
             const studyCells = studies.map((study) => `
                 <td class="text-center" style="min-width: 160px; width: 180px;">
                     <div class="d-flex flex-column align-items-center gap-2">
@@ -249,10 +253,11 @@ const loadLegacyOptInOutTable = async () => {
             `).join("");
 
             return `
-                <tr class="align-middle">
+                <tr class="align-middle concept-selection-row" data-concept-index="${index}" data-concept-id="${escapeHtml(conceptId)}">
                     <td style="min-width: 240px; max-width: 320px;">
                         <div class="text-wrap">${escapeHtml(conceptDisplayName)}</div>
                     </td>
+                    <td class="text-nowrap">${escapeHtml(conceptId)}</td>
                     ${studyCells}
                     <td class="text-center" style="width: 60px;">
                         <button class="transparent-btn p-0 concept-preview-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-expanded="false" aria-controls="${detailsId}" title="Show concept details" data-file-id="${escapeHtml(concept.boxId)}" data-preview-id="${previewId}" data-loaded="false">
@@ -260,13 +265,13 @@ const loadLegacyOptInOutTable = async () => {
                         </button>
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="5" class="p-0">
+                <tr class="concept-selection-detail-row" data-concept-index="${index}">
+                    <td colspan="${studies.length + 3}" class="p-0">
                         <div class="collapse" id="${detailsId}">
                             <div class="p-3 bg-light border-top">
                                 <div class="fw-semibold mb-2">Concept details</div>
                                 <p class="mb-3">${escapeHtml(conceptDisplayName)}</p>
-                                <p class="small text-muted mb-3"><strong>Concept ID:</strong> ${escapeHtml(concept.boxId || "Not available")}</p>
+                                <p class="small text-muted mb-3"><strong>ID:</strong> ${escapeHtml(conceptId)} <span class="ms-3"><strong>Box ID:</strong> ${escapeHtml(concept.boxId || "Not available")}</span></p>
                                 <div id="${previewId}" class="mb-3"${concept.boxId ? " style=\"min-height: 220px;\"" : ""}>
                                     ${concept.boxId ? "<div class='text-muted'>Loading preview...</div>" : "<div class='text-muted'>No Concept Box ID is available in the CSV.</div>"}
                                 </div>
@@ -294,6 +299,7 @@ const loadLegacyOptInOutTable = async () => {
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col" style="min-width: 240px; max-width: 320px;">Concept Name</th>
+                                    <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" id="conceptSelectionIdSort" data-sort-direction="desc">ID <i class="fas fa-sort ms-1"></i></button></th>
                                     <th scope="col" class="text-center" style="min-width: 160px; width: 180px;">Study 1</th>
                                     <th scope="col" class="text-center" style="min-width: 160px; width: 180px;">Study 2</th>
                                     <th scope="col" class="text-center" style="min-width: 160px; width: 180px;">Study 3</th>
@@ -327,6 +333,20 @@ const loadLegacyOptInOutTable = async () => {
                 select.style.backgroundColor = isOut ? '#f8d7da' : '#d1e7dd';
                 select.style.color = isOut ? '#842029' : '#0f5132';
             });
+        });
+
+        const conceptIdSort = document.getElementById("conceptSelectionIdSort");
+        conceptIdSort?.addEventListener("click", () => {
+            const body = conceptIdSort.closest("table")?.querySelector("tbody");
+            if (!body) return;
+            const direction = conceptIdSort.dataset.sortDirection === "asc" ? "desc" : "asc";
+            conceptIdSort.dataset.sortDirection = direction;
+            const details = new Map(Array.from(body.querySelectorAll(":scope > .concept-selection-detail-row")).map(row => [row.dataset.conceptIndex, row]));
+            const pairs = Array.from(body.querySelectorAll(":scope > .concept-selection-row")).map(row => ({ main: row, detail: details.get(row.dataset.conceptIndex) }));
+            pairs.sort((left, right) => compareConceptIds(left.main.dataset.conceptId || "--", right.main.dataset.conceptId || "--") * (direction === "asc" ? 1 : -1));
+            pairs.forEach(({ main, detail }) => { body.appendChild(main); if (detail) body.appendChild(detail); });
+            const icon = conceptIdSort.querySelector("i");
+            if (icon) icon.className = direction === "asc" ? "fas fa-sort-up ms-1" : "fas fa-sort-down ms-1";
         });
 
         container.querySelectorAll('.concept-preview-toggle').forEach((button) => {
@@ -494,11 +514,11 @@ export const loadOptInOutTable = async () => {
 
         assignments.sort((a, b) => `${a.round_name}|${a.concept_title}|${a.study_acronym}`.localeCompare(`${b.round_name}|${b.concept_title}|${b.study_acronym}`, undefined, { sensitivity: "base" }));
         const rows = assignments.map(assignment => `
-            <tr class="align-middle">
-                <td>${assignment.is_demo === "true" ? '<span class="badge bg-info text-dark me-2">Demo</span>' : ""}${escapeHtml(assignment.round_name)}</td>
+            <tr class="align-middle saved-assignment-row" data-concept-id="${escapeHtml(getAssignedConceptId(assignment.concept_file_name || assignment.concept_title))}">
+                <td class="text-nowrap">${assignment.is_demo === "true" ? '<span class="badge bg-info text-dark me-2">Demo</span>' : ""}${escapeHtml(getAssignedConceptId(assignment.concept_file_name || assignment.concept_title))}</td>
                 <td>
                     <div class="d-flex align-items-start gap-2">
-                        <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))} <span class="small text-muted">(Concept ID: ${escapeHtml(assignment.concept_box_id || "Not available")})</span></span>
+                        <span class="flex-grow-1 text-wrap">${escapeHtml(getConceptDisplayName(assignment.concept_title))}</span>
                         <button class="btn btn-sm custom-btn opt-in-out-concept-preview" type="button" data-file-id="${escapeHtml(assignment.concept_box_id)}" title="Preview concept"><i class="fas fa-external-link-alt"></i></button>
                     </div>
                 </td>
@@ -515,7 +535,7 @@ export const loadOptInOutTable = async () => {
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light"><tr><th>Round</th><th>Concept / Concept ID</th><th>Study</th><th>Selection</th><th>Status</th></tr></thead>
+                            <thead class="table-light"><tr><th><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" id="savedAssignmentIdSort" data-sort-direction="desc">ID <i class="fas fa-sort ms-1"></i></button></th><th>Concept</th><th>Study</th><th>Selection</th><th>Status</th></tr></thead>
                             <tbody>${rows}</tbody>
                         </table>
                     </div>
@@ -528,6 +548,19 @@ export const loadOptInOutTable = async () => {
                 <button type="button" class="btn btn-primary shadow opt-in-out-submit-action" disabled>Submit Opt-In/Opt-Out Selections</button>
             </div>
         `;
+
+        const savedAssignmentIdSort = document.getElementById("savedAssignmentIdSort");
+        savedAssignmentIdSort?.addEventListener("click", () => {
+            const body = savedAssignmentIdSort.closest("table")?.querySelector("tbody");
+            if (!body) return;
+            const direction = savedAssignmentIdSort.dataset.sortDirection === "asc" ? "desc" : "asc";
+            savedAssignmentIdSort.dataset.sortDirection = direction;
+            Array.from(body.querySelectorAll(":scope > .saved-assignment-row"))
+                .sort((left, right) => compareConceptIds(left.dataset.conceptId || "--", right.dataset.conceptId || "--") * (direction === "asc" ? 1 : -1))
+                .forEach(row => body.appendChild(row));
+            const icon = savedAssignmentIdSort.querySelector("i");
+            if (icon) icon.className = direction === "asc" ? "fas fa-sort-up ms-1" : "fas fa-sort-down ms-1";
+        });
 
         container.querySelectorAll(".saved-study-status-select").forEach(select => {
             updateStudyStatusStyle(select);
@@ -932,6 +965,7 @@ export const loadStudyAccessAdminTable = async () => {
             const conceptRows = concepts.map((concept, conceptIndex) => {
                 const conceptName = concept.name;
                 const conceptDisplayName = getConceptDisplayName(conceptName);
+                const conceptId = getAssignedConceptId(conceptName);
                 const conceptBoxId = concept.boxId;
                 const roundNumber = concept.roundNumber || getRoundNumberFromFileName(conceptName);
                 const roundLabel = roundNumber ? `R${roundNumber}` : "--";
@@ -943,7 +977,7 @@ export const loadStudyAccessAdminTable = async () => {
                 `).join("");
 
                 return `
-                    <tr class="align-middle study-access-concept-row" data-concept-index="${conceptIndex}" data-round-number="${roundNumber || ""}">
+                    <tr class="align-middle study-access-concept-row" data-concept-index="${conceptIndex}" data-round-number="${roundNumber || ""}" data-concept-id="${escapeHtml(conceptId)}">
                         <td style="min-width: 300px; max-width: 440px;">
                             <div class="d-flex align-items-start gap-2">
                                 <button class="btn btn-link p-0 text-start text-decoration-none concept-user-toggle flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#${conceptDetailsId}" aria-expanded="false" aria-controls="${conceptDetailsId}">
@@ -954,14 +988,14 @@ export const loadStudyAccessAdminTable = async () => {
                                 </button>
                             </div>
                         </td>
-                        <td class="text-center align-middle text-nowrap">${roundLabel}</td>
+                        <td class="text-nowrap">${escapeHtml(conceptId)}</td>
                         ${statusCells}
                     </tr>
                     <tr class="bg-light study-access-concept-detail-row" data-concept-index="${conceptIndex}">
                         <td colspan="${conceptColumnCount}" class="p-0">
                             <div class="collapse" id="${conceptDetailsId}">
                                 <div class="p-3 border-top border-bottom">
-                                    <div class="small text-muted mb-2"><strong>Concept ID:</strong> ${escapeHtml(conceptBoxId || "Not available")} <span class="ms-3"><strong>Round:</strong> ${roundLabel}</span></div>
+                                    <div class="small text-muted mb-2"><strong>ID:</strong> ${escapeHtml(conceptId)} <span class="ms-3"><strong>Box ID:</strong> ${escapeHtml(conceptBoxId || "Not available")}</span> <span class="ms-3"><strong>Round:</strong> ${roundLabel}</span></div>
                                     <div class="fw-semibold mb-2">Users and associated studies</div>
                                     ${userRows ? `
                                         <div class="table-responsive">
@@ -984,9 +1018,7 @@ export const loadStudyAccessAdminTable = async () => {
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" style="min-width: 300px; max-width: 440px;">Concept Name</th>
-                                <th scope="col" class="text-center">
-                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-round-sort" data-sort-direction="desc">Round <i class="fas fa-sort ms-1"></i></button>
-                                </th>
+                                <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-id-sort" data-sort-direction="desc">ID <i class="fas fa-sort ms-1"></i></button></th>
                                 ${studyHeaders}
                             </tr>
                         </thead>
@@ -997,7 +1029,7 @@ export const loadStudyAccessAdminTable = async () => {
                 <div class="p-3">
                     <p class="text-muted mb-3">No individual study mappings are currently available for this requested group.</p>
                     <table class="table table-bordered table-hover mb-0">
-                        <thead class="table-light"><tr><th scope="col">Concept Name</th><th scope="col" class="text-center"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-round-sort" data-sort-direction="desc">Round <i class="fas fa-sort ms-1"></i></button></th></tr></thead>
+                        <thead class="table-light"><tr><th scope="col">Concept Name</th><th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold study-access-id-sort" data-sort-direction="desc">ID <i class="fas fa-sort ms-1"></i></button></th></tr></thead>
                         <tbody>${conceptRows}</tbody>
                     </table>
                 </div>
@@ -1069,31 +1101,19 @@ export const loadStudyAccessAdminTable = async () => {
             });
         }
 
-        container.querySelectorAll(".study-access-round-sort").forEach((roundSortButton) => {
-            roundSortButton.addEventListener("click", () => {
-                const nestedBody = roundSortButton.closest("table")?.querySelector("tbody");
+        container.querySelectorAll(".study-access-id-sort").forEach((idSortButton) => {
+            idSortButton.addEventListener("click", () => {
+                const nestedBody = idSortButton.closest("table")?.querySelector("tbody");
                 if (!nestedBody) return;
-                const direction = roundSortButton.dataset.sortDirection === "asc" ? "desc" : "asc";
-                roundSortButton.dataset.sortDirection = direction;
-                const conceptRows = Array.from(nestedBody.querySelectorAll(":scope > .study-access-concept-row"));
+                const direction = idSortButton.dataset.sortDirection === "asc" ? "desc" : "asc";
+                idSortButton.dataset.sortDirection = direction;
                 const detailRowsByIndex = new Map(Array.from(nestedBody.querySelectorAll(":scope > .study-access-concept-detail-row"))
                     .map(row => [row.dataset.conceptIndex, row]));
-                const pairs = conceptRows.map(row => ({ main: row, detail: detailRowsByIndex.get(row.dataset.conceptIndex) }));
-                pairs.sort((left, right) => {
-                    const leftRound = Number(left.main.dataset.roundNumber);
-                    const rightRound = Number(right.main.dataset.roundNumber);
-                    const leftMissing = !Number.isFinite(leftRound) || leftRound <= 0;
-                    const rightMissing = !Number.isFinite(rightRound) || rightRound <= 0;
-                    if (leftMissing && rightMissing) return 0;
-                    if (leftMissing) return 1;
-                    if (rightMissing) return -1;
-                    return direction === "asc" ? leftRound - rightRound : rightRound - leftRound;
-                });
-                pairs.forEach(({ main, detail }) => {
-                    nestedBody.appendChild(main);
-                    if (detail) nestedBody.appendChild(detail);
-                });
-                const icon = roundSortButton.querySelector("i");
+                const pairs = Array.from(nestedBody.querySelectorAll(":scope > .study-access-concept-row"))
+                    .map(row => ({ main: row, detail: detailRowsByIndex.get(row.dataset.conceptIndex) }));
+                pairs.sort((left, right) => compareConceptIds(left.main.dataset.conceptId || "--", right.main.dataset.conceptId || "--") * (direction === "asc" ? 1 : -1));
+                pairs.forEach(({ main, detail }) => { nestedBody.appendChild(main); if (detail) nestedBody.appendChild(detail); });
+                const icon = idSortButton.querySelector("i");
                 if (icon) icon.className = direction === "asc" ? "fas fa-sort-up ms-1" : "fas fa-sort-down ms-1";
             });
         });

@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -9,9 +9,21 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const getConceptId = (file, fallbackId = "") => String(
-    (file && (file.conceptId || file.masterFileId || file.commentsFileId)) || fallbackId || (file && file.id) || ""
+const getConceptId = (file, fallbackId = "") => {
+    const filenameId = getConceptIdFromFileName(file && (file.name || file.filename || file.fileInfo?.name));
+    const explicitId = [file?.assignedConceptId, file?.conceptId, fallbackId]
+        .map(value => String(value || ""))
+        .find(value => /^R\d+_\d+$/i.test(value));
+    return filenameId || explicitId || "";
+};
+
+const getConceptBoxId = (file, fallbackId = "") => String(
+    file?.conceptId || file?.masterFileId || file?.commentsFileId || fallbackId || file?.id || ""
 );
+
+const renderBoxFileLink = (boxId) => boxId
+    ? `<a href="https://nih.app.box.com/file/${encodeURIComponent(boxId)}" target="_blank" rel="noopener noreferrer">${escapeHtml(boxId)}</a>`
+    : "--";
 
 const getConceptTitleFromFileName = (fileName) => removeRoundSuffixFromFileName(fileName)
     .replace(/\.[^/.]+$/, "")
@@ -35,8 +47,27 @@ const getConceptRoundLabel = (file) => {
     return roundNumber ? `R${roundNumber}` : "--";
 };
 
+const sortConceptsByRoundAndId = (files) => {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+    return [...(Array.isArray(files) ? files : [])].sort((left, right) => {
+        const leftRound = getConceptRoundNumber(left) || Number.MAX_SAFE_INTEGER;
+        const rightRound = getConceptRoundNumber(right) || Number.MAX_SAFE_INTEGER;
+        if (leftRound !== rightRound) return leftRound - rightRound;
+
+        const leftId = getConceptId(left);
+        const rightId = getConceptId(right);
+        if (leftId && rightId) {
+            const idComparison = collator.compare(leftId, rightId);
+            if (idComparison) return idComparison;
+        } else if (leftId) return -1;
+        else if (rightId) return 1;
+
+        return collator.compare(String(left?.name || left?.filename || ""), String(right?.name || right?.filename || ""));
+    });
+};
+
 const getChairConceptMetadataLabel = (file, fallbackId = "") =>
-    `Round: ${getConceptRoundLabel(file)} | Concept ID: ${getConceptId(file, fallbackId) || "Not available"}`;
+    `Round: ${getConceptRoundLabel(file)} | ID: ${getConceptId(file, fallbackId) || "Not available"}`;
 
 const renderConceptSearch = (inputId, statusId, actionsHtml = "") => `
     <div class="main-summary-row align-items-center gap-2 mb-2">
@@ -115,7 +146,7 @@ export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
                 : "";
         template += `
             <option value='${fileId}'>
-            ${replyStatus}${titlename} - Concept ID: ${escapeHtml(conceptId)}</option>`;
+            ${replyStatus}${escapeHtml(conceptId || "ID unavailable")} &mdash; ${escapeHtml(titlename)}</option>`;
       }
       template += `
               </select>
@@ -625,7 +656,7 @@ const DACC_EXPORT_FIELDS = [
     { key: "filename", label: "Filename", selected: true, group: "default" },
     { key: "notes", label: "Notes", selected: true, group: "default" },
     { key: "conceptName", label: "Concept Name", group: "table" },
-    { key: "conceptId", label: "Concept ID", group: "table" },
+    { key: "conceptId", label: "ID", group: "table" },
     { key: "round", label: "Round", group: "table" },
     { key: "submissionDate", label: "Submission Date", group: "table" },
     { key: "state", label: "State", group: "table" },
@@ -1378,10 +1409,10 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         const filesComplete = (chairMenuCache && chairMenuCache.filesComplete) ? chairMenuCache.filesComplete : [];
         const filearrayAllFiles = (chairMenuCache && chairMenuCache.filearrayAllFiles) ? chairMenuCache.filearrayAllFiles : [];
 
-        const filteredIncompleted = selectedRoundId === 'all' ? filesIncompleted : filesIncompleted.filter(f => f && f.roundId === selectedRoundId);
-        const filteredClara = selectedRoundId === 'all' ? filesClaraIncompleted : filesClaraIncompleted.filter(f => f && f.roundId === selectedRoundId);
-        const filteredComplete = selectedRoundId === 'all' ? filesComplete : filesComplete.filter(f => f && f.roundId === selectedRoundId);
-        const filteredAllFiles = selectedRoundId === 'all' ? filearrayAllFiles : filearrayAllFiles.filter(f => f && f.roundId === selectedRoundId);
+        const filteredIncompleted = sortConceptsByRoundAndId(selectedRoundId === 'all' ? filesIncompleted : filesIncompleted.filter(f => f && f.roundId === selectedRoundId));
+        const filteredClara = sortConceptsByRoundAndId(selectedRoundId === 'all' ? filesClaraIncompleted : filesClaraIncompleted.filter(f => f && f.roundId === selectedRoundId));
+        const filteredComplete = sortConceptsByRoundAndId(selectedRoundId === 'all' ? filesComplete : filesComplete.filter(f => f && f.roundId === selectedRoundId));
+        const filteredAllFiles = sortConceptsByRoundAndId(selectedRoundId === 'all' ? filearrayAllFiles : filearrayAllFiles.filter(f => f && f.roundId === selectedRoundId));
 
         var template = `
             <div class="general-bg padding-bottom-1rem">
@@ -1941,7 +1972,7 @@ export function viewFinalDecisionFilesColumns() {
         <div class="container-fluid m-0 pt-2 pb-2 align-left div-sticky" style="border-bottom: 1px solid rgb(0,0,0, 0.1); font-size: .8em">
             <div class="row-24 align-items-center position-relative">
                 <div class="col-24-4 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Round <button class="transparent-btn sort-column" data-column-name="Round"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">ID <button class="transparent-btn sort-column" data-column-name="ID"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-3 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
@@ -1962,10 +1993,10 @@ export function viewAuthFinalDecisionFilesColumns() {
             <div class="row-24 align-items-center position-relative">
                 <div class="col-24-1 text-left font-bold ws-nowrap text-wrap"></div>
                 <div class="col-24-3 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Concept Name <button class="transparent-btn sort-column" data-column-name="Concept Name"><i class="fas fa-sort"></i></button></div>
-                <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Round <button class="transparent-btn sort-column" data-column-name="Round"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">ID <button class="transparent-btn sort-column" data-column-name="ID"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Sub Date <button class="transparent-btn sort-column" data-column-name="Submission Date"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">Ret Date <button class="transparent-btn sort-column" data-column-name="Return Date"><i class="fas fa-sort"></i></button></div>
-                <div class="col-24-2 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
+                <div class="col-24-1 text-left font-bold ws-nowrap text-wrap header-sortable responsive-text">State <button class="transparent-btn sort-column" data-column-name="State"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold text-wrap header-sortable responsive-text">Action Required <button class="transparent-btn sort-column" data-column-name="Action Required"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">AABCG <button class="transparent-btn sort-column" data-column-name="AABCGDecision"><i class="fas fa-sort"></i></button></div>
                 <div class="col-24-2 text-center font-bold ws-nowrap text-wrap header-sortable responsive-text">BCAC <button class="transparent-btn sort-column" data-column-name="BCACDecision"><i class="fas fa-sort"></i></button></div>
@@ -2070,7 +2101,25 @@ export function viewFinalDecisionFiles(files) {
   if (filesContainer) {
     filesContainer.innerHTML = template;
     document.querySelectorAll("#daccAccordian > .accordian-item").forEach((row, index) => {
-      if (files[index]) row.dataset.searchText = `${files[index].name || ""} ${getConceptId(files[index], files[index].id)}`;
+      const file = files[index];
+      const rowCells = row.firstElementChild;
+      const roundCell = rowCells?.children[1];
+      if (rowCells && file) {
+        const conceptIdCell = document.createElement("div");
+        conceptIdCell.className = "col-24-2 text-left";
+        conceptIdCell.innerHTML = `<span class="responsive-text">${escapeHtml(getConceptId(file) || "--")}</span>`;
+        const boxId = getConceptBoxId(file, file.id);
+        rowCells.insertBefore(conceptIdCell, roundCell);
+        roundCell?.remove();
+        const detailsBody = row.querySelector(".accordion-body");
+        if (detailsBody) {
+          const boxIdRow = document.createElement("div");
+          boxIdRow.className = "row mb-1 m-0";
+          boxIdRow.innerHTML = `<div class="col-md-2 pl-2 font-bold">Box ID</div><div class="col">${escapeHtml(boxId || "Not available")}</div>`;
+          detailsBody.insertBefore(boxIdRow, detailsBody.children[1] || null);
+        }
+        row.dataset.searchText = `${file.name || ""} ${getConceptId(file)} ${boxId}`;
+      }
     });
     document.querySelectorAll('#daccDecision .accordion-toggle-btn').forEach(btn => {
       btn.addEventListener('click', async function() {
@@ -3018,7 +3067,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
 
 export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles, processedResFiles) {
   let template = `<div class="row m-0 align-left allow-overflow w-100"><div class="accordion accordion-flush col-md-12" id="adminAccordian">`;
-  const renderAdminConceptName = (file) => `${file.filename} <span class="badge bg-secondary ms-2">Concept ID: ${escapeHtml(getConceptId(file, file.conceptId || file.fileId) || "Not available")}</span>`;
+  const renderAdminConceptName = (file) => file.filename;
   const renderRow = (fInfo, fId, name, titlename, stn, subD, retD, roundInfo) => {
     const rId = roundInfo.roundId || "";
     const roundNumber = getConceptRoundNumber(roundInfo);
@@ -3041,24 +3090,42 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     const adminFileNamesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
       .map(file => [String(file.fileId), file.fileInfo?.name || file.filename || ""]));
     const adminSearchDataById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
-      .map(file => [String(file.fileId), `${file.filename || file.fileInfo?.name || ""} ${getConceptId(file, file.conceptId || file.fileId)} ${file.contacts || ""}`]));
+      .map(file => [String(file.fileId), `${file.filename || file.fileInfo?.name || ""} ${getConceptId(file)} ${getConceptBoxId(file, file.fileId)} ${file.contacts || ""}`]));
     document.querySelectorAll(".action-required-dropdown").forEach(dropdown => {
       dropdown.dataset.fileName = adminFileNamesById.get(dropdown.dataset.fileId) || "";
     });
+    const adminFilesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
+      .map(file => [String(file.fileId), file]));
     const completedAdminFileIds = new Set(processedComFiles.map(file => String(file.fileId)));
     document.querySelectorAll(".admin-table-row > .row-24").forEach(row => {
+      const rowFileId = row.querySelector(".admin-checkbox")?.id;
+      const file = adminFilesById.get(String(rowFileId));
       const conceptCell = row.children[1];
+      const roundCell = row.children[2];
+      const stateCell = row.children[5];
       const actionCell = row.querySelector(".action-required-dropdown")?.parentElement;
-      if (conceptCell) {
-        conceptCell.classList.remove("col-24-2");
-        conceptCell.classList.add("col-24-3");
+      if (conceptCell && file) {
+        conceptCell.classList.replace("col-24-2", "col-24-3");
+        const conceptIdCell = document.createElement("div");
+        conceptIdCell.className = "col-24-2 text-left";
+        conceptIdCell.innerHTML = `<span class="responsive-text">${escapeHtml(getConceptId(file) || "--")}</span>`;
+        row.insertBefore(conceptIdCell, row.children[2]);
+        const boxId = getConceptBoxId(file, rowFileId);
+        const detailsBody = row.closest(".admin-table-row")?.querySelector(".accordion-body");
+        if (detailsBody) {
+          const boxIdRow = document.createElement("div");
+          boxIdRow.className = "row mb-1 m-0";
+          boxIdRow.innerHTML = `<div class="col-md-2 pl-2 font-bold">Box ID</div><div class="col">${renderBoxFileLink(boxId)}</div>`;
+          detailsBody.insertBefore(boxIdRow, detailsBody.children[1] || null);
+        }
       }
+      roundCell?.remove();
+      stateCell?.classList.replace("col-24-2", "col-24-1");
       if (actionCell) {
         actionCell.classList.remove("col-24-3");
         actionCell.classList.add("col-24-2");
         row.insertBefore(actionCell, row.children[6]);
       }
-      const rowFileId = row.querySelector(".admin-checkbox")?.id;
       row.closest(".admin-table-row").dataset.searchText = adminSearchDataById.get(String(rowFileId)) || "";
       if (completedAdminFileIds.has(String(rowFileId))) {
         const statusBadge = row.querySelector(".badge");
@@ -3069,8 +3136,6 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
         }
       }
     });
-    const adminFilesById = new Map([...processedSubFiles, ...processedComFiles, ...processedResFiles]
-      .map(file => [String(file.fileId), file]));
     document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
       dropdown.addEventListener('change', function() {
         const selectedValue = this.value;
