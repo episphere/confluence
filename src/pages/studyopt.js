@@ -1,7 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
 import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
-import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds } from "./chairmenu.js";
+import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests } from "./chairmenu.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -636,6 +636,9 @@ export const studyAccessAdminTemplate = () => {
                         <button type="button" id="exportConsortiaCsvBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
                             <span class="buttonsubmit__text">Export Consortia CSV</span>
                         </button>
+                        <button type="button" id="syncDataManagerStatusBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
+                            <span class="buttonsubmit__text">Sync Data Manager Status</span>
+                        </button>
                     </div>
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
@@ -815,7 +818,7 @@ const bindInitiateOptInOutRoundButton = () => {
                         <div class="col-md-6 mb-3"><label for="optInOutClosesAt" class="form-label">Closes</label><input id="optInOutClosesAt" type="datetime-local" class="form-control" value="${toLocalInput(closeDate)}" required></div>
                     </div>
                     <div id="optInOutRoundSummary" class="alert alert-info"></div>
-                    <div class="alert alert-warning">Existing selection TSVs will be preserved. Missing folders and files will be created for the current C-NCI workbook studies.</div>
+                    <div class="alert alert-warning">Existing selection TSVs will be preserved. Missing folders and files will be created for the current C-NCI workbook studies. Initiating also publishes the concept/study schedule to the Data Managers page.</div>
                     <div id="optInOutRoundProgress" class="small mb-3" style="max-height: 180px; overflow-y: auto;"></div>
                     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Initiate Round</button></div>
                 </form>
@@ -868,7 +871,7 @@ const bindInitiateOptInOutRoundButton = () => {
                         submitButton.textContent = "Retry Initiation";
                     } else {
                         summary.className = "alert alert-success";
-                        summary.textContent = `${result.createdAssignments} study/concept assignments are ready in Box.`;
+                        summary.textContent = `${result.createdAssignments} study/concept assignments are ready in Box and published to Data Managers.`;
                         submitButton.remove();
                         form.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
                     }
@@ -909,6 +912,28 @@ export const loadStudyAccessAdminTable = async () => {
 
         bindCreateDemoOptInOutRoundButton();
         bindInitiateOptInOutRoundButton();
+
+        const syncDataManagerButton = document.getElementById("syncDataManagerStatusBtn");
+        if (syncDataManagerButton && syncDataManagerButton.dataset.bound !== "true") {
+            syncDataManagerButton.dataset.bound = "true";
+            syncDataManagerButton.addEventListener("click", async () => {
+                const buttonText = syncDataManagerButton.querySelector(".buttonsubmit__text");
+                syncDataManagerButton.disabled = true;
+                syncDataManagerButton.classList.add("buttonsubmit--loading");
+                if (buttonText) buttonText.textContent = "Syncing...";
+                try {
+                    const result = await syncCurrentDataManagerChairRequests();
+                    alert(`${result.concepts} C-NCI chair-stage concept${result.concepts === 1 ? " was" : "s were"} published to Data Managers.${result.legacyMatched ? ` ${result.legacyMatched} legacy file(s) were matched by filename or Concept ID.` : ""}${result.skipped ? ` ${result.skipped} file(s) could not be matched to a source round.` : ""}`);
+                } catch (error) {
+                    console.error("Unable to sync Data Manager chair status:", error);
+                    alert(error.message || "Unable to sync Data Manager chair status from Box.");
+                } finally {
+                    syncDataManagerButton.disabled = false;
+                    syncDataManagerButton.classList.remove("buttonsubmit--loading");
+                    if (buttonText) buttonText.textContent = "Sync Data Manager Status";
+                }
+            });
+        }
 
         const exportButton = document.getElementById("exportConsortiaCsvBtn");
         if (exportButton && exportButton.dataset.bound !== "true") {

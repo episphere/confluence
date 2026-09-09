@@ -1,6 +1,6 @@
 import { getFileInfo, returnToSubmitterFolder, showComments, showCommentsSub, getFolderItems, filterStudiesDataTypes, filterConsortiums, hideAnimation, checkDataSubmissionPermissionLevel, getCollaboration, getFile, tsv2Json, getFolderInfo, getAllFilesRecursive, listComments, downloadFile, createComment, emailsAllowedToUpdateData } from "../shared.js";
 import { uploadInStudy } from "../components/modal.js";
-import { getMergedConceptDownloadName, renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
+import { getMergedConceptDownloadName, getMergedConceptMetadata, renderFilePreviewDropdown, viewFinalDecisionFilesTemplate } from "../pages/chairmenu.js";
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabsDataSubmission, switchFiles, sortTableByColumn, addEventUpdateScore } from "../event.js";
 
@@ -564,6 +564,7 @@ export const downloadCommentsAsWord = async (fileId) => {
         
         const comments = JSON.parse(commentsResponse).entries;
         const originalBlob = await originalFileResponse.blob();
+        const metadata = getMergedConceptMetadata(fileInfo);
         
         // Read Word document using docx library
         const arrayBuffer = await originalBlob.arrayBuffer();
@@ -591,6 +592,8 @@ export const downloadCommentsAsWord = async (fileId) => {
         p, div { font-size: 12pt; }
         </style>
         </head><body>`;
+
+        mergedContent += `<div style="margin-bottom: 20px;"><p><strong>Round:</strong> ${metadata.round}<br><strong>Concept ID:</strong> ${metadata.conceptId}</p></div>`;
         
         // Add original document content
         mergedContent += `<div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;">`;
@@ -601,7 +604,6 @@ export const downloadCommentsAsWord = async (fileId) => {
         // Add comments section
         mergedContent += `<div>`;
         mergedContent += `<h1>Comments Requiring Response</h1>`;
-        mergedContent += `<p><strong>File ID:</strong> ${fileId}</p>`;
         
         if (comments.length === 0) {
             mergedContent += `<p>No comments found.</p>`;

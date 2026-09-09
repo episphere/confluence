@@ -1,6 +1,7 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { publishDataManagerChairRequests, updateDataManagerChairStatus } from "../optInOutStore.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -67,7 +68,7 @@ const sortConceptsByRoundAndId = (files) => {
 };
 
 const getChairConceptMetadataLabel = (file, fallbackId = "") =>
-    `Round: ${getConceptRoundLabel(file)} | ID: ${getConceptId(file, fallbackId) || "Not available"}`;
+    `ID: ${getConceptId(file, fallbackId) || "Not available"}`;
 
 const renderConceptSearch = (inputId, statusId, actionsHtml = "") => `
     <div class="main-summary-row align-items-center gap-2 mb-2">
@@ -185,15 +186,24 @@ export const getMergedConceptDownloadName = (file) => {
     const filename = removeRoundSuffixFromFileName(file && file.name ? file.name : "");
     const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
     const titleAndDate = filenameWithoutExtension.match(/^(.*)_(\d{4}-\d{2}-\d{2})$/);
+    const conceptId = getConceptId(file);
+    const roundLabel = getConceptRoundLabel(file);
+    const metadataSuffix = conceptId || (roundLabel !== "--" ? roundLabel : "");
+    const downloadMetadataSuffix = metadataSuffix ? `_${metadataSuffix}` : "";
 
     if (!titleAndDate) {
         const fallbackName = getDownloadFileTitle(file).replace(/\.[^/.]+$/, "");
-        return `${fallbackName || (file && file.id) || "concept"}.doc`;
+        return `${fallbackName || (file && file.id) || "concept"}${downloadMetadataSuffix}.doc`;
     }
 
     const shortTitle = titleAndDate[1].trim().split(/\s+/).slice(0, 5).join(" ");
-    return `${shortTitle}_${titleAndDate[2]}.doc`;
+    return `${shortTitle}_${titleAndDate[2]}${downloadMetadataSuffix}.doc`;
 };
+
+export const getMergedConceptMetadata = (file) => ({
+    round: getConceptRoundLabel(file),
+    conceptId: getConceptId(file) || "Not available"
+});
 
 const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
@@ -426,7 +436,7 @@ export const setupDownloadSelect = (tab, files) => {
                     const file = selectedFiles[index];
                     if (status) status.textContent = `Preparing ${index + 1} of ${selectedFiles.length}: ${getDownloadFileTitle(file)}`;
                     const mergedBlob = await generateMergedConceptBlob(
-                        file.id,
+                        file,
                         getChairCommentSourceId(file, file.id),
                         file.responseComments || []
                     );
@@ -649,7 +659,7 @@ const DACC_TABLE_CONSORTIA = ["AABCG", "BCAC", "C-NCI", "CIMBA", "LAGENO", "MERG
 
 const DACC_EXPORT_FIELDS = [
     { key: "requestedConsortia", label: "Consortia Data requested from", selected: true, group: "default" },
-    { key: "study", label: "Study", selected: true, group: "default" },
+    { key: "study", label: "Submitter Study", selected: true, group: "default" },
     { key: "submitter", label: "Submitter", selected: true, group: "default" },
     { key: "email", label: "Email", selected: true, group: "default" },
     { key: "title", label: "Title", selected: true, group: "default" },
@@ -657,7 +667,6 @@ const DACC_EXPORT_FIELDS = [
     { key: "notes", label: "Notes", selected: true, group: "default" },
     { key: "conceptName", label: "Concept Name", group: "table" },
     { key: "conceptId", label: "ID", group: "table" },
-    { key: "round", label: "Round", group: "table" },
     { key: "submissionDate", label: "Submission Date", group: "table" },
     { key: "state", label: "State", group: "table" },
     ...DACC_TABLE_CONSORTIA.map(consortium => ({ key: `score-${consortium}`, label: consortium, group: "table" })),
@@ -1834,6 +1843,20 @@ async function handleChairCommentSubmit(e) {
                 } catch (dateError) { console.error("Error detecting round:", dateError); }
             }
         }
+
+        const managerConceptId = allFileMatch?.id || cachedCommentSourceId;
+        if (managerConceptId) {
+            try {
+                await updateDataManagerChairStatus({
+                    conceptBoxId: managerConceptId,
+                    consortium,
+                    score: grade,
+                    workflowStage: grade === "5" || grade === "2" ? "chair_clarification" : "chair_complete"
+                });
+            } catch (managerStatusError) {
+                console.warn("Unable to update the Data Managers chair status:", managerStatusError);
+            }
+        }
         
         const userEmail = JSON.parse(localStorage.parms).login;
         const chairEntry = chairsInfo.find(element => element.email === userEmail);
@@ -1889,8 +1912,10 @@ export const commentSubmit = async (consortium) => {
     }
 };
 
-const generateMergedConceptBlob = async (fileId, commentsFileId = fileId, responseComments = []) => {
+const generateMergedConceptBlob = async (file, commentsFileId = file.id, responseComments = []) => {
     try {
+        const fileId = file.id;
+        const metadata = getMergedConceptMetadata(file);
         const [commentsResponse, originalFileResponse] = await Promise.all([
             listComments(commentsFileId),
             downloadFile(fileId)
@@ -1906,7 +1931,7 @@ const generateMergedConceptBlob = async (fileId, commentsFileId = fileId, respon
             } else { originalContent = '<p>Mammoth.js not available.</p>'; }
         } catch (docxError) { originalContent = '<p>Could not extract content.</p>'; }
         
-        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1><p><strong>Concept ID:</strong> ${commentsFileId}</p>`;
+        let mergedContent = `<html><head><meta charset="utf-8"><title>Document with Comments</title><style>body { font-family: 'Times New Roman', serif; font-size: 12pt; } h1 { font-size: 14pt; } h2 { font-size: 13pt; } h3 { font-size: 12pt; } p, div { font-size: 12pt; }</style></head><body><div style="margin-bottom: 20px;"><p><strong>Round:</strong> ${escapeHtml(metadata.round)}<br><strong>Concept ID:</strong> ${escapeHtml(metadata.conceptId)}</p></div><div style="border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px;"><h1>Original Document</h1><div style="line-height: 1.6;">${originalContent}</div></div><div><h1>DACC Comments and Ratings</h1>`;
         if (comments.length === 0) { mergedContent += `<p>No comments found.</p>`; } else {
             comments.forEach((comment, index) => {
                 const matchingResponse = findResponseForComment(comment, responseComments);
@@ -2108,17 +2133,9 @@ export function viewFinalDecisionFiles(files) {
         const conceptIdCell = document.createElement("div");
         conceptIdCell.className = "col-24-2 text-left";
         conceptIdCell.innerHTML = `<span class="responsive-text">${escapeHtml(getConceptId(file) || "--")}</span>`;
-        const boxId = getConceptBoxId(file, file.id);
         rowCells.insertBefore(conceptIdCell, roundCell);
         roundCell?.remove();
-        const detailsBody = row.querySelector(".accordion-body");
-        if (detailsBody) {
-          const boxIdRow = document.createElement("div");
-          boxIdRow.className = "row mb-1 m-0";
-          boxIdRow.innerHTML = `<div class="col-md-2 pl-2 font-bold">Box ID</div><div class="col">${escapeHtml(boxId || "Not available")}</div>`;
-          detailsBody.insertBefore(boxIdRow, detailsBody.children[1] || null);
-        }
-        row.dataset.searchText = `${file.name || ""} ${getConceptId(file)} ${boxId}`;
+        row.dataset.searchText = `${file.name || ""} ${getConceptId(file)}`;
       }
     });
     document.querySelectorAll('#daccDecision .accordion-toggle-btn').forEach(btn => {
@@ -2383,6 +2400,7 @@ export const createAllRoundFolders = async () => {
                     let completedRoutes = 0;
                     let failureCount = 0;
                     const sourceRenameFailures = new Set();
+                    const dataManagerChairReviews = [];
 
                     addStatus('Renaming selected source documents before creating chair copies...', 'fw-bold');
                     for (const review of selectedReviews) {
@@ -2437,6 +2455,16 @@ export const createAllRoundFolders = async () => {
                                         addStatus(`${consortium}: copied to New/${selectedRound.folderName}.`, 'text-success');
                                     }
 
+                                    if (!testMode && studiesInfo.some(study => String(study.consortium).toLowerCase() === String(consortium).toLowerCase())) {
+                                        dataManagerChairReviews.push({
+                                            sourceFileId: review.file.id,
+                                            chairFileId: copiedFile.id,
+                                            fileName: review.newFileName,
+                                            title: review.newFileName,
+                                            consortium
+                                        });
+                                    }
+
                                     const existingTasks = await getTaskList(copiedFile.id);
                                     const hasOpenAssignment = (existingTasks?.entries || []).some(task =>
                                         (task.task_assignment_collection?.entries || []).some(assignment =>
@@ -2462,6 +2490,21 @@ export const createAllRoundFolders = async () => {
                         } catch (error) {
                             failureCount += 1;
                             addStatus(`${review.file.name}: ${error.message || error}`, 'text-danger');
+                        }
+                    }
+
+                    if (dataManagerChairReviews.length) {
+                        try {
+                            await publishDataManagerChairRequests({
+                                round: { id: roundFolder.id, name: selectedRound.folderName },
+                                reviews: dataManagerChairReviews,
+                                studies: studiesInfo,
+                                initiatedBy: String(JSON.parse(localStorage.parms || "{}").login || "")
+                            });
+                            addStatus(`Published ${dataManagerChairReviews.length} chair-review concept route(s) to Data Managers.`, 'text-success');
+                        } catch (error) {
+                            failureCount += 1;
+                            addStatus(`Unable to publish the Data Managers status index: ${error.message || error}`, 'text-danger');
                         }
                     }
 
@@ -2568,6 +2611,113 @@ export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
         name: folder.name,
         concepts: conceptsByRound.get(String(folder.id)) || []
     }));
+};
+
+export const syncCurrentDataManagerChairRequests = async (onProgress = null) => {
+    const report = message => { if (typeof onProgress === "function") onProgress(message); };
+    const chair = chairsInfo.find(item => String(item.consortium).toUpperCase() === "C-NCI");
+    if (!chair) throw new Error("The C-NCI chair configuration was not found.");
+    const [newFiles, clarificationFiles, completeFiles, submitterItems, submitterFiles, completedFiles] = await Promise.all([
+        getAllFilesRecursive(chair.boxIdNew, "name,type,id,description,parent,parent.name,created_at"),
+        getAllFilesRecursive(chair.boxIdClara, "name,type,id,description,parent,parent.name,created_at"),
+        getAllFilesRecursive(chair.boxIdComplete, "name,type,id,description,parent,parent.name,created_at"),
+        getFolderItems(submitterFolder, "name,type,id", 1000),
+        getAllFilesRecursive(submitterFolder, "name,type,id,parent,parent.name,created_at"),
+        getAllFilesRecursive(completedFolder, "name,type,id,parent,parent.name,created_at")
+    ]);
+    const roundFolders = (submitterItems?.entries || [])
+        .filter(item => item.type === "folder")
+        .map(item => ({ id: String(item.id), name: item.name, roundNumber: getRoundNumberFromRoundName(item.name) }));
+    const roundsByName = new Map(roundFolders.map(round => [round.name, round]));
+    const masterFiles = Array.from(new Map([...(submitterFiles || []), ...(completedFiles || [])]
+        .map(file => [String(file.id), file])).values());
+    const masterFilesById = new Map(masterFiles.map(file => [String(file.id), file]));
+    const getFileRound = file => {
+        const parentRound = roundsByName.get(file?.parent?.name || "");
+        if (parentRound) return parentRound;
+        const roundNumber = getConceptRoundNumber(file);
+        return roundNumber ? roundFolders.find(round => round.roundNumber === roundNumber) || null : null;
+    };
+    const resolveLegacyMaster = chairFile => {
+        const chairConceptId = getConceptId(chairFile);
+        const chairKey = getRoundConceptKey(chairFile?.name || "");
+        const chairRound = getFileRound(chairFile);
+        let candidates = masterFiles.filter(file => {
+            if (chairConceptId && getConceptId(file) === chairConceptId) return true;
+            if (chairKey && getRoundConceptKey(file.name) === chairKey) return true;
+            return normalizeBoxFileName(file.name) === normalizeBoxFileName(chairFile?.name || "");
+        });
+        if (chairRound && candidates.length > 1) {
+            const sameRound = candidates.filter(file => getFileRound(file)?.id === chairRound.id);
+            if (sameRound.length) candidates = sameRound;
+        }
+        return candidates.length === 1 ? candidates[0] : null;
+    };
+    const stagedFiles = [
+        ...(newFiles || []).map(file => ({ file, workflowStage: "chair_review" })),
+        ...(clarificationFiles || []).map(file => ({ file, workflowStage: "chair_clarification" })),
+        ...(completeFiles || []).map(file => ({ file, workflowStage: "chair_complete" }))
+    ].filter(item => item.file?.type !== "folder");
+    const reviewsByRound = new Map();
+    let skipped = 0;
+    let legacyMatched = 0;
+
+    for (const [index, item] of stagedFiles.entries()) {
+        const chairFileInfo = item.file.description ? item.file : await getFileInfo(item.file.id);
+        const describedSourceId = String(chairFileInfo?.description || "").trim();
+        let masterFile = /^\d+$/.test(describedSourceId) ? masterFilesById.get(describedSourceId) || null : null;
+        if (!masterFile) {
+            masterFile = resolveLegacyMaster(item.file);
+            if (masterFile && !/^\d+$/.test(describedSourceId)) legacyMatched++;
+        }
+        const sourceFileId = /^\d+$/.test(describedSourceId) ? describedSourceId : String(masterFile?.id || "");
+        let round = roundsByName.get(item.file.parent?.name || "") || getFileRound(masterFile || item.file);
+        if (!round && /^\d+$/.test(sourceFileId)) {
+            try {
+                const sourceInfo = await getFileInfo(sourceFileId);
+                round = getFileRound(sourceInfo);
+            } catch (error) {
+                console.warn(`Unable to resolve the source round for ${item.file.name}:`, error);
+            }
+        }
+        if (!/^\d+$/.test(sourceFileId) || !round) {
+            skipped++;
+            continue;
+        }
+        report(`Reading C-NCI chair status ${index + 1} of ${stagedFiles.length}: ${item.file.name}`);
+        let chairScore = "--";
+        try {
+            const commentResponses = await Promise.allSettled([listComments(sourceFileId), listComments(item.file.id)]);
+            const comments = commentResponses.flatMap(result => result.status === "fulfilled" ? parseBoxCommentEntries(result.value) : []);
+            chairScore = getDaccExportScores(comments).get("C-NCI") || "--";
+        } catch (error) {
+            console.warn(`Unable to read the C-NCI score for ${item.file.name}:`, error);
+        }
+        const review = {
+            sourceFileId,
+            chairFileId: item.file.id,
+            fileName: item.file.name,
+            title: item.file.name,
+            consortium: "C-NCI",
+            workflowStage: item.workflowStage,
+            chairScore
+        };
+        const group = reviewsByRound.get(round.id) || { name: round.name, reviews: [] };
+        const existingIndex = group.reviews.findIndex(entry => String(entry.sourceFileId) === sourceFileId);
+        if (existingIndex >= 0) group.reviews[existingIndex] = review;
+        else group.reviews.push(review);
+        reviewsByRound.set(round.id, group);
+    }
+
+    for (const [roundId, group] of reviewsByRound.entries()) {
+        await publishDataManagerChairRequests({
+            round: { id: roundId, name: group.name },
+            reviews: group.reviews,
+            studies: studiesInfo,
+            initiatedBy: String(JSON.parse(localStorage.parms || "{}").login || "")
+        });
+    }
+    return { concepts: Array.from(reviewsByRound.values()).reduce((total, group) => total + group.reviews.length, 0), legacyMatched, skipped };
 };
 
 export const exportAdminConsortiaCsv = async () => {
@@ -3188,6 +3338,11 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
             const submitMessage = `Consortium: ${consortium}, Rating: ${selectedValue}, Comment: ${comment}`;
             const commentResponse = await createComment(commentFileId, submitMessage);
             if (commentResponse?.status !== 201) throw new Error('Box did not confirm the score comment.');
+            try {
+              await updateDataManagerChairStatus({ conceptBoxId: commentFileId, consortium, score: selectedValue });
+            } catch (managerStatusError) {
+              console.warn("Unable to update the Data Managers score:", managerStatusError);
+            }
 
             Array.from(scoreDropdown.classList)
               .filter(className => className.startsWith('badge-'))
@@ -3376,6 +3531,11 @@ export const returnToChairs = () => {
 
                         const task = await createCompleteTask(chairFile.id, "Returning to complete your review");
                         if (task && task.id) await assignTask(task.id, chair.email);
+                        try {
+                            await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, consortium: selectedConsortium, workflowStage: "chair_review" });
+                        } catch (managerStatusError) {
+                            console.warn("Unable to update the Data Managers return-to-chair status:", managerStatusError);
+                        }
                         if (progressDiv) progressDiv.innerHTML += `<p class="text-success">Returned to ${escapeHtml(selectedConsortium)}.</p>`;
                     }
                 }
@@ -3509,6 +3669,17 @@ export const returnToSubmitter = () => {
                 const completedRoundFolder = await getOrCreateChildFolder(completedFolder, roundName);
                 addStatus(`Moving submitter file to completed/${escapeHtml(roundName)}...`);
                 await moveFile(checkbox.id, completedRoundFolder.id);
+            }
+
+            try {
+                const workflowStage = decision === "Accepted"
+                    ? "admin_accepted"
+                    : decision === "Denied"
+                        ? "admin_denied"
+                        : "admin_clarification";
+                await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, workflowStage });
+            } catch (managerStatusError) {
+                console.warn("Unable to update the Data Managers administrative status:", managerStatusError);
             }
 
             addStatus(`Preparing email for submitter: ${escapeHtml(submitterEmail)}`);

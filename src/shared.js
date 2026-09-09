@@ -24,11 +24,55 @@ export const chairsInfo = [
     {id: 'user_1', email:"wei.zheng@vumc.org", boxId:198957265111, boxIdNew: 199271669706,boxIdClara:199271125801, boxIdComplete: 199271090953,consortium:'AABCG', dacc:[]}, 
     {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146, boxIdNew: 199271619056,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:[]}, 
     {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:[]}, 
-    {id: 'user_4', email:"ahearntu@nih.gov", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
+    {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
     {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
     {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
+
+// Data managers and the individual studies whose collection status they may view.
+// Keep this list in sync with the Study Opt-In/Out roster.
+export const dataManagersInfo = [
+    {id: 'data_manager_1', name: 'Amy McCart-Reed', email: 'amy.reed@uq.edu.au', studies: [{name: 'Brisbane Breast Bank', acronym: 'BRISBANE'}]},
+    {id: 'data_manager_2', name: 'Ann Schwartz', email: 'schwarta@karmanos.org', studies: [{name: 'Detroit Research on Cancer Survivors', acronym: 'ROCS'}]},
+    {id: 'data_manager_3', name: 'Christopher Li', email: 'cili@fredhutch.org', studies: [{name: 'Seattle Area Hormone And Reproductive Epidemoiology Breast Cancer Study', acronym: 'SHARE'}, {name: 'Reproductive Epidemiology And Contraceptive Hormone Study', acronym: 'REACH'}, {name: 'Breast Cancer Risk And Various Outcomes', acronym: 'BRAVO'}]},
+    {id: 'data_manager_4', name: 'Christopher Mathew', email: 'christopher.mathew@kcl.ac.uk', studies: [{name: 'South African Cancer Genetics - breast', acronym: 'SACGEN-B'}, {name: 'South Africa Breast Cancer and HIV Impact Study', acronym: 'SABCHO'}]},
+    {id: 'data_manager_5', name: 'Clement Adebamowo', email: 'cadebamowo@som.umaryland.edu', studies: [{name: 'African Female Breast Cancer Study', acronym: 'ABRECANE'}]},
+    {id: 'data_manager_6', name: 'Dezheng Huo', email: 'dhuo@health.bsd.uchicago.edu', studies: [{name: 'Chicago Multiethnic Epidemiologic Breast Cancer Cohort', acronym: 'ChiMec'}]},
+    {id: 'data_manager_7', name: 'Estela Blanco', email: 'estela.blanco@uc.cl', studies: [{name: 'Cancer in Adults Following in Utero and Early Life Exposure to Arsenic', acronym: 'ARSENIC'}]},
+    {id: 'data_manager_8', name: 'Gloria Sanchez', email: 'gloria.sanchez@udea.edu.co', studies: [{name: 'Risk factors for breast cancer in Colombia', acronym: 'CAMACOL'}]},
+    {id: 'data_manager_9', name: 'Gretchen Gierach', email: 'gierachg@mail.nih.gov', studies: [{name: 'Susan G Komen Tissue Bank', acronym: 'Komen'}]},
+    {id: 'data_manager_10', name: 'Hikmat Abdel-Razeq', email: 'habdelrazeq@khcc.jo', studies: [{name: 'Germline BRCA1/BRCA2 mutations among high risk breast cancer patients in Jordan', acronym: 'Jordan'}]},
+    {id: 'data_manager_11', name: 'Jennifer Brooks', email: 'jennifer.brooks@utoronto.ca', studies: [{name: "Canadian Partnership for Tomorrow's Health", acronym: 'CanPath'}]},
+    {id: 'data_manager_12', name: 'Jonine Figueroa', email: 'jonine.figueroa@nih.gov', studies: [{name: 'The Ghana Breast Health Study', acronym: 'GBHS'}]},
+    {id: 'data_manager_13', name: 'Katherine Nathanson', email: 'knathans@upenn.edu', studies: [{name: 'UPENN High Risk Breast Cancer Cases', acronym: 'UPENN_HighRIsk'}]},
+    {id: 'data_manager_14', name: 'Larry Kushi', email: 'Larry.Kushi@kp.org', studies: [{name: 'Pathways Study', acronym: 'Pathways'}]},
+    {id: 'data_manager_15', name: 'Melissa Boneta Davis', email: 'mbdavis@msm.edu', studies: [{name: 'International Center for the Study of Breast Cancer Subtypes', acronym: 'ICSBCS'}]},
+    {id: 'data_manager_16', name: 'Michele Lynn Cote', email: 'mlcote@iu.edu', studies: [{name: 'Susan G Komen Tissue Bank', acronym: 'Komen'}]},
+    {id: 'data_manager_17', name: 'Muhammad Usman Rashid', email: 'usmanr@skm.org.pk', studies: [{name: 'Pakistani hospital-based breast cancer case-control study', acronym: 'PAK_BCCC'}]},
+    {id: 'data_manager_18', name: 'Rajesh Dikshit', email: 'dixr24@hotmail.com', studies: [{name: 'Development of breast cancer risk prediction model using lifestyle factors and polygenic risk score in Indian population', acronym: 'IndianBCRP'}]},
+    {id: 'data_manager_19', name: 'Sabina Rinaldi', email: 'rinaldis@iarc.fr', studies: [{name: 'South Africa Breast Cancer Study', acronym: 'SABC'}, {name: 'Molecular Subtypes of Premenopausal Breast Cancer in Latin American Women', acronym: 'PRECAMA'}, {name: 'Etude de determinants du cancer du sein au Maroc', acronym: 'EDSMAR'}]},
+    {id: 'data_manager_20', name: 'Sandra Perdomo', email: 'PerdomoS@iarc.fr', studies: [{name: 'Latin American Study of Hereditary Breast and Ovarian Cancer', acronym: 'LACAM'}]},
+    {id: 'data_manager_21', name: 'Sunil Lakhani', email: 's.lakhani@uq.edu.au', studies: [{name: 'Brisbane Breast Bank', acronym: 'BRISBANE'}]},
+    {id: 'data_manager_22', name: 'Susan Domchek', email: 'sdomchek@upenn.edu', studies: [{name: 'UPENN High Risk Breast Cancer Cases', acronym: 'UPENN_HighRIsk'}]},
+    {id: 'data_manager_23', name: 'Tim Rebbeck', email: 'Timothy_Rebbeck@dfci.harvard.edu', studies: [{name: 'Women’s Insights and Shared Experiences', acronym: 'WISE'}]},
+    {id: 'data_manager_24', name: 'Valerie McCormack', email: 'mccormackv@iarc.fr', studies: [{name: 'African Breast Cancer Disparities in Outcomes', acronym: 'ABC-DO'}]},
+    {id: 'data_manager_25', name: 'Yu Chen', email: 'Yu.Chen@nyulangone.org', studies: [{name: 'New York University Women’s Health Study', acronym: 'NYUWHS'}]},
+    {id: 'data_manager_26', name: 'Ben Kopchick', email: 'kopchickbp@nih.gov', studies: [{name: 'Test Study 1', acronym: 'ST1'}, {name: 'Test Study 2', acronym: 'TS2'}, {name: 'Test Study 3', acronym: 'TS3'}]},
+    {id: 'data_manager_27', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', studies: [{name: 'Test Study 2', acronym: 'ST2'}, {name: 'Test Study 3', acronym: 'TS3'}, {name: 'Test Study 4', acronym: 'TS4'}]}
+].map(manager => ({consortium: 'C-NCI', ...manager}));
+
+export const studiesInfo = Array.from(dataManagersInfo.reduce((studies, manager) => {
+    manager.studies.forEach(study => {
+        const key = String(study.acronym || study.name).trim().toLowerCase();
+        const existing = studies.get(key) || {...study, consortium: manager.consortium, dataManagerEmails: []};
+        if (!existing.dataManagerEmails.some(email => email.toLowerCase() === manager.email.toLowerCase())) {
+            existing.dataManagerEmails.push(manager.email);
+        }
+        studies.set(key, existing);
+    });
+    return studies;
+}, new Map()).values());
 
 export const messagesForChair = {
     user_1: 'AABCG DACC Chair',

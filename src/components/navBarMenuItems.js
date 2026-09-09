@@ -1,8 +1,9 @@
-import { applicationURLs, chairsInfo, emailsAllowedToUpdateData, getFile } from './../shared.js';
+import { applicationURLs, chairsInfo, dataManagersInfo, emailsAllowedToUpdateData, getFile } from './../shared.js';
 
 export const navBarMenutemplate = () => {
     let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
+    let authDataManager = dataManagersInfo.some(({email}) => email.toLowerCase() === String(JSON.parse(localStorage.parms).login).toLowerCase());
     let accessToUpload = localStorage.uploadAccessGranted === 'true';
 
     return `
@@ -151,7 +152,7 @@ export const navBarMenutemplate = () => {
                 `) :''
             }
             ${
-                (authAdmin || accessToUpload) ? (
+                (authAdmin || authDataManager || accessToUpload) ? (
                     `<li class="nav-item dropdown grid-elements">
                         <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown6" role="button" title="Study Opt-In/Out" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Study Opt-In/Out
@@ -167,6 +168,11 @@ export const navBarMenutemplate = () => {
                                     Study Opt-In/Out
                                 </a>
                             </li>
+                            ${(authDataManager || authAdmin) ? `<li>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_managers" title="Data Managers" id="dataManagersMenu">
+                                    Data Managers
+                                </a>
+                            </li>` : ""}
                         </ul>
                     </li>`
                 ) : ''
