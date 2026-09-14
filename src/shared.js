@@ -25,10 +25,20 @@ export const chairsInfo = [
     {id: 'user_2', email:"nick.orr@qub.ac.uk", boxId:198953681146, boxIdNew: 199271619056,boxIdClara:199271734113 , boxIdComplete:199271489295 , consortium:'MERGE', dacc:[]}, 
     {id: 'user_3', email:"lfejerman@ucdavis.edu", boxId:198957922203, boxIdNew: 199271000024,boxIdClara: 199271352384, boxIdComplete:199271412714 ,consortium:'LAGENO',dacc:[]}, 
     {id: 'user_4', email:"Georgia.Trench@qimrberghofer.edu.au", boxId:198955772054,boxIdNew:199270853117,boxIdClara:199271132029 , boxIdComplete:199271988830, consortium:'CIMBA', dacc:[]}, 
-    {id: 'user_5', email:"dhuo@uchicago.edu", boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]}, 
+    {id: 'user_5', email:"dhuo@uchicago.edu", accessEmails:["ahearntu@nih.gov"], boxId:198956756286, boxIdNew: 199271097764,boxIdClara:199271469612, boxIdComplete:199271131379 ,consortium:'C-NCI', dacc:[]},
     {id: 'user_6', email:"Roger.Milne@cancervic.org.au", boxId:198954412879,boxIdNew:198957941763,boxIdClara: 198959422380, boxIdComplete: 198956659524, consortium:'BCAC', dacc:[]},
     {id: 'user_7', email:"kopchickbp@nih.gov", boxId:201800851910, boxIdNew: 201801125803,boxIdClara:201802001604, boxIdComplete: 201795658627,consortium:'TEST', dacc:[]}
 ];
+
+export const getChairByEmail = (email) => {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail) return null;
+
+    return chairsInfo.find(chair =>
+        String(chair.email || "").trim().toLowerCase() === normalizedEmail
+        || (chair.accessEmails || []).some(accessEmail => String(accessEmail).trim().toLowerCase() === normalizedEmail)
+    ) || null;
+};
 
 // Data managers and the individual studies whose collection status they may view.
 // Keep this list in sync with the Study Opt-In/Out roster.
@@ -1639,7 +1649,7 @@ export async function showComments(id) {
     `;
     const user = JSON.parse(localStorage.parms).login;
   
-    if (chairsInfo.includes(user)) {
+    if (getChairByEmail(user)) {
         for (const comment of comments) {
             const comment_date = new Date(comment.created_at);
             const date = comment_date.toLocaleDateString();
@@ -1678,7 +1688,7 @@ export async function showComments(id) {
         for (const comment of comments) {
             const comment_user = comment.created_by;
     
-            if (comment_user.login === user || chairsInfo.includes(comment_user.login)) {
+            if (comment_user.login === user || getChairByEmail(comment_user.login)) {
                 const comment_date = new Date(comment.created_at);
                 const date = comment_date.toLocaleDateString();
                 const time = comment_date.toLocaleTimeString();
@@ -1967,7 +1977,7 @@ export async function showCommentsDropDown(id) {
     let template = `<div class='container-fluid'>`;
     const user = JSON.parse(localStorage.parms).login;
 
-    if (chairsInfo.find(element => element.email === user.login)) {
+    if (getChairByEmail(user)) {
         for (const comment of comments) {
             const comment_date = new Date(comment.created_at);
             const date = comment_date.toLocaleDateString();
@@ -1996,7 +2006,7 @@ export async function showCommentsDropDown(id) {
         for (const comment of comments) {
             const comment_user = comment.created_by;
             
-            if (comment_user.login === user || chairsInfo.find(element => element.email === comment_user.login)) {
+            if (comment_user.login === user || getChairByEmail(comment_user.login)) {
                 const comment_date = new Date(comment.created_at);
                 const date = comment_date.toLocaleDateString();
                 const time = comment_date.toLocaleTimeString();
@@ -2059,7 +2069,7 @@ export async function showCommentsDCEG(id, change=false) {
             const ifcons = comment.message.substring(0,10)==="Consortium";
             
                 if (ifcons) {
-                    let cons = chairsInfo.find(element => element.email === comment.created_by.login)?.consortium || "";
+                    let cons = getChairByEmail(comment.created_by.login)?.consortium || "";
                     let score = "--"
                     if (comment.message.substring(0,10)==="Consortium"){
                         cons = comment.message.substring(12, comment.message.indexOf(",", 12)).trim();

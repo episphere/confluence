@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
-import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
+import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, getChairByEmail, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 import { publishDataManagerChairRequests, updateDataManagerChairStatus } from "../optInOutStore.js";
 
 const escapeHtml = (value) => String(value ?? "")
@@ -479,8 +479,7 @@ export const setupDownloadSelect = (tab, files) => {
 
 const getCurrentUserAuth = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
-    let authChair = chairsInfo.find(({ email }) => email === userEmail);
-    return authChair ? authChair : null;
+    return getChairByEmail(userEmail);
 }
 
 let adminDataCache = null;
@@ -572,12 +571,12 @@ const getCommentConsortium = (comment) => {
     if (!comment || !comment.message) return "";
     const messageMatch = comment.message.match(/Consortium:\s*([^,]+)/i);
     if (messageMatch) return messageMatch[1].trim();
-    return (comment.created_by && chairsInfo.find(chair => chair && chair.email === comment.created_by.login)?.consortium) || "";
+    return (comment.created_by && getChairByEmail(comment.created_by.login)?.consortium) || "";
 };
 
 const isChairDecisionComment = (comment, consortium = null) => {
     if (!comment || !comment.message || comment.message.startsWith('Response ID:')) return false;
-    const isChairComment = (comment.created_by && chairsInfo.some(chair => chair && chair.email === comment.created_by.login))
+    const isChairComment = (comment.created_by && getChairByEmail(comment.created_by.login) !== null)
         || comment.message.startsWith('Consortium');
     if (!isChairComment) return false;
     if (!consortium) return true;
@@ -1203,7 +1202,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
         
         const { data } = csv2Json(testData);
         const userEmail = JSON.parse(localStorage.parms).login;
-        const chairEntry = chairsInfo.find(element => element && element.email === userEmail);
+        const chairEntry = getChairByEmail(userEmail);
         const consortium = chairEntry ? chairEntry.consortium : "";
         const daccEmails = (data && Array.isArray(data)) ? data.filter(item => item && item['DACC']==consortium).map(dt => dt['Email']).splice(1) : [];
 
@@ -1701,8 +1700,8 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
 
 export const chairMenuTemplate = () => {
     const userEmail = JSON.parse(localStorage.parms).login;
-    const userForChair = chairsInfo.find(item => item.email === userEmail);
-    if (userForChair === -1) return;
+    const userForChair = getChairByEmail(userEmail);
+    if (!userForChair) return;
     
     let template = `
         <div class="general-bg body-min-height padding-bottom-1rem">
@@ -1859,7 +1858,7 @@ async function handleChairCommentSubmit(e) {
         }
         
         const userEmail = JSON.parse(localStorage.parms).login;
-        const chairEntry = chairsInfo.find(element => element.email === userEmail);
+        const chairEntry = getChairByEmail(userEmail);
 
         if (grade === "5" || grade === "2") {
             if (chairEntry && chairEntry.boxIdClara) await moveFileToChairFolder(fileId, chairEntry.boxIdClara, roundNameForMove);

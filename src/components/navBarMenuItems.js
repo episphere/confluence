@@ -1,7 +1,7 @@
-import { applicationURLs, chairsInfo, dataManagersInfo, emailsAllowedToUpdateData, getFile } from './../shared.js';
+import { applicationURLs, dataManagersInfo, emailsAllowedToUpdateData, getChairByEmail, getFile } from './../shared.js';
 
 export const navBarMenutemplate = () => {
-    let authChair = chairsInfo.map(({email})=>email).indexOf(JSON.parse(localStorage.parms).login)!==-1;
+    let authChair = getChairByEmail(JSON.parse(localStorage.parms).login) !== null;
     let authAdmin = emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms).login);
     let authDataManager = dataManagersInfo.some(({email}) => email.toLowerCase() === String(JSON.parse(localStorage.parms).login).toLowerCase());
     let accessToUpload = localStorage.uploadAccessGranted === 'true';
