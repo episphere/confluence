@@ -20,7 +20,8 @@ const ROUND_COLUMNS = ["round_id", "round_name", "source_box_folder_id", "status
 const ROUND_MANIFEST_COLUMNS = ["round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "study_folder_id", "round_folder_id", "selection_file_id", "provision_status", "provision_error"];
 const STUDY_MANIFEST_COLUMNS = ["round_id", "round_name", "round_status", "opens_at_utc", "closes_at_utc", "concept_box_id", "concept_title", "selection_file_id"];
 const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "concept_file_name", "decision", "submitted", "submitted_by_name", "submitted_by_email", "submitted_at_utc", "updated_at_utc", "is_demo", "demo_created_by", "demo_created_at_utc"];
-const DATA_MANAGER_REQUEST_COLUMNS = ["schema_version", "round_id", "round_name", "round_status", "workflow_stage", "opens_at_utc", "closes_at_utc", "concept_box_id", "chair_file_id", "concept_title", "concept_file_name", "requested_study", "consortium_id", "chair_score", "chair_score_updated_at_utc", "study_id", "study_acronym", "study_name", "selection_file_id", "provision_status", "provision_error", "collection_status", "decision", "submitted", "decision_updated_at_utc", "initiated_at_utc", "initiated_by_email", "updated_at_utc"];
+const DATA_MANAGER_REQUEST_COLUMNS = ["schema_version", "round_id", "round_name", "round_status", "workflow_stage", "opens_at_utc", "closes_at_utc", "concept_box_id", "chair_file_id", "concept_title", "concept_file_name", "requested_study", "consortium_id", "chair_score", "chair_score_updated_at_utc", "study_id", "study_acronym", "study_name", "selection_file_id", "provision_status", "provision_error", "collection_status", "decision", "submitted", "decision_updated_at_utc", "access_notes", "dta_assignments", "access_updated_by", "access_updated_at_utc", "initiated_at_utc", "initiated_by_email", "updated_at_utc"];
+const DATA_MANAGER_OWNED_COLUMNS = ["access_notes", "dta_assignments", "access_updated_by", "access_updated_at_utc"];
 
 const cleanTsvValue = (value) => String(value ?? "").replace(/[\t\r\n]+/g, " ").trim();
 const cleanBoxName = (value) => cleanTsvValue(value).replace(/[\\/]+/g, "-");
@@ -204,8 +205,8 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
     await writeTsv(configFolder.id, ROUNDS_FILE_NAME, ROUND_COLUMNS, upsertRows(roundsFile.rows, [roundRow], row => String(row.round_id)));
     await writeTsv(configFolder.id, `${cleanTsvValue(round.name)}_manifest.tsv`, ROUND_MANIFEST_COLUMNS, roundManifestRows);
 
-    // This denormalized index is the single read source for the Data Managers page.
-    // It is refreshed only when an administrator initiates (or retries) a round.
+    // This denormalized index is the administrative source used to synchronize
+    // each data manager's individual TSV when they open the Data Managers page.
     const dataManagerRequests = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
     const conceptById = new Map(concepts.map(concept => [String(concept.fileId), concept]));
     const existingRequestByKey = new Map(dataManagerRequests.rows.map(row => [getDataManagerRequestKey(row), row]));
@@ -421,6 +422,7 @@ export const publishDataManagerChairRequests = async ({ round, reviews, studies,
             const key = getDataManagerRequestKey(row);
             const existing = requestsByKey.get(key);
             requestsByKey.set(key, existing ? {
+                ...existing,
                 ...row,
                 chair_score: review.chairScore && review.chairScore !== "--" ? review.chairScore : (existing.chair_score || row.chair_score),
                 chair_score_updated_at_utc: review.chairScore && review.chairScore !== "--" ? now : (existing.chair_score_updated_at_utc || ""),
@@ -458,15 +460,68 @@ export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, s
     return true;
 };
 
-export const loadDataManagerRequests = async (studies = null) => {
+export const filterDataManagerRequestRows = (rows, consortium = null) => {
+    const allowedConsortiumId = consortium ? normalizeStudyId(consortium) : null;
+    const visibleConcepts = new Map();
+
+    rows.forEach(row => {
+        if (allowedConsortiumId && normalizeStudyId(row.consortium_id) !== allowedConsortiumId) return;
+        const conceptId = String(row.concept_box_id || row.concept_file_name || row.concept_title || "").trim();
+        const conceptKey = `${row.round_id || row.round_name}|${normalizeStudyId(row.consortium_id)}|${conceptId}`;
+        if (!visibleConcepts.has(conceptKey)) visibleConcepts.set(conceptKey, row);
+    });
+
+    return Array.from(visibleConcepts.values());
+};
+
+export const getDataManagerFileName = managerName => `${cleanBoxName(managerName) || "unknown_data_manager"}.tsv`;
+
+const getVisibleDataManagerRequestKey = row => {
+    const conceptId = String(row.concept_box_id || row.concept_file_name || row.concept_title || "").trim();
+    return `${row.round_id || row.round_name}|${normalizeStudyId(row.consortium_id)}|${conceptId}`;
+};
+
+const mergeDataManagerRows = (sourceRows, managerRows) => {
+    const managerRowsByKey = new Map(managerRows.map(row => [getVisibleDataManagerRequestKey(row), row]));
+    return sourceRows.map(sourceRow => {
+        const managerRow = managerRowsByKey.get(getVisibleDataManagerRequestKey(sourceRow));
+        const managerOwnedValues = Object.fromEntries(DATA_MANAGER_OWNED_COLUMNS.map(column => [column, managerRow?.[column] || ""]));
+        return { ...sourceRow, ...managerOwnedValues };
+    });
+};
+
+export const ensureDataManagerRequestFile = async manager => {
+    if (!manager?.name) throw new Error("A configured Data Manager name is required.");
+    const configFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
+    const sourceFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
+    const visibleRows = filterDataManagerRequestRows(sourceFile.rows, manager.consortium || null);
+    const managerFileName = getDataManagerFileName(manager.name);
+    const managerFile = await readTsvInFolder(configFolder.id, managerFileName);
+    const mergedRows = sourceFile.file ? mergeDataManagerRows(visibleRows, managerFile.rows) : managerFile.rows;
+    if (!managerFile.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, managerFile.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, mergedRows)) {
+        await writeTsv(configFolder.id, managerFileName, DATA_MANAGER_REQUEST_COLUMNS, mergedRows);
+    }
+    return mergedRows;
+};
+
+export const loadDataManagerRequests = async (manager = null) => {
+    if (manager?.name) {
+        const visibleRows = await ensureDataManagerRequestFile(manager);
+        return Promise.all(visibleRows.map(async row => {
+            if (!row.selection_file_id) return { ...row, decision: "pending", submitted: "false" };
+            try {
+                const selection = (await readTsv(row.selection_file_id))[0] || {};
+                return { ...row, ...selection, selection_file_id: row.selection_file_id };
+            } catch (error) {
+                return { ...row, decision: "unavailable", submitted: "false", load_error: error.message };
+            }
+        }));
+    }
+
     const configFolder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
     if (!configFolder) return [];
-    const requestFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
-    const allowedStudyIds = Array.isArray(studies)
-        ? new Set(studies.map(study => normalizeStudyId(study.acronym || study.name)).filter(Boolean))
-        : null;
-    const visibleRows = requestFile.rows.filter(row => !allowedStudyIds
-        || allowedStudyIds.has(normalizeStudyId(row.study_acronym || row.study_id || row.study_name)));
+    const sourceFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
+    const visibleRows = filterDataManagerRequestRows(sourceFile.rows);
 
     return Promise.all(visibleRows.map(async row => {
         if (!row.selection_file_id) return { ...row, decision: "pending", submitted: "false" };
@@ -477,6 +532,48 @@ export const loadDataManagerRequests = async (studies = null) => {
             return { ...row, decision: "unavailable", submitted: "false", load_error: error.message };
         }
     }));
+};
+
+export const saveDataManagerAccessDetails = async ({ roundId, conceptBoxId, consortiumId, notes, dtaAssignments, updatedBy, dataManagerName }) => {
+    const configFolder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
+    if (!configFolder) throw new Error("The Data Manager configuration folder was not found.");
+    const requestFileName = dataManagerName ? getDataManagerFileName(dataManagerName) : DATA_MANAGER_REQUESTS_FILE_NAME;
+    const requestFile = await readTsvInFolder(configFolder.id, requestFileName);
+    if (!requestFile.file) throw new Error(`The Data Manager file ${requestFileName} was not found.`);
+
+    const cleanAssignments = (Array.isArray(dtaAssignments) ? dtaAssignments : [])
+        .map(assignment => ({
+            dta: cleanTsvValue(assignment?.dta),
+            people: cleanTsvValue(assignment?.people),
+            files: (Array.isArray(assignment?.files) ? assignment.files : []).map(file => ({
+                fileId: cleanTsvValue(file?.fileId),
+                fileName: cleanTsvValue(file?.fileName),
+                folderId: cleanTsvValue(file?.folderId),
+                uploadedAt: cleanTsvValue(file?.uploadedAt),
+                uploadedBy: cleanTsvValue(file?.uploadedBy)
+            })).filter(file => file.fileId)
+        }))
+        .filter(assignment => assignment.dta || assignment.people || assignment.files.length);
+    const now = new Date().toISOString();
+    let matched = false;
+    const rows = requestFile.rows.map(row => {
+        const isMatch = String(row.round_id) === String(roundId)
+            && String(row.concept_box_id) === String(conceptBoxId)
+            && normalizeStudyId(row.consortium_id) === normalizeStudyId(consortiumId);
+        if (!isMatch) return row;
+        matched = true;
+        return {
+            ...row,
+            access_notes: cleanTsvValue(notes),
+            dta_assignments: JSON.stringify(cleanAssignments),
+            access_updated_by: cleanTsvValue(updatedBy),
+            access_updated_at_utc: now,
+            updated_at_utc: now
+        };
+    });
+    if (!matched) throw new Error("The Data Manager request could not be matched.");
+    await writeTsv(configFolder.id, requestFileName, DATA_MANAGER_REQUEST_COLUMNS, rows);
+    return { notes: cleanTsvValue(notes), dtaAssignments: cleanAssignments, updatedBy: cleanTsvValue(updatedBy), updatedAt: now };
 };
 
 export const saveOptInOutSelections = async (changes, user) => {

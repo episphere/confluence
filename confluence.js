@@ -6,9 +6,10 @@ import { template as dataRequestTemplate, templateAfterLogin as dataRequestTempl
 import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateAuthTableFiles } from './src/pages/chairmenu.js';
 import { optInOutTemplate, loadOptInOutTable, studyAccessAdminTemplate, loadStudyAccessAdminTable } from './src/pages/studyopt.js';
 import { dataManagersTemplate, loadDataManagerRequestsTable } from './src/pages/dataManagers.js';
+import { ensureDataManagerRequestFile } from './src/optInOutStore.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
-import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators } from './src/shared.js';
+import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators, dataManagersInfo } from './src/shared.js';
 import { addEventConsortiaSelect, addEventUploadStudyForm, addEventStudyRadioBtn, addEventDataGovernanceNavBar, addEventMyProjects, addEventUpdateSummaryStatsData, addEventUpdateAllCollaborators } from './src/event.js';
 import { dataAnalysisTemplate } from './src/pages/dataAnalysis.js';
 import { getFileContent } from './src/visualization.js';
@@ -65,6 +66,16 @@ export const confluence = async () => {
         if (response) {
             const lclStr = JSON.parse(localStorage.parms);
             localStorage.parms = JSON.stringify({...lclStr, ...response});
+        }
+
+        const signedInEmail = String(JSON.parse(localStorage.parms).login || "").trim().toLowerCase();
+        const signedInDataManager = dataManagersInfo.find(manager => manager.email.toLowerCase() === signedInEmail);
+        if (signedInDataManager) {
+            try {
+                await ensureDataManagerRequestFile(signedInDataManager);
+            } catch (error) {
+                console.warn(`Unable to initialize ${signedInDataManager.name}'s Data Manager TSV:`, error);
+            }
         }
 
         try {

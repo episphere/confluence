@@ -847,6 +847,26 @@ export const uploadFile = async (data, fileName, folderId, html) => {
     }
 };
 
+export const uploadBinaryFile = async (file, folderId) => {
+    if (!(file instanceof Blob) || !file.name) throw new Error("A file is required for upload.");
+    const accessToken = JSON.parse(localStorage.parms).access_token;
+    const form = new FormData();
+    form.append("attributes", JSON.stringify({ name: file.name, parent: { id: String(folderId) } }));
+    form.append("file", file, file.name);
+
+    const response = await fetch("https://upload.box.com/api/2.0/files/content", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: form
+    });
+    if (response.status === 401 && (await refreshToken()) === true) return uploadBinaryFile(file, folderId);
+    if (response.status === 201) return response.json();
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData?.context_info?.conflicts?.[0]?.name
+        ? `A file named ${errorData.context_info.conflicts[0].name} already exists in that folder.`
+        : errorData.message || response.statusText || `Box upload failed with status ${response.status}.`);
+};
+
 export const uploadFileVersion = async (data, fileId, type) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;

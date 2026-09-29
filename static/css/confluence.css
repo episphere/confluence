@@ -2496,6 +2496,141 @@ ul.form {
   outline: none;
   box-shadow: none;
 }
+
+.data-manager-detail-row:hover {
+  --bs-table-accent-bg: transparent;
+}
+
+.data-manager-detail-row .accordion-body {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.data-manager-all-investigators {
+  white-space: pre-wrap;
+}
+
+.data-manager-accordion-table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.data-manager-accordion-table th,
+.data-manager-accordion-table td,
+.data-manager-dta-file-links {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.data-manager-accordion-table .data-manager-concept-cell {
+  min-width: 220px;
+}
+
+@media (max-width: 1399.98px) {
+  .data-manager-container {
+    max-width: 94% !important;
+  }
+
+  .data-manager-table-wrap {
+    overflow-x: visible;
+  }
+
+  .data-manager-accordion-table,
+  .data-manager-accordion-table tbody,
+  .data-manager-accordion-table .data-manager-detail-row,
+  .data-manager-accordion-table .data-manager-detail-row > td {
+    display: block;
+    width: 100%;
+  }
+
+  .data-manager-accordion-table thead {
+    display: none;
+  }
+
+  .data-manager-accordion-table .data-manager-request-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.85rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .data-manager-accordion-table .data-manager-request-row > td {
+    display: block;
+    min-width: 0 !important;
+    padding: 0.65rem 0.8rem;
+    border: 0;
+    border-bottom: 1px solid #eef0f2;
+    white-space: normal !important;
+  }
+
+  .data-manager-accordion-table .data-manager-request-row > td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .data-manager-accordion-table .data-manager-concept-cell,
+  .data-manager-accordion-table .data-manager-toggle-cell {
+    grid-column: 1 / -1;
+  }
+
+  .data-manager-accordion-table .data-manager-toggle-cell {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0;
+  }
+
+  .data-manager-accordion-table .data-manager-toggle-cell::before {
+    margin-bottom: 0;
+  }
+
+  .data-manager-accordion-table .data-manager-detail-row .accordion-body {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-top: 0;
+    border-radius: 0 0 0.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .data-manager-container {
+    max-width: calc(100% - 1rem) !important;
+  }
+
+  #dataManagerRequestsContainer .form-control,
+  #dataManagerRequestsContainer .form-select {
+    max-width: none !important;
+  }
+
+  .data-manager-accordion-table .data-manager-request-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .data-manager-accordion-table .data-manager-request-row > td,
+  .data-manager-accordion-table .data-manager-concept-cell,
+  .data-manager-accordion-table .data-manager-toggle-cell {
+    grid-column: 1;
+  }
+
+  .data-manager-detail-row .accordion-body {
+    padding: 0.75rem !important;
+  }
+
+  .data-manager-save-access,
+  .data-manager-add-dta {
+    width: 100%;
+  }
+}
 /* Make accordion button more compact */
 .accordion-button.p-2 {
   padding: 0.5rem !important;
