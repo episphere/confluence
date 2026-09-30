@@ -34,8 +34,12 @@ export const renderDescription = (modified_at) => {
                 </div>
             </div>
         </div>
-        <div class="main-summary-row">
-            <div class="col-xl-2 filter-column black-font" id="summaryFilterSiderBar">
+        <div class="main-summary-row description-catalog-layout">
+            <div class="description-mobile-filter-toolbar d-xl-none" role="region" aria-label="Study filters">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="descriptionMobileFilterToggle" aria-expanded="false" aria-controls="summaryFilterSiderBar"><i class="fas fa-filter me-1"></i><span>Show filters</span></button>
+                <span class="small text-muted" id="descriptionResultCount" aria-live="polite">Loading studies...</span>
+            </div>
+            <div class="col-xl-2 filter-column black-font description-filter-sidebar" id="summaryFilterSiderBar">
                 <div class="div-border white-bg align-left p-2">
                     <div class="main-summary-row">
                         <div class="col-xl-12 pl-1 pr-0">
@@ -45,7 +49,7 @@ export const renderDescription = (modified_at) => {
                     </div>
                 </div>
             </div>
-            <div class="col-xl-10 padding-right-zero padding-left-1 position-relative" id="summaryStatsCharts">
+            <div class="col-xl-10 padding-right-zero padding-left-1 position-relative description-results-panel" id="summaryStatsCharts">
                 <button id="filterBarToggle"><i class="position-absolute fas fa-2x fa-caret-left"></i></button>
                 <div class="main-summary-row pl-2" style="min-height: 10px;margin-bottom: 1rem;">
                     <div class="col white-bg div-border align-left font-size-17" style="padding: 0.5rem;" id="listFilters">
@@ -200,6 +204,10 @@ const getDescription = async () => {
                 </div>
             </div>
         </div>
+        <div class="description-mobile-filter-actions d-xl-none d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" id="descriptionClearFilters">Clear filters</button>
+            <button type="button" class="btn btn-primary btn-sm flex-fill" id="descriptionShowResults"><i class="fas fa-list me-1"></i>View results</button>
+        </div>
     `;
     
     document.getElementById('filterDataCatalogue').innerHTML = filterTemplate;
@@ -213,11 +221,38 @@ const getDescription = async () => {
     addEventFilterDataCatalogue(descriptions, headers);
     downloadFiles(descriptions, headers, 'study_description', true);
     renderStudyDescription(descriptions, descriptions.length, headers);
+    updateDescriptionResultCount(descriptions.length);
     paginationHandler(descriptions, descriptions.length, headers);
     
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(descriptions, defaultPageSize);
     addEventPageSizeSelection(descriptions, headers);
     addEventFilterBarToggle();
+    initializeDescriptionMobileFilters();
+};
+
+const updateDescriptionResultCount = count => {
+    const resultCount = document.getElementById('descriptionResultCount');
+    if (resultCount) resultCount.textContent = `${count} ${count === 1 ? 'study' : 'studies'}`;
+};
+
+const initializeDescriptionMobileFilters = () => {
+    const sidebar = document.getElementById('summaryFilterSiderBar');
+    const toggle = document.getElementById('descriptionMobileFilterToggle');
+    const showResults = document.getElementById('descriptionShowResults');
+    if (!sidebar || !toggle) return;
+
+    const setOpen = open => {
+        sidebar.classList.toggle('description-mobile-filter-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        const label = toggle.querySelector('span');
+        if (label) label.textContent = open ? 'Hide filters' : 'Show filters';
+    };
+    setOpen(false);
+    toggle.addEventListener('click', () => setOpen(!sidebar.classList.contains('description-mobile-filter-open')));
+    showResults?.addEventListener('click', () => {
+        setOpen(false);
+        document.getElementById('listFilters')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 };
 
 const renderStudyDescription = (descriptions, pageSize, headers) => {
@@ -257,11 +292,11 @@ const renderStudyDescription = (descriptions, pageSize, headers) => {
                 <div class="accordion-item" style="transition: all 0.3s ease;">
                     <h2 class="accordion-header" id="flush-headingOne" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" onmouseover="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor='#f0f7ff'; this.querySelector('.accordion-button').style.boxShadow='0 2px 8px rgba(164, 22, 82, 0.1)'; this.querySelector('.accordion-button').style.borderLeft='3px solid #A41652';}" onmouseout="if(!this.nextElementSibling.classList.contains('show')){this.querySelector('.accordion-button').style.backgroundColor=''; this.querySelector('.accordion-button').style.boxShadow=''; this.querySelector('.accordion-button').style.borderLeft='3px solid transparent';}">
                         <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" style="pointer-events: none; padding: 1rem; transition: all 0.2s; border-left: 3px solid transparent;">
-                            <div class="col-md-2">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
-                            <div class="col-md-4">${desc['Study Name'] ? desc['Study Name'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
-                            <div class="col-md-2">${desc['Study Acronym'] ? desc['Study Acronym'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
-                            <div class="col-md-2">${desc['Study design'] ? desc['Study design'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
-                            <div class="col-md-2">${desc['Country'] ? desc['Country'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2" data-label="Consortium">${desc['Consortium']==='NCI' ? 'C-NCI':desc['Consortium'] ? desc['Consortium'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-4 description-study-name" data-label="Study">${desc['Study Name'] ? desc['Study Name'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2" data-label="Acronym">${desc['Study Acronym'] ? desc['Study Acronym'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2" data-label="Design">${desc['Study design'] ? desc['Study design'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
+                            <div class="col-md-2" data-label="Country">${desc['Country'] ? desc['Country'].replace(/"/g, '&quot;').replace(/'/g, '&#39;') : ''}</div>
                         </button>
                     </h2>
                     <div id="heading${desc['Study Acronym'] ? desc['Study Acronym'].replace(/(<b>)|(<\/b>)/g, '').replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne">
@@ -360,6 +395,13 @@ const addEventFilterDataCatalogue = (descriptions, headers) => {
     input.addEventListener('input', () => {
         filterDataBasedOnSelection(descriptions, headers);
     });
+
+    document.getElementById('descriptionClearFilters')?.addEventListener('click', () => {
+        document.querySelectorAll('#filterDataCatalogue input[type="checkbox"]').forEach(checkbox => { checkbox.checked = false; });
+        input.value = '';
+        previousValue = '';
+        filterDataBasedOnSelection(descriptions, headers);
+    });
 };
 
 export const addEventToggleCollapsePanelBtn = () => {
@@ -432,6 +474,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
     const currentValue = input.value.trim().toLowerCase();
     
     if (currentValue.length <= 2 && (previousValue.length > 2 || previousValue.length === 0)) {
+        updateDescriptionResultCount(filteredData.length);
         document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(filteredData, defaultPageSize);
         renderStudyDescription(filteredData, document.getElementById('pageSizeSelector').value, headers);
         paginationHandler(filteredData, document.getElementById('pageSizeSelector').value, headers);
@@ -464,6 +507,7 @@ const filterDataBasedOnSelection = (descriptions, headers) => {
         return dt;
     })
 
+    updateDescriptionResultCount(searchedData.length);
     document.getElementById('pageSizeContainer').innerHTML = pageSizeTemplate(searchedData, defaultPageSize);
     renderStudyDescription(searchedData, document.getElementById('pageSizeSelector').value, headers);
     paginationHandler(searchedData, document.getElementById('pageSizeSelector').value, headers);

@@ -7,6 +7,7 @@ import { chairMenuTemplate, generateChairMenuFiles, authTableTemplate, generateA
 import { optInOutTemplate, loadOptInOutTable, studyAccessAdminTemplate, loadStudyAccessAdminTable } from './src/pages/studyopt.js';
 import { dataManagersTemplate, loadDataManagerRequestsTable } from './src/pages/dataManagers.js';
 import { ensureDataManagerRequestFile } from './src/optInOutStore.js';
+import { initializeResponsiveTables } from './src/components/responsiveTables.js';
 import { formtemplate as dataFormTemplate, formFunctions, dataForm, uploaddataFormTemplate } from './src/pages/dataForm.js';
 import { checkAccessTokenValidity, loginAppDev, loginObs, loginAppEpisphere, logOut, loginAppProd } from './src/manageAuthentication.js';
 import { storeAccessToken, removeActiveClass, showAnimation, getCurrentUser, inactivityTime, filterConsortiums, getFolderItems, filterProjects, amIViewer, getCollaboration, hideAnimation, assignNavbarActive, getFileInfo, handleRangeRequests, applicationURLs, checkDataSubmissionPermissionLevel, studyDescriptions, submitterFolder, Confluence_Data_Platform_Metadata_Shared_with_Investigators, dataManagersInfo } from './src/shared.js';
@@ -774,6 +775,7 @@ const manageHash = async () => {
 };
 
 window.onload = async () => {
+    initializeResponsiveTables();
     const confluenceDiv = document.getElementById('confluenceDiv');
     confluenceDiv.innerHTML = '';
     if (localStorage.parms && JSON.parse(localStorage.parms).access_token) {

@@ -2631,6 +2631,218 @@ ul.form {
     width: 100%;
   }
 }
+
+/* Standard application tables become labeled cards on narrower displays. */
+@media (max-width: 1199.98px) {
+  .responsive-card-table-wrap {
+    overflow-x: visible;
+  }
+
+  .responsive-card-table {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .responsive-card-table > thead {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .responsive-card-table > tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-card-table > tbody > tr:not(.responsive-card-full-row) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: 0 0 0.85rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .responsive-card-table > tbody > tr:not(.responsive-card-full-row) > td {
+    display: block;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0.65rem 0.8rem;
+    border: 0;
+    border-bottom: 1px solid #eef0f2;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .responsive-card-table > tbody > tr:not(.responsive-card-full-row) > td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .responsive-card-table > tbody > .responsive-card-full-row,
+  .responsive-card-table > tbody > .responsive-card-full-row > td {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: normal !important;
+  }
+
+  .responsive-card-table > tbody > .responsive-card-full-row > td::before {
+    content: none;
+  }
+
+  .responsive-card-table input,
+  .responsive-card-table select,
+  .responsive-card-table textarea {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .responsive-card-table > tbody > tr:not(.responsive-card-full-row) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Compact study-description filters and labeled study cards on smaller screens. */
+@media (max-width: 1199.98px) {
+  .description-mobile-filter-toolbar {
+    position: sticky;
+    top: 45px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 0.65rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.4rem;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  }
+
+  .description-filter-sidebar {
+    display: none;
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  .description-filter-sidebar.description-mobile-filter-open {
+    display: block !important;
+  }
+
+  .description-results-panel {
+    width: 100%;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .description-mobile-filter-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding-top: 0.5rem;
+    background: #fff;
+  }
+
+  #filterBarToggle {
+    display: none;
+  }
+
+  #listFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  #listFilters .vertical-line {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #descriptionBody {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  #descriptionBody > .div-sticky {
+    display: none;
+  }
+
+  #descriptionBody .accordion-button {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 1rem;
+    padding-right: 2.5rem !important;
+    white-space: normal;
+  }
+
+  #descriptionBody .accordion-button > div {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    overflow-wrap: anywhere;
+  }
+
+  #descriptionBody .accordion-button > div::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.15rem;
+    color: #6c757d;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  #descriptionBody .accordion-button > .description-study-name {
+    grid-column: 1 / -1;
+  }
+
+  #descriptionBody .accordion-button::after {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+  }
+
+  #descriptionBody .accordion-button:not(.collapsed)::after {
+    transform: translateY(-50%) rotate(-180deg);
+  }
+}
+
+@media (max-width: 575.98px) {
+  #descriptionBody .accordion-button {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #descriptionBody .accordion-button > .description-study-name {
+    grid-column: 1;
+  }
+}
 /* Make accordion button more compact */
 .accordion-button.p-2 {
   padding: 0.5rem !important;
