@@ -2612,10 +2612,11 @@ export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
     }));
 };
 
-export const syncCurrentDataManagerChairRequests = async (onProgress = null) => {
+export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", onProgress = null) => {
     const report = message => { if (typeof onProgress === "function") onProgress(message); };
-    const chair = chairsInfo.find(item => String(item.consortium).toUpperCase() === "C-NCI");
-    if (!chair) throw new Error("The C-NCI chair configuration was not found.");
+    const consortiumId = String(consortium || "C-NCI").trim().toUpperCase();
+    const chair = chairsInfo.find(item => String(item.consortium).trim().toUpperCase() === consortiumId);
+    if (!chair) throw new Error(`The ${consortiumId} chair configuration was not found.`);
     const [newFiles, clarificationFiles, completeFiles, submitterItems, submitterFiles, completedFiles] = await Promise.all([
         getAllFilesRecursive(chair.boxIdNew, "name,type,id,description,parent,parent.name,created_at"),
         getAllFilesRecursive(chair.boxIdClara, "name,type,id,description,parent,parent.name,created_at"),
@@ -2683,21 +2684,21 @@ export const syncCurrentDataManagerChairRequests = async (onProgress = null) => 
             skipped++;
             continue;
         }
-        report(`Reading C-NCI chair status ${index + 1} of ${stagedFiles.length}: ${item.file.name}`);
+        report(`Reading ${consortiumId} chair status ${index + 1} of ${stagedFiles.length}: ${item.file.name}`);
         let chairScore = "--";
         try {
             const commentResponses = await Promise.allSettled([listComments(sourceFileId), listComments(item.file.id)]);
             const comments = commentResponses.flatMap(result => result.status === "fulfilled" ? parseBoxCommentEntries(result.value) : []);
-            chairScore = getDaccExportScores(comments).get("C-NCI") || "--";
+            chairScore = getDaccExportScores(comments).get(consortiumId) || "--";
         } catch (error) {
-            console.warn(`Unable to read the C-NCI score for ${item.file.name}:`, error);
+            console.warn(`Unable to read the ${consortiumId} score for ${item.file.name}:`, error);
         }
         const review = {
             sourceFileId,
             chairFileId: item.file.id,
             fileName: item.file.name,
             title: item.file.name,
-            consortium: "C-NCI",
+            consortium: consortiumId,
             workflowStage: item.workflowStage,
             chairScore
         };

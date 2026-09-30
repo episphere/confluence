@@ -71,7 +71,7 @@ export const confluence = async () => {
 
         const signedInEmail = String(JSON.parse(localStorage.parms).login || "").trim().toLowerCase();
         const signedInDataManager = dataManagersInfo.find(manager => manager.email.toLowerCase() === signedInEmail);
-        if (signedInDataManager) {
+        if (signedInDataManager?.collectionFolderId) {
             try {
                 await ensureDataManagerRequestFile(signedInDataManager);
             } catch (error) {

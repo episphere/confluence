@@ -94,18 +94,18 @@ const renderDtaAssignment = (assignment = {}) => `
         <div class="small mt-2 data-manager-dta-file-links">${renderDtaFiles(assignment.files)}</div>
     </div>`;
 
-const getUploadFolderOptions = async () => {
-    const response = await getFolderItems(Confluence_Opt_In_Out, "id,name,type", 1000);
+const getUploadFolderOptions = async (collectionFolderId = Confluence_Opt_In_Out) => {
+    const response = await getFolderItems(collectionFolderId, "id,name,type", 1000);
     const folders = (Array.isArray(response?.entries) ? response.entries : [])
         .filter(item => item.type === "folder" && item.name !== "_config")
         .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base" }));
     return [
-        { id: String(Confluence_Opt_In_Out), name: "Confluence Opt-In/Out root" },
+        { id: String(collectionFolderId), name: "Consortium data-collection root" },
         ...folders.map(folder => ({ id: String(folder.id), name: folder.name }))
     ];
 };
 
-const openDtaUploadModal = async ({ assignmentElement, uploadedBy, onUploaded }) => {
+const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFolderId, onUploaded }) => {
     const modalElement = document.getElementById("confluenceMainModal");
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
@@ -116,7 +116,7 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, onUploaded })
     bootstrap.Modal.getOrCreateInstance(modalElement).show();
 
     try {
-        const folders = await getUploadFolderOptions();
+        const folders = await getUploadFolderOptions(collectionFolderId);
         const folderOptions = folders.map(folder => `<option value="${escapeHtml(folder.id)}">${escapeHtml(folder.name)} (ID: ${escapeHtml(folder.id)})</option>`).join("");
         body.innerHTML = `
             <form id="dataManagerDtaUploadForm">
@@ -269,6 +269,11 @@ export const loadDataManagerRequestsTable = async () => {
             container.innerHTML = '<p class="text-warning">Your email is not configured for data management.</p>';
             return;
         }
+        if (manager && !manager.collectionFolderId) {
+            container.innerHTML = `<div class="alert alert-info mb-0"><strong>${escapeHtml(manager.consortium)} data collection is in progress.</strong><div class="mt-1">The Box collection location has not been finalized yet. This page will become available when that location is configured.</div></div>`;
+            container.dataset.loaded = "true";
+            return;
+        }
 
         // Administrators without a manager mapping can inspect all rows; mapped
         // administrators retain the same consortium-scoped view as data managers.
@@ -373,7 +378,8 @@ export const loadDataManagerRequestsTable = async () => {
                 notes: body.querySelector(".data-manager-access-notes")?.value || "",
                 dtaAssignments,
                 updatedBy: userEmail,
-                dataManagerName: manager?.name || ""
+                dataManagerConsortium: manager?.consortium || "",
+                dataManagerFolderId: manager?.collectionFolderId || ""
             });
             summaryRow.dataset.search = `${summaryRow.dataset.baseSearch || ""} ${saved.notes} ${saved.dtaAssignments.flatMap(assignment => [assignment.dta, assignment.people, ...parseDtaFiles(assignment.files).map(file => file.fileName)]).join(" ")}`.toLowerCase();
             statusElement.className = "small data-manager-save-status text-success";
@@ -392,7 +398,7 @@ export const loadDataManagerRequestsTable = async () => {
             if (uploadButton) {
                 const assignmentElement = uploadButton.closest(".data-manager-dta-assignment");
                 const body = uploadButton.closest(".accordion-body");
-                if (assignmentElement && body) await openDtaUploadModal({ assignmentElement, uploadedBy: userEmail, onUploaded: () => saveAccessBody(body) });
+                if (assignmentElement && body) await openDtaUploadModal({ assignmentElement, uploadedBy: userEmail, collectionFolderId: manager?.collectionFolderId || Confluence_Opt_In_Out, onUploaded: () => saveAccessBody(body) });
                 return;
             }
 

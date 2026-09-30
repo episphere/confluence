@@ -40,9 +40,9 @@ export const getChairByEmail = (email) => {
     ) || null;
 };
 
-// Data managers and the individual studies whose collection status they may view.
-// Keep this list in sync with the Study Opt-In/Out roster.
-export const dataManagersInfo = [
+// Study managers and the individual studies they represent in Study Opt-In/Out.
+// These users are distinct from the consortium-level Data Managers below.
+export const studyManagersInfo = [
     {id: 'data_manager_1', name: 'Amy McCart-Reed', email: 'amy.reed@uq.edu.au', studies: [{name: 'Brisbane Breast Bank', acronym: 'BRISBANE'}]},
     {id: 'data_manager_2', name: 'Ann Schwartz', email: 'schwarta@karmanos.org', studies: [{name: 'Detroit Research on Cancer Survivors', acronym: 'ROCS'}]},
     {id: 'data_manager_3', name: 'Christopher Li', email: 'cili@fredhutch.org', studies: [{name: 'Seattle Area Hormone And Reproductive Epidemoiology Breast Cancer Study', acronym: 'SHARE'}, {name: 'Reproductive Epidemiology And Contraceptive Hormone Study', acronym: 'REACH'}, {name: 'Breast Cancer Risk And Various Outcomes', acronym: 'BRAVO'}]},
@@ -72,12 +72,34 @@ export const dataManagersInfo = [
     {id: 'data_manager_27', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', studies: [{name: 'Test Study 2', acronym: 'ST2'}, {name: 'Test Study 3', acronym: 'TS3'}, {name: 'Test Study 4', acronym: 'TS4'}]}
 ].map(manager => ({consortium: 'C-NCI', ...manager}));
 
-export const studiesInfo = Array.from(dataManagersInfo.reduce((studies, manager) => {
+// Consortium Box locations used for Data Manager TSVs and agreement uploads.
+export const dataManagerCollectionFolders = {
+    'C-NCI': '422654444804',
+    'LAGENO': '422648647044',
+    'AABCG': '422656022378',
+    'BCAC': '422654545711',
+    'CIMBA': '422656523360',
+    'MERGE': '422653561942'
+};
+
+// Consortium Data Managers. A consortium is offered in the administrative
+// publishing workflow only after both its folder and at least one manager exist.
+export const dataManagersInfo = [
+    {id: 'cnci_data_manager_1', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', consortium: 'C-NCI'},
+    {id: 'cnci_data_manager_2', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'C-NCI'},
+    {id: 'bcac_data_manager_1', name: 'Manjeet Bolla', email: 'mkh39@medschl.cam.ac.uk', consortium: 'BCAC'},
+    {id: 'cimba_data_manager_1', name: 'Leslie Malgorzata', email: 'mal78@medschl.cam.ac.uk', consortium: 'CIMBA'},
+    {id: 'lageno_data_manager_1', name: 'Xiaosong Huang', email: 'xjahuang@ucdavis.edu', consortium: 'LAGENO'},
+    {id: 'lageno_data_manager_2', name: 'Amanda Corpuz', email: 'afcorpuz@ucdavis.edu', consortium: 'LAGENO'},
+    {id: 'merge_data_manager_1', name: 'Nick Orr', email: 'nick.orr@qub.ac.uk', consortium: 'MERGE'}
+].map(manager => ({ ...manager, collectionFolderId: dataManagerCollectionFolders[manager.consortium] || null }));
+
+export const studiesInfo = Array.from(studyManagersInfo.reduce((studies, manager) => {
     manager.studies.forEach(study => {
         const key = String(study.acronym || study.name).trim().toLowerCase();
-        const existing = studies.get(key) || {...study, consortium: manager.consortium, dataManagerEmails: []};
-        if (!existing.dataManagerEmails.some(email => email.toLowerCase() === manager.email.toLowerCase())) {
-            existing.dataManagerEmails.push(manager.email);
+        const existing = studies.get(key) || {...study, consortium: manager.consortium, studyManagerEmails: []};
+        if (!existing.studyManagerEmails.some(email => email.toLowerCase() === manager.email.toLowerCase())) {
+            existing.studyManagerEmails.push(manager.email);
         }
         studies.set(key, existing);
     });

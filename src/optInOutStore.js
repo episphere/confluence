@@ -1,6 +1,7 @@
 import {
     Confluence_Opt_In_Out,
     createFolder,
+    dataManagersInfo,
     getFile,
     getFolderItems,
     uploadFile,
@@ -16,7 +17,7 @@ const DATA_MANAGER_REQUESTS_FILE_NAME = "data_manager_requests.tsv";
 const STUDY_MANIFEST_FILE_NAME = "_study_manifest.tsv";
 const CONSORTIUM_ID = "C-NCI";
 
-const ROUND_COLUMNS = ["round_id", "round_name", "source_box_folder_id", "status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email"];
+const ROUND_COLUMNS = ["round_id", "round_name", "consortium_id", "source_box_folder_id", "status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email"];
 const ROUND_MANIFEST_COLUMNS = ["round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "study_folder_id", "round_folder_id", "selection_file_id", "provision_status", "provision_error"];
 const STUDY_MANIFEST_COLUMNS = ["round_id", "round_name", "round_status", "opens_at_utc", "closes_at_utc", "concept_box_id", "concept_title", "selection_file_id"];
 const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "concept_file_name", "decision", "submitted", "submitted_by_name", "submitted_by_email", "submitted_at_utc", "updated_at_utc", "is_demo", "demo_created_by", "demo_created_at_utc"];
@@ -98,7 +99,7 @@ const upsertRows = (existingRows, newRows, keyForRow) => {
 const getStudyId = (study) => cleanBoxName(study.acronym || study.name);
 const getConceptSelectionFileName = (conceptBoxId) => `concept_${cleanTsvValue(conceptBoxId)}.tsv`;
 
-const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now, isDemo = false, demoCreatedBy = "" }) => {
+const ensureSelectionFile = async ({ roundFolderId, round, study, concept, consortiumId = CONSORTIUM_ID, now, isDemo = false, demoCreatedBy = "" }) => {
     const fileName = getConceptSelectionFileName(concept.fileId);
     const existing = await findFile(roundFolderId, fileName);
     if (existing) return existing;
@@ -107,7 +108,7 @@ const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now, 
         schema_version: "1",
         round_id: round.id,
         round_name: round.name,
-        consortium_id: CONSORTIUM_ID,
+        consortium_id: consortiumId,
         study_id: getStudyId(study),
         study_acronym: study.acronym,
         study_name: study.name,
@@ -127,14 +128,14 @@ const ensureSelectionFile = async ({ roundFolderId, round, study, concept, now, 
     return writeTsv(roundFolderId, fileName, SELECTION_COLUMNS, [row]);
 };
 
-export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt, closesAt, initiatedBy, onProgress }) => {
+export const provisionOptInOutRound = async ({ round, concepts, studies, consortiumId = CONSORTIUM_ID, opensAt, closesAt, initiatedBy, onProgress }) => {
     const now = new Date().toISOString();
     const report = (message) => { if (typeof onProgress === "function") onProgress(message); };
     const configFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
-    const consortiumFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, CONSORTIUM_ID);
+    const consortiumFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, consortiumId);
     const roundManifestRows = [];
 
-    report(`Preparing ${studies.length} C-NCI studies...`);
+    report(`Preparing ${studies.length} ${consortiumId} ${studies.length === 1 ? "assignment" : "studies"}...`);
     for (const study of studies) {
         const studyId = getStudyId(study);
         const studyFolder = await getOrCreateOptInOutFolder(consortiumFolder.id, studyId);
@@ -144,7 +145,7 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
         for (const concept of concepts) {
             report(`Creating ${studyId}: ${concept.title}`);
             try {
-                const selectionFile = await ensureSelectionFile({ roundFolderId: roundFolder.id, round, study, concept, now });
+                const selectionFile = await ensureSelectionFile({ roundFolderId: roundFolder.id, round, study, concept, consortiumId, now });
                 const assignment = {
                     round_id: round.id,
                     round_name: round.name,
@@ -158,7 +159,7 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
                 studyManifestRows.push(assignment);
                 roundManifestRows.push({
                     ...assignment,
-                    consortium_id: CONSORTIUM_ID,
+                    consortium_id: consortiumId,
                     study_id: studyId,
                     study_acronym: study.acronym,
                     study_name: study.name,
@@ -171,7 +172,7 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
                 roundManifestRows.push({
                     round_id: round.id,
                     round_name: round.name,
-                    consortium_id: CONSORTIUM_ID,
+                    consortium_id: consortiumId,
                     study_id: studyId,
                     study_acronym: study.acronym,
                     study_name: study.name,
@@ -195,6 +196,7 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
     const roundRow = {
         round_id: round.id,
         round_name: round.name,
+        consortium_id: consortiumId,
         source_box_folder_id: round.id,
         status: roundManifestRows.some(row => row.provision_status === "error") ? "initializing" : "open",
         opens_at_utc: opensAt,
@@ -202,11 +204,14 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
         initiated_at_utc: now,
         initiated_by_email: initiatedBy
     };
-    await writeTsv(configFolder.id, ROUNDS_FILE_NAME, ROUND_COLUMNS, upsertRows(roundsFile.rows, [roundRow], row => String(row.round_id)));
-    await writeTsv(configFolder.id, `${cleanTsvValue(round.name)}_manifest.tsv`, ROUND_MANIFEST_COLUMNS, roundManifestRows);
+    await writeTsv(configFolder.id, ROUNDS_FILE_NAME, ROUND_COLUMNS, upsertRows(roundsFile.rows, [roundRow], row => `${row.round_id}|${row.consortium_id || CONSORTIUM_ID}`));
+    const roundManifestFileName = normalizeStudyId(consortiumId) === normalizeStudyId(CONSORTIUM_ID)
+        ? `${cleanTsvValue(round.name)}_manifest.tsv`
+        : `${cleanTsvValue(round.name)}_${cleanBoxName(consortiumId)}_manifest.tsv`;
+    await writeTsv(configFolder.id, roundManifestFileName, ROUND_MANIFEST_COLUMNS, roundManifestRows);
 
-    // This denormalized index is the administrative source used to synchronize
-    // each data manager's individual TSV when they open the Data Managers page.
+    // This denormalized index is retained for administrators. The completed
+    // rows are published into each Data Manager's individual consortium TSV.
     const dataManagerRequests = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
     const conceptById = new Map(concepts.map(concept => [String(concept.fileId), concept]));
     const existingRequestByKey = new Map(dataManagerRequests.rows.map(row => [getDataManagerRequestKey(row), row]));
@@ -223,7 +228,7 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
         chair_file_id: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.chair_file_id || "",
         concept_title: assignment.concept_title,
         concept_file_name: conceptById.get(String(assignment.concept_box_id))?.fileName || "",
-        requested_study: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.requested_study || CONSORTIUM_ID,
+        requested_study: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.requested_study || consortiumId,
         consortium_id: assignment.consortium_id,
         chair_score: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.chair_score || "--",
         chair_score_updated_at_utc: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.chair_score_updated_at_utc || "",
@@ -241,8 +246,10 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, opensAt
         initiated_by_email: initiatedBy,
         updated_at_utc: now
     }));
-    const otherRoundRequests = dataManagerRequests.rows.filter(row => String(row.round_id) !== String(round.id));
-    await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, [...otherRoundRequests, ...requestRows]);
+    const otherRoundRequests = dataManagerRequests.rows.filter(row => String(row.round_id) !== String(round.id) || normalizeStudyId(row.consortium_id) !== normalizeStudyId(consortiumId));
+    const updatedDataManagerRequests = [...otherRoundRequests, ...requestRows];
+    await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedDataManagerRequests);
+    await publishRowsToDataManagerFiles(updatedDataManagerRequests, [consortiumId]);
 
     const failures = roundManifestRows.filter(row => row.provision_status === "error");
     return { createdAssignments: roundManifestRows.length - failures.length, failures, totalAssignments: roundManifestRows.length };
@@ -385,10 +392,14 @@ export const publishDataManagerChairRequests = async ({ round, reviews, studies,
 
     reviews.forEach(review => {
         const requestedStudy = String(review.consortium || CONSORTIUM_ID);
-        const matchingStudies = requestedStudy.toUpperCase() === CONSORTIUM_ID
-            ? studies.filter(study => String(study.consortium || CONSORTIUM_ID).toUpperCase() === CONSORTIUM_ID)
+        const consortiumStudies = studies.filter(study => normalizeStudyId(study.consortium || CONSORTIUM_ID) === normalizeStudyId(requestedStudy));
+        const matchingStudies = consortiumStudies.length
+            ? consortiumStudies
             : studies.filter(study => [study.acronym, study.name].some(value => normalizeStudyId(value) === normalizeStudyId(requestedStudy)));
-        matchingStudies.forEach(study => {
+        const managerTargets = matchingStudies.length
+            ? matchingStudies
+            : [{ acronym: requestedStudy, name: requestedStudy, consortium: requestedStudy }];
+        managerTargets.forEach(study => {
             const row = {
                 schema_version: "1",
                 round_id: round.id,
@@ -431,7 +442,9 @@ export const publishDataManagerChairRequests = async ({ round, reviews, studies,
         });
     });
 
-    await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, Array.from(requestsByKey.values()));
+    const updatedRequests = Array.from(requestsByKey.values());
+    await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedRequests);
+    await publishRowsToDataManagerFiles(updatedRequests, reviews.map(review => review.consortium || CONSORTIUM_ID));
 };
 
 export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, score, workflowStage }) => {
@@ -441,11 +454,13 @@ export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, s
     if (!requestFile.file) return false;
     const now = new Date().toISOString();
     let matched = false;
+    const affectedConsortia = new Set();
     const rows = requestFile.rows.map(row => {
         const sameConcept = String(row.concept_box_id) === String(conceptBoxId);
         const sameConsortium = !consortium || String(row.consortium_id || row.requested_study).toLowerCase() === String(consortium).toLowerCase();
         if (!sameConcept || !sameConsortium) return row;
         matched = true;
+        affectedConsortia.add(row.consortium_id || row.requested_study);
         return {
             ...row,
             workflow_stage: workflowStage || row.workflow_stage,
@@ -457,6 +472,7 @@ export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, s
     });
     if (!matched) return false;
     await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, rows);
+    await publishRowsToDataManagerFiles(rows, affectedConsortia);
     return true;
 };
 
@@ -474,7 +490,9 @@ export const filterDataManagerRequestRows = (rows, consortium = null) => {
     return Array.from(visibleConcepts.values());
 };
 
-export const getDataManagerFileName = managerName => `${cleanBoxName(managerName) || "unknown_data_manager"}.tsv`;
+export const getDataManagerFileName = consortiumId => `${cleanBoxName(consortiumId) || "unknown_consortium"}.tsv`;
+
+const getLegacyDataManagerFileName = managerName => `${cleanBoxName(managerName) || "unknown_data_manager"}.tsv`;
 
 const getVisibleDataManagerRequestKey = row => {
     const conceptId = String(row.concept_box_id || row.concept_file_name || row.concept_title || "").trim();
@@ -483,38 +501,89 @@ const getVisibleDataManagerRequestKey = row => {
 
 const mergeDataManagerRows = (sourceRows, managerRows) => {
     const managerRowsByKey = new Map(managerRows.map(row => [getVisibleDataManagerRequestKey(row), row]));
-    return sourceRows.map(sourceRow => {
+    const sourceKeys = new Set(sourceRows.map(getVisibleDataManagerRequestKey));
+    const synchronizedRows = sourceRows.map(sourceRow => {
         const managerRow = managerRowsByKey.get(getVisibleDataManagerRequestKey(sourceRow));
         const managerOwnedValues = Object.fromEntries(DATA_MANAGER_OWNED_COLUMNS.map(column => [column, managerRow?.[column] || ""]));
         return { ...sourceRow, ...managerOwnedValues };
     });
+    return [...synchronizedRows, ...managerRows.filter(row => !sourceKeys.has(getVisibleDataManagerRequestKey(row)))];
+};
+
+const mergeLegacyDataManagerRows = rows => {
+    const rowsByKey = new Map();
+    rows.forEach(row => {
+        const key = getVisibleDataManagerRequestKey(row);
+        const existing = rowsByKey.get(key);
+        if (!existing) {
+            rowsByKey.set(key, row);
+            return;
+        }
+        const existingUpdatedAt = Date.parse(existing.access_updated_at_utc || "") || 0;
+        const rowUpdatedAt = Date.parse(row.access_updated_at_utc || "") || 0;
+        const newer = rowUpdatedAt >= existingUpdatedAt ? row : existing;
+        const older = newer === row ? existing : row;
+        const managerOwnedValues = Object.fromEntries(DATA_MANAGER_OWNED_COLUMNS.map(column => [column, newer[column] || older[column] || ""]));
+        rowsByKey.set(key, { ...older, ...newer, ...managerOwnedValues });
+    });
+    return Array.from(rowsByKey.values());
+};
+
+const loadLegacyDataManagerRows = async (configFolderId, consortiumId) => {
+    const legacyManagerNames = Array.from(new Set(dataManagersInfo
+        .filter(manager => normalizeStudyId(manager.consortium) === normalizeStudyId(consortiumId))
+        .map(manager => manager.name)
+        .filter(Boolean)));
+    const legacyFiles = await Promise.all(legacyManagerNames.map(managerName => readTsvInFolder(configFolderId, getLegacyDataManagerFileName(managerName))));
+    return mergeLegacyDataManagerRows(legacyFiles.flatMap(result => result.rows));
+};
+
+// Administrative workflows publish each consortium's request rows directly to
+// its Data Managers. Managers therefore never need access to the central index.
+const publishRowsToDataManagerFiles = async (sourceRows, consortiumIds = null) => {
+    const requestedConsortia = consortiumIds
+        ? new Set(Array.from(consortiumIds, normalizeStudyId))
+        : null;
+    const configuredConsortia = Array.from(dataManagersInfo.reduce((consortia, manager) => {
+        if (!manager.consortium || !manager.collectionFolderId) return consortia;
+        if (requestedConsortia && !requestedConsortia.has(normalizeStudyId(manager.consortium))) return consortia;
+        consortia.set(normalizeStudyId(manager.consortium), { consortium: manager.consortium, collectionFolderId: manager.collectionFolderId });
+        return consortia;
+    }, new Map()).values());
+    for (const consortium of configuredConsortia) {
+        const managerConfigFolder = await getOrCreateOptInOutFolder(consortium.collectionFolderId, CONFIG_FOLDER_NAME);
+        const managerFileName = getDataManagerFileName(consortium.consortium);
+        const managerFile = await readTsvInFolder(managerConfigFolder.id, managerFileName);
+        const existingRows = managerFile.file ? managerFile.rows : await loadLegacyDataManagerRows(managerConfigFolder.id, consortium.consortium);
+        const visibleRows = filterDataManagerRequestRows(sourceRows, consortium.consortium);
+        const mergedRows = mergeDataManagerRows(visibleRows, existingRows);
+        if (!managerFile.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, managerFile.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, mergedRows)) {
+            await writeTsv(managerConfigFolder.id, managerFileName, DATA_MANAGER_REQUEST_COLUMNS, mergedRows);
+        }
+    }
 };
 
 export const ensureDataManagerRequestFile = async manager => {
-    if (!manager?.name) throw new Error("A configured Data Manager name is required.");
-    const configFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
-    const sourceFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
-    const visibleRows = filterDataManagerRequestRows(sourceFile.rows, manager.consortium || null);
-    const managerFileName = getDataManagerFileName(manager.name);
-    const managerFile = await readTsvInFolder(configFolder.id, managerFileName);
-    const mergedRows = sourceFile.file ? mergeDataManagerRows(visibleRows, managerFile.rows) : managerFile.rows;
-    if (!managerFile.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, managerFile.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, mergedRows)) {
-        await writeTsv(configFolder.id, managerFileName, DATA_MANAGER_REQUEST_COLUMNS, mergedRows);
+    if (!manager?.consortium) throw new Error("A configured Data Manager consortium is required.");
+    if (!manager.collectionFolderId) throw new Error(`${manager.consortium || "This consortium"} data collection is still in progress.`);
+    const managerConfigFolder = await getOrCreateOptInOutFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
+    const managerFileName = getDataManagerFileName(manager.consortium);
+    const managerFile = await readTsvInFolder(managerConfigFolder.id, managerFileName);
+    if (!managerFile.file) {
+        const legacyRows = await loadLegacyDataManagerRows(managerConfigFolder.id, manager.consortium);
+        await writeTsv(managerConfigFolder.id, managerFileName, DATA_MANAGER_REQUEST_COLUMNS, legacyRows);
+        return legacyRows;
     }
-    return mergedRows;
+    return managerFile.rows;
 };
 
 export const loadDataManagerRequests = async (manager = null) => {
-    if (manager?.name) {
-        const visibleRows = await ensureDataManagerRequestFile(manager);
-        return Promise.all(visibleRows.map(async row => {
-            if (!row.selection_file_id) return { ...row, decision: "pending", submitted: "false" };
-            try {
-                const selection = (await readTsv(row.selection_file_id))[0] || {};
-                return { ...row, ...selection, selection_file_id: row.selection_file_id };
-            } catch (error) {
-                return { ...row, decision: "unavailable", submitted: "false", load_error: error.message };
-            }
+    if (manager?.consortium) {
+        const managerRows = await ensureDataManagerRequestFile(manager);
+        return managerRows.map(row => ({
+            ...row,
+            decision: row.decision || "pending",
+            submitted: row.submitted || "false"
         }));
     }
 
@@ -534,10 +603,12 @@ export const loadDataManagerRequests = async (manager = null) => {
     }));
 };
 
-export const saveDataManagerAccessDetails = async ({ roundId, conceptBoxId, consortiumId, notes, dtaAssignments, updatedBy, dataManagerName }) => {
-    const configFolder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
+export const saveDataManagerAccessDetails = async ({ roundId, conceptBoxId, consortiumId, notes, dtaAssignments, updatedBy, dataManagerConsortium, dataManagerFolderId }) => {
+    const storageRootId = dataManagerConsortium ? dataManagerFolderId : Confluence_Opt_In_Out;
+    if (!storageRootId) throw new Error(`${consortiumId || "This consortium"} data collection is still in progress.`);
+    const configFolder = await findFolder(storageRootId, CONFIG_FOLDER_NAME);
     if (!configFolder) throw new Error("The Data Manager configuration folder was not found.");
-    const requestFileName = dataManagerName ? getDataManagerFileName(dataManagerName) : DATA_MANAGER_REQUESTS_FILE_NAME;
+    const requestFileName = dataManagerConsortium ? getDataManagerFileName(dataManagerConsortium) : DATA_MANAGER_REQUESTS_FILE_NAME;
     const requestFile = await readTsvInFolder(configFolder.id, requestFileName);
     if (!requestFile.file) throw new Error(`The Data Manager file ${requestFileName} was not found.`);
 
@@ -609,9 +680,11 @@ export const saveOptInOutSelections = async (changes, user) => {
                 const requestFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
                 if (requestFile.file) {
                     const savedByFileId = new Map(saved.map(item => [String(item.selectionFileId), item.updated]));
+                    const affectedConsortia = new Set();
                     const updatedRequests = requestFile.rows.map(row => {
                         const selection = savedByFileId.get(String(row.selection_file_id));
                         if (!selection) return row;
+                        affectedConsortia.add(selection.consortium_id || row.consortium_id);
                         return {
                             ...row,
                             collection_status: selection.decision === "opt_in" ? "ready_for_data_collection" : "not_participating",
@@ -622,10 +695,11 @@ export const saveOptInOutSelections = async (changes, user) => {
                         };
                     });
                     await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedRequests);
+                    await publishRowsToDataManagerFiles(updatedRequests, affectedConsortia);
                 }
             }
         } catch (error) {
-            // Selection TSVs remain authoritative; a later page load still reads them directly.
+            // Selection TSVs remain authoritative even if the administrative index refresh fails.
             console.warn("Unable to refresh the Data Manager request index:", error);
         }
     }

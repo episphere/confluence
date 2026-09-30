@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName } from "../shared.js";
+import { csv2Json, dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests } from "./chairmenu.js";
 
@@ -637,7 +637,7 @@ export const studyAccessAdminTemplate = () => {
                             <span class="buttonsubmit__text">Export Consortia CSV</span>
                         </button>
                         <button type="button" id="syncDataManagerStatusBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
-                            <span class="buttonsubmit__text">Sync Data Manager Status</span>
+                            <span class="buttonsubmit__text">Publish Chair Status to Data Managers</span>
                         </button>
                     </div>
                 </div>
@@ -662,15 +662,45 @@ const getCnciWorkbookStudies = async () => {
     return Array.from(studiesById.values()).sort((a, b) => String(a.acronym || a.name).localeCompare(String(b.acronym || b.name), undefined, { sensitivity: "base" }));
 };
 
-const getAcceptedCnciRounds = async () => {
-    const rounds = await loadAcceptedAdminConceptRounds(true);
-    const acceptedConceptCount = rounds.reduce((total, round) => total + round.concepts.length, 0);
-    const cnciRounds = rounds.map(round => ({
-        ...round,
-        concepts: round.concepts.filter(concept => concept.requestedConsortia.some(value => String(value).trim().toUpperCase() === "C-NCI"))
-    })).filter(round => round.concepts.length);
-    return { rounds: cnciRounds, acceptedConceptCount };
+const getDataManagerConsortia = () => Array.from(dataManagersInfo.reduce((consortia, manager) => {
+    const consortium = String(manager.consortium || "").trim().toUpperCase();
+    if (!consortium) return consortia;
+    const existing = consortia.get(consortium) || { consortium, collectionFolderId: null };
+    if (manager.collectionFolderId) existing.collectionFolderId = String(manager.collectionFolderId);
+    consortia.set(consortium, existing);
+    return consortia;
+}, new Map()).values());
+
+const renderDataManagerConsortiumChoices = (groupName, selectedConsortia = ["C-NCI"]) => getDataManagerConsortia()
+    .map((item, index) => {
+        const inputId = `${groupName}-${index}`;
+        const isSelected = selectedConsortia.includes(item.consortium) && item.collectionFolderId;
+        return `<div class="form-check"><input class="form-check-input data-manager-consortium-choice" type="checkbox" name="${escapeHtml(groupName)}" id="${escapeHtml(inputId)}" value="${escapeHtml(item.consortium)}" ${isSelected ? "checked" : ""} ${item.collectionFolderId ? "" : "disabled"}><label class="form-check-label" for="${escapeHtml(inputId)}">${escapeHtml(item.consortium)}${item.collectionFolderId ? "" : " — location in progress"}</label></div>`;
+    }).join("");
+
+const getSelectedDataManagerConsortia = container => Array.from(container.querySelectorAll(".data-manager-consortium-choice:checked"), input => input.value);
+
+const getConsortiumStudies = async consortium => {
+    const consortiumId = String(consortium || "").trim().toUpperCase();
+    if (consortiumId === "C-NCI") return getCnciWorkbookStudies();
+    const configuredStudies = studiesInfo.filter(study => String(study.consortium || "").trim().toUpperCase() === consortiumId);
+    return configuredStudies.length
+        ? configuredStudies
+        : [{ name: consortiumId, acronym: consortiumId, consortium: consortiumId, consortiumLevel: true }];
 };
+
+const getAcceptedConsortiumRounds = async (consortium, sourceRounds = null) => {
+    const consortiumId = String(consortium || "").trim().toUpperCase();
+    const rounds = sourceRounds || await loadAcceptedAdminConceptRounds(true);
+    const acceptedConceptCount = rounds.reduce((total, round) => total + round.concepts.length, 0);
+    const consortiumRounds = rounds.map(round => ({
+        ...round,
+        concepts: round.concepts.filter(concept => concept.requestedConsortia.some(value => String(value).trim().toUpperCase() === consortiumId))
+    })).filter(round => round.concepts.length);
+    return { rounds: consortiumRounds, acceptedConceptCount };
+};
+
+const getAcceptedCnciRounds = async () => getAcceptedConsortiumRounds("C-NCI");
 
 const bindCreateDemoOptInOutRoundButton = () => {
     const button = document.getElementById("createDemoOptInOutRoundBtn");
@@ -795,13 +825,14 @@ const bindInitiateOptInOutRoundButton = () => {
         bootstrap.Modal.getOrCreateInstance(modalElement).show();
 
         try {
-            const [{ rounds: availableRounds, acceptedConceptCount }, studies] = await Promise.all([getAcceptedCnciRounds(), getCnciWorkbookStudies()]);
-            if (!availableRounds.length) {
-                body.innerHTML = acceptedConceptCount > 0
-                    ? `<div class="alert alert-warning mb-0">${acceptedConceptCount} accepted concept${acceptedConceptCount === 1 ? " was" : "s were"} matched to an Admin Chair round, but none were identified as requesting C-NCI.</div>`
-                    : '<div class="alert alert-warning mb-0">No files in the completed round folders could be matched to an Admin Chair round.</div>';
+            const configuredConsortia = getDataManagerConsortia();
+            const enabledConsortia = configuredConsortia.filter(item => item.collectionFolderId);
+            if (!enabledConsortia.length) {
+                body.innerHTML = '<div class="alert alert-warning mb-0">No consortium has a configured Data Manager collection folder.</div>';
                 return;
             }
+            const allRounds = await loadAcceptedAdminConceptRounds(true);
+            const defaultConsortium = enabledConsortia[0].consortium;
 
             const now = new Date();
             const closeDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -809,82 +840,159 @@ const bindInitiateOptInOutRoundButton = () => {
                 const offset = date.getTimezoneOffset() * 60000;
                 return new Date(date.getTime() - offset).toISOString().slice(0, 16);
             };
-            const roundOptions = availableRounds.map(round => `<option value="${escapeHtml(round.id)}">${escapeHtml(round.name)} (${round.concepts.length} accepted C-NCI concept${round.concepts.length === 1 ? "" : "s"})</option>`).join("");
             body.innerHTML = `
                 <form id="initiateOptInOutRoundForm">
-                    <div class="mb-3"><label for="optInOutRoundSelect" class="form-label">Round</label><select id="optInOutRoundSelect" class="form-select" required>${roundOptions}</select></div>
+                    <fieldset class="mb-3"><legend class="fs-6 fw-semibold">Consortia <span class="text-muted fw-normal">(select one or more)</span></legend><div id="optInOutConsortiumChoices" class="border rounded p-2">${renderDataManagerConsortiumChoices("optInOutConsortium", [defaultConsortium])}</div></fieldset>
+                    <div class="mb-3"><label for="optInOutRoundSelect" class="form-label">Round</label><select id="optInOutRoundSelect" class="form-select" required></select></div>
                     <div class="row">
                         <div class="col-md-6 mb-3"><label for="optInOutOpensAt" class="form-label">Opens</label><input id="optInOutOpensAt" type="datetime-local" class="form-control" value="${toLocalInput(now)}" required></div>
                         <div class="col-md-6 mb-3"><label for="optInOutClosesAt" class="form-label">Closes</label><input id="optInOutClosesAt" type="datetime-local" class="form-control" value="${toLocalInput(closeDate)}" required></div>
                     </div>
                     <div id="optInOutRoundSummary" class="alert alert-info"></div>
-                    <div class="alert alert-warning">Existing selection TSVs will be preserved. Missing folders and files will be created for the current C-NCI workbook studies. Initiating also publishes the concept/study schedule to the Data Managers page.</div>
+                    <div id="optInOutRoundNotice" class="alert alert-warning"></div>
                     <div id="optInOutRoundProgress" class="small mb-3" style="max-height: 180px; overflow-y: auto;"></div>
                     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Initiate Round</button></div>
                 </form>
             `;
             const form = document.getElementById("initiateOptInOutRoundForm");
+            const consortiumChoices = document.getElementById("optInOutConsortiumChoices");
             const roundSelect = document.getElementById("optInOutRoundSelect");
             const summary = document.getElementById("optInOutRoundSummary");
+            const notice = document.getElementById("optInOutRoundNotice");
+            const submitButton = form.querySelector('button[type="submit"]');
+            let availableRounds = [];
+            const roundsByConsortium = new Map();
+            const studiesByConsortium = new Map();
+
             const updateSummary = () => {
                 const selectedRound = availableRounds.find(round => String(round.id) === roundSelect.value);
-                const assignments = (selectedRound?.concepts.length || 0) * studies.length;
-                summary.textContent = `${selectedRound?.concepts.length || 0} accepted concepts × ${studies.length} C-NCI studies = ${assignments} study/concept TSV files.`;
+                const selectedConsortia = getSelectedDataManagerConsortia(consortiumChoices);
+                if (!selectedConsortia.length) {
+                    summary.textContent = "Select at least one consortium.";
+                    submitButton.disabled = true;
+                    return;
+                }
+                if (!selectedRound) {
+                    summary.textContent = "No accepted concepts were found for the selected consortia.";
+                    submitButton.disabled = true;
+                    return;
+                }
+                const summaries = selectedConsortia.map(consortiumId => {
+                    const consortiumRound = (roundsByConsortium.get(consortiumId) || []).find(round => String(round.id) === String(selectedRound.id));
+                    const studies = studiesByConsortium.get(consortiumId) || [];
+                    const conceptCount = consortiumRound?.concepts.length || 0;
+                    const assignmentCount = conceptCount * studies.length;
+                    const targetLabel = studies.some(study => study.consortiumLevel)
+                        ? "one consortium-level assignment per concept"
+                        : `${studies.length} ${studies.length === 1 ? "study" : "studies"}`;
+                    return `<li><strong>${escapeHtml(consortiumId)}:</strong> ${conceptCount} accepted concept${conceptCount === 1 ? "" : "s"} × ${escapeHtml(targetLabel)} = ${assignmentCount} assignment${assignmentCount === 1 ? "" : "s"}${conceptCount ? "" : " (will be skipped)"}</li>`;
+                });
+                summary.innerHTML = `<strong>${escapeHtml(selectedRound.name)}</strong><ul class="mb-0 mt-1">${summaries.join("")}</ul>`;
+                submitButton.disabled = !selectedConsortia.some(consortiumId => (roundsByConsortium.get(consortiumId) || []).some(round => String(round.id) === String(selectedRound.id) && round.concepts.length));
             };
+
+            const updateConsortiumSelection = async () => {
+                const selectedConsortia = getSelectedDataManagerConsortia(consortiumChoices);
+                const previousRoundId = roundSelect.value;
+                roundsByConsortium.clear();
+                studiesByConsortium.clear();
+                await Promise.all(selectedConsortia.map(async consortiumId => {
+                    const [result, studies] = await Promise.all([
+                        getAcceptedConsortiumRounds(consortiumId, allRounds),
+                        getConsortiumStudies(consortiumId)
+                    ]);
+                    roundsByConsortium.set(consortiumId, result.rounds);
+                    studiesByConsortium.set(consortiumId, studies);
+                }));
+                const roundsById = new Map();
+                selectedConsortia.forEach(consortiumId => (roundsByConsortium.get(consortiumId) || []).forEach(round => {
+                    if (!roundsById.has(String(round.id))) roundsById.set(String(round.id), { id: round.id, name: round.name });
+                }));
+                availableRounds = Array.from(roundsById.values());
+                roundSelect.innerHTML = availableRounds.map(round => `<option value="${escapeHtml(round.id)}" ${String(round.id) === previousRoundId ? "selected" : ""}>${escapeHtml(round.name)}</option>`).join("");
+                roundSelect.disabled = !availableRounds.length;
+                summary.className = "alert alert-info";
+                const consortiumLevelIds = selectedConsortia.filter(consortiumId => (studiesByConsortium.get(consortiumId) || []).some(study => study.consortiumLevel));
+                notice.innerHTML = `Existing selection TSVs will be preserved. Missing files will be created and each consortium's schedule will be published to its Data Managers.${consortiumLevelIds.length ? ` <strong>${escapeHtml(consortiumLevelIds.join(", "))}</strong> ${consortiumLevelIds.length === 1 ? "does" : "do"} not yet have an individual study roster, so consortium-level assignments will be used.` : ""}`;
+                updateSummary();
+            };
+
+            consortiumChoices.addEventListener("change", () => updateConsortiumSelection().catch(error => {
+                summary.className = "alert alert-danger";
+                summary.textContent = error.message || "Unable to load the selected consortia.";
+                submitButton.disabled = true;
+            }));
             roundSelect.addEventListener("change", updateSummary);
-            updateSummary();
+            await updateConsortiumSelection();
 
             form.addEventListener("submit", async event => {
                 event.preventDefault();
                 const selectedRound = availableRounds.find(round => String(round.id) === roundSelect.value);
+                const selectedConsortia = getSelectedDataManagerConsortia(consortiumChoices);
                 const opensAt = new Date(document.getElementById("optInOutOpensAt").value);
                 const closesAt = new Date(document.getElementById("optInOutClosesAt").value);
-                const submitButton = form.querySelector('button[type="submit"]');
                 const progress = document.getElementById("optInOutRoundProgress");
-                if (!selectedRound || Number.isNaN(opensAt.getTime()) || Number.isNaN(closesAt.getTime()) || closesAt <= opensAt) {
-                    progress.innerHTML = '<div class="text-danger">Select a valid round and a closing time after the opening time.</div>';
+                const jobs = selectedConsortia.map(consortiumId => ({
+                    consortiumId,
+                    round: (roundsByConsortium.get(consortiumId) || []).find(round => String(round.id) === String(selectedRound?.id)),
+                    studies: studiesByConsortium.get(consortiumId) || []
+                })).filter(job => job.round?.concepts.length && job.studies.length);
+                if (!selectedRound || !jobs.length || Number.isNaN(opensAt.getTime()) || Number.isNaN(closesAt.getTime()) || closesAt <= opensAt) {
+                    progress.innerHTML = '<div class="text-danger">Select at least one consortium, a valid round, and a closing time after the opening time.</div>';
                     return;
                 }
 
                 submitButton.disabled = true;
                 submitButton.textContent = "Initiating...";
+                consortiumChoices.querySelectorAll(".data-manager-consortium-choice").forEach(input => { input.disabled = true; });
+                roundSelect.disabled = true;
                 progress.innerHTML = "";
-                const addProgress = message => {
-                    progress.insertAdjacentHTML("beforeend", `<div>${escapeHtml(message)}</div>`);
+                const addProgress = (consortiumId, message) => {
+                    progress.insertAdjacentHTML("beforeend", `<div><strong>${escapeHtml(consortiumId)}:</strong> ${escapeHtml(message)}</div>`);
                     progress.scrollTop = progress.scrollHeight;
                 };
-                try {
-                    const initiatedBy = String(JSON.parse(localStorage.parms || "{}").login || "");
-                    const result = await provisionOptInOutRound({
-                        round: selectedRound,
-                        concepts: selectedRound.concepts,
-                        studies,
-                        opensAt: opensAt.toISOString(),
-                        closesAt: closesAt.toISOString(),
-                        initiatedBy,
-                        onProgress: addProgress
-                    });
-                    if (result.failures.length) {
-                        summary.className = "alert alert-warning";
-                        summary.textContent = `${result.createdAssignments} files are ready; ${result.failures.length} failed. Run initiation again to retry missing files.`;
-                        submitButton.disabled = false;
-                        submitButton.textContent = "Retry Initiation";
-                    } else {
-                        summary.className = "alert alert-success";
-                        summary.textContent = `${result.createdAssignments} study/concept assignments are ready in Box and published to Data Managers.`;
-                        submitButton.remove();
-                        form.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
+                const initiatedBy = String(JSON.parse(localStorage.parms || "{}").login || "");
+                const results = [];
+                const errors = [];
+                for (const job of jobs) {
+                    try {
+                        const result = await provisionOptInOutRound({
+                            round: job.round,
+                            concepts: job.round.concepts,
+                            studies: job.studies,
+                            consortiumId: job.consortiumId,
+                            opensAt: opensAt.toISOString(),
+                            closesAt: closesAt.toISOString(),
+                            initiatedBy,
+                            onProgress: message => addProgress(job.consortiumId, message)
+                        });
+                        results.push({ ...result, consortiumId: job.consortiumId });
+                    } catch (error) {
+                        console.error(`Unable to initiate ${job.consortiumId} Opt-In/Opt-Out round:`, error);
+                        errors.push({ consortiumId: job.consortiumId, message: error.message || "Unable to initiate the round." });
+                        addProgress(job.consortiumId, error.message || "Unable to initiate the round.");
                     }
-                } catch (error) {
-                    console.error("Unable to initiate Opt-In/Opt-Out round:", error);
-                    progress.insertAdjacentHTML("beforeend", `<div class="text-danger">${escapeHtml(error.message || "Unable to initiate the round.")}</div>`);
+                }
+                const createdAssignments = results.reduce((total, result) => total + result.createdAssignments, 0);
+                const failedAssignments = results.reduce((total, result) => total + result.failures.length, 0);
+                if (errors.length || failedAssignments) {
+                    summary.className = "alert alert-warning";
+                    summary.textContent = `${createdAssignments} assignments are ready; ${failedAssignments + errors.length} operation${failedAssignments + errors.length === 1 ? " needs" : "s need"} attention. Run initiation again to retry missing files.`;
                     submitButton.disabled = false;
                     submitButton.textContent = "Retry Initiation";
+                    const enabledIds = new Set(enabledConsortia.map(item => item.consortium));
+                    consortiumChoices.querySelectorAll(".data-manager-consortium-choice").forEach(input => { input.disabled = !enabledIds.has(input.value); });
+                    roundSelect.disabled = false;
+                } else {
+                    summary.className = "alert alert-success";
+                    summary.textContent = `${createdAssignments} assignment${createdAssignments === 1 ? " is" : "s are"} ready in Box and published for ${jobs.map(job => job.consortiumId).join(", ")}.`;
+                    submitButton.remove();
+                    form.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
                 }
             });
         } catch (error) {
             console.error("Unable to prepare Opt-In/Opt-Out initiation:", error);
-            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load the accepted Admin Chair concepts or C-NCI studies.</div>';
+            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load the accepted Admin Chair concepts or consortium studies.</div>';
         } finally {
             button.disabled = false;
             button.classList.remove("buttonsubmit--loading");
@@ -918,20 +1026,81 @@ export const loadStudyAccessAdminTable = async () => {
             syncDataManagerButton.dataset.bound = "true";
             syncDataManagerButton.addEventListener("click", async () => {
                 const buttonText = syncDataManagerButton.querySelector(".buttonsubmit__text");
-                syncDataManagerButton.disabled = true;
-                syncDataManagerButton.classList.add("buttonsubmit--loading");
-                if (buttonText) buttonText.textContent = "Syncing...";
-                try {
-                    const result = await syncCurrentDataManagerChairRequests();
-                    alert(`${result.concepts} C-NCI chair-stage concept${result.concepts === 1 ? " was" : "s were"} published to Data Managers.${result.legacyMatched ? ` ${result.legacyMatched} legacy file(s) were matched by filename or Concept ID.` : ""}${result.skipped ? ` ${result.skipped} file(s) could not be matched to a source round.` : ""}`);
-                } catch (error) {
-                    console.error("Unable to sync Data Manager chair status:", error);
-                    alert(error.message || "Unable to sync Data Manager chair status from Box.");
-                } finally {
+                const modalElement = document.getElementById("confluenceMainModal");
+                const header = document.getElementById("confluenceModalHeader");
+                const body = document.getElementById("confluenceModalBody");
+                const enabledConsortia = getDataManagerConsortia().filter(item => item.collectionFolderId);
+                if (!modalElement || !header || !body || !enabledConsortia.length) {
+                    alert("No consortium has a configured Data Manager collection folder.");
+                    return;
+                }
+                const defaultConsortium = enabledConsortia[0].consortium;
+                header.innerHTML = '<h5 class="modal-title">Publish Chair Status to Data Managers</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+                body.innerHTML = `
+                    <form id="publishDataManagerChairStatusForm">
+                        <fieldset class="mb-3"><legend class="fs-6 fw-semibold">Consortia <span class="text-muted fw-normal">(select one or more)</span></legend><div id="publishDataManagerConsortiumChoices" class="border rounded p-2">${renderDataManagerConsortiumChoices("publishDataManagerConsortium", [defaultConsortium])}</div></fieldset>
+                        <p class="text-muted">This scans each selected consortium's chair-review folders and publishes every concept's current stage and chair score to its individual Data Manager TSV files.</p>
+                        <div id="publishDataManagerStatus" class="alert d-none" role="alert"></div>
+                        <div id="publishDataManagerProgress" class="small mb-3" style="max-height: 180px; overflow-y: auto;"></div>
+                        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-outline-primary">Publish Status</button></div>
+                    </form>`;
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                const form = document.getElementById("publishDataManagerChairStatusForm");
+                const consortiumChoices = document.getElementById("publishDataManagerConsortiumChoices");
+                form.addEventListener("submit", async event => {
+                    event.preventDefault();
+                    const selectedConsortia = getSelectedDataManagerConsortia(consortiumChoices);
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const status = document.getElementById("publishDataManagerStatus");
+                    const progress = document.getElementById("publishDataManagerProgress");
+                    if (!selectedConsortia.length) {
+                        status.className = "alert alert-warning";
+                        status.textContent = "Select at least one consortium.";
+                        return;
+                    }
+                    submitButton.disabled = true;
+                    consortiumChoices.querySelectorAll(".data-manager-consortium-choice").forEach(input => { input.disabled = true; });
+                    syncDataManagerButton.disabled = true;
+                    syncDataManagerButton.classList.add("buttonsubmit--loading");
+                    if (buttonText) buttonText.textContent = "Publishing...";
+                    status.className = "alert alert-info";
+                    status.textContent = `Publishing chair status for ${selectedConsortia.join(", ")}...`;
+                    progress.innerHTML = "";
+                    const results = [];
+                    const errors = [];
+                    for (const consortiumId of selectedConsortia) {
+                        try {
+                            const result = await syncCurrentDataManagerChairRequests(consortiumId, message => {
+                                progress.insertAdjacentHTML("beforeend", `<div><strong>${escapeHtml(consortiumId)}:</strong> ${escapeHtml(message)}</div>`);
+                                progress.scrollTop = progress.scrollHeight;
+                            });
+                            results.push({ ...result, consortiumId });
+                        } catch (error) {
+                            console.error(`Unable to publish ${consortiumId} Data Manager chair status:`, error);
+                            errors.push({ consortiumId, message: error.message || "Unable to publish chair status from Box." });
+                            progress.insertAdjacentHTML("beforeend", `<div class="text-danger"><strong>${escapeHtml(consortiumId)}:</strong> ${escapeHtml(error.message || "Unable to publish chair status from Box.")}</div>`);
+                            progress.scrollTop = progress.scrollHeight;
+                        }
+                    }
+                    if (!errors.length) {
+                        const conceptCount = results.reduce((total, result) => total + result.concepts, 0);
+                        const legacyMatched = results.reduce((total, result) => total + result.legacyMatched, 0);
+                        const skipped = results.reduce((total, result) => total + result.skipped, 0);
+                        status.className = "alert alert-success";
+                        status.textContent = `${conceptCount} chair-stage concept${conceptCount === 1 ? " was" : "s were"} published for ${selectedConsortia.join(", ")}.${legacyMatched ? ` ${legacyMatched} legacy file(s) were matched.` : ""}${skipped ? ` ${skipped} file(s) could not be matched to a source round.` : ""}`;
+                        submitButton.remove();
+                        form.querySelector('[data-bs-dismiss="modal"]').textContent = "Close";
+                    } else {
+                        status.className = "alert alert-danger";
+                        status.textContent = `${results.length} consortium publish operation${results.length === 1 ? " completed" : "s completed"}; ${errors.length} failed. You can retry safely.`;
+                        submitButton.disabled = false;
+                        const enabledIds = new Set(enabledConsortia.map(item => item.consortium));
+                        consortiumChoices.querySelectorAll(".data-manager-consortium-choice").forEach(input => { input.disabled = !enabledIds.has(input.value); });
+                    }
                     syncDataManagerButton.disabled = false;
                     syncDataManagerButton.classList.remove("buttonsubmit--loading");
-                    if (buttonText) buttonText.textContent = "Sync Data Manager Status";
-                }
+                    if (buttonText) buttonText.textContent = "Publish Chair Status to Data Managers";
+                });
             });
         }
 
