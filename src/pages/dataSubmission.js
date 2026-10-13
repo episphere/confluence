@@ -489,6 +489,7 @@ const normalizeConceptDocumentHtml = (html) => {
         "Genotyping",
         "Data Requested From",
         "Carrier Status requested",
+        "CIMBA methodological note reviewed",
         "Risk Factor Variables",
         "Pathology Variables",
         "Survival and Treatment Variables",
@@ -760,7 +761,8 @@ export const parseWordDocument = (text) => {
     // console.log('genotyping:', formData.genotyping);
     formData.sex = extractBetween('Data Requested From', 'Carrier Status requested', text);
     // console.log('sex:', formData.sex);
-    formData.carStatus = extractBetween('Carrier Status requested', 'Risk Factor Variables', text);
+    formData.carStatus = extractBetween('Carrier Status requested', '(?:CIMBA methodological note reviewed|Risk Factor Variables)', text);
+    formData.cimbaMethodologyConfirmation = extractBetween('CIMBA methodological note reviewed', 'Risk Factor Variables', text);
     // console.log('carStatus:', formData.carStatus);
     formData.riskfactvarv = extractBetween('Risk Factor Variables', 'Pathology Variables', text);
     // console.log('riskfactvarv:', formData.riskfactvarv);

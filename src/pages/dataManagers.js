@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
+import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, listComments, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
 import { loadDataManagerRequests, saveDataManagerAccessDetails } from "../optInOutStore.js";
 
 const escapeHtml = value => String(value ?? "")
@@ -66,6 +66,35 @@ const loadInvestigatorDetails = async requests => {
         }));
     }
     return detailsByConceptId;
+};
+
+const loadReviewerComments = async body => {
+    const section = body.querySelector(".data-manager-reviewer-comments");
+    if (!section || section.dataset.loaded === "true" || section.dataset.loading === "true") return;
+    const conceptId = body.dataset.conceptBoxId;
+    if (!conceptId) {
+        section.textContent = "Reviewer comments are unavailable because this request has no concept file.";
+        return;
+    }
+    section.dataset.loading = "true";
+    section.textContent = "Loading reviewer comments...";
+    try {
+        const response = await listComments(conceptId);
+        const data = typeof response === "string" ? JSON.parse(response) : response;
+        if (!Array.isArray(data?.entries)) throw new Error("Unable to read Box comments.");
+        section.innerHTML = data.entries.length ? data.entries.map(comment => `
+            <div class="border-bottom pb-2 mb-2">
+                <p class="text-primary small mb-0">${escapeHtml(comment.created_by?.name || comment.created_by?.login || "Unknown reviewer")}</p>
+                <p class="my-0 text-break" style="white-space: pre-wrap;">${escapeHtml(comment.message)}</p>
+                <p class="small mb-0 text-muted">${escapeHtml(comment.created_at ? formatDateTime(comment.created_at) : "Date unavailable")}</p>
+            </div>`).join("") : '<span class="text-muted">No comments to show.</span>';
+        section.dataset.loaded = "true";
+    } catch (error) {
+        console.warn(`Unable to load reviewer comments for Concept ID ${conceptId}:`, error);
+        section.innerHTML = '<span class="text-danger">Unable to load reviewer comments.</span> <button type="button" class="btn btn-sm btn-outline-secondary data-manager-retry-comments">Retry</button>';
+    } finally {
+        delete section.dataset.loading;
+    }
 };
 
 const parseDtaFiles = value => {
@@ -323,6 +352,10 @@ export const loadDataManagerRequestsTable = async () => {
                                     <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Institution</div><div>${escapeHtml(details.institution || "Not provided")}</div></div>
                                     <div class="col-12"><div class="small fw-bold text-muted">All investigators who need access</div><div class="data-manager-all-investigators">${escapeHtml(details.allInvestigators || "Not provided")}</div></div>
                                 </div>
+                                <details class="data-manager-comments-dropdown mb-3 border-top pt-3">
+                                    <summary class="fw-semibold">DACC reviewer comments</summary>
+                                    <div class="data-manager-reviewer-comments mt-3" role="status">Open to load reviewer comments.</div>
+                                </details>
                                 <div class="border-top pt-3">
                                     <label class="form-label fw-semibold">Access notes / people granted access</label>
                                     <textarea class="form-control data-manager-access-notes" rows="3" placeholder="Record who has been granted access and any relevant notes.">${escapeHtml(request.access_notes || "")}</textarea>
@@ -343,6 +376,12 @@ export const loadDataManagerRequestsTable = async () => {
                 <span id="dataManagerRequestCount" class="small text-muted ms-auto"></span>
             </div>
             <div class="table-responsive data-manager-table-wrap"><table class="table table-hover align-middle mb-0 data-manager-accordion-table"><thead class="table-light"><tr><th>Concept</th><th>Round</th><th>Consortium score</th><th>Current stage</th><th>Expected availability</th><th><span class="visually-hidden">Details</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+
+        container.querySelectorAll(".data-manager-comments-dropdown").forEach(dropdown => {
+            dropdown.addEventListener("toggle", () => {
+                if (dropdown.open) loadReviewerComments(dropdown.closest(".accordion-body"));
+            });
+        });
 
         const applyFilters = () => {
             const search = document.getElementById("dataManagerRequestSearch")?.value.trim().toLowerCase() || "";
@@ -388,6 +427,12 @@ export const loadDataManagerRequestsTable = async () => {
         };
 
         container.addEventListener("click", async event => {
+            const retryCommentsButton = event.target.closest(".data-manager-retry-comments");
+            if (retryCommentsButton) {
+                await loadReviewerComments(retryCommentsButton.closest(".accordion-body"));
+                return;
+            }
+
             const addButton = event.target.closest(".data-manager-add-dta");
             if (addButton) {
                 addButton.closest(".accordion-body")?.querySelector(".data-manager-dta-list")?.insertAdjacentHTML("beforeend", renderDtaAssignment());
