@@ -1,5 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
-import { csv2Json, dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo } from "../shared.js";
+import { csv2Json, dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo, getFile, studyDescriptions, listComments, createComment } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests } from "./chairmenu.js";
 
@@ -53,8 +53,119 @@ const getStudyStatusSelect = (value = "in") => {
 
 const normalizeStudyFilterValue = (value) => String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 
-const loadStudyAccessAdminRows = async () => {
-    const workbookRows = await loadOptInOutWorkbookRows();
+const STUDY_ACCESS_COMMENT_PREFIX = "Study Opt-In/Out change: ";
+const studyAccessDecisionKey = (consortium, study) => `${normalizeStudyFilterValue(consortium === "NCI" ? "C-NCI" : consortium)}|${normalizeStudyFilterValue(study)}`;
+
+const loadStudyAccessDecisions = async (conceptId) => {
+    const comments = [];
+    let offset = 0;
+    while (true) {
+        const response = await listComments(conceptId, offset);
+        const page = typeof response === "string" ? JSON.parse(response) : response;
+        if (!Array.isArray(page?.entries)) throw new Error("Unable to load saved study decisions from Box.");
+        comments.push(...page.entries);
+        offset += page.entries.length;
+        if (offset >= (page.total_count ?? offset)) break;
+        if (!page.entries.length) throw new Error("Box returned an incomplete study decision history.");
+    }
+    const decisions = new Map();
+    comments.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at)).forEach(comment => {
+        if (!comment.message?.startsWith(STUDY_ACCESS_COMMENT_PREFIX)) return;
+        try {
+            const change = JSON.parse(comment.message.slice(STUDY_ACCESS_COMMENT_PREFIX.length));
+            if (change.consortium && change.study && ["in", "out"].includes(change.decision)) {
+                decisions.set(studyAccessDecisionKey(change.consortium, change.study), change.decision);
+            }
+        } catch (error) {
+            console.warn("Ignoring malformed study decision comment", comment.id);
+        }
+    });
+    return decisions;
+};
+
+const confirmStudyAccessChange = (select, container, managerView) => {
+    const decision = select.value;
+    const previous = select.dataset.previousValue;
+    select.value = previous;
+    if (decision === previous) return;
+    const { consortium, study, conceptBoxId } = select.closest("td").dataset;
+    const user = JSON.parse(localStorage.parms || "{}");
+    const isManager = dataManagersInfo.some(manager => manager.email.toLowerCase() === String(user.login).toLowerCase()
+        && normalizeStudyFilterValue(manager.consortium) === normalizeStudyFilterValue(consortium));
+    if (managerView ? !isManager : !emailsAllowedToUpdateData.includes(user.login)) return;
+    const modalElement = document.getElementById("confluenceMainModal");
+    const header = document.getElementById("confluenceModalHeader");
+    const body = document.getElementById("confluenceModalBody");
+    if (!modalElement || !header || !body) return;
+    header.innerHTML = '<h5 class="modal-title">Confirm Opt-In/Out Change</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+    body.innerHTML = `<form id="studyDecisionChangeForm">
+        <p class="text-muted">Concept: ${escapeHtml(select.closest("tr")?.querySelector(".concept-user-toggle")?.textContent?.trim() || conceptBoxId)}</p>
+        <p>Change <strong>${escapeHtml(study)}</strong> (${escapeHtml(consortium)}) from <strong>Opt-${previous === "out" ? "Out" : "In"}</strong> to <strong>Opt-${decision === "out" ? "Out" : "In"}</strong>?</p>
+        <label for="studyDecisionReason" class="form-label">Reason for change (recorded in Box)</label>
+        <textarea id="studyDecisionReason" class="form-control" rows="3" required></textarea>
+        <div id="studyDecisionStatus" class="mt-3" role="status"></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Update Opt-In/Out</button></div>
+    </form>`;
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+    body.querySelector("form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const reasonInput = body.querySelector("textarea");
+        const reason = reasonInput.value.trim();
+        if (!reason) { reasonInput.value = ""; reasonInput.reportValidity(); return; }
+        const buttons = modalElement.querySelectorAll("button");
+        const status = body.querySelector("#studyDecisionStatus");
+        const preventDismiss = event => event.preventDefault();
+        modalElement.addEventListener("hide.bs.modal", preventDismiss);
+        buttons.forEach(button => { button.disabled = true; });
+        status.textContent = "Saving change to Box...";
+        try {
+            const latest = await loadStudyAccessDecisions(conceptBoxId);
+            const committed = latest.get(studyAccessDecisionKey(consortium, study)) || "in";
+            if (committed !== previous) throw new Error("This selection has changed since the page loaded. Reload the page before editing it.");
+            const response = await createComment(conceptBoxId, STUDY_ACCESS_COMMENT_PREFIX + JSON.stringify({
+                consortium, study, previous, decision, reason, changed_by: user.login, changed_at_utc: new Date().toISOString()
+            }));
+            if (response?.status !== 201) throw new Error("Box did not confirm the change. Please try again.");
+            container.querySelectorAll(".study-status-select").forEach(control => {
+                const cell = control.closest("td").dataset;
+                if (cell.conceptBoxId !== conceptBoxId || studyAccessDecisionKey(cell.consortium, cell.study) !== studyAccessDecisionKey(consortium, study)) return;
+                control.value = decision;
+                control.dataset.previousValue = decision;
+                const isOut = decision === "out";
+                control.classList.toggle("border-danger", isOut);
+                control.classList.toggle("text-danger", isOut);
+                control.classList.toggle("border-success", !isOut);
+                control.classList.toggle("text-success", !isOut);
+                control.style.backgroundColor = isOut ? "#f8d7da" : "#d1e7dd";
+                control.style.color = isOut ? "#842029" : "#0f5132";
+            });
+            modalElement.removeEventListener("hide.bs.modal", preventDismiss);
+            modal.hide();
+        } catch (error) {
+            status.className = "alert alert-danger mt-3";
+            status.textContent = error.message || "Unable to save the change.";
+        } finally {
+            modalElement.removeEventListener("hide.bs.modal", preventDismiss);
+            buttons.forEach(button => { button.disabled = false; });
+        }
+    });
+};
+
+const loadStudyAccessAdminRows = async (allowedConsortia = null) => {
+    const [workbookRows, descriptionText] = await Promise.all([
+        loadOptInOutWorkbookRows(),
+        getFile(studyDescriptions)
+    ]);
+    const catalogStudies = JSON.parse(descriptionText).map((row) => ({
+        consortium: String(row.Consortium || "").trim(),
+        acronym: String(row["Study Acronym"] || "").trim(),
+        name: String(row["Study Name"] || "").trim()
+    })).filter((study) => study.consortium && (study.acronym || study.name));
+    const normalizeConsortium = (value) => {
+        const normalized = normalizeStudyFilterValue(value);
+        return normalized === "nci" ? "cnci" : normalized;
+    };
     const csvResponse = await fetch(OPT_IN_OUT_CONCEPTS_CSV_PATH);
     if (!csvResponse.ok) throw new Error(`Unable to load ${OPT_IN_OUT_CONCEPTS_CSV_PATH}`);
 
@@ -71,6 +182,7 @@ const loadStudyAccessAdminRows = async () => {
             .filter(Boolean);
 
         requestedValues.forEach((requestedStudy) => {
+            if (allowedConsortia && !allowedConsortia.some(consortium => normalizeConsortium(consortium) === normalizeConsortium(requestedStudy))) return;
             const key = normalizeStudyFilterValue(requestedStudy);
             const existing = requestedStudyMap.get(key) || { label: requestedStudy, concepts: new Map() };
             if (conceptName) {
@@ -128,13 +240,25 @@ const loadStudyAccessAdminRows = async () => {
     return Array.from(requestedStudyMap.values())
         .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }))
         .map((request) => {
-            const normalizedRequest = normalizeStudyFilterValue(request.label);
-            const studies = normalizedRequest === "cnci"
+            const normalizedRequest = normalizeConsortium(request.label);
+            const workbookStudies = normalizedRequest === "cnci"
                 ? allStudies
                 : allStudies.filter((study) => [study.name, study.acronym]
                     .map(normalizeStudyFilterValue)
                     .filter(Boolean)
                     .some((value) => value === normalizedRequest || value.includes(normalizedRequest) || normalizedRequest.includes(value)));
+            const matchingCatalogStudies = catalogStudies.filter((study) =>
+                normalizeConsortium(study.consortium) === normalizedRequest ||
+                [study.name, study.acronym].some((value) => normalizeStudyFilterValue(value) === normalizedRequest)
+            );
+            const studyMap = new Map();
+            [...workbookStudies, ...matchingCatalogStudies].forEach((study) => {
+                const key = normalizeStudyFilterValue(study.acronym || study.name);
+                if (key && !studyMap.has(key)) studyMap.set(key, study);
+            });
+            const studies = Array.from(studyMap.values()).sort((a, b) =>
+                (a.acronym || a.name).localeCompare(b.acronym || b.name, undefined, { sensitivity: "base" })
+            );
             const studyKeys = new Set(studies.map((study) => normalizeStudyFilterValue(study.acronym || study.name)));
             const associatedUsers = users.map((user) => ({
                 ...user,
@@ -618,15 +742,15 @@ export const optInOutTemplate = () => {
     `;
 };
 
-export const studyAccessAdminTemplate = () => {
+export const studyAccessAdminTemplate = (managerView = false) => {
     return `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
                 <div class="main-summary-row d-flex justify-content-between align-items-center">
                     <div class="align-left">
-                        <h1 class="page-header">Study Access Admin</h1>
+                        <h1 class="page-header">${managerView ? "Consortium Study Access" : "Study Access Admin"}</h1>
                     </div>
-                    <div class="align-right">
+                    ${managerView ? "" : `<div class="align-right">
                         <button type="button" id="createDemoOptInOutRoundBtn" class="buttonsubmit button-glow-red">
                             <span class="buttonsubmit__text">Create Demo Round</span>
                         </button>
@@ -639,10 +763,10 @@ export const studyAccessAdminTemplate = () => {
                         <button type="button" id="syncDataManagerStatusBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;">
                             <span class="buttonsubmit__text">Publish Chair Status to Data Managers</span>
                         </button>
-                    </div>
+                    </div>`}
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
-                    <p class="mb-3">Expand a requested consortia/study to review its accepted concepts and individual studies. Initiating a round creates pending selection files in Box; expand a concept name to see its users and associated studies.</p>
+                    <p class="mb-3">Expand a consortium to review concepts and individual studies. Opt-in/out changes require a reason and are recorded in Box.</p>
                     <div id="studyAccessAdminTableContainer">Loading...</div>
                 </div>
             </div>
@@ -1000,7 +1124,7 @@ const bindInitiateOptInOutRoundButton = () => {
     });
 };
 
-export const loadStudyAccessAdminTable = async () => {
+export const loadStudyAccessAdminTable = async (managerView = false) => {
     const container = document.getElementById("studyAccessAdminTableContainer");
     if (!container || container.dataset.loaded === "true") return;
 
@@ -1013,7 +1137,10 @@ export const loadStudyAccessAdminTable = async () => {
         }
 
         const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
-        if (!userForAuth) {
+        const allowedConsortia = managerView ? dataManagersInfo
+            .filter(manager => manager.email.toLowerCase() === userEmail.toLowerCase())
+            .map(manager => manager.consortium) : null;
+        if (managerView ? !allowedConsortia.length : !userForAuth) {
             container.innerHTML = "<p class='text-warning'>You do not have access to this admin page.</p>";
             return;
         }
@@ -1125,7 +1252,14 @@ export const loadStudyAccessAdminTable = async () => {
             });
         }
 
-        const requestedStudies = await loadStudyAccessAdminRows();
+        const requestedStudies = await loadStudyAccessAdminRows(allowedConsortia);
+        const savedDecisions = new Map();
+        const conceptIds = [...new Set(requestedStudies.flatMap(request => request.concepts.map(concept => concept.boxId)).filter(Boolean))];
+        for (let index = 0; index < conceptIds.length; index += 10) {
+            await Promise.all(conceptIds.slice(index, index + 10).map(async id => {
+                savedDecisions.set(id, await loadStudyAccessDecisions(id));
+            }));
+        }
         if (!requestedStudies.length) {
             container.innerHTML = "<p class='text-warning'>No requested consortia or study values were found.</p>";
             return;
@@ -1165,8 +1299,8 @@ export const loadStudyAccessAdminTable = async () => {
                 const roundLabel = roundNumber ? `R${roundNumber}` : "--";
                 const conceptDetailsId = `studyAccessConcept-${requestIndex}-${conceptIndex}`;
                 const statusCells = studies.map((study) => `
-                    <td class="text-center align-middle" data-study="${escapeHtml(study.acronym || study.name)}">
-                        <div class="d-flex justify-content-center">${getStudyStatusSelect("in")}</div>
+                    <td class="text-center align-middle" data-study="${escapeHtml(study.acronym || study.name)}" data-consortium="${escapeHtml(study.consortium || request.label)}" data-concept-box-id="${escapeHtml(conceptBoxId)}">
+                        <div class="d-flex justify-content-center">${getStudyStatusSelect(savedDecisions.get(conceptBoxId)?.get(studyAccessDecisionKey(study.consortium || request.label, study.acronym || study.name)) || "in")}</div>
                     </td>
                 `).join("");
 
@@ -1359,14 +1493,10 @@ export const loadStudyAccessAdminTable = async () => {
         }
 
         container.querySelectorAll(".study-status-select").forEach((select) => {
+            select.dataset.previousValue = select.value;
+            select.disabled = !select.closest("td").dataset.conceptBoxId;
             select.addEventListener("change", () => {
-                const isOut = select.value === "out";
-                select.classList.toggle("border-danger", isOut);
-                select.classList.toggle("text-danger", isOut);
-                select.classList.toggle("border-success", !isOut);
-                select.classList.toggle("text-success", !isOut);
-                select.style.backgroundColor = isOut ? "#f8d7da" : "#d1e7dd";
-                select.style.color = isOut ? "#842029" : "#0f5132";
+                confirmStudyAccessChange(select, container, managerView);
             });
         });
 

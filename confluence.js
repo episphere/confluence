@@ -108,6 +108,7 @@ export const confluence = async () => {
         const optInOutElement = document.getElementById('optInOutMenu');
         const studyAccessAdminElement = document.getElementById('studyAccessAdminMenu');
         const dataManagersElement = document.getElementById('dataManagersMenu');
+        const dataManagerStudyAccessElement = document.getElementById('dataManagerStudyAccessMenu');
         const acceptedFormsElement = document.getElementById('acceptedForms');
         const plotsTabElement = document.getElementById('plotsTab');
 
@@ -282,6 +283,17 @@ export const confluence = async () => {
                 document.title = 'Confluence - Data Managers';
                 confluenceDiv.innerHTML = dataManagersTemplate();
                 await loadDataManagerRequestsTable();
+                hideAnimation();
+            });
+        }
+        if (dataManagerStudyAccessElement) {
+            dataManagerStudyAccessElement.addEventListener('click', async () => {
+                if (dataManagerStudyAccessElement.classList.contains('navbar-active')) return;
+                showAnimation();
+                assignNavbarActive(dataManagerStudyAccessElement, 2);
+                document.title = 'Confluence - Consortium Study Access';
+                confluenceDiv.innerHTML = studyAccessAdminTemplate(true);
+                await loadStudyAccessAdminTable(true);
                 hideAnimation();
             });
         }
@@ -492,6 +504,15 @@ const manageRouter = async () => {
         await loadStudyAccessAdminTable();
         hideAnimation();
     }
+    else if (hash === '#data_manager_study_access') {
+        const element = document.getElementById('dataManagerStudyAccessMenu');
+        if (!element || element.classList.contains('navbar-active')) return;
+        document.title = 'Confluence - Consortium Study Access';
+        assignNavbarActive(element, 2);
+        confluenceDiv.innerHTML = studyAccessAdminTemplate(true);
+        await loadStudyAccessAdminTable(true);
+        hideAnimation();
+    }
     else if (hash === '#data_managers') {
         const element = document.getElementById('dataManagersMenu');
         if (!element) return;
@@ -607,6 +628,11 @@ const manageHash = async () => {
     }
     else if (hash === '#study_access_admin') {
         const element = document.getElementById('studyAccessAdminMenu');
+        if (!element) return;
+        element.click();
+    }
+    else if (hash === '#data_manager_study_access') {
+        const element = document.getElementById('dataManagerStudyAccessMenu');
         if (!element) return;
         element.click();
     }

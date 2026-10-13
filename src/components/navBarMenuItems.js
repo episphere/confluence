@@ -152,12 +152,33 @@ export const navBarMenutemplate = () => {
                 `) :''
             }
             ${
+                (authDataManager || authAdmin) ? (
+                    `<li class="nav-item dropdown grid-elements">
+                        <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown7" role="button" title="Data Managers" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Data Managers
+                        </a>
+                        <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown7">
+                            <li>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_managers" title="Data Managers" id="dataManagersMenu">
+                                    Data Managers
+                                </a>
+                            </li>
+                            ${authDataManager ? `<li>
+                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_manager_study_access" title="Consortium Study Access" id="dataManagerStudyAccessMenu">
+                                    Consortium Study Access
+                                </a>
+                            </li>` : ""}
+                        </ul>
+                    </li>`
+                ) : ''
+            }
+            ${
                 (authAdmin || authDataManager || accessToUpload) ? (
                     `<li class="nav-item dropdown grid-elements">
                         <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown6" role="button" title="Study Opt-In/Out" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Study Opt-In/Out
                         </a>
-                        <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown6">
                             ${authAdmin ? `<li>
                                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#study_access_admin" title="Study Access Admin" id="studyAccessAdminMenu">
                                     Study Access Admin
@@ -168,11 +189,6 @@ export const navBarMenutemplate = () => {
                                     Study Opt-In/Out
                                 </a>
                             </li>
-                            ${(authDataManager || authAdmin) ? `<li>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#data_managers" title="Data Managers" id="dataManagersMenu">
-                                    Data Managers
-                                </a>
-                            </li>` : ""}
                         </ul>
                     </li>`
                 ) : ''

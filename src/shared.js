@@ -2269,10 +2269,10 @@ export const getCurrentRoundFolderId = async (parentFolderId) => {
     return context.folderId;
 };
 
-export const listComments = async (id) => {
+export const listComments = async (id, offset = 0) => {
     try {
         const access_token = JSON.parse(localStorage.parms).access_token;
-        const response = await fetch(`https://api.box.com/2.0/files/${id}/comments`, {
+        const response = await fetch(`https://api.box.com/2.0/files/${id}/comments?offset=${offset}&limit=100`, {
             method: "GET",
             headers: {
                 Authorization: "Bearer " + access_token,
@@ -2282,16 +2282,16 @@ export const listComments = async (id) => {
         });
         
         if (response.status === 401) {
-            if ((await refreshToken()) === true) return await listComments(id);
+            if ((await refreshToken()) === true) return await listComments(id, offset);
         } else if (response.status === 429) {
             const retryAfter = response.headers.get('retry-after') || 1;
             await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
-            return await listComments(id);
+            return await listComments(id, offset);
         } else {
             return response.text();
         }
     } catch (err) {
-        if ((await refreshToken()) === true) return await listComments(id);
+        if ((await refreshToken()) === true) return await listComments(id, offset);
     }
 };
 
