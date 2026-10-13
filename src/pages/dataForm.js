@@ -1,6 +1,8 @@
 import { uploadWordFileVersion, submitterFolder, downloadFile, uploadWordFile, addMetaData, conceptForm, getFile, getCollaboration, checkDataSubmissionPermissionLevel, listComments, createComment, emailsAllowedToUpdateData, getCurrentRoundContext, addRoundSuffixToFileName } from "../shared.js"
 // import * as docx from "docx";
 
+const cimbaMethodologyNote = `<p>CIMBA pathogenic variant carriers are not a random sample of <i>BRCA1</i> and <i>BRCA2</i> carriers. Study participants have largely been ascertained through clinical genetics services, where testing is often driven by early-onset disease and/or strong family history. This results in non-random sampling with respect to disease status and age at diagnosis. Analyses that ignore this ascertainment process, such as standard case-control or conventional survival analyses may yield biased risk estimates. Applicants should therefore use statistical methods that appropriately account for the underlying ascertainment and sampling framework when analysing CIMBA data. For further details, see for example: Antoniou et al (2005) <a href="https://doi.org/10.1002/gepi.20074" target="_blank" rel="noopener noreferrer">https://doi.org/10.1002/gepi.20074</a>, Barnes et al (2012) <a href="https://doi.org/10.1002/gepi.21620" target="_blank" rel="noopener noreferrer">https://doi.org/10.1002/gepi.21620</a>, Antoniou et al (2010) <a href="https://doi.org/10.1038/ng.669" target="_blank" rel="noopener noreferrer">https://doi.org/10.1038/ng.669</a></p>`;
+
 export const formtemplate = (showDownloadButton = true, resubmitTitle = null) => {
     const date = new Date();
     const today = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
@@ -337,6 +339,13 @@ export const formtemplate = (showDownloadButton = true, resubmitTitle = null) =>
                                                 <input class="form-check-input" id="BRCA2Yes" name="carStatus" type="checkbox" value="BRCA2" style="position: relative; top: -2px;"/>
                                                 <label class="form-check-label" for="BRCA2Yes">BRCA2</label>
                                             </div>
+                                            <div id="cimbaMethodologyConfirmationGroup" class="mt-3" hidden>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" id="cimbaMethodologyConfirmation" name="cimbaMethodologyConfirmation" type="checkbox" value="Yes" disabled/>
+                                                    <label id="cimbaMethodologyLabel" class="form-check-label" for="cimbaMethodologyConfirmation"><b>If requesting BRCA1 or BRCA2 data from CIMBA, please confirm you have reviewed this methodological note</b><span class="required-label">*</span></label>
+                                                </div>
+                                                <div id="cimbaMethodologyHoverNote" class="cimba-methodology-hover-note" role="note" aria-label="CIMBA methodological note">${cimbaMethodologyNote}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -639,7 +648,84 @@ export const formFunctions = () => {
     });
 };
 
+const setupCimbaMethodologyConfirmation = () => {
+    const carriers = [document.getElementById('BRCA1Yes'), document.getElementById('BRCA2Yes')];
+    const group = document.getElementById('cimbaMethodologyConfirmationGroup');
+    const confirmation = document.getElementById('cimbaMethodologyConfirmation');
+    const label = document.getElementById('cimbaMethodologyLabel');
+    let reviewed = false;
+    const isRequested = () => carriers.some(input => input.checked);
+    const updateConfirmationValidity = () => {
+        confirmation.setCustomValidity(isRequested() && (!reviewed || !confirmation.checked)
+            ? 'Please confirm review of the CIMBA methodological note before submitting BRCA1 or BRCA2 data requests.'
+            : '');
+    };
+    const showNote = () => {
+        const modalElement = document.getElementById('popUpModal');
+        document.getElementById('modalBody').innerHTML = `
+            <h5 id="cimbaMethodologyNoteTitle">CIMBA methodological note</h5>
+            ${cimbaMethodologyNote}
+            <button type="button" id="confirmCimbaMethodologyRead" class="btn btn-primary">I confirm review of note</button>`;
+        modalElement.setAttribute('aria-labelledby', 'cimbaMethodologyNoteTitle');
+        modalElement.addEventListener('hidden.bs.modal', () => modalElement.removeAttribute('aria-labelledby'), { once: true });
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        document.getElementById('confirmCimbaMethodologyRead').addEventListener('click', () => {
+            if (isRequested()) {
+                reviewed = true;
+                confirmation.checked = true;
+                group.dataset.reviewed = 'true';
+                label.tabIndex = 0;
+                label.setAttribute('aria-describedby', 'cimbaMethodologyHoverNote');
+                updateConfirmationValidity();
+            }
+            modal.hide();
+        });
+        modal.show();
+    };
+    const sync = (openNote = false) => {
+        const requested = isRequested();
+        group.hidden = !requested;
+        confirmation.disabled = !requested;
+        confirmation.required = requested;
+        if (!requested) {
+            confirmation.checked = false;
+            reviewed = false;
+            delete group.dataset.reviewed;
+            label.removeAttribute('tabindex');
+            label.removeAttribute('aria-describedby');
+        } else if (openNote && !reviewed) {
+            showNote();
+        }
+        updateConfirmationValidity();
+    };
+    carriers.forEach(input => input.addEventListener('change', () => sync(true)));
+    group.addEventListener('keydown', event => {
+        if (event.key === 'Escape') group.dataset.noteDismissed = 'true';
+    });
+    group.addEventListener('mouseleave', () => delete group.dataset.noteDismissed);
+    group.addEventListener('focusin', () => delete group.dataset.noteDismissed);
+    confirmation.addEventListener('change', updateConfirmationValidity);
+    confirmation.addEventListener('click', event => {
+        if (!reviewed) {
+            event.preventDefault();
+            showNote();
+        }
+    });
+    sync();
+    return {
+        sync,
+        validate: () => {
+            sync();
+            if (!isRequested() || (reviewed && confirmation.checked)) return true;
+            if (reviewed) confirmation.reportValidity();
+            else showNote();
+            return false;
+        }
+    };
+};
+
 export const dataForm = async (prepopulateData = null) => {
+  const cimbaMethodology = setupCimbaMethodologyConfirmation();
   async function handleFormSubmit3() {
     console.log("Button Clicked to Download");
     let formFile = await downloadFile(conceptForm);
@@ -687,12 +773,16 @@ export const dataForm = async (prepopulateData = null) => {
         // a.download = filename;
         // a.click();
         
-    await generateWord(jsondata, btn, false);
-    btn.classList.toggle("buttonsubmit--loading");
-    btn.disabled = false;
+    try {
+      await generateWord(jsondata, btn, false);
+    } finally {
+      btn.classList.remove("buttonsubmit--loading");
+      btn.disabled = false;
+    }
   }
   async function handleFormSubmit(eventtest) {
     eventtest.preventDefault();
+    if (!cimbaMethodology.validate()) return;
     
     // Check if all comment responses are filled for resubmissions
     if (prepopulateData?.fileId) {
@@ -762,6 +852,8 @@ export const dataForm = async (prepopulateData = null) => {
         setTimeout(() => {
             Object.keys(prepopulateData).forEach(key => {
                 const value = prepopulateData[key];
+                // A new submission requires the applicant to review and confirm again.
+                if (key === 'cimbaMethodologyConfirmation') return;
                 
                 // Handle radio buttons (amendment)
                 if (key === 'amendment') {
@@ -808,6 +900,7 @@ export const dataForm = async (prepopulateData = null) => {
                     }
                 }
             });
+            cimbaMethodology.sync();
         }, 100);
     }
 
@@ -1255,6 +1348,20 @@ export const dataForm = async (prepopulateData = null) => {
                 after: 150,
               },
             }),
+            new docx.Paragraph({
+              heading: docx.HeadingLevel.HEADING_2,
+              alignment: docx.AlignmentType.START,
+              children: [
+                new docx.TextRun({ text: "CIMBA methodological note reviewed: " }),
+                new docx.TextRun({
+                  text: jsondata.carStatus.some(value => value === 'BRCA1' || value === 'BRCA2')
+                    ? (jsondata.cimbaMethodologyConfirmation === 'Yes' ? 'Yes' : 'Not confirmed')
+                    : 'Not applicable',
+                  bold: false,
+                }),
+              ],
+              spacing: { after: 150 },
+            }),
             // new docx.Paragraph({
             //   heading: docx.HeadingLevel.HEADING_2,
             //   alignment: docx.AlignmentType.START,
@@ -1409,6 +1516,7 @@ export const dataForm = async (prepopulateData = null) => {
     console.log(btn);
     await docx.Packer.toBlob(doc).then(async (blob) => {
       console.log(btn);
+      let uploadedFileName = filename;
       if (uploadReady) {
       const originalConceptId = document.getElementById('originalConceptId').value;
       const fileId = prepopulateData?.fileId;
@@ -1427,7 +1535,6 @@ export const dataForm = async (prepopulateData = null) => {
       }
       
       let response;
-      let uploadedFileName = filename;
       const roundContext = await getCurrentRoundContext(submitterFolder);
       const targetFolderId = roundContext.folderId;
       
