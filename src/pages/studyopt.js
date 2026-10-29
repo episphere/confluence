@@ -1,4 +1,5 @@
 import { showPreview } from "../components/boxPreview.js";
+import { renderAdminPageTabs } from "../components/adminNavigation.js";
 import { dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo, getFile, studyDescriptions } from "../shared.js";
 import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections, loadStudyAccessAssignments, saveStudyAccessSelection } from "../optInOutStore.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests } from "./chairmenu.js";
@@ -443,6 +444,7 @@ export const studyAccessAdminTemplate = (managerView = false) => {
     return `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
+                ${managerView ? "" : renderAdminPageTabs("study-access")}
                 <div class="main-summary-row d-flex justify-content-between align-items-center">
                     <div class="align-left">
                         <h1 class="page-header">${managerView ? "Consortium Study Access" : "Study Access Admin"}</h1>

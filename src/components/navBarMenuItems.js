@@ -1,4 +1,5 @@
 import { applicationURLs, dataManagersInfo, emailsAllowedToUpdateData, getChairByEmail, getFile } from './../shared.js';
+import { ADMIN_PAGES } from './adminNavigation.js';
 
 export const navBarMenutemplate = () => {
     let authChair = getChairByEmail(JSON.parse(localStorage.parms).login) !== null;
@@ -113,7 +114,7 @@ export const navBarMenutemplate = () => {
                 </ul>
             </li>-->
             ${
-                (authChair || authAdmin) ? (
+                authChair ? (
                     `<li class="nav-item dropdown grid-elements">
                         <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown4" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             DACC Menu
@@ -129,15 +130,6 @@ export const navBarMenutemplate = () => {
                                                             <li><a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#events/DACC" id="DACCevents">DACC Meetings</a></li>`
                                 ) : ''
                             }
-                            ${
-                                authAdmin ? (
-                                    `<li>
-                                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#auth_table" title="Admin Table" id="authTable">
-                                            Admin Table
-                                        </a>
-                                    </li>`
-                                ) : ''
-                            }
                             <!--<a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#accepted_forms" title="Accepted Projects" id="acceptedForms"> Accepted Data Requests </a>
                                 <li class="grid-elements">
                                     <a class="nav-link nav-menu-links white-font" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
@@ -151,6 +143,16 @@ export const navBarMenutemplate = () => {
                     </li>
                 `) :''
             }
+            ${authAdmin ? `<li class="nav-item dropdown grid-elements">
+                <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarAdminDropdown" role="button" title="Admin" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Admin
+                </a>
+                <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarAdminDropdown">
+                    ${ADMIN_PAGES.map(page => `<li>
+                        <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="${page.href}" title="${page.label}" id="${page.id}">${page.label}</a>
+                    </li>`).join("")}
+                </ul>
+            </li>` : ""}
             ${
                 (authDataManager || authAdmin) ? (
                     `<li class="nav-item dropdown grid-elements">
@@ -179,11 +181,6 @@ export const navBarMenutemplate = () => {
                             Study Opt-In/Out
                         </a>
                         <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown6">
-                            ${authAdmin ? `<li>
-                                <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#study_access_admin" title="Study Access Admin" id="studyAccessAdminMenu">
-                                    Study Access Admin
-                                </a>
-                            </li>` : ""}
                             <li>
                                 <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#opt_in_out" title="Study Opt-In/Out" id="optInOutMenu">
                                     Study Opt-In/Out

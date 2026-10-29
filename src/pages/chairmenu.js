@@ -2,6 +2,8 @@ import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
 import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, getChairByEmail, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
 import { publishDataManagerChairRequests, updateDataManagerChairStatus } from "../optInOutStore.js";
+import { REQUESTED_DATA_GROUPS, extractAdminRequestedData, matchesAdminRequestedData } from "./adminRequestedData.js";
+import { renderAdminPageTabs } from "../components/adminNavigation.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -88,18 +90,26 @@ const setupConceptSearch = (inputId, statusId, rowSelector) => {
     const applySearch = () => {
         const query = input.value.trim().toLowerCase();
         const rows = Array.from(document.querySelectorAll(rowSelector));
+        const filterPanel = inputId === "adminConceptSearch" ? document.getElementById("adminRequestedDataFilters") : null;
+        const selections = filterPanel ? Array.from(filterPanel.querySelectorAll("input:checked"))
+            .map(checkbox => [checkbox.dataset.group, checkbox.value]) : [];
+        const matchMode = filterPanel?.querySelector("select")?.value;
+        const selectedRound = inputId === "adminConceptSearch" ? document.getElementById("roundSelect")?.value : null;
         let visibleCount = 0;
         rows.forEach(row => {
             const investigators = row.querySelector('[id^="investigators"]')?.textContent || "";
             const searchableText = `${row.dataset.searchText || ""} ${investigators}`.toLowerCase();
-            const matches = query.length < 3 || searchableText.includes(query);
+            const matchesSearch = query.length < 3 || searchableText.includes(query);
+            const requestedData = row.requestedData || {};
+            const matchesRound = !selectedRound || selectedRound === "all" || row.dataset.roundId === selectedRound;
+            const matches = matchesSearch && matchesRound && matchesAdminRequestedData(requestedData, selections, matchMode);
             row.classList.toggle("d-none", !matches);
             if (matches) visibleCount++;
         });
 
         if (!status) return;
         if (query.length > 0 && query.length < 3) status.textContent = "Enter at least 3 characters.";
-        else if (query.length >= 3) status.textContent = `${visibleCount} matching concept${visibleCount === 1 ? "" : "s"}`;
+        else if (query.length >= 3 || selections.length) status.textContent = `${visibleCount} matching concept${visibleCount === 1 ? "" : "s"}`;
         else status.textContent = "";
     };
 
@@ -109,8 +119,50 @@ const setupConceptSearch = (inputId, statusId, rowSelector) => {
 
 const refreshConceptSearch = (inputId) => {
     const input = document.getElementById(inputId);
-    if (input && typeof input.applyConceptSearch === "function" && input.value.trim().length >= 3) input.applyConceptSearch();
+    if (input && typeof input.applyConceptSearch === "function") input.applyConceptSearch();
 };
+
+const renderAdminRequestedDataFilters = () => `
+    <div id="adminRequestedDataFilters" class="d-flex flex-wrap align-items-start gap-2 mb-2">
+        ${REQUESTED_DATA_GROUPS.map(group => `
+            <details class="border rounded p-2 bg-white">
+                <summary>${escapeHtml(group.label)} <span class="small text-muted" data-filter-count="${group.key}"></span></summary>
+                ${group.choices.map((choice, index) => `<div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="adminData-${group.key}-${index}" data-group="${group.key}" value="${escapeHtml(choice)}">
+                    <label class="form-check-label" for="adminData-${group.key}-${index}">${escapeHtml(choice)}</label>
+                </div>`).join("")}
+            </details>`).join("")}
+        <div>
+            <label for="adminRequestedDataMode" class="small">Match selected data</label>
+            <select id="adminRequestedDataMode" class="form-select form-select-sm">
+                <option value="or">OR — any selected choice</option>
+                <option value="and">AND — every selected choice</option>
+            </select>
+        </div>
+        <button type="button" id="adminRequestedDataClear" class="btn btn-outline-secondary btn-sm align-self-center">Clear data filters</button>
+    </div>`;
+
+const setupAdminRequestedDataFilters = () => {
+    const panel = document.getElementById("adminRequestedDataFilters");
+    if (!panel) return;
+    const update = () => {
+        REQUESTED_DATA_GROUPS.forEach(group => {
+            const count = panel.querySelectorAll(`input[data-group="${group.key}"]:checked`).length;
+            panel.querySelector(`[data-filter-count="${group.key}"]`).textContent = count ? `(${count} selected)` : "";
+        });
+        refreshConceptSearch("adminConceptSearch");
+    };
+    panel.addEventListener("change", update);
+    document.getElementById("adminRequestedDataClear").addEventListener("click", () => {
+        panel.querySelectorAll("input").forEach(input => { input.checked = false; });
+        update();
+    });
+    update();
+};
+
+const renderAdminRequestedDataDetails = file => file.documentDataLoaded
+    ? REQUESTED_DATA_GROUPS.map(group => `<div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">${escapeHtml(group.label)}</div><div class="col">${escapeHtml((file.requestedData?.[group.key] || []).join(", ") || "Not selected / not provided")}</div></div>`).join("")
+    : `<span class="text-muted">Loading requested data...</span>`;
 
 export function renderFilePreviewDropdown(files, tab, hideDownloadAll = false) {
     let template = "";
@@ -993,8 +1045,8 @@ const setAdminHydrationProgress = (kind, loaded, total, failures = 0) => {
     status.classList.toggle("text-success", complete && failureCount === 0);
     status.classList.toggle("text-warning", failureCount > 0);
     status.textContent = complete
-        ? (failureCount ? `Background loading finished with ${failureCount} item(s) unavailable.` : "All scores, comments, and investigator search data loaded.")
-        : `Loading scores/comments ${commentsLoaded}/${commentsTotal}; investigator search data ${documentsLoaded}/${documentsTotal}...`;
+        ? (failureCount ? `Background loading finished with ${failureCount} item(s) unavailable. Unavailable forms cannot match requested data filters.` : "All scores, comments, investigators, and requested data loaded.")
+        : `Loading scores/comments ${commentsLoaded}/${commentsTotal}; investigators and requested data ${documentsLoaded}/${documentsTotal}. Data filter results update as forms load...`;
 };
 
 const getAdminDocumentData = async (file) => {
@@ -1003,7 +1055,8 @@ const getAdminDocumentData = async (file) => {
         const request = readDocFile(file.fileId)
             .then(docContent => ({
                 contacts: docContent ? extractContactInvestigators(docContent) : "",
-                requestedConsortia: docContent ? parseRequestedConsortiaValues(docContent) : []
+                requestedConsortia: docContent ? parseRequestedConsortiaValues(docContent) : [],
+                requestedData: extractAdminRequestedData(docContent)
             }))
             .catch(error => {
                 adminDocumentDataCache.delete(cacheKey);
@@ -1018,6 +1071,9 @@ const updateAdminRowSearchData = (file) => {
     const checkbox = document.getElementById(String(file.fileId));
     const row = checkbox?.closest(".admin-table-row");
     if (!row) return;
+    row.requestedData = file.requestedData;
+    const details = row.querySelector(".admin-requested-data");
+    if (details) details.innerHTML = renderAdminRequestedDataDetails(file);
     row.dataset.searchText = `${file.filename || file.fileInfo?.name || ""} ${getConceptId(file, file.conceptId || file.fileId)} ${file.contacts || ""}`;
     const investigators = document.getElementById(`investigators${file.fileId}`);
     if (investigators) {
@@ -1047,6 +1103,7 @@ const hydrateAdminDocumentData = async (data, requireComplete = false) => {
                 const documentData = await getAdminDocumentData(file);
                 file.contacts = documentData.contacts;
                 file.requestedConsortia = documentData.requestedConsortia;
+                file.requestedData = documentData.requestedData;
                 file.documentDataLoaded = true;
                 updateAdminRowSearchData(file);
             }));
@@ -1059,6 +1116,8 @@ const hydrateAdminDocumentData = async (data, requireComplete = false) => {
                     investigators.textContent = "Unable to load investigator details.";
                     investigators.classList.add("text-danger");
                 }
+                const details = document.getElementById(String(chunk[index].fileId))?.closest(".admin-table-row")?.querySelector(".admin-requested-data");
+                if (details) details.innerHTML = '<span class="text-danger">Unable to load requested data from this form.</span>';
             });
             setAdminHydrationProgress("documents", loaded, files.length, failures);
             refreshConceptSearch("adminConceptSearch");
@@ -2526,6 +2585,7 @@ export const authTableTemplate = () => {
     const userForAuth = emailsAllowedToUpdateData.includes(userEmail);
     if (!userForAuth) return;
     let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Add Concept IDs to Filenames </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
+    template = template.replace('<div class="container body-min-height">', `<div class="container body-min-height">${renderAdminPageTabs("dacc")}`);
     template = template.replace(
         '<button type="button" id="renameFilesBtn"',
         '<button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"><span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn"'
@@ -2766,11 +2826,7 @@ export const generateAuthTableFiles = async () => {
     const renderAuthSelectedRound = async (selectedFolderId) => {
         const tableContainer = document.getElementById('adminAccordian');
         if (tableContainer && tableContainer.innerHTML !== "") {
-            const rows = tableContainer.querySelectorAll('.admin-table-row');
-            rows.forEach(row => {
-                const roundId = row.getAttribute('data-round-id');
-                if (selectedFolderId === 'all' || roundId === selectedFolderId) row.classList.remove('d-none'); else row.classList.add('d-none');
-            });
+            refreshConceptSearch("adminConceptSearch");
             return;
         }
         const filteredSub = adminDataCache.sub;
@@ -3171,6 +3227,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     if (filteredSub.length > 0 || processedCom.length > 0 || processedRes.length > 0) {
         template += `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted<h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate<h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
         template += renderConceptSearch("adminConceptSearch", "adminConceptSearchStatus");
+        template += renderAdminRequestedDataFilters();
         template += `<div id="adminHydrationStatus" class="small text-muted mb-2" aria-live="polite">Preparing background data...</div>`;
         template += viewAuthFinalDecisionFilesColumns();
         template += '<div id="files"> </div></div></div>';
@@ -3179,6 +3236,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     if (filteredSub.length !== 0 || processedCom.length !== 0 || processedRes.length !== 0) {
         viewAuthFinalDecisionFiles(filteredSub, processedCom, processedRes);
         setupConceptSearch("adminConceptSearch", "adminConceptSearchStatus", "#adminAccordian > .admin-table-row");
+        setupAdminRequestedDataFilters();
         initializeAdminActionRequiredControls();
         const updateButtonStates = () => {
             const anyChecked = document.querySelectorAll('.pl:checked').length > 0;
@@ -3250,6 +3308,16 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     document.querySelectorAll(".admin-table-row > .row-24").forEach(row => {
       const rowFileId = row.querySelector(".admin-checkbox")?.id;
       const file = adminFilesById.get(String(rowFileId));
+      if (file) {
+        row.parentElement.requestedData = file.requestedData;
+        const detailsBody = row.parentElement.querySelector(".accordion-body");
+        if (detailsBody) {
+          const requestedDataDetails = document.createElement("div");
+          requestedDataDetails.className = "admin-requested-data mb-2";
+          requestedDataDetails.innerHTML = renderAdminRequestedDataDetails(file);
+          detailsBody.insertBefore(requestedDataDetails, detailsBody.querySelector('[id$="Comments"]')?.parentElement || null);
+        }
+      }
       const conceptCell = row.children[1];
       const roundCell = row.children[2];
       const stateCell = row.children[5];
