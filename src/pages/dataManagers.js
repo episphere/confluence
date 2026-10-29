@@ -3,6 +3,7 @@ import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, e
 import { loadDataManagerRequests, saveDataManagerAccessDetails, saveDataManagerStage, DATA_MANAGER_STAGES } from "../optInOutStore.js";
 import { prepareTestDataManagerWorkspace } from "./chairmenu.js";
 import { getTestDataManager, renderTestDataManagerBanner } from "../components/testDataManagerMode.js";
+import { getDataManagerRoundLabel, getDataManagerRoundNumber, normalizeDataManagerScore, setupDataManagerTable } from "../components/dataManagerTable.js";
 
 const escapeHtml = value => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -327,10 +328,12 @@ export const loadDataManagerRequestsTable = async () => {
 
         const investigatorDetails = await loadInvestigatorDetails(requests);
         requests.sort((left, right) => `${left.round_name}|${getConceptId(left)}`.localeCompare(`${right.round_name}|${getConceptId(right)}`, undefined, { numeric: true, sensitivity: "base" }));
-        const roundOptions = Array.from(new Set(requests.map(request => request.round_name).filter(Boolean)))
+        const roundOptions = Array.from(new Set(requests.map(getDataManagerRoundLabel)))
             .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }))
             .map(round => `<option value="${escapeHtml(round)}">${escapeHtml(round)}</option>`).join("");
         const rows = requests.map((request, index) => {
+            const roundLabel = getDataManagerRoundLabel(request);
+            const score = normalizeDataManagerScore(request.chair_score);
             const status = getCollectionStatus(request);
             const details = investigatorDetails.get(String(request.concept_box_id || "")) || {};
             const assignments = parseDtaAssignments(request.dta_assignments);
@@ -343,13 +346,13 @@ export const loadDataManagerRequestsTable = async () => {
                 : request.submitted === "true" && request.decision === "opt_out"
                     ? "Not applicable"
                     : `After ${formatDateTime(request.closes_at_utc)}`;
-            const baseSearchText = [getConceptName(request), getConceptId(request), request.round_name, request.consortium_id, request.chair_score, details.contactInvestigator, details.email, details.institution, details.allInvestigators].join(" ").toLowerCase();
+            const baseSearchText = [getConceptName(request), getConceptId(request), roundLabel, request.consortium_id, score, details.contactInvestigator, details.email, details.institution, details.allInvestigators].join(" ").toLowerCase();
             const searchText = `${baseSearchText} ${request.access_notes || ""} ${assignments.flatMap(assignment => [assignment.dta, assignment.people, ...parseDtaFiles(assignment.files).map(file => file.fileName)]).join(" ")}`.toLowerCase();
             return `
-                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(request.round_name)}" data-stage-search="${escapeHtml(status.label.toLowerCase())}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
+                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(roundLabel)}" data-score="${escapeHtml(score)}" data-sort-concept="${escapeHtml(getConceptName(request))}" data-sort-round="${getDataManagerRoundNumber(request) ?? ""}" data-sort-score="${escapeHtml(score)}" data-sort-stage="${escapeHtml(status.label)}" data-sort-availability="${!isPreOptInStage && request.submitted === "true" && request.decision === "opt_in" ? "0" : !isPreOptInStage && request.submitted !== "true" && Number.isFinite(Date.parse(request.closes_at_utc)) ? Date.parse(request.closes_at_utc) : escapeHtml(availability)}" data-stage-search="${escapeHtml(status.label.toLowerCase())}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
                     <td class="data-manager-concept-cell" data-label="Concept"><div class="d-flex align-items-start gap-2"><span class="flex-grow-1 text-wrap">${escapeHtml(getConceptName(request))}</span>${request.concept_box_id ? `<button class="btn btn-sm custom-btn data-manager-concept-preview flex-shrink-0" type="button" data-file-id="${escapeHtml(request.concept_box_id)}" title="Preview concept" aria-label="Preview ${escapeHtml(getConceptName(request))}"><i class="fas fa-external-link-alt"></i></button>` : ""}</div><div class="small text-muted">ID: ${escapeHtml(getConceptId(request))}</div></td>
-                    <td data-label="Round">${escapeHtml(request.round_name)}</td>
-                    <td data-label="Consortium score"><span class="fw-semibold">${escapeHtml(request.chair_score || "--")}</span><div class="small text-muted">${escapeHtml(request.consortium_id || "--")}</div></td>
+                    <td data-label="Round">${escapeHtml(roundLabel)}</td>
+                    <td data-label="Score"><span class="fw-semibold">${escapeHtml(score)}</span><div class="small text-muted">${escapeHtml(request.consortium_id || "--")}</div></td>
                     <td data-label="Current stage">
                         <select class="form-select form-select-sm data-manager-stage" data-request-index="${index}" aria-label="Current stage for ${escapeHtml(getConceptName(request))}">
                             <option value="" ${!request.manager_stage ? "selected" : ""}>Automatic — ${escapeHtml(getCollectionStatus({ ...request, manager_stage: "" }).label)}</option>
@@ -392,9 +395,14 @@ export const loadDataManagerRequestsTable = async () => {
             <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
                 <input id="dataManagerRequestSearch" type="search" class="form-control" style="max-width: 420px;" placeholder="Search concepts, investigators, email, institution, DTA, or status" aria-label="Search data collection requests">
                 <select id="dataManagerRoundFilter" class="form-select" style="max-width: 260px;" aria-label="Filter by round"><option value="">All rounds</option>${roundOptions}</select>
+                <details id="dataManagerScoreFilter" class="border rounded bg-white p-2">
+                    <summary data-score-summary>All scores</summary>
+                    ${Array.from(new Set(["1", "2", "3", "4", "5", "777", "NA", "--", ...requests.map(request => normalizeDataManagerScore(request.chair_score))])).map((score, index) => `<div class="form-check mt-2"><input type="checkbox" class="form-check-input" id="dataManagerScore${index}" value="${escapeHtml(score)}"><label class="form-check-label" for="dataManagerScore${index}">${escapeHtml(score === "--" ? "-- (No score)" : score)}</label></div>`).join("")}
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-clear-scores>Show all scores</button>
+                </details>
                 <span id="dataManagerRequestCount" class="small text-muted ms-auto"></span>
             </div>
-            <div class="table-responsive data-manager-table-wrap"><table class="table table-hover align-middle mb-0 data-manager-accordion-table"><thead class="table-light"><tr><th>Concept</th><th>Round</th><th>Consortium score</th><th>Current stage</th><th>Expected availability</th><th><span class="visually-hidden">Details</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+            <div class="table-responsive data-manager-table-wrap"><table class="table table-hover align-middle mb-0 data-manager-accordion-table"><thead class="table-light"><tr>${[["Concept", "Concept"], ["Round", "Round"], ["Score", "Score"], ["Stage", "Current stage"], ["Availability", "Expected availability"]].map(([key, label]) => `<th aria-sort="none"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" data-manager-sort="${key}">${label}<i class="fas fa-sort ms-1" aria-hidden="true"></i></button></th>`).join("")}<th><span class="visually-hidden">Details</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 
         container.querySelectorAll(".data-manager-comments-dropdown").forEach(dropdown => {
             dropdown.addEventListener("toggle", () => {
@@ -402,23 +410,7 @@ export const loadDataManagerRequestsTable = async () => {
             });
         });
 
-        const applyFilters = () => {
-            const search = document.getElementById("dataManagerRequestSearch")?.value.trim().toLowerCase() || "";
-            const round = document.getElementById("dataManagerRoundFilter")?.value || "";
-            let visible = 0;
-            container.querySelectorAll(".data-manager-request-row").forEach(row => {
-                const show = (!round || row.dataset.round === round)
-                    && (!search || `${row.dataset.search || ""} ${row.dataset.stageSearch || ""}`.includes(search));
-                row.classList.toggle("d-none", !show);
-                document.getElementById(row.dataset.detailRow)?.classList.toggle("d-none", !show);
-                if (show) visible++;
-            });
-            const count = document.getElementById("dataManagerRequestCount");
-            if (count) count.textContent = `${visible} request${visible === 1 ? "" : "s"}`;
-        };
-        document.getElementById("dataManagerRequestSearch")?.addEventListener("input", applyFilters);
-        document.getElementById("dataManagerRoundFilter")?.addEventListener("change", applyFilters);
-        applyFilters();
+        const applyFilters = setupDataManagerTable(container);
 
         container.querySelectorAll(".data-manager-stage").forEach(select => {
             select.addEventListener("change", async () => {
@@ -437,6 +429,7 @@ export const loadDataManagerRequestsTable = async () => {
                     const status = getCollectionStatus(request);
                     cell.querySelector(".data-manager-stage-detail").textContent = status.detail;
                     row.dataset.stageSearch = status.label.toLowerCase();
+                    row.dataset.sortStage = status.label;
                     message.className = "small data-manager-stage-status text-success";
                     message.textContent = "Saved";
                     applyFilters();

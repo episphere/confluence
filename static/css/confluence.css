@@ -2546,6 +2546,13 @@ ul.form {
   width: 100%;
 }
 
+.data-manager-accordion-table [data-manager-sort] {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
 .data-manager-accordion-table th,
 .data-manager-accordion-table td,
 .data-manager-dta-file-links {
