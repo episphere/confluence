@@ -2,107 +2,164 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const { test } = require('node:test');
-
-const source = fs.readFileSync('src/pages/studyopt.js', 'utf8');
-const catalog = JSON.parse(fs.readFileSync('src/data/studyDescriptions (2).json', 'utf8'));
-const groups = ['AABCG', 'BCAC', 'C-NCI', 'CIMBA', 'LAGENO', 'MERGE'];
-const slice = (start, end) => source.slice(source.indexOf(start), source.indexOf(end));
-function setup(overrides = {}) {
+const source = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/export /g, '');
+const selection = (id, study, consortium = 'C-NCI', round = 'r1') => ({
+    round_id: round, round_name: round, consortium_id: consortium, study_id: study, study_acronym: study, study_name: study,
+    concept_box_id: 'concept1', concept_title: 'Same title', concept_file_name: 'Same title.docx',
+    selection_file_id: id, workflow_stage: 'opt_in_out', decision: 'pending', submitted: 'false', updated_at_utc: '2026-01-01'
+});
+function setup({login = 'admin@example.org', failUpload = false, failComment = false} = {}) {
+    const files = new Map();
+    const folders = new Map([['root', [{id: 'config', name: '_config', type: 'folder'}]], ['cnci', [{id: 'cnci-config', name: '_config', type: 'folder'}]], ['bcac', [{id: 'bcac-config', name: '_config', type: 'folder'}]]]);
+    const reads = [], comments = [];
     const context = {
-        console, dataManagersInfo: [{email: 'manager@example.org', consortium: 'BCAC'}],
-        emailsAllowedToUpdateData: ['admin@example.org'],
-        localStorage: {parms: JSON.stringify({login: 'manager@example.org'})},
-        loadOptInOutWorkbookRows: async () => [{Name: 'Existing user', Study_1: 'Existing study', 'Study_1 Acronym': 'EXISTING'}],
-        getFile: async () => JSON.stringify(catalog), studyDescriptions: 1,
-        fetch: async () => ({ok: true, text: async () => ''}),
-        csv2Json: () => ({data: groups.map((group, i) => ({Concept: 'Example', 'Concept Box ID': String(i + 1), 'Requested Consortia/Study': group}))}),
-        getRoundNumberFromFileName: () => null,
-        extractContactInvestigators: value => value,
-        readDocFile: async () => '',
-        ...overrides
+        console: {warn() {}}, Confluence_Opt_In_Out: 'root', emailsAllowedToUpdateData: ['admin@example.org'],
+        dataManagersInfo: [{email: 'manager@example.org', consortium: 'C-NCI', collectionFolderId: 'cnci'}, {email: 'other@example.org', consortium: 'BCAC', collectionFolderId: 'bcac'}],
+        localStorage: {parms: JSON.stringify({login, name: 'Reviewer'})},
+        getFolderItems: async id => { reads.push(id); return {entries: folders.get(id) || []}; },
+        getFile: async id => { reads.push(id); return files.get(id); },
+        uploadFileVersion: async (data, id) => { if (failUpload) return {status: 403}; files.set(id, data); return {entries: [{id}]}; },
+        uploadFile: async (data, name, folder) => {
+            const id = folder + '/' + name; files.set(id, data);
+            folders.set(folder, [...(folders.get(folder) || []), {id, name, type: 'file'}]);
+            return {entries: [{id}]};
+        },
+        createComment: async (id, message) => { comments.push({id, message}); return {status: failComment ? 403 : 201}; },
+        createFolder: async () => { throw new Error('Unexpected folder creation'); }
     };
     vm.createContext(context);
-    vm.runInContext('const OPT_IN_OUT_CONCEPTS_CSV_PATH = "unused";\n'
-        + slice('const escapeHtml', 'const getConceptDisplayName')
-        + slice('const normalizeHeaderValue', 'const isTruthyCellValue')
-        + slice('const normalizeStudyFilterValue', 'const loadOptInOutWorkbookRows')
-        + slice('const getWorkbookStudyEntries', 'const loadLegacyOptInOutTable')
-        + slice('export const studyAccessAdminTemplate', 'const getCnciWorkbookStudies').replace('export ', '')
-        + '\nthis.api = {loadStudyAccessAdminRows, loadStudyAccessDecisions, confirmStudyAccessChange, studyAccessAdminTemplate};', context);
-    return context;
+    vm.runInContext(source + '\nthis.api = {saveDataManagerStage, loadStudyAccessAssignments, saveStudyAccessSelection, saveOptInOutSelections, loadDataManagerRequests, publishDataManagerChairRequests, publishRowsToDataManagerFiles, serializeTsv, parseTsv};', context);
+    function addFile(folder, id, name, rows) {
+        files.set(id, context.api.serializeTsv([...new Set(rows.flatMap(row => Object.keys(row)))], rows));
+        folders.set(folder, [...(folders.get(folder) || []), {id, name, type: 'file'}]);
+    }
+    const rows = [selection('s1', '4-CBCS'), selection('s2', 'OTHER'), selection('s3', '4-CBCS', 'C-NCI', 'r2'), selection('s4', 'BCAC-STUDY', 'BCAC')];
+    addFile('config', 'requests', 'data_manager_requests.tsv', rows);
+    addFile('config', 'manifest', 'r1_manifest.tsv', rows);
+    rows.forEach(row => addFile('selections', row.selection_file_id, row.selection_file_id + '.tsv', [row]));
+    return {context, api: context.api, files, folders, reads, comments, rows, addFile};
 }
-
-test('manager data is limited to their consortium before concept documents are read', async () => {
-    const reads = [];
-    const context = setup({readDocFile: async id => { reads.push(id); return ''; }});
-    const rows = await context.api.loadStudyAccessAdminRows(['BCAC']);
-    assert.deepEqual(Array.from(rows, row => row.label), ['BCAC']);
-    assert.deepEqual(reads, ['2']);
-    assert.equal(rows[0].studies.length, 124);
-    assert(rows[0].studies.every(study => study.consortium === 'BCAC'));
-    assert.equal((await context.api.loadStudyAccessAdminRows([])).length, 0);
+test('manager stage persists across publishing and can return to automatic', async () => {
+    const app = setup({login: 'manager@example.org'});
+    await app.api.publishRowsToDataManagerFiles(app.rows);
+    const input = {roundId: 'r1', conceptBoxId: 'concept1', consortiumId: 'C-NCI', stage: 'chair_complete'};
+    await app.api.saveDataManagerStage(input);
+    await app.api.publishRowsToDataManagerFiles(app.rows);
+    const manager = app.context.dataManagersInfo[0];
+    let rows = await app.api.loadDataManagerRequests(manager);
+    assert.equal(rows.find(row => row.round_id === 'r1').manager_stage, 'chair_complete');
+    assert.equal(rows.find(row => row.round_id === 'r1').stage_updated_by, 'manager@example.org');
+    assert.equal(rows.find(row => row.round_id === 'r2').manager_stage, '');
+    await assert.rejects(app.api.saveDataManagerStage({...input, consortiumId: 'BCAC'}), /access/);
+    await assert.rejects(app.api.saveDataManagerStage({...input, stage: 'invalid'}), /Invalid/);
+    await app.api.saveDataManagerStage({...input, stage: ''});
+    rows = await app.api.loadDataManagerRequests(manager);
+    assert.equal(rows.find(row => row.round_id === 'r1').manager_stage, '');
+    assert.equal(rows.find(row => row.round_id === 'r1').decision, 'pending');
 });
-
-test('admin retains all consortia and existing C-NCI workbook studies', async () => {
-    const rows = await setup().api.loadStudyAccessAdminRows();
-    assert.equal(rows.length, 6);
-    assert(rows.find(row => row.label === 'C-NCI').studies.some(study => study.acronym === 'EXISTING'));
-    const markup = setup().api.studyAccessAdminTemplate(true);
-    assert(markup.includes('Consortium Study Access'));
-    assert(!markup.includes('initiateOptInOutRoundBtn'));
-    assert(!markup.includes('syncDataManagerStatusBtn'));
+test('failed stage save leaves stored value unchanged', async () => {
+    const app = setup({login: 'manager@example.org', failUpload: true});
+    await app.api.publishRowsToDataManagerFiles(app.rows);
+    await assert.rejects(app.api.saveDataManagerStage({roundId: 'r1', conceptBoxId: 'concept1', consortiumId: 'C-NCI', stage: 'chair_complete'}));
+    const rows = await app.api.loadDataManagerRequests(app.context.dataManagersInfo[0]);
+    assert.equal(rows[0].manager_stage, '');
 });
-
-test('saved decisions paginate, ignore unrelated comments, and use the latest change', async () => {
-    const offsets = [];
-    const comment = (decision, time) => ({created_at: time, message: 'Study Opt-In/Out change: ' + JSON.stringify({consortium: 'BCAC', study: 'ABC', decision})});
-    const context = setup({listComments: async (id, offset) => {
-        offsets.push(offset);
-        return JSON.stringify({total_count: 3, entries: offset === 0
-            ? [comment('out', '2026-01-01'), {message: 'DACC comment'}]
-            : [comment('in', '2026-01-02')]});
-    }});
-    assert.equal((await context.api.loadStudyAccessDecisions('2')).get('bcac|abc'), 'in');
-    assert.deepEqual(offsets, [0, 2]);
-    await assert.rejects(setup({listComments: async () => '{}'}).api.loadStudyAccessDecisions('2'));
+test('admin loads every study/round and publishes complete consortium indexes', async () => {
+    const app = setup();
+    const rows = await app.api.loadStudyAccessAssignments();
+    assert.equal(rows.length, 4);
+    assert(rows.every(row => row.decision === 'pending'));
+    const index = app.api.parseTsv(app.files.get('cnci-config/study_access_assignments.tsv'));
+    assert.equal(index.length, 3);
+    assert(index.every(row => row.consortium_id === 'C-NCI'));
+    assert.equal(new Set(index.map(row => row.selection_file_id)).size, 3);
 });
-
-test('reason is required, cancellation preserves value, and Box success commits the change', async () => {
-    let submit;
-    let posts = 0;
-    let hidden = false;
-    const reason = {value: '', reportValidity() {}};
-    const status = {};
-    const modal = {querySelectorAll: () => [], addEventListener() {}, removeEventListener() {}};
-    const body = {querySelector: selector => selector === 'form' ? {addEventListener: (_, handler) => { submit = handler; }} : selector === 'textarea' ? reason : status};
-    const select = {value: 'out', dataset: {previousValue: 'in'}, closest: selector => selector === 'tr' ? null : ({dataset: {consortium: 'BCAC', study: 'ABC', conceptBoxId: '2'}}), classList: {toggle() {}}, style: {}};
-    const context = setup({
-        document: {getElementById: id => id === 'confluenceMainModal' ? modal : id === 'confluenceModalBody' ? body : {}},
-        bootstrap: {Modal: {getOrCreateInstance: () => ({show() {}, hide() { hidden = true; }})}},
-        listComments: async () => ({entries: [], total_count: 0}),
-        createComment: async (id, message) => { posts++; assert(message.includes('Required reason')); return {status: posts === 1 ? 403 : 201}; }
-    });
-    context.api.confirmStudyAccessChange(select, {querySelectorAll: () => [select]}, true);
-    assert.equal(select.value, 'in');
-    await submit({preventDefault() {}});
-    assert.equal(posts, 0);
-    reason.value = 'Required reason';
-    await submit({preventDefault() {}});
-    assert.equal(posts, 1);
-    assert.equal(select.value, 'in');
-    assert.equal(select.dataset.previousValue, 'in');
-    assert(!hidden);
-    assert(status.textContent.includes('Box did not confirm'));
-    await submit({preventDefault() {}});
-    assert.equal(posts, 2);
-    assert.equal(select.value, 'out');
-    assert.equal(select.dataset.previousValue, 'out');
-    assert(hidden);
+test('manager reads only their consortium, without central access', async () => {
+    const app = setup({login: 'manager@example.org'});
+    app.addFile('cnci-config', 'manager-index', 'study_access_assignments.tsv', app.rows);
+    assert.equal((await app.api.loadStudyAccessAssignments(true)).length, 3);
+    for (const id of ['root', 's4', 'bcac']) assert(!app.reads.includes(id));
 });
-
-test('manager cannot open a change dialog for another consortium', () => {
-    const context = setup({document: {getElementById() { throw new Error('Unauthorized dialog opened'); }}});
-    const select = {value: 'out', dataset: {previousValue: 'in'}, closest: () => ({dataset: {consortium: 'MERGE'}})};
-    context.api.confirmStudyAccessChange(select, {}, true);
-    assert.equal(select.value, 'in');
+test('save updates the original TSV; manager and admin reload the same decision', async () => {
+    const app = setup();
+    const before = await app.api.loadStudyAccessAssignments();
+    app.context.localStorage.parms = JSON.stringify({login: 'manager@example.org'});
+    const saved = await app.api.saveStudyAccessSelection({assignment: before[0], decision: 'opt_out', reason: 'Not participating', managerView: true});
+    assert.equal(saved.updated.decision, 'opt_out');
+    const record = app.api.parseTsv(app.files.get('s1'))[0];
+    assert.equal(record.decision_reason, 'Not participating');
+    assert.equal(JSON.parse(record.decision_history)[0].changed_by, 'manager@example.org');
+    for (const id of ['s2', 's3']) assert.equal(app.api.parseTsv(app.files.get(id))[0].decision, 'pending');
+    assert.equal((await app.api.loadStudyAccessAssignments(true))[0].decision, 'opt_out');
+    app.context.localStorage.parms = JSON.stringify({login: 'admin@example.org'});
+    assert.equal((await app.api.loadStudyAccessAssignments())[0].decision, 'opt_out');
+    assert.equal(app.comments.length, 1);
+});
+test('blank reasons, cross-consortium writes, and stale edits are rejected', async () => {
+    const app = setup();
+    const rows = await app.api.loadStudyAccessAssignments();
+    await assert.rejects(app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_out', reason: '  '}), /reason/);
+    app.context.localStorage.parms = JSON.stringify({login: 'manager@example.org'});
+    await assert.rejects(app.api.saveStudyAccessSelection({assignment: rows[3], decision: 'opt_out', reason: 'No', managerView: true}), /access/);
+    await app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_out', reason: 'No', managerView: true});
+    await assert.rejects(app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_in', reason: 'Stale', managerView: true}), /changed/);
+});
+test('missing files stay unavailable and denied saves leave decisions unchanged', async () => {
+    const app = setup({failUpload: true});
+    const rows = await app.api.loadStudyAccessAssignments();
+    await assert.rejects(app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_out', reason: 'No'}));
+    assert.equal(app.api.parseTsv(app.files.get('s1'))[0].decision, 'pending');
+    app.files.delete('s2');
+    assert.equal((await app.api.loadStudyAccessAssignments()).find(row => row.selection_file_id === 's2').decision, 'unavailable');
+});
+test('comment failure preserves the selection and reason with a warning', async () => {
+    const app = setup({failComment: true});
+    const rows = await app.api.loadStudyAccessAssignments();
+    const result = await app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_out', reason: 'Reason'});
+    assert(result.warning);
+    assert.equal(app.api.parseTsv(app.files.get('s1'))[0].decision_reason, 'Reason');
+});
+test('missing manager index fails explicitly without a CSV fallback', async () => {
+    await assert.rejects(setup({login: 'manager@example.org'}).api.loadStudyAccessAssignments(true), /not been published/);
+});
+test('round manifests recover assignments missing from the request index', async () => {
+    const app = setup();
+    app.files.set('requests', app.api.serializeTsv(Object.keys(app.rows[0]), [app.rows[0]]));
+    assert.equal((await app.api.loadStudyAccessAssignments()).length, 4);
+});
+test('manager saves survive lack of central-index access and ordinary study saves retain audit history', async () => {
+    const app = setup();
+    const rows = await app.api.loadStudyAccessAssignments();
+    app.context.localStorage.parms = JSON.stringify({login: 'manager@example.org'});
+    const original = app.context.getFolderItems;
+    app.context.getFolderItems = async id => { if (id === 'root') throw new Error('Forbidden'); return original(id); };
+    await app.api.saveStudyAccessSelection({assignment: rows[0], decision: 'opt_out', reason: 'Reason', managerView: true});
+    assert.equal((await app.api.loadStudyAccessAssignments(true))[0].decision, 'opt_out');
+    const result = await app.api.saveOptInOutSelections([{selectionFileId: 's1', decision: 'opt_in'}], {email: 'study@example.org'});
+    assert.equal(result.saved.length, 1);
+    assert.equal(JSON.parse(app.api.parseTsv(app.files.get('s1'))[0].decision_history)[0].reason, 'Reason');
+});
+test('chair publishing preserves initiated study links', async () => {
+    const app = setup();
+    await app.api.publishDataManagerChairRequests({round: {id: 'r1', name: 'r1'}, reviews: [{sourceFileId: 'concept1', consortium: 'C-NCI', requestedStudy: 'C-NCI', title: 'Same title', chairScore: '1'}],
+        studies: [{acronym: '4-CBCS', name: '4-CBCS', consortium: 'C-NCI'}], initiatedBy: 'admin@example.org'});
+    const row = app.api.parseTsv(app.files.get('requests')).find(row => row.study_id === '4-CBCS' && row.round_id === 'r1');
+    assert.equal(row.selection_file_id, 's1');
+    assert.equal(row.workflow_stage, 'opt_in_out');
+});
+test('table keeps same-title rounds separate and renders pending and missing assignments honestly', async () => {
+    const page = fs.readFileSync('src/pages/studyopt.js', 'utf8');
+    const slice = (start, end) => page.slice(page.indexOf(start), page.indexOf(end));
+    const context = {console, loadStudyAccessAssignments: async () => [selection('s1', '4-CBCS'), selection('s2', 'OTHER'), selection('s3', '4-CBCS', 'C-NCI', 'r2')],
+        loadOptInOutWorkbookRows: async () => [], getRoundNumberFromFileName: () => null, readDocFile: async () => '', extractContactInvestigators: () => ''};
+    vm.createContext(context);
+    vm.runInContext(slice('const escapeHtml', 'const getConceptDisplayName') + slice('const normalizeStudyFilterValue', 'const loadOptInOutWorkbookRows')
+        + '\nthis.api = {loadStudyAccessAdminRows, getStudyAccessStatusSelect};', context);
+    const groups = await context.api.loadStudyAccessAdminRows(true);
+    assert.equal(groups.length, 1);
+    assert.equal(groups[0].concepts.length, 2);
+    assert.equal(groups[0].studies.length, 2);
+    assert(context.api.getStudyAccessStatusSelect(selection('s1', '4-CBCS')).includes('value="pending" selected'));
+    assert(context.api.getStudyAccessStatusSelect(null).includes('Not assigned'));
+    assert(context.api.getStudyAccessStatusSelect({load_error: 'Denied'}).includes('Unavailable'));
 });

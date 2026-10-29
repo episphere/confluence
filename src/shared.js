@@ -85,6 +85,7 @@ export const dataManagerCollectionFolders = {
 // Consortium Data Managers. A consortium is offered in the administrative
 // publishing workflow only after both its folder and at least one manager exist.
 export const dataManagersInfo = [
+    {id: 'aabcg_data_manager_1', name: 'Wei Zheng', email: 'wei.zheng@vanderbilt.edu', consortium: 'AABCG'},
     {id: 'cnci_data_manager_1', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', consortium: 'C-NCI'},
     {id: 'cnci_data_manager_2', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'C-NCI'},
     {id: 'bcac_data_manager_1', name: 'Manjeet Bolla', email: 'mkh39@medschl.cam.ac.uk', consortium: 'BCAC'},

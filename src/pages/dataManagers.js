@@ -1,6 +1,6 @@
 import { showPreview } from "../components/boxPreview.js";
 import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, listComments, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
-import { loadDataManagerRequests, saveDataManagerAccessDetails } from "../optInOutStore.js";
+import { loadDataManagerRequests, saveDataManagerAccessDetails, saveDataManagerStage, DATA_MANAGER_STAGES } from "../optInOutStore.js";
 
 const escapeHtml = value => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -248,6 +248,10 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFol
 };
 
 const getCollectionStatus = request => {
+    if (Object.hasOwn(DATA_MANAGER_STAGES, request.manager_stage || "")) return {
+        label: DATA_MANAGER_STAGES[request.manager_stage], className: "bg-primary",
+        detail: `Set by ${request.stage_updated_by || "data manager"}${request.stage_updated_at_utc ? ` on ${formatDateTime(request.stage_updated_at_utc)}` : ""}.`
+    };
     if (request.provision_status === "error") return { label: "Setup error", className: "bg-danger", detail: request.provision_error || "The assignment could not be created." };
     if (request.load_error || request.decision === "unavailable") return { label: "Status unavailable", className: "bg-secondary", detail: request.load_error || "The selection file could not be read." };
     if (request.workflow_stage === "chair_review") return { label: "Chair review", className: "bg-warning text-dark", detail: `${request.consortium_id || "Consortium"} chair review is in progress.` };
@@ -331,14 +335,21 @@ export const loadDataManagerRequestsTable = async () => {
                 : request.submitted === "true" && request.decision === "opt_out"
                     ? "Not applicable"
                     : `After ${formatDateTime(request.closes_at_utc)}`;
-            const baseSearchText = [getConceptName(request), getConceptId(request), request.round_name, request.consortium_id, request.chair_score, status.label, details.contactInvestigator, details.email, details.institution, details.allInvestigators].join(" ").toLowerCase();
+            const baseSearchText = [getConceptName(request), getConceptId(request), request.round_name, request.consortium_id, request.chair_score, details.contactInvestigator, details.email, details.institution, details.allInvestigators].join(" ").toLowerCase();
             const searchText = `${baseSearchText} ${request.access_notes || ""} ${assignments.flatMap(assignment => [assignment.dta, assignment.people, ...parseDtaFiles(assignment.files).map(file => file.fileName)]).join(" ")}`.toLowerCase();
             return `
-                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(request.round_name)}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
+                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(request.round_name)}" data-stage-search="${escapeHtml(status.label.toLowerCase())}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
                     <td class="data-manager-concept-cell" data-label="Concept"><div class="d-flex align-items-start gap-2"><span class="flex-grow-1 text-wrap">${escapeHtml(getConceptName(request))}</span>${request.concept_box_id ? `<button class="btn btn-sm custom-btn data-manager-concept-preview flex-shrink-0" type="button" data-file-id="${escapeHtml(request.concept_box_id)}" title="Preview concept" aria-label="Preview ${escapeHtml(getConceptName(request))}"><i class="fas fa-external-link-alt"></i></button>` : ""}</div><div class="small text-muted">ID: ${escapeHtml(getConceptId(request))}</div></td>
                     <td data-label="Round">${escapeHtml(request.round_name)}</td>
                     <td data-label="Consortium score"><span class="fw-semibold">${escapeHtml(request.chair_score || "--")}</span><div class="small text-muted">${escapeHtml(request.consortium_id || "--")}</div></td>
-                    <td data-label="Current stage"><span class="badge ${status.className}">${escapeHtml(status.label)}</span><div class="small text-muted mt-1">${escapeHtml(status.detail)}</div></td>
+                    <td data-label="Current stage">
+                        <select class="form-select form-select-sm data-manager-stage" data-request-index="${index}" aria-label="Current stage for ${escapeHtml(getConceptName(request))}">
+                            <option value="" ${!request.manager_stage ? "selected" : ""}>Automatic — ${escapeHtml(getCollectionStatus({ ...request, manager_stage: "" }).label)}</option>
+                            ${Object.entries(DATA_MANAGER_STAGES).map(([value, label]) => `<option value="${value}" ${request.manager_stage === value ? "selected" : ""}>${label}</option>`).join("")}
+                        </select>
+                        <div class="small text-muted mt-1 data-manager-stage-detail">${escapeHtml(status.detail)}</div>
+                        <div class="small data-manager-stage-status" role="status"></div>
+                    </td>
                     <td data-label="Expected availability">${escapeHtml(availability)}${request.closes_at_utc ? `<div class="small text-muted">Decision deadline: ${escapeHtml(formatDateTime(request.closes_at_utc))}</div>` : ""}</td>
                     <td class="data-manager-toggle-cell" data-label="Details"><button class="accordion-toggle-btn data-manager-accordion-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${rowId}Collapse" aria-expanded="false" aria-controls="${rowId}Collapse" title="Show investigator and access details" aria-label="Show investigator and access details"><i class="fas fa-chevron-down"></i></button></td>
                 </tr>
@@ -389,7 +400,7 @@ export const loadDataManagerRequestsTable = async () => {
             let visible = 0;
             container.querySelectorAll(".data-manager-request-row").forEach(row => {
                 const show = (!round || row.dataset.round === round)
-                    && (!search || (row.dataset.search || "").includes(search));
+                    && (!search || `${row.dataset.search || ""} ${row.dataset.stageSearch || ""}`.includes(search));
                 row.classList.toggle("d-none", !show);
                 document.getElementById(row.dataset.detailRow)?.classList.toggle("d-none", !show);
                 if (show) visible++;
@@ -400,6 +411,36 @@ export const loadDataManagerRequestsTable = async () => {
         document.getElementById("dataManagerRequestSearch")?.addEventListener("input", applyFilters);
         document.getElementById("dataManagerRoundFilter")?.addEventListener("change", applyFilters);
         applyFilters();
+
+        container.querySelectorAll(".data-manager-stage").forEach(select => {
+            select.addEventListener("change", async () => {
+                const request = requests[Number(select.dataset.requestIndex)];
+                const previous = request.manager_stage || "";
+                const stage = select.value;
+                const row = select.closest("tr");
+                const cell = select.closest("td");
+                const message = cell.querySelector(".data-manager-stage-status");
+                select.disabled = true;
+                message.className = "small data-manager-stage-status text-muted";
+                message.textContent = "Saving...";
+                try {
+                    const saved = await saveDataManagerStage({ roundId: request.round_id, conceptBoxId: request.concept_box_id, consortiumId: request.consortium_id, stage });
+                    Object.assign(request, { manager_stage: saved.stage, stage_updated_by: saved.updatedBy, stage_updated_at_utc: saved.updatedAt });
+                    const status = getCollectionStatus(request);
+                    cell.querySelector(".data-manager-stage-detail").textContent = status.detail;
+                    row.dataset.stageSearch = status.label.toLowerCase();
+                    message.className = "small data-manager-stage-status text-success";
+                    message.textContent = "Saved";
+                    applyFilters();
+                } catch (error) {
+                    select.value = previous;
+                    message.className = "small data-manager-stage-status text-danger";
+                    message.textContent = error.message || "Unable to save the stage.";
+                } finally {
+                    select.disabled = false;
+                }
+            });
+        });
 
         const saveAccessBody = async body => {
             const summaryRow = body?.closest(".data-manager-detail-row")?.previousElementSibling;
