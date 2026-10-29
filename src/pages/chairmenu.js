@@ -1,7 +1,8 @@
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
 import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, getChairByEmail, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
-import { publishDataManagerChairRequests, updateDataManagerChairStatus } from "../optInOutStore.js";
+import { publishDataManagerChairRequests, updateDataManagerChairStatus, seedTestDataManagerRequests } from "../optInOutStore.js";
+import { dataManagersInfo } from "../shared.js";
 import { REQUESTED_DATA_GROUPS, extractAdminRequestedData, matchesAdminRequestedData } from "./adminRequestedData.js";
 import { renderAdminPageTabs } from "../components/adminNavigation.js";
 
@@ -2670,6 +2671,31 @@ export const loadAcceptedAdminConceptRounds = async (forceRefresh = false) => {
         name: folder.name,
         concepts: conceptsByRound.get(String(folder.id)) || []
     }));
+};
+
+let testDataManagerPreparation = null;
+export const prepareTestDataManagerWorkspace = async () => {
+    const email = String(JSON.parse(localStorage.parms || "{}").login || "").toLowerCase();
+    const manager = dataManagersInfo.find(item => item.isTest && item.email.toLowerCase() === email);
+    if (!manager) return;
+    if (testDataManagerPreparation) return testDataManagerPreparation;
+    testDataManagerPreparation = (async () => {
+        const data = await loadAdminDataCache();
+        const rounds = new Map();
+        // Source documents are read-only references. Simulated approvals and
+        // every subsequent TEST selection live in the dedicated workspace.
+        for (const file of [...data.sub, ...data.com, ...data.res]) {
+            if (!file.roundId || !/\.docx?$/i.test(file.filename || "")) continue;
+            const id = `test_${file.roundId}`;
+            if (!rounds.has(id)) rounds.set(id, { id, name: `TEST_${file.roundName || file.roundId}`, concepts: new Map() });
+            const key = getConceptId(file) || getConceptTitleFromFileName(file.filename);
+            rounds.get(id).concepts.set(key, { fileId: String(file.fileId), title: file.titlename || file.filename,
+                fileName: file.filename, requestedConsortia: [manager.consortium] });
+        }
+        const studies = studiesInfo.filter(study => study.consortium === manager.consortium);
+        await seedTestDataManagerRequests({ rounds: Array.from(rounds.values(), round => ({ ...round, concepts: Array.from(round.concepts.values()) })), studies });
+    })();
+    try { return await testDataManagerPreparation; } finally { testDataManagerPreparation = null; }
 };
 
 export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", onProgress = null) => {

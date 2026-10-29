@@ -150,7 +150,7 @@ test('chair publishing preserves initiated study links', async () => {
 test('table keeps same-title rounds separate and renders pending and missing assignments honestly', async () => {
     const page = fs.readFileSync('src/pages/studyopt.js', 'utf8');
     const slice = (start, end) => page.slice(page.indexOf(start), page.indexOf(end));
-    const context = {console, loadStudyAccessAssignments: async () => [selection('s1', '4-CBCS'), selection('s2', 'OTHER'), selection('s3', '4-CBCS', 'C-NCI', 'r2')],
+    const context = {console, dataManagersInfo: [], getTestDataManager: () => null, loadStudyAccessAssignments: async () => [selection('s1', '4-CBCS'), selection('s2', 'OTHER'), selection('s3', '4-CBCS', 'C-NCI', 'r2')],
         loadOptInOutWorkbookRows: async () => [], getRoundNumberFromFileName: () => null, readDocFile: async () => '', extractContactInvestigators: () => ''};
     vm.createContext(context);
     vm.runInContext(slice('const escapeHtml', 'const getConceptDisplayName') + slice('const normalizeStudyFilterValue', 'const loadOptInOutWorkbookRows')

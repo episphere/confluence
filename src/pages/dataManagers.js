@@ -1,6 +1,8 @@
 import { showPreview } from "../components/boxPreview.js";
 import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, listComments, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
 import { loadDataManagerRequests, saveDataManagerAccessDetails, saveDataManagerStage, DATA_MANAGER_STAGES } from "../optInOutStore.js";
+import { prepareTestDataManagerWorkspace } from "./chairmenu.js";
+import { getTestDataManager, renderTestDataManagerBanner } from "../components/testDataManagerMode.js";
 
 const escapeHtml = value => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -134,7 +136,7 @@ const getUploadFolderOptions = async (collectionFolderId = Confluence_Opt_In_Out
     ];
 };
 
-const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFolderId, onUploaded }) => {
+const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFolderId, onUploaded, isTest = false }) => {
     const modalElement = document.getElementById("confluenceMainModal");
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
@@ -146,6 +148,7 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFol
 
     try {
         const folders = await getUploadFolderOptions(collectionFolderId);
+        const allowedFolders = new Set(folders.map(folder => String(folder.id)));
         const folderOptions = folders.map(folder => `<option value="${escapeHtml(folder.id)}">${escapeHtml(folder.name)} (ID: ${escapeHtml(folder.id)})</option>`).join("");
         body.innerHTML = `
             <form id="dataManagerDtaUploadForm">
@@ -191,6 +194,7 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFol
                 let folderId;
                 if (createMode) {
                     const parentId = document.getElementById("dtaParentFolderId").value.trim() || document.getElementById("dtaParentFolder").value;
+                    if (isTest && !allowedFolders.has(parentId)) throw new Error("Choose a folder inside the TEST workspace.");
                     const folderName = document.getElementById("dtaNewFolderName").value.trim();
                     if (!folderName) throw new Error("Enter a name for the new folder.");
                     const created = await createFolder(parentId, folderName);
@@ -203,6 +207,7 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFol
                     if (!folderId) throw new Error(created?.message || "Unable to create or locate the requested Box folder.");
                 } else {
                     folderId = document.getElementById("dtaExistingFolderId").value.trim() || document.getElementById("dtaExistingFolder").value;
+                    if (isTest && !allowedFolders.has(folderId)) throw new Error("Test uploads must stay inside the TEST workspace.");
                 }
                 if (!folderId) throw new Error("Choose a destination Box folder.");
 
@@ -278,7 +283,9 @@ export const dataManagersTemplate = () => `
                 <div class="align-left"><h1 class="page-header">Data Managers</h1></div>
             </div>
             <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                ${renderTestDataManagerBanner()}
                 <p class="mb-3">Concepts appear here when an administrator initiates chair review and remain visible through Opt-In/Out and data collection. You will only see requests for your configured consortium.</p>
+                <p><a href="${!getTestDataManager() && emailsAllowedToUpdateData.includes(JSON.parse(localStorage.parms || "{}").login) ? "#study_access_admin" : "#data_manager_study_access"}" class="btn btn-outline-primary">Initiate and monitor Opt-In/Out rounds</a></p>
                 <div id="dataManagerRequestsContainer">Loading...</div>
             </div>
         </div>
@@ -310,6 +317,7 @@ export const loadDataManagerRequestsTable = async () => {
 
         // Administrators without a manager mapping can inspect all rows; mapped
         // administrators retain the same consortium-scoped view as data managers.
+        if (manager?.isTest) await prepareTestDataManagerWorkspace();
         const requests = await loadDataManagerRequests(manager);
         if (!requests.length) {
             container.innerHTML = '<div class="alert alert-info mb-0">No data-collection requests have been initiated for your consortium.</div>';
@@ -484,7 +492,7 @@ export const loadDataManagerRequestsTable = async () => {
             if (uploadButton) {
                 const assignmentElement = uploadButton.closest(".data-manager-dta-assignment");
                 const body = uploadButton.closest(".accordion-body");
-                if (assignmentElement && body) await openDtaUploadModal({ assignmentElement, uploadedBy: userEmail, collectionFolderId: manager?.collectionFolderId || Confluence_Opt_In_Out, onUploaded: () => saveAccessBody(body) });
+                if (assignmentElement && body) await openDtaUploadModal({ assignmentElement, uploadedBy: userEmail, collectionFolderId: manager?.collectionFolderId || Confluence_Opt_In_Out, isTest: Boolean(manager?.isTest), onUploaded: () => saveAccessBody(body) });
                 return;
             }
 

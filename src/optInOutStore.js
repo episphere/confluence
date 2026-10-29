@@ -22,6 +22,7 @@ const CONSORTIUM_ID = "C-NCI";
 
 const ROUND_COLUMNS = ["round_id", "round_name", "consortium_id", "source_box_folder_id", "status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email"];
 const ROUND_MANIFEST_COLUMNS = ["round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "study_folder_id", "round_folder_id", "selection_file_id", "provision_status", "provision_error"];
+ROUND_MANIFEST_COLUMNS.push("round_status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email");
 const STUDY_MANIFEST_COLUMNS = ["round_id", "round_name", "round_status", "opens_at_utc", "closes_at_utc", "concept_box_id", "concept_title", "selection_file_id"];
 const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consortium_id", "study_id", "study_acronym", "study_name", "concept_box_id", "concept_title", "concept_file_name", "decision", "submitted", "submitted_by_name", "submitted_by_email", "submitted_at_utc", "updated_at_utc", "is_demo", "demo_created_by", "demo_created_at_utc", "decision_reason", "decision_history"];
 const DATA_MANAGER_REQUEST_COLUMNS = ["schema_version", "round_id", "round_name", "round_status", "workflow_stage", "opens_at_utc", "closes_at_utc", "concept_box_id", "chair_file_id", "concept_title", "concept_file_name", "requested_study", "consortium_id", "chair_score", "chair_score_updated_at_utc", "study_id", "study_acronym", "study_name", "selection_file_id", "provision_status", "provision_error", "collection_status", "decision", "submitted", "decision_updated_at_utc", "access_notes", "dta_assignments", "access_updated_by", "access_updated_at_utc", "initiated_at_utc", "initiated_by_email", "updated_at_utc"];
@@ -152,11 +153,48 @@ const ensureSelectionFile = async ({ roundFolderId, round, study, concept, conso
     return writeTsv(roundFolderId, fileName, SELECTION_COLUMNS, [row]);
 };
 
-export const provisionOptInOutRound = async ({ round, concepts, studies, consortiumId = CONSORTIUM_ID, opensAt, closesAt, initiatedBy, onProgress }) => {
+export const provisionOptInOutRound = async ({ round, concepts, studies, consortiumId = CONSORTIUM_ID, opensAt, closesAt, initiatedBy, onProgress, managerView = false }) => {
+    const user = JSON.parse(localStorage.parms || "{}");
+    const email = String(user.login || "").trim();
+    const isAdmin = !managerView && emailsAllowedToUpdateData.includes(email);
+    const testWorkspace = dataManagersInfo.find(item => item.isTest && normalizeStudyId(item.consortium) === normalizeStudyId(consortiumId));
+    const manager = dataManagersInfo.find(item => item.email.toLowerCase() === email.toLowerCase()
+        && normalizeStudyId(item.consortium) === normalizeStudyId(consortiumId));
+    if (!isAdmin && !manager) throw new Error("You do not have access to initiate this consortium's round.");
+    if (!round?.id || !round.name || !concepts?.length || !studies?.length
+        || !Number.isFinite(Date.parse(opensAt)) || !Number.isFinite(Date.parse(closesAt)) || Date.parse(closesAt) <= Date.parse(opensAt)) {
+        throw new Error("Choose a round, concepts, studies, and a valid opt-in/out period.");
+    }
+    if (studies.some(study => study.consortium && normalizeStudyId(study.consortium) !== normalizeStudyId(consortiumId))) {
+        throw new Error("Study rosters must belong to the selected consortium.");
+    }
+    if (!isAdmin) {
+        if (!manager.collectionFolderId) throw new Error("No collection folder is configured for this consortium.");
+        const published = await ensureDataManagerRequestFile(manager);
+        const eligible = new Set(published.filter(row => String(row.round_id) === String(round.id)
+            && normalizeStudyId(row.consortium_id) === normalizeStudyId(consortiumId)
+            && ["admin_accepted", "opt_in_out"].includes(row.workflow_stage)).map(row => String(row.concept_box_id)));
+        if (concepts.some(concept => !eligible.has(String(concept.fileId)))) throw new Error("Only accepted concepts published to your consortium can be initiated.");
+    }
+    initiatedBy = email;
     const now = new Date().toISOString();
     const report = (message) => { if (typeof onProgress === "function") onProgress(message); };
-    const configFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
-    const consortiumFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, consortiumId);
+    const configFolder = await getOrCreateOptInOutFolder(testWorkspace ? testWorkspace.collectionFolderId : isAdmin ? Confluence_Opt_In_Out : manager.collectionFolderId, CONFIG_FOLDER_NAME);
+    let consortiumFolder;
+    if (testWorkspace) {
+        consortiumFolder = await getOrCreateOptInOutFolder(testWorkspace.collectionFolderId, "studies");
+    } else if (isAdmin) {
+        consortiumFolder = await getOrCreateOptInOutFolder(Confluence_Opt_In_Out, consortiumId);
+    } else {
+        // A manager may collaborate directly on a consortium folder without
+        // being able to list the parent administrative folder.
+        try { consortiumFolder = await findFolder(Confluence_Opt_In_Out, consortiumId); } catch (error) { /* Try direct collaborations below. */ }
+        if (!consortiumFolder) {
+            const roots = await getFolderItems("0", "name,type,id", 1000);
+            consortiumFolder = boxEntries(roots).find(item => item.type === "folder" && normalizeName(item.name) === normalizeName(consortiumId));
+        }
+        if (!consortiumFolder) throw new Error(`The ${consortiumId} Opt-In/Out study folder must be shared with this data manager in Box before initiation.`);
+    }
     const roundManifestRows = [];
 
     report(`Preparing ${studies.length} ${consortiumId} ${studies.length === 1 ? "assignment" : "studies"}...`);
@@ -217,6 +255,15 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, consort
     }
 
     const roundsFile = await readTsvInFolder(configFolder.id, ROUNDS_FILE_NAME);
+    let previousRound = roundsFile.rows.find(row => String(row.round_id) === String(round.id)
+        && normalizeStudyId(row.consortium_id) === normalizeStudyId(consortiumId));
+    const target = dataManagersInfo.find(item => item.collectionFolderId && normalizeStudyId(item.consortium) === normalizeStudyId(consortiumId));
+    if (!previousRound && target) {
+        const priorConfig = await findFolder(target.collectionFolderId, CONFIG_FOLDER_NAME);
+        const priorRounds = priorConfig ? await readTsvInFolder(priorConfig.id, ROUNDS_FILE_NAME) : { rows: [] };
+        previousRound = priorRounds.rows.find(row => String(row.round_id) === String(round.id)
+            && normalizeStudyId(row.consortium_id) === normalizeStudyId(consortiumId));
+    }
     const roundRow = {
         round_id: round.id,
         round_name: round.name,
@@ -225,8 +272,8 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, consort
         status: roundManifestRows.some(row => row.provision_status === "error") ? "initializing" : "open",
         opens_at_utc: opensAt,
         closes_at_utc: closesAt,
-        initiated_at_utc: now,
-        initiated_by_email: initiatedBy
+        initiated_at_utc: previousRound?.initiated_at_utc || now,
+        initiated_by_email: previousRound?.initiated_by_email || initiatedBy
     };
     await writeTsv(configFolder.id, ROUNDS_FILE_NAME, ROUND_COLUMNS, upsertRows(roundsFile.rows, [roundRow], row => `${row.round_id}|${row.consortium_id || CONSORTIUM_ID}`));
     const roundManifestFileName = normalizeStudyId(consortiumId) === normalizeStudyId(CONSORTIUM_ID)
@@ -266,14 +313,21 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, consort
         decision: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.decision || "pending",
         submitted: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.submitted || "false",
         decision_updated_at_utc: existingRequestByKey.get(getDataManagerRequestKey(assignment))?.decision_updated_at_utc || "",
-        initiated_at_utc: now,
-        initiated_by_email: initiatedBy,
+        initiated_at_utc: roundRow.initiated_at_utc,
+        initiated_by_email: roundRow.initiated_by_email,
         updated_at_utc: now
     }));
     const otherRoundRequests = dataManagerRequests.rows.filter(row => String(row.round_id) !== String(round.id) || normalizeStudyId(row.consortium_id) !== normalizeStudyId(consortiumId));
     const updatedDataManagerRequests = [...otherRoundRequests, ...requestRows];
     await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedDataManagerRequests);
     await publishRowsToDataManagerFiles(updatedDataManagerRequests, [consortiumId]);
+    // Publish the schedule beside the consortium's assignments so an admin can
+    // read manager-initiated rounds without relying on a central index update.
+    if (target) {
+        const targetConfig = await getOrCreateOptInOutFolder(target.collectionFolderId, CONFIG_FOLDER_NAME);
+        const targetRounds = await readTsvInFolder(targetConfig.id, ROUNDS_FILE_NAME);
+        await writeTsv(targetConfig.id, ROUNDS_FILE_NAME, ROUND_COLUMNS, upsertRows(targetRounds.rows, [roundRow], row => `${row.round_id}|${normalizeStudyId(row.consortium_id)}`));
+    }
 
     const failures = roundManifestRows.filter(row => row.provision_status === "error");
     return { createdAssignments: roundManifestRows.length - failures.length, failures, totalAssignments: roundManifestRows.length };
@@ -336,6 +390,11 @@ export const provisionDemoOptInOutRound = async ({ demoName, sourceRound, concep
 
 const resolveStudyFolder = async (study) => {
     const studyId = getStudyId(study);
+    const testWorkspace = dataManagersInfo.find(manager => manager.isTest && normalizeStudyId(manager.consortium) === normalizeStudyId(study.consortium));
+    if (testWorkspace) {
+        const studies = await findFolder(testWorkspace.collectionFolderId, "studies");
+        return studies ? findFolder(studies.id, studyId) : null;
+    }
     try {
         const consortiumFolder = await findFolder(Confluence_Opt_In_Out, CONSORTIUM_ID);
         if (consortiumFolder) {
@@ -533,7 +592,9 @@ const mergeDataManagerRows = (sourceRows, managerRows) => {
     const synchronizedRows = sourceRows.map(sourceRow => {
         const managerRow = managerRowsByKey.get(getVisibleDataManagerRequestKey(sourceRow));
         const managerOwnedValues = Object.fromEntries(DATA_MANAGER_OWNED_COLUMNS.map(column => [column, managerRow?.[column] || ""]));
-        return { ...sourceRow, ...managerOwnedValues };
+        const initiatedValues = managerRow?.selection_file_id && !sourceRow.selection_file_id && sourceRow.workflow_stage !== "admin_denied"
+            ? Object.fromEntries(["selection_file_id", "workflow_stage", "round_status", "opens_at_utc", "closes_at_utc", "initiated_at_utc", "initiated_by_email", "updated_at_utc"].map(column => [column, managerRow[column]])) : {};
+        return { ...sourceRow, ...initiatedValues, ...managerOwnedValues };
     });
     return [...synchronizedRows, ...managerRows.filter(row => !sourceKeys.has(getVisibleDataManagerRequestKey(row)))];
 };
@@ -574,6 +635,7 @@ const publishRowsToDataManagerFiles = async (sourceRows, consortiumIds = null) =
         : null;
     const configuredConsortia = Array.from(dataManagersInfo.reduce((consortia, manager) => {
         if (!manager.consortium || !manager.collectionFolderId) return consortia;
+        if (manager.isTest && !requestedConsortia?.has(normalizeStudyId(manager.consortium))) return consortia;
         if (requestedConsortia && !requestedConsortia.has(normalizeStudyId(manager.consortium))) return consortia;
         consortia.set(normalizeStudyId(manager.consortium), { consortium: manager.consortium, collectionFolderId: manager.collectionFolderId });
         return consortia;
@@ -604,6 +666,32 @@ export const ensureDataManagerRequestFile = async manager => {
         return legacyRows;
     }
     return managerFile.rows;
+};
+
+export const seedTestDataManagerRequests = async ({ rounds, studies }) => {
+    const email = String(JSON.parse(localStorage.parms || "{}").login || "").trim();
+    const manager = dataManagersInfo.find(item => item.isTest && item.email.toLowerCase() === email.toLowerCase());
+    if (!manager?.collectionFolderId) throw new Error("A test data-manager workspace is required.");
+    if (!studies.length || studies.some(study => study.consortium !== manager.consortium)) throw new Error("Use only the TEST study roster.");
+    const config = await getOrCreateOptInOutFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
+    const existing = await readTsvInFolder(config.id, DATA_MANAGER_REQUESTS_FILE_NAME);
+    const previous = new Map(existing.rows.map(row => [getDataManagerRequestKey(row), row]));
+    const now = new Date().toISOString();
+    const added = rounds.flatMap(round => round.concepts.flatMap(concept => studies.map(study => {
+        const row = { schema_version: "1", round_id: round.id, round_name: round.name, consortium_id: manager.consortium,
+            workflow_stage: "admin_accepted", concept_box_id: concept.fileId, concept_title: concept.title,
+            concept_file_name: concept.fileName, requested_study: manager.consortium,
+            study_id: getStudyId(study), study_acronym: study.acronym, study_name: study.name,
+            decision: "pending", submitted: "false", updated_at_utc: now };
+        // Existing simulated decisions, schedules, and manager notes survive a refresh.
+        return { ...row, ...previous.get(getDataManagerRequestKey(row)) };
+    })));
+    const rows = upsertRows(existing.rows, added, getDataManagerRequestKey);
+    if (!existing.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, existing.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, rows)) {
+        await writeTsv(config.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, rows);
+    }
+    await publishRowsToDataManagerFiles(rows, [manager.consortium]);
+    return rows;
 };
 
 export const loadDataManagerRequests = async (manager = null) => {
@@ -656,7 +744,15 @@ export const saveDataManagerStage = async ({ roundId, conceptBoxId, consortiumId
 };
 
 export const saveDataManagerAccessDetails = async ({ roundId, conceptBoxId, consortiumId, notes, dtaAssignments, updatedBy, dataManagerConsortium, dataManagerFolderId }) => {
-    const storageRootId = dataManagerConsortium ? dataManagerFolderId : Confluence_Opt_In_Out;
+    const email = String(JSON.parse(localStorage.parms || "{}").login || "").trim();
+    const manager = dataManagersInfo.find(item => item.email.toLowerCase() === email.toLowerCase()
+        && normalizeStudyId(item.consortium) === normalizeStudyId(consortiumId));
+    const testUser = dataManagersInfo.find(item => item.isTest && item.email.toLowerCase() === email.toLowerCase());
+    if (testUser && (!manager || dataManagerConsortium !== manager.consortium || String(dataManagerFolderId) !== String(manager.collectionFolderId))) {
+        throw new Error("Test data-manager changes must stay inside the TEST workspace.");
+    }
+    const storageRootId = manager?.isTest ? manager.collectionFolderId : dataManagerConsortium ? dataManagerFolderId : Confluence_Opt_In_Out;
+    if (manager?.isTest) updatedBy = email;
     if (!storageRootId) throw new Error(`${consortiumId || "This consortium"} data collection is still in progress.`);
     const configFolder = await findFolder(storageRootId, CONFIG_FOLDER_NAME);
     if (!configFolder) throw new Error("The Data Manager configuration folder was not found.");
@@ -703,7 +799,12 @@ export const saveDataManagerAccessDetails = async ({ roundId, conceptBoxId, cons
 // and round so both review tables point to the original selection TSVs.
 const publishStudyAccessIndex = async (folderId, rows) => {
     const existing = await readTsvInFolder(folderId, STUDY_ACCESS_FILE_NAME);
-    const assignments = upsertRows(existing.rows, rows.filter(row => row.selection_file_id || row.workflow_stage === "opt_in_out"), getDataManagerRequestKey);
+    const existingByKey = new Map(existing.rows.map(row => [getDataManagerRequestKey(row), row]));
+    const incoming = rows.filter(row => row.selection_file_id || row.workflow_stage === "opt_in_out").map(row => {
+        const previous = existingByKey.get(getDataManagerRequestKey(row));
+        return previous && (Date.parse(previous.updated_at_utc) || 0) > (Date.parse(row.updated_at_utc) || 0) ? previous : row;
+    });
+    const assignments = upsertRows(existing.rows, incoming, getDataManagerRequestKey);
     if (!existing.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, existing.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, assignments)) {
         await writeTsv(folderId, STUDY_ACCESS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, assignments);
     }
@@ -714,7 +815,18 @@ const studyAccessUser = managerView => {
     const email = String(user.login || "").trim();
     const managers = dataManagersInfo.filter(manager => manager.email.toLowerCase() === email.toLowerCase());
     if (managerView ? !managers.length : !emailsAllowedToUpdateData.includes(email)) throw new Error("You do not have access to these study selections.");
-    return { name: user.name || "", email, managers };
+    return { name: user.name || "", email, managers, managerView };
+};
+
+const applyOptInOutSchedules = async (rows, configId) => {
+    const rounds = await readTsvInFolder(configId, ROUNDS_FILE_NAME);
+    return rows.map(row => {
+        const round = rounds.rows.find(item => String(item.round_id) === String(row.round_id)
+            && normalizeStudyId(item.consortium_id || CONSORTIUM_ID) === normalizeStudyId(row.consortium_id));
+        return round ? { ...row, opens_at_utc: round.opens_at_utc, closes_at_utc: round.closes_at_utc,
+            initiated_at_utc: round.initiated_at_utc, initiated_by_email: round.initiated_by_email,
+            round_status: round.status === "initializing" ? "initializing" : row.round_status || round.status } : row;
+    });
 };
 
 const loadStudyAccessIndex = async managerView => {
@@ -726,27 +838,60 @@ const loadStudyAccessIndex = async managerView => {
             const folder = await findFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
             const index = folder ? await readTsvInFolder(folder.id, STUDY_ACCESS_FILE_NAME) : null;
             if (!index?.file) throw new Error(`The ${manager.consortium} study assignment index has not been published. Ask an administrator to open Study Access Admin or initiate the round.`);
-            return index.rows.filter(row => normalizeStudyId(row.consortium_id) === normalizeStudyId(manager.consortium));
+            return applyOptInOutSchedules(index.rows.filter(row => normalizeStudyId(row.consortium_id) === normalizeStudyId(manager.consortium)), folder.id);
         }));
         return results.flat();
     }
     const folder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
-    if (!folder) return [];
-    const index = await readTsvInFolder(folder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
-    const assignments = new Map(index.rows.filter(row => row.selection_file_id || row.workflow_stage === "opt_in_out")
-        .map(row => [getDataManagerRequestKey(row), row]));
-    // Round manifests survive a request-index refresh and remain the inventory
-    // of provisioned studies, including assignments whose creation failed.
-    const items = await getFolderItems(folder.id, "name,type,id,parent", 1000);
-    if (!Array.isArray(items?.entries)) throw new Error("Unable to read round manifests from Box.");
-    for (const file of items.entries.filter(item => item.type === "file" && item.name.endsWith("_manifest.tsv"))) {
-        for (const row of await readTsv(file.id)) {
-            if (!row.round_id || !row.consortium_id || !row.study_id) continue;
-            const key = getDataManagerRequestKey(row);
-            assignments.set(key, { ...assignments.get(key), ...row, workflow_stage: "opt_in_out" });
+    const assignments = new Map();
+    if (folder) {
+        const index = await readTsvInFolder(folder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
+        index.rows.filter(row => row.selection_file_id || row.workflow_stage === "opt_in_out")
+            .forEach(row => assignments.set(getDataManagerRequestKey(row), row));
+        // Round manifests survive a request-index refresh and remain the inventory
+        // of provisioned studies, including assignments whose creation failed.
+        const items = await getFolderItems(folder.id, "name,type,id,parent", 1000);
+        if (!Array.isArray(items?.entries)) throw new Error("Unable to read round manifests from Box.");
+        for (const file of items.entries.filter(item => item.type === "file" && item.name.endsWith("_manifest.tsv"))) {
+            for (const row of await readTsv(file.id)) {
+                if (!row.round_id || !row.consortium_id || !row.study_id) continue;
+                const key = getDataManagerRequestKey(row);
+                assignments.set(key, { ...assignments.get(key), ...row, workflow_stage: "opt_in_out" });
+            }
         }
+        for (const row of await applyOptInOutSchedules(Array.from(assignments.values()), folder.id)) assignments.set(getDataManagerRequestKey(row), row);
+    }
+    // Managers publish to their own consortium folder, rather than requiring
+    // write access to the central administrative configuration.
+    const consortia = Array.from(new Map(dataManagersInfo.filter(manager => manager.collectionFolderId && !manager.isTest)
+        .map(manager => [normalizeStudyId(manager.consortium), manager])).values());
+    for (const manager of consortia) {
+        const config = await findFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
+        if (!config) continue;
+        const index = await readTsvInFolder(config.id, STUDY_ACCESS_FILE_NAME);
+        const scopedRows = await applyOptInOutSchedules(index.rows.filter(row => normalizeStudyId(row.consortium_id) === normalizeStudyId(manager.consortium)), config.id);
+        scopedRows.forEach(row => {
+            const key = getDataManagerRequestKey(row);
+            const previous = assignments.get(key);
+            if (!previous || (Date.parse(row.updated_at_utc) || 0) >= (Date.parse(previous.updated_at_utc) || 0)) assignments.set(key, row);
+        });
     }
     return Array.from(assignments.values());
+};
+
+export const loadOptInOutProgressRows = async (managerView = false) => {
+    const user = studyAccessUser(managerView);
+    const assignments = await loadStudyAccessAssignments(managerView);
+    const managers = managerView ? user.managers : Array.from(new Map(dataManagersInfo.filter(manager => manager.collectionFolderId && !manager.isTest)
+        .map(manager => [normalizeStudyId(manager.consortium), manager])).values());
+    const rows = [...assignments];
+    const keys = new Set(assignments.map(getVisibleDataManagerRequestKey));
+    for (const manager of managers) {
+        const published = await loadDataManagerRequests(manager);
+        published.filter(row => row.workflow_stage === "admin_accepted" && !keys.has(getVisibleDataManagerRequestKey(row)))
+            .forEach(row => rows.push({ ...row, round_status: "not_started", selection_file_id: "", opens_at_utc: "", closes_at_utc: "", initiated_at_utc: "", initiated_by_email: "" }));
+    }
+    return rows;
 };
 
 const hydrateStudyAccessSelections = async rows => {
@@ -771,18 +916,30 @@ const hydrateStudyAccessSelections = async rows => {
     return result;
 };
 
+const studyAccessLoads = new Map();
 export const loadStudyAccessAssignments = async (managerView = false) => {
-    const rows = await loadStudyAccessIndex(managerView);
-    // Backfill consortium indexes for rounds initiated before this index existed.
-    if (!managerView) {
-        const consortia = Array.from(new Map(dataManagersInfo.filter(manager => manager.collectionFolderId)
-            .map(manager => [normalizeStudyId(manager.consortium), manager])).values());
-        for (const manager of consortia) {
-            const folder = await getOrCreateOptInOutFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
-            await publishStudyAccessIndex(folder.id, rows.filter(row => normalizeStudyId(row.consortium_id) === normalizeStudyId(manager.consortium)));
+    const user = studyAccessUser(managerView);
+    const key = `${user.email}|${managerView}`;
+    if (studyAccessLoads.has(key)) return studyAccessLoads.get(key);
+    const request = (async () => {
+        const rows = await loadStudyAccessIndex(managerView);
+        // Backfill consortium indexes for rounds initiated before this index existed.
+        if (!managerView) {
+            const consortia = Array.from(new Map(dataManagersInfo.filter(manager => manager.collectionFolderId && !manager.isTest)
+                .map(manager => [normalizeStudyId(manager.consortium), manager])).values());
+            for (const manager of consortia) {
+                const folder = await getOrCreateOptInOutFolder(manager.collectionFolderId, CONFIG_FOLDER_NAME);
+                await publishStudyAccessIndex(folder.id, rows.filter(row => normalizeStudyId(row.consortium_id) === normalizeStudyId(manager.consortium)));
+            }
         }
+        return hydrateStudyAccessSelections(rows);
+    })();
+    studyAccessLoads.set(key, request);
+    try {
+        return await request;
+    } finally {
+        studyAccessLoads.delete(key);
     }
-    return hydrateStudyAccessSelections(rows);
 };
 
 export const saveStudyAccessSelection = async ({ assignment, decision, reason, managerView = false }) => {
@@ -800,6 +957,9 @@ export const saveStudyAccessSelection = async ({ assignment, decision, reason, m
     if (result.failed.length) throw new Error(result.failed[0].error);
     const updated = result.saved[0].updated;
     let warning = "";
+    if (dataManagersInfo.some(manager => manager.isTest && normalizeStudyId(manager.consortium) === normalizeStudyId(updated.consortium_id))) {
+        return { updated: { ...assignment, ...updated }, warning };
+    }
     try {
         const response = await createComment(match.concept_box_id, "Study Opt-In/Out selection updated: " + JSON.stringify({
             round: updated.round_name, consortium: updated.consortium_id, study: updated.study_acronym || updated.study_id,
@@ -816,11 +976,18 @@ export const saveStudyAccessSelection = async ({ assignment, decision, reason, m
 export const saveOptInOutSelections = async (changes, user) => {
     const saved = [];
     const failed = [];
+    const scopedTest = (user.managerView || user.testMode) && dataManagersInfo.find(manager => manager.isTest
+        && manager.email.toLowerCase() === String(user.email || "").toLowerCase());
+    const testAssignments = scopedTest ? await loadStudyAccessIndex(true) : [];
     for (const change of changes) {
         try {
             if (!["opt_in", "opt_out"].includes(change.decision)) throw new Error("Invalid Opt-In/Opt-Out decision.");
             const rows = await readTsv(change.selectionFileId);
             if (!rows.length) throw new Error("The selection TSV is empty.");
+            if (scopedTest && !testAssignments.some(assignment => String(assignment.selection_file_id) === String(change.selectionFileId)
+                && ["round_id", "consortium_id", "study_id", "concept_box_id"].every(field => String(assignment[field]) === String(rows[0][field])))) {
+                throw new Error("Test mode can update only selections in the TEST workspace.");
+            }
             if (change.expectedSelection) {
                 const expected = change.expectedSelection;
                 for (const field of ["round_id", "consortium_id", "study_id", "concept_box_id", "decision", "updated_at_utc"]) {
@@ -857,27 +1024,31 @@ export const saveOptInOutSelections = async (changes, user) => {
 
     if (saved.length) {
         try {
-            const configFolder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
-            if (configFolder) {
-                const requestFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
-                if (requestFile.file) {
-                    const savedByFileId = new Map(saved.map(item => [String(item.selectionFileId), item.updated]));
-                    const affectedConsortia = new Set();
-                    const updatedRequests = requestFile.rows.map(row => {
-                        const selection = savedByFileId.get(String(row.selection_file_id));
-                        if (!selection) return row;
-                        affectedConsortia.add(selection.consortium_id || row.consortium_id);
-                        return {
-                            ...row,
-                            collection_status: selection.decision === "opt_in" ? "ready_for_data_collection" : "not_participating",
-                            decision: selection.decision,
-                            submitted: selection.submitted,
-                            decision_updated_at_utc: selection.updated_at_utc,
-                            updated_at_utc: selection.updated_at_utc
-                        };
-                    });
-                    await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedRequests);
-                    await publishRowsToDataManagerFiles(updatedRequests, affectedConsortia);
+            const roots = new Set(saved.map(item => dataManagersInfo.find(manager => manager.isTest
+                && normalizeStudyId(manager.consortium) === normalizeStudyId(item.updated.consortium_id))?.collectionFolderId || Confluence_Opt_In_Out));
+            for (const root of roots) {
+                const configFolder = await findFolder(root, CONFIG_FOLDER_NAME);
+                if (configFolder) {
+                    const requestFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
+                    if (requestFile.file) {
+                        const savedByFileId = new Map(saved.map(item => [String(item.selectionFileId), item.updated]));
+                        const affectedConsortia = new Set();
+                        const updatedRequests = requestFile.rows.map(row => {
+                            const selection = savedByFileId.get(String(row.selection_file_id));
+                            if (!selection) return row;
+                            affectedConsortia.add(selection.consortium_id || row.consortium_id);
+                            return {
+                                ...row,
+                                collection_status: selection.decision === "opt_in" ? "ready_for_data_collection" : "not_participating",
+                                decision: selection.decision,
+                                submitted: selection.submitted,
+                                decision_updated_at_utc: selection.updated_at_utc,
+                                updated_at_utc: selection.updated_at_utc
+                            };
+                        });
+                        await writeTsv(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME, DATA_MANAGER_REQUEST_COLUMNS, updatedRequests);
+                        await publishRowsToDataManagerFiles(updatedRequests, affectedConsortia);
+                    }
                 }
             }
         } catch (error) {

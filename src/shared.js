@@ -68,12 +68,13 @@ export const studyManagersInfo = [
     {id: 'data_manager_23', name: 'Tim Rebbeck', email: 'Timothy_Rebbeck@dfci.harvard.edu', studies: [{name: 'Women’s Insights and Shared Experiences', acronym: 'WISE'}]},
     {id: 'data_manager_24', name: 'Valerie McCormack', email: 'mccormackv@iarc.fr', studies: [{name: 'African Breast Cancer Disparities in Outcomes', acronym: 'ABC-DO'}]},
     {id: 'data_manager_25', name: 'Yu Chen', email: 'Yu.Chen@nyulangone.org', studies: [{name: 'New York University Women’s Health Study', acronym: 'NYUWHS'}]},
-    {id: 'data_manager_26', name: 'Ben Kopchick', email: 'kopchickbp@nih.gov', studies: [{name: 'Test Study 1', acronym: 'ST1'}, {name: 'Test Study 2', acronym: 'TS2'}, {name: 'Test Study 3', acronym: 'TS3'}]},
+    {id: 'data_manager_26', name: 'Ben Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', studies: [{name: 'Test Study 1', acronym: 'TEST_ST1'}, {name: 'Test Study 2', acronym: 'TEST_ST2'}, {name: 'Test Study 3', acronym: 'TEST_ST3'}]},
     {id: 'data_manager_27', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', studies: [{name: 'Test Study 2', acronym: 'ST2'}, {name: 'Test Study 3', acronym: 'TS3'}, {name: 'Test Study 4', acronym: 'TS4'}]}
 ].map(manager => ({consortium: 'C-NCI', ...manager}));
 
 // Consortium Box locations used for Data Manager TSVs and agreement uploads.
 export const dataManagerCollectionFolders = {
+    'TEST': '432318158314',
     'C-NCI': '422654444804',
     'LAGENO': '422648647044',
     'AABCG': '422656022378',
@@ -87,7 +88,7 @@ export const dataManagerCollectionFolders = {
 export const dataManagersInfo = [
     {id: 'aabcg_data_manager_1', name: 'Wei Zheng', email: 'wei.zheng@vanderbilt.edu', consortium: 'AABCG'},
     {id: 'cnci_data_manager_1', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', consortium: 'C-NCI'},
-    {id: 'cnci_data_manager_2', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'C-NCI'},
+    {id: 'test_data_manager_1', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', isTest: true},
     {id: 'bcac_data_manager_1', name: 'Manjeet Bolla', email: 'mkh39@medschl.cam.ac.uk', consortium: 'BCAC'},
     {id: 'cimba_data_manager_1', name: 'Leslie Malgorzata', email: 'mal78@medschl.cam.ac.uk', consortium: 'CIMBA'},
     {id: 'lageno_data_manager_1', name: 'Xiaosong Huang', email: 'xjahuang@ucdavis.edu', consortium: 'LAGENO'},

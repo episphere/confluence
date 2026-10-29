@@ -1,8 +1,10 @@
 import { showPreview } from "../components/boxPreview.js";
 import { renderAdminPageTabs } from "../components/adminNavigation.js";
 import { dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo, getFile, studyDescriptions } from "../shared.js";
-import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections, loadStudyAccessAssignments, saveStudyAccessSelection } from "../optInOutStore.js";
-import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests } from "./chairmenu.js";
+import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptInOutRound, provisionOptInOutRound, saveOptInOutSelections, loadStudyAccessAssignments, saveStudyAccessSelection, loadDataManagerRequests } from "../optInOutStore.js";
+import { mountOptInOutProgress } from "../components/optInOutProgress.js";
+import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests, prepareTestDataManagerWorkspace } from "./chairmenu.js";
+import { getTestDataManager, renderTestDataManagerBanner } from "../components/testDataManagerMode.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -116,6 +118,7 @@ const confirmStudyAccessChange = (select, container, managerView, assignmentsByI
             }
             modalElement.removeEventListener("hide.bs.modal", preventDismiss);
             modal.hide();
+            void mountOptInOutProgress(document.getElementById("optInOutProgressContainer"), managerView);
         } catch (error) {
             status.className = "alert alert-danger mt-3";
             status.textContent = error.message || "Unable to save the change.";
@@ -149,7 +152,7 @@ const loadStudyAccessAdminRows = async (managerView = false) => {
     });
     let users = [];
     try {
-        users = (await loadOptInOutWorkbookRows()).map(row => ({
+        users = (managerView && getTestDataManager() ? [] : await loadOptInOutWorkbookRows()).map(row => ({
             name: String(getCellValue(row, ["Name"]) || "Unnamed user"),
             email: String(getCellValue(row, ["Email"]) || ""), studies: getWorkbookStudyEntries(row)
         }));
@@ -159,6 +162,8 @@ const loadStudyAccessAdminRows = async (managerView = false) => {
     const conceptsById = new Map();
     requests.forEach(request => {
         request.users = users.map(user => ({ ...user, studies: user.studies.filter(study => request.studies.has(studyAccessStudyKey(study))) })).filter(user => user.studies.length);
+        const testManager = dataManagersInfo.find(manager => manager.isTest && manager.consortium === request.label);
+        if (testManager) request.users = [{ name: testManager.name, email: testManager.email, studies: Array.from(request.studies.values()) }];
         request.concepts.forEach(concept => {
             if (!conceptsById.has(concept.boxId)) conceptsById.set(concept.boxId, []);
             conceptsById.get(concept.boxId).push(concept);
@@ -317,16 +322,17 @@ export const loadOptInOutTable = async () => {
             return;
         }
         const isAdmin = emailsAllowedToUpdateData.includes(userEmail);
-        const workbookRows = await loadOptInOutWorkbookRows();
+        const testManager = getTestDataManager();
+        const workbookRows = testManager ? [] : await loadOptInOutWorkbookRows();
         const userRow = workbookRows.find(row => String(getCellValue(row, ["Email", "email"])).trim().toLowerCase() === userEmail.toLowerCase());
-        if (!userRow && !isAdmin) {
+        if (!userRow && !isAdmin && !testManager) {
             container.innerHTML = "<p class='text-warning'>Your email was not found in the study access roster.</p>";
             return;
         }
-        const studies = userRow ? getWorkbookStudyEntries(userRow) : [];
+        const studies = testManager ? studiesInfo.filter(study => study.consortium === testManager.consortium) : userRow ? getWorkbookStudyEntries(userRow) : [];
         const [productionAssignments, demoAssignments] = await Promise.all([
             studies.length ? loadOptInOutAssignments(studies) : Promise.resolve([]),
-            isAdmin ? loadDemoOptInOutAssignments() : Promise.resolve([])
+            isAdmin && !testManager ? loadDemoOptInOutAssignments() : Promise.resolve([])
         ]);
         const assignments = [...demoAssignments, ...productionAssignments];
         if (!assignments.length) {
@@ -391,7 +397,7 @@ export const loadOptInOutTable = async () => {
                 updateOptInOutSubmitButtons(container);
             });
         });
-        const user = { name: userRow ? String(getCellValue(userRow, ["Name", "name"])) : "Administrative Demo User", email: userEmail };
+        const user = { name: testManager?.name || (userRow ? String(getCellValue(userRow, ["Name", "name"])) : "Administrative Demo User"), email: userEmail, testMode: Boolean(testManager) };
         container.querySelectorAll(".opt-in-out-submit-action").forEach(button => button.addEventListener("click", () => openOptInOutSubmitModal(container, user)));
         container.querySelectorAll(".opt-in-out-concept-preview").forEach(button => {
             button.addEventListener("click", () => {
@@ -427,6 +433,7 @@ export const optInOutTemplate = () => {
     return `
         <div class="general-bg padding-bottom-1rem">
             <div class="container body-min-height">
+                ${renderTestDataManagerBanner()}
                 <div class="main-summary-row">
                     <div class="align-left">
                         <h1 class="page-header">Opt-In Opt-Out</h1>
@@ -449,7 +456,7 @@ export const studyAccessAdminTemplate = (managerView = false) => {
                     <div class="align-left">
                         <h1 class="page-header">${managerView ? "Consortium Study Access" : "Study Access Admin"}</h1>
                     </div>
-                    ${managerView ? "" : `<div class="align-right">
+                    ${managerView ? `<div class="align-right"><button type="button" id="initiateOptInOutRoundBtn" class="buttonsubmit button-glow-red"><span class="buttonsubmit__text">Initiate Opt-In/Out Round</span></button></div>` : `<div class="align-right">
                         <button type="button" id="createDemoOptInOutRoundBtn" class="buttonsubmit button-glow-red">
                             <span class="buttonsubmit__text">Create Demo Round</span>
                         </button>
@@ -465,6 +472,9 @@ export const studyAccessAdminTemplate = (managerView = false) => {
                     </div>`}
                 </div>
                 <div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;">
+                    ${managerView ? renderTestDataManagerBanner() : ""}
+                    <p class="small text-muted">Data managers initiate opt-in/out for their consortia. Administrators monitor all consortia and can initiate a round when needed.</p>
+                    <div id="optInOutProgressContainer" class="mb-4" aria-live="polite">Loading round progress...</div>
                     <p class="mb-3">Expand a consortium to review initiated rounds and study selections from Box. Pending means no decision has been submitted. Changes require a reason and update the study selection record.</p>
                     <div id="studyAccessAdminTableContainer">Loading...</div>
                 </div>
@@ -485,7 +495,8 @@ const getCnciWorkbookStudies = async () => {
     return Array.from(studiesById.values()).sort((a, b) => String(a.acronym || a.name).localeCompare(String(b.acronym || b.name), undefined, { sensitivity: "base" }));
 };
 
-const getDataManagerConsortia = () => Array.from(dataManagersInfo.reduce((consortia, manager) => {
+const getDataManagerConsortia = (includeTest = false) => Array.from(dataManagersInfo.reduce((consortia, manager) => {
+    if (manager.isTest && !includeTest) return consortia;
     const consortium = String(manager.consortium || "").trim().toUpperCase();
     if (!consortium) return consortia;
     const existing = consortia.get(consortium) || { consortium, collectionFolderId: null };
@@ -494,7 +505,8 @@ const getDataManagerConsortia = () => Array.from(dataManagersInfo.reduce((consor
     return consortia;
 }, new Map()).values());
 
-const renderDataManagerConsortiumChoices = (groupName, selectedConsortia = ["C-NCI"]) => getDataManagerConsortia()
+const renderDataManagerConsortiumChoices = (groupName, selectedConsortia = ["C-NCI"], allowedIds = null) => getDataManagerConsortia(Boolean(allowedIds))
+    .filter(item => !allowedIds || allowedIds.includes(item.consortium))
     .map((item, index) => {
         const inputId = `${groupName}-${index}`;
         const isSelected = selectedConsortia.includes(item.consortium) && item.collectionFolderId;
@@ -505,6 +517,9 @@ const getSelectedDataManagerConsortia = container => Array.from(container.queryS
 
 const getConsortiumStudies = async consortium => {
     const consortiumId = String(consortium || "").trim().toUpperCase();
+    if (dataManagersInfo.some(manager => manager.isTest && manager.consortium === consortiumId)) {
+        return studiesInfo.filter(study => study.consortium === consortiumId);
+    }
     const catalog = JSON.parse(await getFile(studyDescriptions));
     const catalogStudies = catalog.filter(row => {
         const id = String(row.Consortium || "").trim().toUpperCase();
@@ -636,7 +651,26 @@ const bindCreateDemoOptInOutRoundButton = () => {
     });
 };
 
-const bindInitiateOptInOutRoundButton = () => {
+const loadManagerAcceptedRounds = async () => {
+    const email = String(JSON.parse(localStorage.parms || "{}").login || "").toLowerCase();
+    const managers = Array.from(new Map(dataManagersInfo.filter(manager => manager.email.toLowerCase() === email)
+        .map(manager => [manager.consortium, manager])).values());
+    const rounds = new Map();
+    for (const manager of managers) {
+        for (const row of await loadDataManagerRequests(manager)) {
+            if (!["admin_accepted", "opt_in_out"].includes(row.workflow_stage)) continue;
+            if (!rounds.has(row.round_id)) rounds.set(row.round_id, { id: row.round_id, name: row.round_name, concepts: new Map() });
+            const concepts = rounds.get(row.round_id).concepts;
+            const concept = concepts.get(row.concept_box_id) || { fileId: row.concept_box_id, fileName: row.concept_file_name,
+                title: row.concept_title, requestedConsortia: [] };
+            concept.requestedConsortia.push(manager.consortium);
+            concepts.set(row.concept_box_id, concept);
+        }
+    }
+    return Array.from(rounds.values(), round => ({ ...round, concepts: Array.from(round.concepts.values()) }));
+};
+
+const bindInitiateOptInOutRoundButton = (managerView = false) => {
     const button = document.getElementById("initiateOptInOutRoundBtn");
     if (!button || button.dataset.bound === "true") return;
     button.dataset.bound = "true";
@@ -653,13 +687,15 @@ const bindInitiateOptInOutRoundButton = () => {
         bootstrap.Modal.getOrCreateInstance(modalElement).show();
 
         try {
-            const configuredConsortia = getDataManagerConsortia();
+            const email = String(JSON.parse(localStorage.parms || "{}").login || "").toLowerCase();
+            const allowedIds = managerView ? dataManagersInfo.filter(manager => manager.email.toLowerCase() === email).map(manager => manager.consortium) : null;
+            const configuredConsortia = getDataManagerConsortia(managerView).filter(item => !allowedIds || allowedIds.includes(item.consortium));
             const enabledConsortia = configuredConsortia.filter(item => item.collectionFolderId);
             if (!enabledConsortia.length) {
                 body.innerHTML = '<div class="alert alert-warning mb-0">No consortium has a configured Data Manager collection folder.</div>';
                 return;
             }
-            const allRounds = await loadAcceptedAdminConceptRounds(true);
+            const allRounds = managerView ? await loadManagerAcceptedRounds() : await loadAcceptedAdminConceptRounds(true);
             const defaultConsortium = enabledConsortia[0].consortium;
 
             const now = new Date();
@@ -670,7 +706,7 @@ const bindInitiateOptInOutRoundButton = () => {
             };
             body.innerHTML = `
                 <form id="initiateOptInOutRoundForm">
-                    <fieldset class="mb-3"><legend class="fs-6 fw-semibold">Consortia <span class="text-muted fw-normal">(select one or more)</span></legend><div id="optInOutConsortiumChoices" class="border rounded p-2">${renderDataManagerConsortiumChoices("optInOutConsortium", [defaultConsortium])}</div></fieldset>
+                    <fieldset class="mb-3"><legend class="fs-6 fw-semibold">Consortia <span class="text-muted fw-normal">(select one or more)</span></legend><div id="optInOutConsortiumChoices" class="border rounded p-2">${renderDataManagerConsortiumChoices("optInOutConsortium", [defaultConsortium], allowedIds)}</div></fieldset>
                     <div class="mb-3"><label for="optInOutRoundSelect" class="form-label">Round</label><select id="optInOutRoundSelect" class="form-select" required></select></div>
                     <div class="row">
                         <div class="col-md-6 mb-3"><label for="optInOutOpensAt" class="form-label">Opens</label><input id="optInOutOpensAt" type="datetime-local" class="form-control" value="${toLocalInput(now)}" required></div>
@@ -792,6 +828,7 @@ const bindInitiateOptInOutRoundButton = () => {
                             opensAt: opensAt.toISOString(),
                             closesAt: closesAt.toISOString(),
                             initiatedBy,
+                            managerView,
                             onProgress: message => addProgress(job.consortiumId, message)
                         });
                         results.push({ ...result, consortiumId: job.consortiumId });
@@ -820,14 +857,14 @@ const bindInitiateOptInOutRoundButton = () => {
                         const table = document.getElementById("studyAccessAdminTableContainer");
                         if (table) {
                             delete table.dataset.loaded;
-                            void loadStudyAccessAdminTable();
+                            void loadStudyAccessAdminTable(managerView);
                         }
                     }, { once: true });
                 }
             });
         } catch (error) {
             console.error("Unable to prepare Opt-In/Opt-Out initiation:", error);
-            body.innerHTML = '<div class="alert alert-danger mb-0">Unable to load the accepted Admin Chair concepts or consortium studies.</div>';
+            body.innerHTML = `<div class="alert alert-danger mb-0">${escapeHtml(error.message || "Unable to load accepted concepts or consortium studies.")}</div>`;
         } finally {
             button.disabled = false;
             button.classList.remove("buttonsubmit--loading");
@@ -856,8 +893,10 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
             return;
         }
 
+        if (managerView && getTestDataManager()) await prepareTestDataManagerWorkspace();
         bindCreateDemoOptInOutRoundButton();
-        bindInitiateOptInOutRoundButton();
+        bindInitiateOptInOutRoundButton(managerView);
+        void mountOptInOutProgress(document.getElementById("optInOutProgressContainer"), managerView);
 
         const syncDataManagerButton = document.getElementById("syncDataManagerStatusBtn");
         if (syncDataManagerButton && syncDataManagerButton.dataset.bound !== "true") {
@@ -969,7 +1008,7 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
             if (assignment.selection_file_id) assignmentsById.set(assignment.selection_file_id, assignment);
         })));
         if (!requestedStudies.length) {
-            container.innerHTML = "<p class='text-warning'>No initiated Opt-In/Out assignments were found. An administrator must initiate a round first.</p>";
+            container.innerHTML = "<p class='text-warning'>No initiated Opt-In/Out assignments were found. A data manager or administrator can initiate a round using the button above.</p>";
             return;
         }
 
