@@ -42,7 +42,7 @@ function setup(login = manager.email) {
         files.set(id, api.serializeTsv([...new Set(rows.flatMap(row => Object.keys(row)))], rows));
         folders.set(folder, [...(folders.get(folder) || []), {id, name, type: 'file'}]);
     }
-    const accepted = {schema_version: '1', round_id: 'r1', round_name: 'Round_1', consortium_id: 'C-NCI', concept_box_id: 'c1', concept_title: 'Test concept', workflow_stage: 'admin_accepted', study_id: 'STUDY', study_acronym: 'STUDY', updated_at_utc: '2026-01-01T00:00:00Z'};
+    const accepted = {schema_version: '1', round_id: 'r1', round_name: 'Round_1', consortium_id: 'C-NCI', concept_box_id: 'c1', concept_title: 'Test concept', workflow_stage: 'admin_accepted', study_id: 'STUDY', study_acronym: 'STUDY', updated_at_utc: '2026-01-01T00:00:00Z', response_file_id:'returned1', discussion_snapshot:JSON.stringify({comments:[{id:'reply',message:'Response ID: question, Original reply'}]})};
     put('manager-config', 'C-NCI.tsv', [accepted]);
     put('manager-config', 'study_access_assignments.tsv', []);
     put('central', 'data_manager_requests.tsv', [accepted]);
@@ -60,6 +60,8 @@ test('manager initiates their published accepted round without central access an
     const managerRows = await app.api.loadStudyAccessAssignments(true);
     assert.equal(managerRows.length, 1);
     assert.equal(managerRows[0].decision, 'pending');
+    assert.equal(managerRows[0].response_file_id,'returned1');
+    assert.equal(JSON.parse(managerRows[0].discussion_snapshot).comments[0].id,'reply');
     app.context.localStorage.parms = JSON.stringify({login: 'admin@example.org'});
     const adminRows = await app.api.loadStudyAccessAssignments();
     assert.equal(adminRows.length, 1);

@@ -65,7 +65,7 @@ test('current concepts are included for TEST without changing their form request
     const another = {...file,fileId:'another',filename:'Another.docx',assignedConceptId:'R1_2',requestedConsortia:['BCAC']};
     let seeded;
     const context = vm.createContext({localStorage:{parms:JSON.stringify({login:email})},dataManagersInfo:[testManager],studiesInfo:studies,
-        loadAdminDataCache:async()=>({sub:[file, another],com:[],res:[]}),getConceptId:entry=>entry.assignedConceptId,getConceptTitleFromFileName:value=>value,
+        loadAdminDataCache:async()=>({sub:[file, another],com:[],res:[]}),findMatchingFileByName:()=>null,getConceptId:entry=>entry.assignedConceptId,getConceptTitleFromFileName:value=>value,
         seedTestDataManagerRequests:async value=>{seeded=value;}
     });
     vm.runInContext(source + '\nthis.prepare = prepareTestDataManagerWorkspace;', context);

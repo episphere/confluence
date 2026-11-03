@@ -28,7 +28,7 @@ function setup({login = 'admin@example.org', failUpload = false, failComment = f
         createFolder: async () => { throw new Error('Unexpected folder creation'); }
     };
     vm.createContext(context);
-    vm.runInContext(source + '\nthis.api = {saveDataManagerStage, loadStudyAccessAssignments, saveStudyAccessSelection, saveOptInOutSelections, loadDataManagerRequests, publishDataManagerChairRequests, publishRowsToDataManagerFiles, serializeTsv, parseTsv};', context);
+    vm.runInContext(source + '\nthis.api = {saveDataManagerStage, loadStudyAccessAssignments, saveStudyAccessSelection, saveOptInOutSelections, loadDataManagerRequests, publishDataManagerChairRequests, updateDataManagerChairStatus, publishRowsToDataManagerFiles, serializeTsv, parseTsv};', context);
     function addFile(folder, id, name, rows) {
         files.set(id, context.api.serializeTsv([...new Set(rows.flatMap(row => Object.keys(row)))], rows));
         folders.set(folder, [...(folders.get(folder) || []), {id, name, type: 'file'}]);
@@ -39,6 +39,26 @@ function setup({login = 'admin@example.org', failUpload = false, failComment = f
     rows.forEach(row => addFile('selections', row.selection_file_id, row.selection_file_id + '.tsv', [row]));
     return {context, api: context.api, files, folders, reads, comments, rows, addFile};
 }
+test('reply sources and published discussion remain readable from the consortium manager index', async () => {
+    const app = setup();
+    const snapshot = {comments:[{id:'r1',message:'Response ID: q1, Submitter explanation'}],response_lookup_complete:true,checked_at_utc:'2026-11-03T12:00:00Z'};
+    await app.api.publishDataManagerChairRequests({round:{id:'r1',name:'Round_1'},reviews:[{sourceFileId:'concept1',chairFileId:'chair1',responseFileId:'returned1',discussionSnapshot:snapshot,consortium:'C-NCI',fileName:'Concept.docx'}],studies:[{acronym:'4-CBCS',name:'Study',consortium:'C-NCI'}],initiatedBy:'admin@example.org'});
+    await app.api.updateDataManagerChairStatus({conceptBoxId:'concept1',consortium:'C-NCI',score:'2'});
+    app.context.localStorage.parms = JSON.stringify({login:'manager@example.org'});
+    const manager = app.context.dataManagersInfo[0];
+    const requests = await app.api.loadDataManagerRequests(manager);
+    const request = requests.find(row=>row.round_id==='r1');
+    assert.equal(request.response_file_id,'returned1');
+    assert.equal(request.chair_file_id,'chair1');
+    assert.equal(JSON.parse(request.discussion_snapshot).comments[0].message,'Response ID: q1, Submitter explanation');
+    app.context.localStorage.parms = JSON.stringify({login:'admin@example.org'});
+    snapshot.comments.push({id:'r2',message:'Response ID: q1, Updated reply'});
+    await app.api.updateDataManagerChairStatus({conceptBoxId:'concept1',consortium:'C-NCI',discussionSnapshot:snapshot,responseFileId:'returned2'});
+    const updated = app.api.parseTsv(app.files.get('cnci-config/C-NCI.tsv')).find(row=>row.round_id==='r1');
+    assert.equal(updated.response_file_id,'returned2');
+    assert.equal(JSON.parse(updated.discussion_snapshot).comments.length,2);
+});
+
 test('manager stage persists across publishing and can return to automatic', async () => {
     const app = setup({login: 'manager@example.org'});
     await app.api.publishRowsToDataManagerFiles(app.rows);

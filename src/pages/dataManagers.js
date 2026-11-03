@@ -1,9 +1,11 @@
+import { showLoadingProgress } from "../components/loadingProgress.js";
 import { showPreview } from "../components/boxPreview.js";
-import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, listComments, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
+import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
 import { loadDataManagerRequests, saveDataManagerAccessDetails, saveDataManagerStage, DATA_MANAGER_STAGES } from "../optInOutStore.js";
 import { prepareTestDataManagerWorkspace } from "./chairmenu.js";
 import { getTestDataManager, renderTestDataManagerBanner } from "../components/testDataManagerMode.js";
 import { getDataManagerRoundLabel, getDataManagerRoundNumber, normalizeDataManagerScore, setupDataManagerTable } from "../components/dataManagerTable.js";
+import { loadDataManagerDiscussion, renderDataManagerDiscussion } from "../components/dataManagerDiscussion.js";
 
 const escapeHtml = value => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -54,10 +56,11 @@ const parseDtaAssignments = value => {
 const getEmailLinks = email => String(email || "").split(/[;,\s]+/).filter(Boolean)
     .map(address => `<a href="mailto:${encodeURIComponent(address)}">${escapeHtml(address)}</a>`).join(", ");
 
-const loadInvestigatorDetails = async requests => {
+const loadInvestigatorDetails = async (requests, onProgress = () => {}) => {
     const detailsByConceptId = new Map();
     const conceptIds = Array.from(new Set(requests.map(request => String(request.concept_box_id || "")).filter(Boolean)));
     const chunkSize = 8;
+    onProgress(0, conceptIds.length);
     for (let index = 0; index < conceptIds.length; index += chunkSize) {
         await Promise.all(conceptIds.slice(index, index + chunkSize).map(async conceptId => {
             try {
@@ -67,34 +70,28 @@ const loadInvestigatorDetails = async requests => {
                 detailsByConceptId.set(conceptId, {});
             }
         }));
+        onProgress(Math.min(index + chunkSize, conceptIds.length), conceptIds.length);
     }
     return detailsByConceptId;
 };
 
-const loadReviewerComments = async body => {
+const loadReviewerComments = async (body, refresh = false) => {
     const section = body.querySelector(".data-manager-reviewer-comments");
-    if (!section || section.dataset.loaded === "true" || section.dataset.loading === "true") return;
+    if (!section || (!refresh && section.dataset.loaded === "true") || section.dataset.loading === "true") return;
     const conceptId = body.dataset.conceptBoxId;
     if (!conceptId) {
-        section.textContent = "Reviewer comments are unavailable because this request has no concept file.";
+        section.textContent = "Comments and replies are unavailable because this request has no concept file.";
         return;
     }
     section.dataset.loading = "true";
-    section.textContent = "Loading reviewer comments...";
+    section.textContent = "Checking chair comments and submitter replies...";
     try {
-        const response = await listComments(conceptId);
-        const data = typeof response === "string" ? JSON.parse(response) : response;
-        if (!Array.isArray(data?.entries)) throw new Error("Unable to read Box comments.");
-        section.innerHTML = data.entries.length ? data.entries.map(comment => `
-            <div class="border-bottom pb-2 mb-2">
-                <p class="text-primary small mb-0">${escapeHtml(comment.created_by?.name || comment.created_by?.login || "Unknown reviewer")}</p>
-                <p class="my-0 text-break" style="white-space: pre-wrap;">${escapeHtml(comment.message)}</p>
-                <p class="small mb-0 text-muted">${escapeHtml(comment.created_at ? formatDateTime(comment.created_at) : "Date unavailable")}</p>
-            </div>`).join("") : '<span class="text-muted">No comments to show.</span>';
-        section.dataset.loaded = "true";
+        const discussion = await loadDataManagerDiscussion(body.discussionRequest || { concept_box_id: conceptId });
+        section.innerHTML = renderDataManagerDiscussion(discussion);
+        section.dataset.loaded = discussion.errors.length || !discussion.response_lookup_complete ? "false" : "true";
     } catch (error) {
         console.warn(`Unable to load reviewer comments for Concept ID ${conceptId}:`, error);
-        section.innerHTML = '<span class="text-danger">Unable to load reviewer comments.</span> <button type="button" class="btn btn-sm btn-outline-secondary data-manager-retry-comments">Retry</button>';
+        section.innerHTML = '<span class="text-danger">Unable to check chair comments and submitter replies.</span> <button type="button" class="btn btn-sm btn-outline-secondary data-manager-retry-comments">Retry</button>';
     } finally {
         delete section.dataset.loading;
     }
@@ -295,8 +292,11 @@ export const dataManagersTemplate = () => `
 
 export const loadDataManagerRequestsTable = async () => {
     const container = document.getElementById("dataManagerRequestsContainer");
-    if (!container || container.dataset.loaded === "true") return;
-    container.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading collection status from Box...</div>';
+    if (!container || container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+    container.dataset.loading = "true";
+    container.setAttribute("aria-busy", "true");
+    const updateProgress = showLoadingProgress(container, "Loading Data Managers Data", "dataManager");
+    updateProgress(5, "Checking data-manager access...");
 
     try {
         const userEmail = String(JSON.parse(localStorage.parms || "{}").login || "").trim();
@@ -318,7 +318,11 @@ export const loadDataManagerRequestsTable = async () => {
 
         // Administrators without a manager mapping can inspect all rows; mapped
         // administrators retain the same consortium-scoped view as data managers.
-        if (manager?.isTest) await prepareTestDataManagerWorkspace();
+        if (manager?.isTest) {
+            updateProgress(15, "Preparing the TEST workspace from current concepts...");
+            await prepareTestDataManagerWorkspace();
+        }
+        updateProgress(30, "Loading requests and study decisions from Box...");
         const requests = await loadDataManagerRequests(manager);
         if (!requests.length) {
             container.innerHTML = '<div class="alert alert-info mb-0">No data-collection requests have been initiated for your consortium.</div>';
@@ -326,7 +330,10 @@ export const loadDataManagerRequestsTable = async () => {
             return;
         }
 
-        const investigatorDetails = await loadInvestigatorDetails(requests);
+        const investigatorDetails = await loadInvestigatorDetails(requests, (loaded, total) => {
+            updateProgress(40 + (total ? loaded / total : 1) * 50, `Loading investigator details (${loaded}/${total})...`);
+        });
+        updateProgress(95, "Preparing requests, filters, and access details...");
         requests.sort((left, right) => `${left.round_name}|${getConceptId(left)}`.localeCompare(`${right.round_name}|${getConceptId(right)}`, undefined, { numeric: true, sensitivity: "base" }));
         const roundOptions = Array.from(new Set(requests.map(getDataManagerRoundLabel)))
             .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }))
@@ -367,7 +374,7 @@ export const loadDataManagerRequestsTable = async () => {
                 <tr id="${rowId}Details" class="data-manager-detail-row">
                     <td colspan="6" class="p-0 border-0">
                         <div id="${rowId}Collapse" class="accordion-collapse collapse">
-                            <div class="accordion-body border-bottom bg-light" data-round-id="${escapeHtml(request.round_id)}" data-concept-box-id="${escapeHtml(request.concept_box_id)}" data-consortium-id="${escapeHtml(request.consortium_id)}">
+                            <div class="accordion-body border-bottom bg-light" data-request-index="${index}" data-round-id="${escapeHtml(request.round_id)}" data-concept-box-id="${escapeHtml(request.concept_box_id)}" data-consortium-id="${escapeHtml(request.consortium_id)}">
                                 <div class="row g-3 mb-3">
                                     <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Contact Investigator / PI</div><div>${escapeHtml(details.contactInvestigator || "Not provided")}</div></div>
                                     <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Email</div><div class="text-break">${details.email ? getEmailLinks(details.email) : '<span class="text-muted">Not provided</span>'}</div></div>
@@ -375,8 +382,8 @@ export const loadDataManagerRequestsTable = async () => {
                                     <div class="col-12"><div class="small fw-bold text-muted">All investigators who need access</div><div class="data-manager-all-investigators">${escapeHtml(details.allInvestigators || "Not provided")}</div></div>
                                 </div>
                                 <details class="data-manager-comments-dropdown mb-3 border-top pt-3">
-                                    <summary class="fw-semibold">DACC reviewer comments</summary>
-                                    <div class="data-manager-reviewer-comments mt-3" role="status">Open to load reviewer comments.</div>
+                                    <summary class="fw-semibold">DACC comments and submitter replies</summary>
+                                    <div class="data-manager-reviewer-comments mt-3" role="status">Open to check chair comments and submitter replies.</div>
                                 </details>
                                 <div class="border-top pt-3">
                                     <label class="form-label fw-semibold">Access notes / people granted access</label>
@@ -391,6 +398,7 @@ export const loadDataManagerRequestsTable = async () => {
                 </tr>`;
         }).join("");
 
+        updateProgress(100, "Data loaded. Displaying requests...");
         container.innerHTML = `
             <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
                 <input id="dataManagerRequestSearch" type="search" class="form-control" style="max-width: 420px;" placeholder="Search concepts, investigators, email, institution, DTA, or status" aria-label="Search data collection requests">
@@ -404,6 +412,7 @@ export const loadDataManagerRequestsTable = async () => {
             </div>
             <div class="table-responsive data-manager-table-wrap"><table class="table table-hover align-middle mb-0 data-manager-accordion-table"><thead class="table-light"><tr>${[["Concept", "Concept"], ["Round", "Round"], ["Score", "Score"], ["Stage", "Current stage"], ["Availability", "Expected availability"]].map(([key, label]) => `<th aria-sort="none"><button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" data-manager-sort="${key}">${label}<i class="fas fa-sort ms-1" aria-hidden="true"></i></button></th>`).join("")}<th><span class="visually-hidden">Details</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 
+        container.querySelectorAll(".accordion-body[data-request-index]").forEach(body => { body.discussionRequest = requests[Number(body.dataset.requestIndex)]; });
         container.querySelectorAll(".data-manager-comments-dropdown").forEach(dropdown => {
             dropdown.addEventListener("toggle", () => {
                 if (dropdown.open) loadReviewerComments(dropdown.closest(".accordion-body"));
@@ -471,7 +480,7 @@ export const loadDataManagerRequestsTable = async () => {
         container.addEventListener("click", async event => {
             const retryCommentsButton = event.target.closest(".data-manager-retry-comments");
             if (retryCommentsButton) {
-                await loadReviewerComments(retryCommentsButton.closest(".accordion-body"));
+                await loadReviewerComments(retryCommentsButton.closest(".accordion-body"), true);
                 return;
             }
 
@@ -528,5 +537,8 @@ export const loadDataManagerRequestsTable = async () => {
     } catch (error) {
         console.error("Unable to load Data Manager requests:", error);
         container.innerHTML = '<p class="text-danger">Unable to load data-collection status from Box.</p>';
+    } finally {
+        delete container.dataset.loading;
+        container.removeAttribute("aria-busy");
     }
 };

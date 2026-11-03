@@ -5,6 +5,8 @@ import { publishDataManagerChairRequests, updateDataManagerChairStatus, seedTest
 import { dataManagersInfo } from "../shared.js";
 import { REQUESTED_DATA_GROUPS, extractAdminRequestedData, matchesAdminRequestedData } from "./adminRequestedData.js";
 import { renderAdminPageTabs } from "../components/adminNavigation.js";
+import { loadDataManagerDiscussion } from "../components/dataManagerDiscussion.js";
+import { showLoadingProgress } from "../components/loadingProgress.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -1048,6 +1050,12 @@ const setAdminHydrationProgress = (kind, loaded, total, failures = 0) => {
     status.textContent = complete
         ? (failureCount ? `Background loading finished with ${failureCount} item(s) unavailable. Unavailable forms cannot match requested data filters.` : "All scores, comments, investigators, and requested data loaded.")
         : `Loading scores/comments ${commentsLoaded}/${commentsTotal}; investigators and requested data ${documentsLoaded}/${documentsTotal}. Data filter results update as forms load...`;
+    const progress = document.getElementById("adminTableLoadingProgress");
+    if (progress?.updateLoadingProgress) {
+        const total = commentsTotal + documentsTotal;
+        progress.updateLoadingProgress(total ? 35 + 65 * (commentsLoaded + documentsLoaded) / total : 100, status.textContent);
+        if (complete) progress.hidden = true;
+    }
 };
 
 const getAdminDocumentData = async (file) => {
@@ -2554,6 +2562,7 @@ export const createAllRoundFolders = async () => {
 
                     if (dataManagerChairReviews.length) {
                         try {
+                            await attachDataManagerDiscussions(dataManagerChairReviews, await getRequiringInputFiles(returnToSubmitterFolder));
                             await publishDataManagerChairRequests({
                                 round: { id: roundFolder.id, name: selectedRound.folderName },
                                 reviews: dataManagerChairReviews,
@@ -2587,6 +2596,7 @@ export const authTableTemplate = () => {
     if (!userForAuth) return;
     let template = `<div class="general-bg padding-bottom-1rem"><div class="container body-min-height"><div class="main-summary-row" style="display: flex; justify-content: space-between; align-items: center;"><div class="align-left"><h1 class="page-header">Admin Table View</h1></div><div id="roundSelectionContainer" style="margin-left: 20px;"></div><div class="align-right"><button type="button" id="saveActionRequiredBtn" class="buttonsubmit button-glow-red" disabled style="opacity: 0.5;"> <span class="buttonsubmit__text"> Save Action Required </span></button><button type="submit" id="submitID" class="buttonsubmit button-glow-red" style="margin-left: 10px;" onclick="this.classList.toggle('buttonsubmit--loading')"> <span class="buttonsubmit__text"> Update Users </span></button><button type="button" id="renameFilesBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"> <span class="buttonsubmit__text"> Add Concept IDs to Filenames </span></button></div></div><div class="data-submission div-border font-size-18" style="padding-left: 1rem; padding-right: 1rem;"><div class="tab-content" id="selectedTab"><div class="tab-pane fade show active" id="daccDecision" role="tabpanel" aria-labeledby="daccDecisionTab"><div id="authTableView" class="align-left"></div><button type="submit" class="buttonsubmit button-glow-red" id="returnSubmitter" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Submitter </span></button><button type="submit" class="buttonsubmit button-glow-red" id="returnChairs" onclick="this.classList.toggle('buttonsubmit--loading')"><span class="buttonsubmit__text"> Return to Chairs </span></button><a href="mailto:mkh39@medschl.cam.ac.uk; xjahuang@ucdavis.edu; vzavala@ucdavis.edu; r.santos@qub.ac.uk; guochong.jia@vumc.org; thomas.ahearn@nih.gov?subject=Confluence Data Coordinating Centers" id='email' class='btn btn-dark'>Send Email to DACC</a></div></div></div></div></div>`;
     template = template.replace('<div class="container body-min-height">', `<div class="container body-min-height">${renderAdminPageTabs("dacc")}`);
+    template = template.replace('<div id="authTableView"', '<div id="adminTableLoadingProgress"></div><div id="authTableView"');
     template = template.replace(
         '<button type="button" id="renameFilesBtn"',
         '<button type="button" id="initRoundsBtn" class="buttonsubmit button-glow-red" style="margin-left: 10px;"><span class="buttonsubmit__text"> Init Rounds </span></button><button type="button" id="renameFilesBtn"'
@@ -2595,12 +2605,24 @@ export const authTableTemplate = () => {
 };
 
 export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
-    const userFolders = await getFolderItems(returnToSubmitterFolderId, "name,type,id", 1000);
-    const requiringInputByUser = await Promise.all((userFolders.entries || [])
+    const listChildren = async folderId => {
+        const entries = [];
+        let offset = 0;
+        while (true) {
+            const page = await getFolderItems(folderId, "name,type,id", 1000, offset);
+            if (!Array.isArray(page?.entries)) throw new Error(`Unable to check submitter response folder ${folderId}.`);
+            entries.push(...page.entries);
+            offset += page.entries.length;
+            if (!page.total_count || offset >= page.total_count) return entries;
+            if (!page.entries.length) throw new Error(`Incomplete submitter response folder listing for ${folderId}.`);
+        }
+    };
+    const userFolders = await listChildren(returnToSubmitterFolderId);
+    const requiringInputByUser = await Promise.all(userFolders
         .filter(userFolder => userFolder.type === 'folder')
         .map(async userFolder => {
-            const subfolders = await getFolderItems(userFolder.id, "name,type,id", 1000);
-            const requiringInputFolders = (subfolders.entries || [])
+            const subfolders = await listChildren(userFolder.id);
+            const requiringInputFolders = subfolders
                 .filter(subfolder => subfolder.name === 'Requiring Input' && subfolder.type === 'folder');
             const files = await Promise.all(requiringInputFolders.map(subfolder =>
                 getAllFilesRecursive(subfolder.id, "name,type,id,parent,parent.name,created_at,modified_at")
@@ -2689,8 +2711,9 @@ export const prepareTestDataManagerWorkspace = async () => {
             const id = `test_${file.roundId}`;
             if (!rounds.has(id)) rounds.set(id, { id, name: `TEST_${file.roundName || file.roundId}`, concepts: new Map() });
             const key = getConceptId(file) || getConceptTitleFromFileName(file.filename);
+            const responseFile = findMatchingFileByName(data.res, file.filename);
             rounds.get(id).concepts.set(key, { fileId: String(file.fileId), title: file.titlename || file.filename,
-                fileName: file.filename, requestedConsortia: [manager.consortium] });
+                fileName: file.filename, responseFileId: responseFile?.fileId || file.responseFileId || "", requestedConsortia: [manager.consortium] });
         }
         const studies = studiesInfo.filter(study => study.consortium === manager.consortium);
         await seedTestDataManagerRequests({ rounds: Array.from(rounds.values(), round => ({ ...round, concepts: Array.from(round.concepts.values()) })), studies });
@@ -2698,18 +2721,29 @@ export const prepareTestDataManagerWorkspace = async () => {
     try { return await testDataManagerPreparation; } finally { testDataManagerPreparation = null; }
 };
 
+const attachDataManagerDiscussions = async (reviews, responseFiles) => {
+    for (let index = 0; index < reviews.length; index += 6) {
+        await Promise.all(reviews.slice(index, index + 6).map(async review => {
+            review.responseFileId = findMatchingFileByName(responseFiles, review.fileName)?.id || "";
+            review.discussionSnapshot = await loadDataManagerDiscussion({ concept_box_id: review.sourceFileId,
+                chair_file_id: review.chairFileId, response_file_id: review.responseFileId, response_lookup_complete: true });
+        }));
+    }
+};
+
 export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", onProgress = null) => {
     const report = message => { if (typeof onProgress === "function") onProgress(message); };
     const consortiumId = String(consortium || "C-NCI").trim().toUpperCase();
     const chair = chairsInfo.find(item => String(item.consortium).trim().toUpperCase() === consortiumId);
     if (!chair) throw new Error(`The ${consortiumId} chair configuration was not found.`);
-    const [newFiles, clarificationFiles, completeFiles, submitterItems, submitterFiles, completedFiles] = await Promise.all([
+    const [newFiles, clarificationFiles, completeFiles, submitterItems, submitterFiles, completedFiles, responseFiles] = await Promise.all([
         getAllFilesRecursive(chair.boxIdNew, "name,type,id,description,parent,parent.name,created_at"),
         getAllFilesRecursive(chair.boxIdClara, "name,type,id,description,parent,parent.name,created_at"),
         getAllFilesRecursive(chair.boxIdComplete, "name,type,id,description,parent,parent.name,created_at"),
         getFolderItems(submitterFolder, "name,type,id", 1000),
         getAllFilesRecursive(submitterFolder, "name,type,id,parent,parent.name,created_at"),
-        getAllFilesRecursive(completedFolder, "name,type,id,parent,parent.name,created_at")
+        getAllFilesRecursive(completedFolder, "name,type,id,parent,parent.name,created_at"),
+        getRequiringInputFiles(returnToSubmitterFolder)
     ]);
     const roundFolders = (submitterItems?.entries || [])
         .filter(item => item.type === "folder")
@@ -2796,6 +2830,7 @@ export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", 
     }
 
     for (const [roundId, group] of reviewsByRound.entries()) {
+        await attachDataManagerDiscussions(group.reviews, responseFiles);
         await publishDataManagerChairRequests({
             round: { id: roundId, name: group.name },
             reviews: group.reviews,
@@ -2835,64 +2870,83 @@ export const exportAdminConsortiaCsv = async () => {
 };
 
 export const generateAuthTableFiles = async () => {
-    showAnimation();
-    testingDataGov();
-    const folderItems = await getFolderItems(submitterFolder);
-    const roundFolders = folderItems.entries.filter(item => item.type === 'folder' && item.name.toLowerCase().startsWith('round'));
-    roundFolders.sort((a, b) => b.name.localeCompare(a.name));
+    const progress = document.getElementById("adminTableLoadingProgress");
+    if (!progress || progress.dataset.loading === "true") { hideAnimation(); return; }
+    progress.dataset.loading = "true";
+    progress.hidden = false;
+    progress.setAttribute("aria-busy", "true");
+    const updateProgress = showLoadingProgress(progress, "Loading Admin Table Data", "adminTable");
+    progress.updateLoadingProgress = updateProgress;
+    hideAnimation();
+    updateProgress(5, "Loading submission rounds from Box...");
+    try {
+        testingDataGov();
+        const folderItems = await getFolderItems(submitterFolder);
+        const roundFolders = folderItems.entries.filter(item => item.type === 'folder' && item.name.toLowerCase().startsWith('round'));
+        roundFolders.sort((a, b) => b.name.localeCompare(a.name));
 
-    await Promise.all([
-        loadAdminDataCache(),
-        loadAdminActionRequiredSelections().catch(error => {
-            adminActionRequiredStorage = null;
-            console.warn("Unable to load saved Action Required selections from Box:", error);
-        })
-    ]);
+        updateProgress(15, "Loading concepts and saved Action Required selections...");
+        await Promise.all([
+            loadAdminDataCache(),
+            loadAdminActionRequiredSelections().catch(error => {
+                adminActionRequiredStorage = null;
+                console.warn("Unable to load saved Action Required selections from Box:", error);
+            })
+        ]);
+        updateProgress(35, "Preparing the table; loading scores, comments, and requested data...");
 
-    const renderAuthSelectedRound = async (selectedFolderId) => {
-        const tableContainer = document.getElementById('adminAccordian');
-        if (tableContainer && tableContainer.innerHTML !== "") {
-            refreshConceptSearch("adminConceptSearch");
-            return;
-        }
-        const filteredSub = adminDataCache.sub;
-        const filteredCom = adminDataCache.com;
-        const filteredRes = adminDataCache.res;
-        await viewAuthFinalDecisionFilesTemplate(filteredSub, filteredCom, filteredRes);
-        returnToChairs();
-        returnToSubmitter();
-        addRenameFilesEvent();
-        const initRoundsBtn = document.getElementById('initRoundsBtn');
-        if (initRoundsBtn) initRoundsBtn.addEventListener('click', createAllRoundFolders);
-        if (selectedFolderId !== 'all') {
-            document.querySelectorAll('.admin-table-row').forEach(row => {
-                if (row.getAttribute('data-round-id') !== selectedFolderId) row.classList.add('d-none');
+        const renderAuthSelectedRound = async (selectedFolderId) => {
+            const tableContainer = document.getElementById('adminAccordian');
+            if (tableContainer && tableContainer.innerHTML !== "") {
+                refreshConceptSearch("adminConceptSearch");
+                return;
+            }
+            const filteredSub = adminDataCache.sub;
+            const filteredCom = adminDataCache.com;
+            const filteredRes = adminDataCache.res;
+            await viewAuthFinalDecisionFilesTemplate(filteredSub, filteredCom, filteredRes);
+            returnToChairs();
+            returnToSubmitter();
+            addRenameFilesEvent();
+            const initRoundsBtn = document.getElementById('initRoundsBtn');
+            if (initRoundsBtn) initRoundsBtn.addEventListener('click', createAllRoundFolders);
+            if (selectedFolderId !== 'all') {
+                document.querySelectorAll('.admin-table-row').forEach(row => {
+                    if (row.getAttribute('data-round-id') !== selectedFolderId) row.classList.add('d-none');
+                });
+            }
+        };
+
+        const roundSelectionContainer = document.getElementById('roundSelectionContainer');
+        if (roundSelectionContainer && roundFolders.length > 0) {
+            const activeRoundIds = new Set([
+                ...adminDataCache.sub.map(file => file.roundId),
+                ...adminDataCache.com.map(file => file.roundId),
+                ...adminDataCache.res.map(file => file.roundId)
+            ].filter(id => id));
+            const displayRoundFolders = roundFolders.filter(folder => activeRoundIds.has(folder.id));
+
+            let dropdownHtml = `<div style=\"display: flex; align-items: center; gap: 10px;\"><label for=\"roundSelect\"><b>Select Round:</b></label><select id=\"roundSelect\" class=\"form-select\" style=\"width: auto;\"><option value=\"all\">All Rounds</option>`;
+            displayRoundFolders.forEach(folder => { dropdownHtml += `<option value="${folder.id}">${folder.name}</option>`; });
+            dropdownHtml += `</select></div>`;
+            roundSelectionContainer.innerHTML = dropdownHtml;
+            document.getElementById('roundSelect').addEventListener('change', async (e) => {
+                showAnimation();
+                await renderAuthSelectedRound(e.target.value);
+                hideAnimation();
             });
         }
-    };
-
-    const roundSelectionContainer = document.getElementById('roundSelectionContainer');
-    if (roundSelectionContainer && roundFolders.length > 0) {
-        const activeRoundIds = new Set([
-            ...adminDataCache.sub.map(file => file.roundId),
-            ...adminDataCache.com.map(file => file.roundId),
-            ...adminDataCache.res.map(file => file.roundId)
-        ].filter(id => id));
-        const displayRoundFolders = roundFolders.filter(folder => activeRoundIds.has(folder.id));
-
-        let dropdownHtml = `<div style=\"display: flex; align-items: center; gap: 10px;\"><label for=\"roundSelect\"><b>Select Round:</b></label><select id=\"roundSelect\" class=\"form-select\" style=\"width: auto;\"><option value=\"all\">All Rounds</option>`;
-        displayRoundFolders.forEach(folder => { dropdownHtml += `<option value="${folder.id}">${folder.name}</option>`; });
-        dropdownHtml += `</select></div>`;
-        roundSelectionContainer.innerHTML = dropdownHtml;
-        document.getElementById('roundSelect').addEventListener('change', async (e) => {
-            showAnimation();
-            await renderAuthSelectedRound(e.target.value);
-            hideAnimation();
-        });
+        await renderAuthSelectedRound('all');
+        if (!document.querySelector("#adminAccordian > .admin-table-row")) progress.hidden = true;
+    } catch (error) {
+        console.error("Unable to load Admin Table data:", error);
+        progress.innerHTML = '<p class="text-danger" role="alert">Unable to load Admin Table data from Box. Reload the page to retry.</p>';
+        delete progress.updateLoadingProgress;
+    } finally {
+        delete progress.dataset.loading;
+        progress.removeAttribute("aria-busy");
+        hideAnimation();
     }
-    await renderAuthSelectedRound('all');
-
-    hideAnimation();
 };
 
 const updateAdminDecisionScoreFromComment = (comment, rowFileId, change = true) => {
@@ -3611,6 +3665,7 @@ export const returnToChairs = () => {
             submitButton.textContent = "Returning...";
 
             try {
+                const responseFiles = await getRequiringInputFiles(returnToSubmitterFolder);
                 for (const checkbox of selectedFiles) {
                     for (const selectedConsortium of selectedChairs) {
                         const chair = chairsInfo.find(item => item.consortium === selectedConsortium);
@@ -3626,9 +3681,18 @@ export const returnToChairs = () => {
                         const task = await createCompleteTask(chairFile.id, "Returning to complete your review");
                         if (task && task.id) await assignTask(task.id, chair.email);
                         try {
-                            await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, consortium: selectedConsortium, workflowStage: "chair_review" });
+                            const adminFile = [...(adminDataCache?.sub || []), ...(adminDataCache?.com || []), ...(adminDataCache?.res || [])].find(file => String(file.fileId) === String(checkbox.id));
+                            const sourceId = adminFile?.commentsFileId || checkbox.id;
+                            const responseId = adminFile?.responseFileId || findMatchingFileByName(responseFiles, checkbox.value)?.id || "";
+                            const discussionSnapshot = await loadDataManagerDiscussion({ concept_box_id: sourceId, chair_file_id: chairFile.id,
+                                response_file_id: responseId, response_lookup_complete: true });
+                            const published = await updateDataManagerChairStatus({ conceptBoxId: sourceId, consortium: selectedConsortium, workflowStage: "chair_review", responseFileId: responseId, discussionSnapshot });
+                            if (!published || discussionSnapshot.errors.length) {
+                                if (progressDiv) progressDiv.innerHTML += '<p class="text-warning">Data Manager reply visibility could not be fully verified. Publish the latest chair status and replies from Study Access Admin.</p>';
+                            }
                         } catch (managerStatusError) {
                             console.warn("Unable to update the Data Managers return-to-chair status:", managerStatusError);
+                            if (progressDiv) progressDiv.innerHTML += '<p class="text-warning">Unable to publish submitter replies for Data Managers. Retry publishing chair status from Study Access Admin.</p>';
                         }
                         if (progressDiv) progressDiv.innerHTML += `<p class="text-success">Returned to ${escapeHtml(selectedConsortium)}.</p>`;
                     }
@@ -3771,7 +3835,11 @@ export const returnToSubmitter = () => {
                     : decision === "Denied"
                         ? "admin_denied"
                         : "admin_clarification";
-                await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, workflowStage });
+                const discussionSnapshot = decision === "Requiring Input" ? await loadDataManagerDiscussion({
+                    concept_box_id: checkbox.id, response_file_id: copiedFileId, response_lookup_complete: true
+                }) : undefined;
+                await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, workflowStage,
+                    responseFileId: decision === "Requiring Input" ? copiedFileId : undefined, discussionSnapshot });
             } catch (managerStatusError) {
                 console.warn("Unable to update the Data Managers administrative status:", managerStatusError);
             }

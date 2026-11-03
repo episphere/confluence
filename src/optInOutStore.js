@@ -28,6 +28,7 @@ const SELECTION_COLUMNS = ["schema_version", "round_id", "round_name", "consorti
 const DATA_MANAGER_REQUEST_COLUMNS = ["schema_version", "round_id", "round_name", "round_status", "workflow_stage", "opens_at_utc", "closes_at_utc", "concept_box_id", "chair_file_id", "concept_title", "concept_file_name", "requested_study", "consortium_id", "chair_score", "chair_score_updated_at_utc", "study_id", "study_acronym", "study_name", "selection_file_id", "provision_status", "provision_error", "collection_status", "decision", "submitted", "decision_updated_at_utc", "access_notes", "dta_assignments", "access_updated_by", "access_updated_at_utc", "initiated_at_utc", "initiated_by_email", "updated_at_utc"];
 const DATA_MANAGER_OWNED_COLUMNS = ["access_notes", "dta_assignments", "access_updated_by", "access_updated_at_utc", "manager_stage", "stage_updated_by", "stage_updated_at_utc"];
 DATA_MANAGER_REQUEST_COLUMNS.push("manager_stage", "stage_updated_by", "stage_updated_at_utc");
+DATA_MANAGER_REQUEST_COLUMNS.push("response_file_id", "discussion_snapshot");
 
 export const DATA_MANAGER_STAGES = {
     chair_review: "Chair review",
@@ -168,9 +169,11 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, consort
     if (studies.some(study => study.consortium && normalizeStudyId(study.consortium) !== normalizeStudyId(consortiumId))) {
         throw new Error("Study rosters must belong to the selected consortium.");
     }
+    let publishedRequestRows = [];
     if (!isAdmin) {
         if (!manager.collectionFolderId) throw new Error("No collection folder is configured for this consortium.");
         const published = await ensureDataManagerRequestFile(manager);
+        publishedRequestRows = published;
         const eligible = new Set(published.filter(row => String(row.round_id) === String(round.id)
             && normalizeStudyId(row.consortium_id) === normalizeStudyId(consortiumId)
             && ["admin_accepted", "opt_in_out"].includes(row.workflow_stage)).map(row => String(row.concept_box_id)));
@@ -286,6 +289,11 @@ export const provisionOptInOutRound = async ({ round, concepts, studies, consort
     const dataManagerRequests = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
     const conceptById = new Map(concepts.map(concept => [String(concept.fileId), concept]));
     const existingRequestByKey = new Map(dataManagerRequests.rows.map(row => [getDataManagerRequestKey(row), row]));
+    const publishedByConcept = new Map(publishedRequestRows.map(row => [getVisibleDataManagerRequestKey(row), row]));
+    roundManifestRows.forEach(assignment => {
+        const key = getDataManagerRequestKey(assignment);
+        if (!existingRequestByKey.has(key)) existingRequestByKey.set(key, publishedByConcept.get(getVisibleDataManagerRequestKey(assignment)) || {});
+    });
     const requestRows = roundManifestRows.map(assignment => ({
         ...existingRequestByKey.get(getDataManagerRequestKey(assignment)),
         schema_version: "1",
@@ -515,6 +523,8 @@ export const publishDataManagerChairRequests = async ({ round, reviews, studies,
             };
             const key = getDataManagerRequestKey(row);
             const existing = requestsByKey.get(key);
+            row.response_file_id = review.responseFileId === undefined ? existing?.response_file_id || "" : String(review.responseFileId || "");
+            row.discussion_snapshot = review.discussionSnapshot === undefined ? existing?.discussion_snapshot || "" : JSON.stringify(review.discussionSnapshot);
             requestsByKey.set(key, existing ? {
                 ...existing,
                 ...row,
@@ -534,7 +544,7 @@ export const publishDataManagerChairRequests = async ({ round, reviews, studies,
     await publishRowsToDataManagerFiles(updatedRequests, reviews.map(review => review.consortium || CONSORTIUM_ID));
 };
 
-export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, score, workflowStage }) => {
+export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, score, workflowStage, responseFileId, discussionSnapshot }) => {
     const configFolder = await findFolder(Confluence_Opt_In_Out, CONFIG_FOLDER_NAME);
     if (!configFolder) return false;
     const requestFile = await readTsvInFolder(configFolder.id, DATA_MANAGER_REQUESTS_FILE_NAME);
@@ -550,6 +560,8 @@ export const updateDataManagerChairStatus = async ({ conceptBoxId, consortium, s
         affectedConsortia.add(row.consortium_id || row.requested_study);
         return {
             ...row,
+            response_file_id: responseFileId === undefined ? row.response_file_id : String(responseFileId || ""),
+            discussion_snapshot: discussionSnapshot === undefined ? row.discussion_snapshot : JSON.stringify(discussionSnapshot),
             workflow_stage: workflowStage || row.workflow_stage,
             collection_status: workflowStage || row.collection_status,
             chair_score: score === undefined ? row.chair_score : (score || "--"),
@@ -681,10 +693,12 @@ export const seedTestDataManagerRequests = async ({ rounds, studies }) => {
         const row = { schema_version: "1", round_id: round.id, round_name: round.name, consortium_id: manager.consortium,
             workflow_stage: "admin_accepted", concept_box_id: concept.fileId, concept_title: concept.title,
             concept_file_name: concept.fileName, requested_study: manager.consortium,
+            response_file_id: concept.responseFileId || "", discussion_snapshot: concept.discussionSnapshot ? JSON.stringify(concept.discussionSnapshot) : "",
             study_id: getStudyId(study), study_acronym: study.acronym, study_name: study.name,
             decision: "pending", submitted: "false", updated_at_utc: now };
         // Existing simulated decisions, schedules, and manager notes survive a refresh.
-        return { ...row, ...previous.get(getDataManagerRequestKey(row)) };
+        const existing = previous.get(getDataManagerRequestKey(row));
+        return { ...row, ...existing, response_file_id: concept.responseFileId || existing?.response_file_id || "" };
     })));
     const rows = upsertRows(existing.rows, added, getDataManagerRequestKey);
     if (!existing.file || serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, existing.rows) !== serializeTsv(DATA_MANAGER_REQUEST_COLUMNS, rows)) {

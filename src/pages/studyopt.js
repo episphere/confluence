@@ -5,6 +5,7 @@ import { loadDemoOptInOutAssignments, loadOptInOutAssignments, provisionDemoOptI
 import { mountOptInOutProgress } from "../components/optInOutProgress.js";
 import { exportAdminConsortiaCsv, loadAcceptedAdminConceptRounds, syncCurrentDataManagerChairRequests, prepareTestDataManagerWorkspace } from "./chairmenu.js";
 import { getTestDataManager, renderTestDataManagerBanner } from "../components/testDataManagerMode.js";
+import { showLoadingProgress } from "../components/loadingProgress.js";
 
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -131,8 +132,10 @@ const confirmStudyAccessChange = (select, container, managerView, assignmentsByI
 
 const studyAccessStudyKey = study => normalizeStudyFilterValue(study.study_id || study.study_acronym || study.acronym || study.name);
 
-const loadStudyAccessAdminRows = async (managerView = false) => {
+const loadStudyAccessAdminRows = async (managerView = false, onProgress = () => {}) => {
+    onProgress(35, "Loading study assignments and submitted decisions...");
     const assignments = await loadStudyAccessAssignments(managerView);
+    onProgress(55, "Matching consortia, rounds, and study contacts...");
     const requests = new Map();
     assignments.forEach(assignment => {
         const consortium = assignment.consortium_id;
@@ -170,6 +173,7 @@ const loadStudyAccessAdminRows = async (managerView = false) => {
         });
     });
     const conceptIds = [...conceptsById.keys()].filter(Boolean);
+    onProgress(65, `Loading concept investigators (0/${conceptIds.length})...`);
     for (let index = 0; index < conceptIds.length; index += 10) {
         await Promise.all(conceptIds.slice(index, index + 10).map(async id => {
             try {
@@ -179,6 +183,8 @@ const loadStudyAccessAdminRows = async (managerView = false) => {
                 console.warn(`Unable to load investigators for ${id}:`, error);
             }
         }));
+        const loaded = Math.min(index + 10, conceptIds.length);
+        onProgress(65 + 25 * loaded / conceptIds.length, `Loading concept investigators (${loaded}/${conceptIds.length})...`);
     }
     return Array.from(requests.values()).sort((a, b) => a.label.localeCompare(b.label)).map(request => ({
         ...request,
@@ -874,9 +880,12 @@ const bindInitiateOptInOutRoundButton = (managerView = false) => {
 
 export const loadStudyAccessAdminTable = async (managerView = false) => {
     const container = document.getElementById("studyAccessAdminTableContainer");
-    if (!container || container.dataset.loaded === "true") return;
+    if (!container || container.dataset.loaded === "true" || container.dataset.loading === "true") return;
 
-    container.innerHTML = `<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
+    container.dataset.loading = "true";
+    container.setAttribute("aria-busy", "true");
+    const updateProgress = showLoadingProgress(container, managerView ? "Loading Consortium Study Access Data" : "Loading Study Access Admin Data", "studyAccess");
+    updateProgress(5, "Checking study-access permissions...");
     try {
         const userEmail = JSON.parse(localStorage.parms || "{}").login;
         if (!userEmail) {
@@ -893,10 +902,14 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
             return;
         }
 
-        if (managerView && getTestDataManager()) await prepareTestDataManagerWorkspace();
+        if (managerView && getTestDataManager()) {
+            updateProgress(15, "Preparing the TEST workspace...");
+            await prepareTestDataManagerWorkspace();
+        }
         bindCreateDemoOptInOutRoundButton();
         bindInitiateOptInOutRoundButton(managerView);
-        void mountOptInOutProgress(document.getElementById("optInOutProgressContainer"), managerView);
+        updateProgress(25, "Loading opt-in/out periods and round progress...");
+        const roundProgressLoading = mountOptInOutProgress(document.getElementById("optInOutProgressContainer"), managerView);
 
         const syncDataManagerButton = document.getElementById("syncDataManagerStatusBtn");
         if (syncDataManagerButton && syncDataManagerButton.dataset.bound !== "true") {
@@ -1002,7 +1015,9 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
             });
         }
 
-        const requestedStudies = await loadStudyAccessAdminRows(managerView);
+        const requestedStudies = await loadStudyAccessAdminRows(managerView, updateProgress);
+        await roundProgressLoading;
+        updateProgress(95, "Preparing study decisions, search, and sorting...");
         const assignmentsById = new Map();
         requestedStudies.forEach(request => request.concepts.forEach(concept => concept.assignments.forEach(assignment => {
             if (assignment.selection_file_id) assignmentsById.set(assignment.selection_file_id, assignment);
@@ -1128,6 +1143,7 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
             `;
         }).join("");
 
+        updateProgress(100, "Data loaded. Displaying study access...");
         container.innerHTML = `
             <div id="studyAccessSaveStatus" class="d-none" role="status"></div>
             <div class="main-summary-row mb-2">
@@ -1271,5 +1287,8 @@ export const loadStudyAccessAdminTable = async (managerView = false) => {
     } catch (error) {
         console.error("Error loading study access admin table:", error);
         container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Unable to load study selections from Box.")}</p>`;
+    } finally {
+        delete container.dataset.loading;
+        container.removeAttribute("aria-busy");
     }
 };
