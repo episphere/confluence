@@ -190,24 +190,24 @@ export const navBarMenutemplate = () => {
                     </li>`
                 ) : ''
             }
-            <li class="grid-elements">
+            <li class="nav-item grid-elements">
                 <a class="nav-link nav-menu-links white-font" href="#data_submission" title="Data Submitted" id="dataSubmission"> 
                     Submitted Concepts
                 </a>
             </li>
-            <li class="grid-elements">
-                <a class="nav-link nav-menu-links white-font" rel="noopener" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
+            <li class="nav-item grid-elements">
+                <a class="nav-link nav-menu-links white-font" target="_blank" rel="noopener noreferrer" href="https://github.com/episphere/confluence/issues" title="Confluence github issues">
                     Report issue
                 </a>
             </li>
         </ul>
-        <ul class="navbar-nav ml-auto" id="navBarOptions2">
+        <ul class="navbar-nav ms-auto mb-lg-0" id="navBarOptions2">
             ${localStorage.parms && JSON.parse(localStorage.parms).name ? `
                 <li class="nav-item dropdown grid-elements d-flex">
                     <a class="nav-link nav-menu-links dropdown-toggle dropdown-btn white-font" href="#" id="navbarDropdown5" role="button" title="Confluence" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         ${JSON.parse(localStorage.parms).name}
                     </a>
-                    <ul class="dropdown-menu navbar-dropdown" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu navbar-dropdown dropdown-menu-end" aria-labelledby="navbarDropdown5">
                         <li>
                             <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#logout" id="logOutBtn">
                                 Log Out
@@ -216,13 +216,12 @@ export const navBarMenutemplate = () => {
                     </ul>
                 </li>
                 ` : `
-                <li class="grid-elements">
-                    <a class="dropdown-item nav-link nav-menu-links dropdown-menu-links" href="#logout" id="logOutBtn">
+                <li class="nav-item grid-elements">
+                    <a class="nav-link nav-menu-links white-font" href="#logout" id="logOutBtn">
                         Log Out
                     </a>
                 </li>
             `}
-            </div>
         </ul>
     `;
 };

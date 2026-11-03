@@ -318,8 +318,11 @@ const openOptInOutSubmitModal = (container, user) => {
 
 export const loadOptInOutTable = async () => {
     const container = document.getElementById("optInOutTableContainer");
-    if (!container || container.dataset.loaded === "true") return;
-    container.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading selections from Box...</div>';
+    if (!container || container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+    container.dataset.loading = "true";
+    container.setAttribute("aria-busy", "true");
+    const updateProgress = showLoadingProgress(container, "Loading Study Opt-In/Opt-Out Data", "optInOut");
+    updateProgress(5, "Checking study access...");
 
     try {
         const userEmail = String(JSON.parse(localStorage.parms || "{}").login || "").trim();
@@ -329,6 +332,7 @@ export const loadOptInOutTable = async () => {
         }
         const isAdmin = emailsAllowedToUpdateData.includes(userEmail);
         const testManager = getTestDataManager();
+        updateProgress(20, testManager ? "Loading the TEST study roster..." : "Loading the study access roster...");
         const workbookRows = testManager ? [] : await loadOptInOutWorkbookRows();
         const userRow = workbookRows.find(row => String(getCellValue(row, ["Email", "email"])).trim().toLowerCase() === userEmail.toLowerCase());
         if (!userRow && !isAdmin && !testManager) {
@@ -336,10 +340,12 @@ export const loadOptInOutTable = async () => {
             return;
         }
         const studies = testManager ? studiesInfo.filter(study => study.consortium === testManager.consortium) : userRow ? getWorkbookStudyEntries(userRow) : [];
+        updateProgress(40, "Loading open assignments and saved decisions from Box...");
         const [productionAssignments, demoAssignments] = await Promise.all([
             studies.length ? loadOptInOutAssignments(studies) : Promise.resolve([]),
             isAdmin && !testManager ? loadDemoOptInOutAssignments() : Promise.resolve([])
         ]);
+        updateProgress(85, "Organizing concepts, studies, and saved selections...");
         const assignments = [...demoAssignments, ...productionAssignments];
         if (!assignments.length) {
             container.innerHTML = "<p class='text-warning'>No open Opt-In/Opt-Out assignments were found for your studies. An administrator may need to initiate the round first.</p>";
@@ -363,6 +369,7 @@ export const loadOptInOutTable = async () => {
         `).join("");
 
         const hasDemoAssignments = assignments.some(assignment => assignment.is_demo === "true");
+        updateProgress(100, "Data loaded. Displaying study selections...");
         container.innerHTML = `
             ${hasDemoAssignments ? '<div class="alert alert-info"><strong>Demo Mode:</strong> Demo selections are isolated from production study and round files.</div>' : ""}
             <div class="card shadow-sm border-0">
@@ -432,6 +439,9 @@ export const loadOptInOutTable = async () => {
     } catch (error) {
         console.error("Error loading Box-backed Opt-In/Opt-Out data:", error);
         container.innerHTML = "<p class='text-danger'>Error loading Opt-In/Opt-Out assignments from Box.</p>";
+    } finally {
+        delete container.dataset.loading;
+        container.removeAttribute("aria-busy");
     }
 };
 

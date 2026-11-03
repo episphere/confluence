@@ -35,13 +35,31 @@ const extractBetweenLabels = (text, startLabel, endLabel) => {
     return (endMatch ? remaining.slice(0, endMatch.index) : remaining).trim();
 };
 
-export const extractDataManagerInvestigatorDetails = text => ({
-    contactInvestigator: extractBetweenLabels(text, "Contact Investigator(s)", "Institution(s)"),
-    institution: extractBetweenLabels(text, "Institution(s)", "Contact Email"),
-    email: extractBetweenLabels(text, "Contact Email", "Member of Consortia or Study / Trial Group?")
-        .match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+/i)?.[0] || "",
-    allInvestigators: extractBetweenLabels(text, "ALL Investigators (and Institutions) who require access", "Consortia or Study / Trial Group data being requested")
-});
+export const extractDataManagerInvestigatorDetails = text => {
+    const normalized = String(text || "").replace(/\s+/g, " ").trim();
+    const labels = [
+        "Contact Investigator(s)", "Institution(s)", "Contact Email",
+        "Member of Consortia or Study / Trial Group?",
+        "ALL Investigators (and Institutions) who require access",
+        "Consortia or Study / Trial Group data being requested"
+    ];
+    let nextIndex = 0;
+    const readableFormat = labels.every(label => {
+        const match = new RegExp(escapeRegExp(label), "i").exec(normalized.slice(nextIndex));
+        if (!match) return false;
+        nextIndex += match.index + match[0].length;
+        return true;
+    });
+    if (!readableFormat) return { readableFormat: false };
+    return {
+        readableFormat: true,
+        contactInvestigator: extractBetweenLabels(text, "Contact Investigator(s)", "Institution(s)"),
+        institution: extractBetweenLabels(text, "Institution(s)", "Contact Email"),
+        email: extractBetweenLabels(text, "Contact Email", "Member of Consortia or Study / Trial Group?")
+            .match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+/i)?.[0] || "",
+        allInvestigators: extractBetweenLabels(text, "ALL Investigators (and Institutions) who require access", "Consortia or Study / Trial Group data being requested")
+    };
+};
 
 const parseDtaAssignments = value => {
     try {
@@ -375,12 +393,12 @@ export const loadDataManagerRequestsTable = async () => {
                     <td colspan="6" class="p-0 border-0">
                         <div id="${rowId}Collapse" class="accordion-collapse collapse">
                             <div class="accordion-body border-bottom bg-light" data-request-index="${index}" data-round-id="${escapeHtml(request.round_id)}" data-concept-box-id="${escapeHtml(request.concept_box_id)}" data-consortium-id="${escapeHtml(request.consortium_id)}">
-                                <div class="row g-3 mb-3">
-                                    <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Contact Investigator / PI</div><div>${escapeHtml(details.contactInvestigator || "Not provided")}</div></div>
-                                    <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Email</div><div class="text-break">${details.email ? getEmailLinks(details.email) : '<span class="text-muted">Not provided</span>'}</div></div>
-                                    <div class="col-12 col-lg-4"><div class="small fw-bold text-muted">Institution</div><div>${escapeHtml(details.institution || "Not provided")}</div></div>
-                                    <div class="col-12"><div class="small fw-bold text-muted">All investigators who need access</div><div class="data-manager-all-investigators">${escapeHtml(details.allInvestigators || "Not provided")}</div></div>
-                                </div>
+                                ${details.readableFormat ? `<div class="data-manager-contact-details mb-3">
+                                    <div><div class="small fw-bold text-muted">Contact Investigator / PI</div><div>${escapeHtml(details.contactInvestigator || "Not provided")}</div></div>
+                                    <div><div class="small fw-bold text-muted">Email</div><div>${details.email ? getEmailLinks(details.email) : '<span class="text-muted">Not provided</span>'}</div></div>
+                                    <div><div class="small fw-bold text-muted">Institution</div><div>${escapeHtml(details.institution || "Not provided")}</div></div>
+                                    <div class="data-manager-investigators-field"><div class="small fw-bold text-muted">All investigators who need access</div><div class="data-manager-all-investigators">${escapeHtml(details.allInvestigators || "Not provided")}</div></div>
+                                </div>` : '<div class="text-muted mb-3">(Unable to read, see concept for details)</div>'}
                                 <details class="data-manager-comments-dropdown mb-3 border-top pt-3">
                                     <summary class="fw-semibold">DACC comments and submitter replies</summary>
                                     <div class="data-manager-reviewer-comments mt-3" role="status">Open to check chair comments and submitter replies.</div>
