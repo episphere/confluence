@@ -791,8 +791,9 @@ const parseBoxCommentEntries = (response) => {
 };
 
 const getDaccExportState = (file) => {
-    if (String(file?.parent?.id || "") === String(completedFolder)) return "Accepted";
-    if (String(file?.parent?.id || "") === String(deniedFolder)) return "Denied";
+    const folderIds = [file?.parent?.id, ...(file?.path_collection?.entries || []).map(folder => folder.id)].map(String);
+    if (folderIds.includes(String(deniedFolder))) return "Denied";
+    if (folderIds.includes(String(completedFolder))) return "Accepted";
     return "Ongoing";
 };
 
@@ -972,7 +973,12 @@ const showDaccExportFieldSelection = (files, button) => {
     });
 };
 
-const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = []) => files.map(fileInfo => {
+const getRecordedAdminReturn = file => {
+    const match = String(file?.description || "").match(/^Confluence admin return: (Accepted|Denied|Requiring Input) (\S+)$/m);
+    return match && Number.isFinite(Date.parse(match[2])) ? { decision: match[1], date: match[2] } : null;
+};
+
+const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRoundFolders = [], returnCopies = []) => files.map(fileInfo => {
     const fileId = fileInfo.id;
     const filename = fileInfo.name;
     const titlename = getConceptTitleFromFileName(filename);
@@ -982,6 +988,13 @@ const getProcessedAdminFiles = async (files, type, allSubFiles = [], submitterRo
     let commentsFileId = fileId;
     let responseFileId = null;
     let conceptId = fileId;
+
+    if (type === 'com') {
+        const returnCopy = returnCopies
+            .filter(copy => String(copy.description || "").trim() === String(fileId) && Number.isFinite(Date.parse(copy.created_at)))
+            .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))[0];
+        returnedDate = getRecordedAdminReturn(fileInfo)?.date || returnCopy?.created_at || null;
+    }
 
     if (type === 'res') {
         returnedDate = fileInfo.created_at;
@@ -1247,7 +1260,7 @@ export const generateChairMenuFiles = async (forceRefresh = false) => {
             getAllFilesRecursive(userChairItem.boxIdNew, "name,type,id,parent,created_at,parent.name"),
             getAllFilesRecursive(userChairItem.boxIdClara, "name,type,id,parent,created_at,parent.name"),
             getAllFilesRecursive(userChairItem.boxIdComplete, "name,type,id,parent,created_at,parent.name"),
-            getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at,parent.name"),
+            getAllFilesRecursive(completedFolder, "name,type,id,parent,created_at,parent.name,path_collection"),
             getFile(DACCmembers)
         ]);
 
@@ -1781,47 +1794,18 @@ export const chairMenuTemplate = () => {
 };
 
 const moveFileToChairFolder = async (fileId, targetBaseFolderId, targetSubfolderName = null) => {
-    try {
-        let subfolderName = targetSubfolderName;
-        if (!subfolderName) {
-            const fileInfo = await getFileInfo(fileId);
-            if (fileInfo && fileInfo.parent) {
-                const parentFolderInfo = await getFolderInfo(fileInfo.parent.id);
-                if (parentFolderInfo && parentFolderInfo.name && parentFolderInfo.name.toLowerCase().startsWith('round')) {
-                    subfolderName = parentFolderInfo.name;
-                }
-            }
-        }
-
-        if (!subfolderName) {
-            await moveFile(fileId, targetBaseFolderId);
-            return;
-        }
-        
-        const targetItems = await getFolderItems(targetBaseFolderId, "name,id,type", 1000);
-        let targetSubfolder = (targetItems && targetItems.entries) ? targetItems.entries.find(f => f.name === subfolderName && f.type === 'folder') : null;
-
-        if (!targetSubfolder) {
-            const newFolder = await createFolder(targetBaseFolderId, subfolderName);
-            if (newFolder && newFolder.id) {
-                targetSubfolder = newFolder;
-            } else if (newFolder && (newFolder.status === 409 || newFolder.code === 'item_name_already_exists')) {
-                const refreshedFolders = await getFolderItems(targetBaseFolderId, "name,id,type", 1000);
-                targetSubfolder = (refreshedFolders && refreshedFolders.entries) ? refreshedFolders.entries.find(f => f.name === subfolderName && f.type === 'folder') : null;
-            }
-        }
-
-        if (targetSubfolder && targetSubfolder.id) {
-            await moveFile(fileId, targetSubfolder.id);
-        } else {
-            await moveFile(fileId, targetBaseFolderId);
-        }
-    } catch (e) {
-        console.error("Error moving file with structure:", e);
-        await moveFile(fileId, targetBaseFolderId);
+    let roundName = targetSubfolderName;
+    if (!roundName) {
+        const fileInfo = await getFileInfo(fileId);
+        if (!fileInfo?.id) throw new Error(`Unable to read chair file ${fileId}.`);
+        const parent = await getFolderInfo(fileInfo.parent.id);
+        if (parent?.name?.toLowerCase().startsWith("round")) roundName = parent.name;
     }
+    const destination = roundName
+        ? await getOrCreateChildFolder(targetBaseFolderId, roundName)
+        : { id: targetBaseFolderId };
+    return await moveAdminFileVerified(fileId, destination.id);
 };
-
 async function handleChairCommentSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -2186,7 +2170,7 @@ export function viewFinalDecisionFiles(files) {
     const titlename = getConceptTitleFromFileName(filename);
     const shorttitlename = titlename.length > 40 ? titlename.substring(0, 39) + "..." : titlename;
     const roundLabel = getConceptRoundLabel(fileInfo);
-    template += `<div class="accordian-item chair-table-row mb-2 border-bottom pb-2" data-round-number="${escapeHtml(getConceptRoundNumber(fileInfo) || "")}"><div class="row-24 align-items-center position-relative"><div class="col-24-4 text-left"><span class="responsive-text" title="${titlename}">${shorttitlename}</span></div><div class="col-24-2 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-3 text-left"><span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span></div><div class="col-24-2 text-left">${fileInfo.parent && fileInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fileInfo.parent && fileInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="AABCG Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="BCAC Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="C-NCI Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="CIMBA Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="LAGENO Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="MERGE Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}" data-file-id="${fileId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${filename} <button class="btn btn-lg custom-btn preview-file preview-file-inline" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept ID</div><div class="col">${escapeHtml(getConceptId(fileInfo, fileId) || "Not available")}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Investigator(s)</div><div class="col" id="investigators${fileId}"><span class="text-muted italic">Click accordion to load...</span></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div></div></div></div>`;
+    template += `<div class="accordian-item chair-table-row mb-2 border-bottom pb-2" data-round-number="${escapeHtml(getConceptRoundNumber(fileInfo) || "")}"><div class="row-24 align-items-center position-relative"><div class="col-24-4 text-left"><span class="responsive-text" title="${titlename}">${shorttitlename}</span></div><div class="col-24-2 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-3 text-left"><span class="responsive-text">${new Date(fileInfo.created_at).toDateString().substring(4)}</span></div><div class="col-24-2 text-left">${getDaccExportState(fileInfo) === "Accepted" ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : getDaccExportState(fileInfo) === "Denied" ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fileId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="AABCG Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fileId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="BCAC Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fileId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="C-NCI Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fileId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="CIMBA Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fileId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="LAGENO Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fileId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown disabled" disabled="true" aria-label="MERGE Decision"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fileId}" aria-expanded="false" aria-controls="file${fileId}" data-file-id="${fileId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fileId}" class="accordion-collapse collapse" aria-labelledby="flush-heading${fileId}"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${filename} <button class="btn btn-lg custom-btn preview-file preview-file-inline" title='Preview File' data-file-id="${fileId}" aria-label="Preview File"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept ID</div><div class="col">${escapeHtml(getConceptId(fileInfo, fileId) || "Not available")}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Investigator(s)</div><div class="col" id="investigators${fileId}"><span class="text-muted italic">Click accordion to load...</span></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fileId}Comments'></div></div></div></div></div>`;
   }
   template += `</div></div>`;
   const filesContainer = document.getElementById("files");
@@ -2604,7 +2588,7 @@ export const authTableTemplate = () => {
     return template;
 };
 
-export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
+export const getRequiringInputFiles = async (returnToSubmitterFolderId, decisions = ['Requiring Input']) => {
     const listChildren = async folderId => {
         const entries = [];
         let offset = 0;
@@ -2623,9 +2607,9 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
         .map(async userFolder => {
             const subfolders = await listChildren(userFolder.id);
             const requiringInputFolders = subfolders
-                .filter(subfolder => subfolder.name === 'Requiring Input' && subfolder.type === 'folder');
+                .filter(subfolder => decisions.includes(subfolder.name) && subfolder.type === 'folder');
             const files = await Promise.all(requiringInputFolders.map(subfolder =>
-                getAllFilesRecursive(subfolder.id, "name,type,id,parent,parent.name,created_at,modified_at")
+                getAllFilesRecursive(subfolder.id, "name,type,id,description,parent,parent.name,created_at,modified_at")
             ));
             return files.flat();
         }));
@@ -2635,20 +2619,22 @@ export const getRequiringInputFiles = async (returnToSubmitterFolderId) => {
 const loadAdminDataCache = async () => {
     if (adminDataCache) return adminDataCache;
 
-    const [allFilesSub, allFilesCom, allFilesRes, submitterFolderItems, roundSchedule] = await Promise.all([
+    const [allFilesSub, allFilesCom, allReturnedFiles, submitterFolderItems, roundSchedule] = await Promise.all([
         getAllFilesRecursive(submitterFolder, "name,type,id,parent,parent.name,created_at,modified_at"),
-        getAllFilesRecursive(completedFolder, "name,type,id,parent,parent.name,created_at,modified_at"),
-        getRequiringInputFiles(returnToSubmitterFolder),
+        getAllFilesRecursive(completedFolder, "name,type,id,description,parent,parent.name,path_collection,created_at,modified_at"),
+        getRequiringInputFiles(returnToSubmitterFolder, ['Requiring Input', 'Accepted', 'Denied']),
         getFolderItems(submitterFolder, "name,type,id", 1000),
         fetch("./src/data/roundSchedule.json").then(response => response.ok ? response.json() : []).catch(() => [])
     ]);
+    const allFilesRes = allReturnedFiles.filter(file => file.parent?.name === 'Requiring Input');
+    const finalReturnCopies = allReturnedFiles.filter(file => ['Accepted', 'Denied'].includes(file.parent?.name));
     const scheduleByFolderName = new Map((roundSchedule || []).map(round => [round.folderName, round]));
     const submitterRoundFolders = (submitterFolderItems?.entries || [])
         .filter(item => item.type === "folder" && item.name.toLowerCase().startsWith("round"))
         .map(item => ({ ...item, ...(scheduleByFolderName.get(item.name) || {}) }));
     const [processedSub, processedCom, processedRes] = await Promise.all([
         getProcessedAdminFiles(allFilesSub, 'sub'),
-        getProcessedAdminFiles(allFilesCom, 'com', allFilesSub, submitterRoundFolders),
+        getProcessedAdminFiles(allFilesCom, 'com', allFilesSub, submitterRoundFolders, finalReturnCopies),
         getProcessedAdminFiles(allFilesRes, 'res', [...allFilesSub, ...allFilesCom])
     ]);
     const roundFoldersById = new Map(submitterRoundFolders.map(folder => [String(folder.id), folder]));
@@ -3360,7 +3346,7 @@ export function viewAuthFinalDecisionFiles(processedSubFiles, processedComFiles,
     const rId = roundInfo.roundId || "";
     const roundNumber = getConceptRoundNumber(roundInfo);
     const roundLabel = roundNumber ? `R${roundNumber}` : "--";
-    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-round-id="${rId}" data-round-number="${roundNumber || ""}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-2 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${fInfo.parent.id == completedFolder ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : fInfo.parent.id == deniedFolder ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Investigator(s)</div><div class="col${roundInfo.contacts ? "" : " text-muted"}" id="investigators${fId}">${roundInfo.documentDataLoaded ? escapeHtml(roundInfo.contacts || "Not provided") : "Loading investigator details..."}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
+    return `<div class="accordian-item admin-table-row mb-2 border-bottom pb-2" data-concept-box-id="${escapeHtml(roundInfo.conceptId || fId)}" data-file-type="${roundInfo.type}" data-round-id="${rId}" data-round-number="${roundNumber || ""}"><div class="row-24 align-items-center position-relative"><div class="col-24-1 text-left"><input type="checkbox" class="pl admin-checkbox" id="${fId}" value="${fInfo.name}" aria-label="Select file"></div><div class="col-24-2 text-left"><span class="responsive-text" title="${titlename}">${stn}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${roundLabel}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${new Date(subD).toDateString().substring(4)}</span></div><div class="col-24-1 text-left"><span class="responsive-text">${retD ? new Date(retD).toDateString().substring(4) : "--"}</span></div><div class="col-24-2 text-left">${getDaccExportState(fInfo) === "Accepted" ? '<h6 class="badge badge-pill bg-success">Accepted</h6>' : getDaccExportState(fInfo) === "Denied" ? '<h6 class="badge badge-pill bg-danger">Denied</h6>' : '<h6 class="badge badge-pill bg-warning">Ongoing</h6>'}</div><div class="col-24-2 text-center" id="AABCG${fId}" data-value="AABCG"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="BCAC${fId}" data-value="BCAC"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="C-NCI${fId}" data-value="C-NCI"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="CIMBA${fId}" data-value="CIMBA"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="LAGENO${fId}" data-value="LAGENO"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-2 text-center" id="MERGE${fId}" data-value="MERGE"><select class="form-select form-select-sm decision-dropdown"><option value="--" selected>--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="777">777</option><option value="NA">NA</option></select></div><div class="col-24-3 text-center"><select class="form-select form-select-sm action-required-dropdown" data-file-id="${fId}" aria-label="Action required for ${escapeHtml(fInfo.name)}"><option value="" selected>--</option><option value="Move to Accepted">Move to Accepted</option><option value="Move to Declined">Move to Declined</option><option value="Needs Resending">Needs Resending</option></select></div><div class="col-24-1 text-right"><button class="accordion-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#file${fId}" aria-expanded="false" aria-controls="file${fId}"><i class="fas fa-chevron-down"></i></button></div></div><div id="file${fId}" class="accordion-collapse collapse"><div class="accordion-body"><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Concept</div><div class="col">${name} <button class="btn btn-lg custom-btn preview-file" title='Preview File' data-file-id="${fId}"><i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></button></div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Round</div><div class="col">${roundLabel}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Investigator(s)</div><div class="col${roundInfo.contacts ? "" : " text-muted"}" id="investigators${fId}">${roundInfo.documentDataLoaded ? escapeHtml(roundInfo.contacts || "Not provided") : "Loading investigator details..."}</div></div><div class="row mb-1 m-0"><div class="col-md-2 pl-2 font-bold">Comments</div><div class="col" id='file${fId}Comments'></div></div></div></div></div>`;
   };
   for (const f of processedSubFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f);
   for (const f of processedComFiles) template += renderRow(f.fileInfo, f.fileId, renderAdminConceptName(f), f.titlename, f.shorttitlename, f.submissionDate, f.returnedDate, f);
@@ -3603,6 +3589,50 @@ const refreshAdminTable = () => {
     generateAuthTableFiles();
 };
 
+const moveAdminFileVerified = async (fileId, parentId) => {
+    await updateBoxFile(fileId, { parent: { id: String(parentId) } });
+    const movedFile = await getFileInfo(fileId);
+    if (String(movedFile?.parent?.id) !== String(parentId)) {
+        throw new Error(`Box has not confirmed moving file ${fileId} to folder ${parentId}. The return is incomplete; refresh and retry.`);
+    }
+    return movedFile;
+};
+
+const getOrCreateAdminReturnCopy = async (sourceId, targetFolderId) => {
+    const files = await getAllFilesRecursive(targetFolderId, "id,name,type,description,parent");
+    const existing = files.find(file => String(file.description || "").trim() === String(sourceId));
+    if (existing) return existing;
+    const responses = (await getRequiringInputFiles(returnToSubmitterFolder))
+        .filter(file => String(file.description || "").trim() === String(sourceId));
+    if (responses.length > 1) throw new Error("Multiple clarification copies reference this concept. Review the Box copies before returning it.");
+    if (responses.length === 1) return await moveAdminFileVerified(responses[0].id, targetFolderId);
+    const copied = await copyFile(sourceId, targetFolderId, String(sourceId));
+    if (!copied?.id) throw new Error(`Unable to create the submitter copy: ${copied?.statusText || copied?.status || "Box copy failed"}.`);
+    return copied;
+};
+
+const loadAdminReturnComments = async fileId => {
+    const entries = [];
+    let offset = 0;
+    while (true) {
+        const response = await listComments(fileId, offset);
+        const page = typeof response === "string" ? JSON.parse(response) : response;
+        if (!Array.isArray(page?.entries)) throw new Error(`Unable to read comments for file ${fileId}.`);
+        entries.push(...page.entries);
+        offset += page.entries.length;
+        if (offset >= (page.total_count ?? offset)) return entries;
+        if (!page.entries.length) throw new Error(`Incomplete comment listing for file ${fileId}.`);
+    }
+};
+
+const recordAdminReturnDate = async (file, decision) => {
+    // Keep the original date when finishing a partially completed return.
+    if (getRecordedAdminReturn(file)?.decision === decision) return;
+    const description = String(file.description || "")
+        .replace(/^Confluence admin return: .*$(?:\r?\n)?/gm, '').trimEnd();
+    await updateBoxFile(file.id, { description: `${description}${description ? '\n' : ''}Confluence admin return: ${decision} ${new Date().toISOString()}` });
+};
+
 export const returnToChairs = () => {
     const returnChairs = async (e) => {
         e.preventDefault();
@@ -3724,6 +3754,10 @@ export const returnToSubmitter = () => {
             alert("Please select at least one file to return.");
             return;
         }
+        if (selectedFiles.length > 1) {
+            alert("Please select one concept at a time to return.");
+            return;
+        }
 
         const header = document.getElementById("confluenceModalHeader");
         const body = document.getElementById("confluenceModalBody");
@@ -3776,7 +3810,12 @@ export const returnToSubmitter = () => {
             addStatus("Starting process...");
             addStatus(`Gathering data for Box file: ${escapeHtml(checkbox.id)}`);
 
-            const fileSelected = await getFileInfo(checkbox.id);
+            const sourceId = checkbox.closest(".admin-table-row")?.dataset.conceptBoxId || checkbox.id;
+            if (checkbox.closest(".admin-table-row")?.dataset.fileType === "res" && String(sourceId) === String(checkbox.id)) {
+                throw new Error("Unable to identify the original concept for this returned copy. Return the original concept from the intake or completed folder instead.");
+            }
+            const fileSelected = await getFileInfo(sourceId);
+            if (!fileSelected?.id || !fileSelected.created_by?.login) throw new Error("Unable to read the original concept and its submitter.");
             const fileName = fileSelected.name;
             const submitterEmail = fileSelected.created_by.login;
             const userFolderName = `The_Confluence_Project_Returned_Concepts-${submitterEmail}`;
@@ -3805,12 +3844,11 @@ export const returnToSubmitter = () => {
             const targetFolder = await getOrCreateChildFolder(userFolder.id, decision);
 
             addStatus(`Copying file to ${escapeHtml(decision)} folder...`);
-            const copiedFile = await copyFile(checkbox.id, targetFolder.id, String(checkbox.id));
+            const copiedFile = await getOrCreateAdminReturnCopy(sourceId, targetFolder.id);
             const copiedFileId = copiedFile.id;
 
             addStatus("Copying comments...");
-            const returnComments = await listComments(checkbox.id);
-            const commentsToCopy = JSON.parse(returnComments).entries;
+            const commentsToCopy = await loadAdminReturnComments(sourceId);
             await copyComments(commentsToCopy, copiedFileId);
 
             if (decision === "Accepted" || decision === "Denied") {
@@ -3819,16 +3857,30 @@ export const returnToSubmitter = () => {
                     const chairFile = await findFileByNameInFolders(fileName, [chair.boxIdNew, chair.boxIdClara]);
                     if (chairFile) {
                         addStatus(`Moving chair copy to completed folder: ${escapeHtml(chair.consortium)}`);
-                        await moveFileToChairFolder(chairFile.id, chair.boxIdComplete);
+                        await moveFileToChairFolder(chairFile.id, chair.boxIdComplete, roundName);
                     }
                 }
 
                 addStatus(`Ensuring completed round folder exists: ${escapeHtml(roundName)}...`);
                 const completedRoundFolder = await getOrCreateChildFolder(completedFolder, roundName);
                 addStatus(`Moving submitter file to completed/${escapeHtml(roundName)}...`);
-                await moveFile(checkbox.id, completedRoundFolder.id);
+                await moveAdminFileVerified(sourceId, completedRoundFolder.id);
+                // Retain replies on the same Box file, but remove completed
+                // clarification copies from the active Requiring Input queue.
+                const responseCopies = await getRequiringInputFiles(returnToSubmitterFolder);
+                for (const response of responseCopies) {
+                    if (String(response.description || "").trim() === String(sourceId)
+                        || (String(checkbox.id) !== String(sourceId) && String(response.id) === String(checkbox.id))) {
+                        addStatus("Moving prior clarification copy out of Requiring Input...");
+                        await moveAdminFileVerified(response.id, targetFolder.id);
+                    }
+                }
             }
 
+            addStatus("Recording the return date...");
+            await recordAdminReturnDate(fileSelected, decision);
+
+            let managerStatusSynced = true;
             try {
                 const workflowStage = decision === "Accepted"
                     ? "admin_accepted"
@@ -3836,19 +3888,23 @@ export const returnToSubmitter = () => {
                         ? "admin_denied"
                         : "admin_clarification";
                 const discussionSnapshot = decision === "Requiring Input" ? await loadDataManagerDiscussion({
-                    concept_box_id: checkbox.id, response_file_id: copiedFileId, response_lookup_complete: true
+                    concept_box_id: sourceId, response_file_id: copiedFileId, response_lookup_complete: true
                 }) : undefined;
-                await updateDataManagerChairStatus({ conceptBoxId: checkbox.id, workflowStage,
+                await updateDataManagerChairStatus({ conceptBoxId: sourceId, workflowStage,
                     responseFileId: decision === "Requiring Input" ? copiedFileId : undefined, discussionSnapshot });
             } catch (managerStatusError) {
+                managerStatusSynced = false;
                 console.warn("Unable to update the Data Managers administrative status:", managerStatusError);
+                addStatus('<span class="text-warning">Files were returned, but the Data Managers status could not be synchronized. Retry the return to synchronize it.</span>');
             }
 
+            refreshAdminTable();
+
             addStatus(`Preparing email for submitter: ${escapeHtml(submitterEmail)}`);
-            addStatus('<strong class="text-success">Complete.</strong>');
+            addStatus(managerStatusSynced ? '<strong class="text-success">Complete.</strong>' : '<strong class="text-warning">Files returned; Data Managers status synchronization is incomplete.</strong>');
 
             header.innerHTML = `
-                <h5 class="modal-title">File Return Complete</h5>
+                <h5 class="modal-title">${managerStatusSynced ? "File Return Complete" : "Files Returned — Status Sync Incomplete"}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             `;
 
@@ -3868,6 +3924,8 @@ export const returnToSubmitter = () => {
         } catch (error) {
             console.error("Error returning file to submitter:", error);
             addStatus(`<span class="text-danger">Error: ${escapeHtml(error.message)}</span>`);
+            header.innerHTML = '<h5 class="modal-title">File Return Incomplete</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+            adminDataCache = null;
         }
     };
 
@@ -3876,11 +3934,16 @@ export const returnToSubmitter = () => {
 };
 
 export const copyComments = async (comments, fileId) => {
+    const existingMessages = new Set((await loadAdminReturnComments(fileId)).map(comment => comment.message));
     for (const chair of chairsInfo) {
         const chairComments = comments.filter(comment => comment.message && comment.message.includes(`Consortium: ${chair.consortium}`));
 
         for (const comment of chairComments) {
-            await createComment(fileId, `${comment.message} Box Comment ID: ${comment.id}`);
+            const message = `${comment.message} Box Comment ID: ${comment.id}`;
+            if (existingMessages.has(message)) continue;
+            const result = await createComment(fileId, message);
+            if (!(result?.status >= 200 && result?.status < 300)) throw new Error("Unable to copy all chair comments. The return is incomplete; retry to finish copying comments.");
+            existingMessages.add(message);
         }
     }
 };

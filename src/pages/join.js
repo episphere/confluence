@@ -44,11 +44,11 @@ export const confluenceResources = () => {
                     The BCAC is a forum of investigators interested in the inherited risk of breast cancer. The aim of the consortium is to combine data from many studies, and to provide a reliable assessment of the risks associated with these gene.
                 </div>
                 <div class="consortia-desc">
-                    <a href="https://aabcg.app.vumc.org" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://aabcg.app.vumc.org" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
+                    <a href="" target="_blank" rel="noopener noreferrer" class="external-url" data-href="" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</br>
                     The AABCG is a collaboration of investigators focused on identifying novel genetic susceptibility factors for breast cancer in African-ancestry women and evaluating the influence of germline risk variants on breast cancer biology.
                 </div>
                 <div class="consortia-desc">
-                    <a href= "https://www.lageno-bc.org/about/" target="_blank" rel="noopener noreferrer" class="external-url" data-href="https://www.lageno-bc.org/about/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
+                    <a href= "" target="_blank" rel="noopener noreferrer" class="external-url" data-href="" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</br>
                     LAGENO-BC is a collaborative effort including a multinational team of investigators sharing knowledge and materials to facilitate breast cancer genetics research relevant to the diverse populations of Latin America and its diaspora.
                 </div>
                 <div class="consortia-desc">
@@ -128,7 +128,7 @@ export const confluenceResourcesDes = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td><a href="https://aabcg.app.vumc.org/" class="external-url" data-href="https://aabcg.app.vumc.org/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
+                            <td><a href="" class="external-url" data-href="" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">African-ancestry Breast Cancer Genetic Consortium</a> (AABCG)</td>
                             <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104917145" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>
@@ -140,7 +140,7 @@ export const confluenceResourcesDes = () => {
                             <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104914745" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                             <tr>
-                            <td><a href= "https://www.lageno-bc.org/about/" class="external-url" data-href="https://www.lageno-bc.org/about/" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
+                            <td><a href= "" class="external-url" data-href="" data-bs-toggle="modal" data-bs-target="#confluenceMainModal">Latin America Genomics Breast Cancer Consortium</a> (LAGENO-BC)</td>
                             <td style="text-align: center"><button class="btn custom-btn preview-file" data-file-id="1224104919545" aria-label="Preview File" data-bs-keyboard="false" data-bs-backdrop="static" data-bs-toggle="modal" data-bs-target="#confluencePreviewerModal"><i class="fas fa-external-link-alt join"></i></button></td>
                         </tr>
                         <tr>

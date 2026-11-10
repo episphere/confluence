@@ -88,12 +88,12 @@ export const dataManagerCollectionFolders = {
 export const dataManagersInfo = [
     {id: 'aabcg_data_manager_1', name: 'Wei Zheng', email: 'wei.zheng@vanderbilt.edu', consortium: 'AABCG'},
     {id: 'cnci_data_manager_1', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', consortium: 'C-NCI'},
-    {id: 'test_data_manager_1', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', isTest: true},
+    //{id: 'test_data_manager_1', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', isTest: true},
     {id: 'bcac_data_manager_1', name: 'Manjeet Bolla', email: 'mkh39@medschl.cam.ac.uk', consortium: 'BCAC'},
     {id: 'cimba_data_manager_1', name: 'Leslie Malgorzata', email: 'mal78@medschl.cam.ac.uk', consortium: 'CIMBA'},
     {id: 'lageno_data_manager_1', name: 'Xiaosong Huang', email: 'xjahuang@ucdavis.edu', consortium: 'LAGENO'},
     {id: 'lageno_data_manager_2', name: 'Amanda Corpuz', email: 'afcorpuz@ucdavis.edu', consortium: 'LAGENO'},
-    {id: 'merge_data_manager_1', name: 'Nick Orr', email: 'nick.orr@qub.ac.uk', consortium: 'MERGE'}
+    {id: 'merge_data_manager_1', name: 'Nick Orr', email: 'kopchickbp@nih.gov', consortium: 'MERGE'}
 ].map(manager => ({ ...manager, collectionFolderId: dataManagerCollectionFolders[manager.consortium] || null }));
 
 export const studiesInfo = Array.from(studyManagersInfo.reduce((studies, manager) => {
