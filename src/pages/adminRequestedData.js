@@ -8,6 +8,9 @@ export const REQUESTED_DATA_GROUPS = [
 
 const escapePattern = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+export const isSummaryResultsOnly = requestedData => requestedData?.genotyping?.length === 1
+    && requestedData.genotyping[0].toLowerCase() === "concept 1 gwas summary results";
+
 export const extractAdminRequestedData = (text) => {
     const normalized = String(text || "").replace(/\s+/g, " ");
     const headings = ["Genotyping", "Data Requested From", "Carrier Status requested", "CIMBA methodological note reviewed", "Risk Factor Variables", "Pathology Variables", "Survival and Treatment Variables", "Mammographic Density Variable", "Time Plan"];

@@ -22,7 +22,8 @@ export const summarizeOptInOutRounds = (rows, now = Date.now()) => {
     return Array.from(groups.values(), group => {
         const unique = new Map(group.assignments.map(row => [JSON.stringify([row.study_id, row.concept_box_id]), row]));
         const assignments = Array.from(unique.values());
-        const total = group.started ? assignments.length : 0;
+        const notApplicable = assignments.filter(row => row.decision === "not_applicable").length;
+        const total = group.started ? assignments.length - notApplicable : 0;
         const optedIn = assignments.filter(row => submittedDecision(row) && row.decision === "opt_in").length;
         const optedOut = assignments.filter(row => submittedDecision(row) && row.decision === "opt_out").length;
         const unavailable = group.started ? assignments.filter(row => row.decision === "unavailable" || row.provision_status === "error").length : 0;
@@ -30,11 +31,11 @@ export const summarizeOptInOutRounds = (rows, now = Date.now()) => {
         const opens = Date.parse(group.opensAt), closes = Date.parse(group.closesAt);
         const validPeriod = Number.isFinite(opens) && Number.isFinite(closes) && closes > opens;
         const period = !group.started ? "Not started" : !validPeriod ? "Dates unavailable" : now < opens ? "Scheduled" : now > closes ? "Ended" : "Open";
-        const status = !group.started ? "Not started" : unavailable || !validPeriod ? "Needs attention" : total && optedIn + optedOut === total ? "Completed"
+        const status = !group.started ? "Not started" : unavailable || !validPeriod ? "Needs attention" : (total || notApplicable) && optedIn + optedOut === total ? "Completed"
             : period === "Ended" ? "Ended with pending decisions" : period === "Scheduled" ? "Scheduled" : "In progress";
-        return { ...group, assignments, total, optedIn, optedOut, unavailable, pending, period, status,
+        return { ...group, assignments, total, optedIn, optedOut, notApplicable, unavailable, pending, period, status,
             overdue: period === "Ended" ? pending : 0,
-            responseRate: total ? Math.round((optedIn + optedOut) / total * 100) : 0,
+            responseRate: total ? Math.round((optedIn + optedOut) / total * 100) : group.started && notApplicable ? 100 : 0,
             studies: new Set(assignments.map(row => row.study_id)).size,
             concepts: new Set(assignments.map(row => row.concept_box_id)).size };
     });
@@ -61,7 +62,7 @@ export const mountOptInOutProgress = async (host, managerView = false) => {
             .map(value => `<option value="${escapeHtml(value)}"${value === selected ? " selected" : ""}>${escapeHtml(value)}</option>`).join("");
         host.innerHTML = `
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><h2 class="h5 mb-0">Opt-In/Out round progress</h2><button class="btn btn-outline-secondary btn-sm" type="button" data-progress-refresh>Refresh progress</button></div>
-            <p class="small text-muted">Times are Eastern Time. Counts represent study/concept decisions. Completed means every decision was submitted; Ended means the closing time has passed. Accepted concepts published to data managers appear as Not started until initiation.</p>
+            <p class="small text-muted">Times are Eastern Time. Counts represent required study/concept decisions; summary-results-only requests are N/A and excluded. Completed means every decision was submitted; Ended means the closing time has passed. Accepted concepts published to data managers appear as Not started until initiation.</p>
             <div class="d-flex flex-wrap gap-2 align-items-end mb-3">
                 <div><label class="small" for="progressRound">Round</label><select class="form-select form-select-sm" id="progressRound" data-progress-filter="round"><option value="">All rounds</option>${options(summaries.map(item => item.roundName), previous.round)}</select></div>
                 <div><label class="small" for="progressConsortium">Consortium</label><select class="form-select form-select-sm" id="progressConsortium" data-progress-filter="consortium"><option value="">All consortia</option>${options(summaries.map(item => item.consortium), previous.consortium)}</select></div>
@@ -97,7 +98,7 @@ export const mountOptInOutProgress = async (host, managerView = false) => {
                     <td><strong>${escapeHtml(item.status)}</strong><div class="small">${escapeHtml(owners || "No manager configured")}</div><div class="small text-muted">Initiated: ${escapeHtml(item.initiatedBy || "Not recorded")}<br>${item.initiatedAt ? escapeHtml(formatDate(item.initiatedAt)) : ""}</div></td>
                     <td>${item.started ? item.studies : "Not assigned"} / ${item.concepts}</td><td>${item.optedIn}</td><td>${item.optedOut}</td>${managerView ? "" : `<td>${item.pending}</td><td>${item.unavailable}</td>`}<td>${item.started ? `${item.responseRate}%<br><span class="small">${item.optedIn + item.optedOut} / ${item.total}</span>` : "Not started"}</td>
                     <td><a class="btn btn-sm btn-outline-primary" href="${escapeHtml(buildOptInOutEmailDraft(item, summaries))}">Draft round update</a></td></tr>
-                    <tr><td colspan="${managerView ? 8 : 10}"><details><summary class="small">Study decisions for ${escapeHtml(item.roundName)} / ${escapeHtml(item.consortium)}</summary><ul class="small mb-0">${item.assignments.map(row => `<li>${escapeHtml(row.study_acronym || row.study_id)} — ${escapeHtml(row.concept_title || row.concept_box_id)}: <strong>${!item.started ? "Not started" : row.decision === "unavailable" ? "Unavailable" : submittedDecision(row) ? row.decision === "opt_in" ? "Opted in" : "Opted out" : "Pending"}</strong>${row.submitted_by_email ? `; submitted by ${escapeHtml(row.submitted_by_email)} at ${escapeHtml(formatDate(row.submitted_at_utc || row.updated_at_utc))}` : ""}</li>`).join("")}</ul></details></td></tr>`;
+                    <tr><td colspan="${managerView ? 8 : 10}"><details><summary class="small">Study decisions for ${escapeHtml(item.roundName)} / ${escapeHtml(item.consortium)}</summary><ul class="small mb-0">${item.assignments.map(row => `<li>${escapeHtml(row.study_acronym || row.study_id)} — ${escapeHtml(row.concept_title || row.concept_box_id)}: <strong>${row.decision === "not_applicable" ? "N/A - Summary Results Requested Only" : !item.started ? "Not started" : row.decision === "unavailable" ? "Unavailable" : submittedDecision(row) ? row.decision === "opt_in" ? "Opted in" : "Opted out" : "Pending"}</strong>${row.decision !== "not_applicable" && row.submitted_by_email ? `; submitted by ${escapeHtml(row.submitted_by_email)} at ${escapeHtml(formatDate(row.submitted_at_utc || row.updated_at_utc))}` : ""}</li>`).join("")}</ul></details></td></tr>`;
             }).join("") || `<tr><td colspan="${managerView ? 8 : 10}" class="text-muted">No periods match these filters.</td></tr>`;
         };
         host.querySelectorAll("[data-progress-filter]").forEach(control => control.addEventListener("change", render));

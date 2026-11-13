@@ -4,7 +4,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const source = fs.readFileSync('src/pages/adminRequestedData.js', 'utf8').replace(/export /g, '');
 const context = vm.createContext({});
-vm.runInContext(source + '\nthis.api = { extractAdminRequestedData, matchesAdminRequestedData };', context);
+vm.runInContext(source + '\nthis.api = { extractAdminRequestedData, matchesAdminRequestedData, isSummaryResultsOnly };', context);
 const { extractAdminRequestedData: parse, matchesAdminRequestedData: matches } = context.api;
 const form = `Description of Analysis Plan: BRCA2 in males, pathology and risk factors
 Genotyping: Individual-level genotyped data, Individual-level imputed data
@@ -16,6 +16,16 @@ Pathology Variables: No
 Survival and Treatment Variables: Yes
 Mammographic Density Variable: No
 Time Plan: Yes, include pathology`;
+
+test('only the sole summary-results Genotyping selection exempts PI opt-in/out', () => {
+    const summary = form.replace('Individual-level genotyped data, Individual-level imputed data', 'Concept 1 GWAS Summary Results');
+    assert.equal(context.api.isSummaryResultsOnly(parse(summary)), true);
+    for (const text of [form, '', summary.replace('Genotyping:', 'Other:'),
+        summary.replace('Concept 1 GWAS Summary Results', 'Concept 1 GWAS Summary Results, Individual-level imputed data'),
+        summary.replace('Concept 1 GWAS Summary Results', 'Concept 1 GWAS Summary Results, Individual-level genotyped data')]) {
+        assert.equal(context.api.isSummaryResultsOnly(parse(text)), false);
+    }
+});
 
 test('reads only form selections, with exact sex matching and phenotype Yes/No', () => {
     assert.deepEqual(JSON.parse(JSON.stringify(parse(form))), {

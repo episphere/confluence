@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const {test} = require('node:test');
-const store = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/export /g, '');
+const store = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/^import .*adminRequestedData.*$/m, '').replace(/export /g, '') + '\n' + fs.readFileSync('src/pages/adminRequestedData.js', 'utf8').replace(/export /g, '');
 const root = '432318158314';
 const email = 'kopchickbp@nih.gov';
 const testManager = {email, name: 'Benjamin Kopchick', consortium: 'TEST', isTest: true, collectionFolderId: root};
@@ -14,6 +14,7 @@ function setup() {
         Confluence_Opt_In_Out: 'production-root', emailsAllowedToUpdateData: [email],
         dataManagersInfo: [testManager, {email: 'real-manager@example.org', consortium: 'C-NCI', collectionFolderId: 'production-collection'}],
         getFolderItems: async id => { reads.push(id); if (!String(id).startsWith(root)) throw new Error('Production folder access is forbidden in this test'); return {entries: folders.get(id) || []}; },
+        readDocFile: async () => '',
         getFile: async id => {reads.push(id); return files.get(id);},
         createFolder: async (parent, name) => { const id = parent + '/' + name; assert.ok(id.startsWith(root + '/')); writes.push(id); const item = {id, name, type: 'folder'}; folders.set(parent, [...(folders.get(parent) || []), item]); return item; },
         uploadFile: async (data, name, parent) => {const id = parent + '/' + name; assert.ok(id.startsWith(root + '/')); writes.push(id); files.set(id, data); folders.set(parent, [...(folders.get(parent) || []), {id, name, type: 'file'}]); return {entries: [{id}]};},

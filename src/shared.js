@@ -42,6 +42,8 @@ export const getChairByEmail = (email) => {
 
 // Study managers and the individual studies they represent in Study Opt-In/Out.
 // These users are distinct from the consortium-level Data Managers below.
+// Legacy bootstrap list: production workflows now use studyRoster.js and the
+// per-consortium Box Excel files. Only TEST uses this local list at runtime.
 export const studyManagersInfo = [
     {id: 'data_manager_1', name: 'Amy McCart-Reed', email: 'amy.reed@uq.edu.au', studies: [{name: 'Brisbane Breast Bank', acronym: 'BRISBANE'}]},
     {id: 'data_manager_2', name: 'Ann Schwartz', email: 'schwarta@karmanos.org', studies: [{name: 'Detroit Research on Cancer Survivors', acronym: 'ROCS'}]},
@@ -88,12 +90,12 @@ export const dataManagerCollectionFolders = {
 export const dataManagersInfo = [
     {id: 'aabcg_data_manager_1', name: 'Wei Zheng', email: 'wei.zheng@vanderbilt.edu', consortium: 'AABCG'},
     {id: 'cnci_data_manager_1', name: 'Thomas Ahearn', email: 'ahearntu@nih.gov', consortium: 'C-NCI'},
-    //{id: 'test_data_manager_1', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', isTest: true},
+    {id: 'test_data_manager_1', name: 'Benjamin Kopchick', email: 'kopchickbp@nih.gov', consortium: 'TEST', isTest: true},
     {id: 'bcac_data_manager_1', name: 'Manjeet Bolla', email: 'mkh39@medschl.cam.ac.uk', consortium: 'BCAC'},
     {id: 'cimba_data_manager_1', name: 'Leslie Malgorzata', email: 'mal78@medschl.cam.ac.uk', consortium: 'CIMBA'},
     {id: 'lageno_data_manager_1', name: 'Xiaosong Huang', email: 'xjahuang@ucdavis.edu', consortium: 'LAGENO'},
     {id: 'lageno_data_manager_2', name: 'Amanda Corpuz', email: 'afcorpuz@ucdavis.edu', consortium: 'LAGENO'},
-    {id: 'merge_data_manager_1', name: 'Nick Orr', email: 'kopchickbp@nih.gov', consortium: 'MERGE'}
+    //{id: 'merge_data_manager_1', name: 'Nick Orr', email: 'kopchickbp@nih.gov', consortium: 'MERGE'}
 ].map(manager => ({ ...manager, collectionFolderId: dataManagerCollectionFolders[manager.consortium] || null }));
 
 export const studiesInfo = Array.from(studyManagersInfo.reduce((studies, manager) => {

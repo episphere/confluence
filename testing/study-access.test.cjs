@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const { test } = require('node:test');
-const source = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/export /g, '');
+const source = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/^import .*adminRequestedData.*$/m, '').replace(/export /g, '') + '\n' + fs.readFileSync('src/pages/adminRequestedData.js', 'utf8').replace(/export /g, '');
 const selection = (id, study, consortium = 'C-NCI', round = 'r1') => ({
     round_id: round, round_name: round, consortium_id: consortium, study_id: study, study_acronym: study, study_name: study,
     concept_box_id: 'concept1', concept_title: 'Same title', concept_file_name: 'Same title.docx',
@@ -17,6 +17,7 @@ function setup({login = 'admin@example.org', failUpload = false, failComment = f
         dataManagersInfo: [{email: 'manager@example.org', consortium: 'C-NCI', collectionFolderId: 'cnci'}, {email: 'other@example.org', consortium: 'BCAC', collectionFolderId: 'bcac'}],
         localStorage: {parms: JSON.stringify({login, name: 'Reviewer'})},
         getFolderItems: async id => { reads.push(id); return {entries: folders.get(id) || []}; },
+        readDocFile: async () => '',
         getFile: async id => { reads.push(id); return files.get(id); },
         uploadFileVersion: async (data, id) => { if (failUpload) return {status: 403}; files.set(id, data); return {entries: [{id}]}; },
         uploadFile: async (data, name, folder) => {
@@ -39,6 +40,87 @@ function setup({login = 'admin@example.org', failUpload = false, failComment = f
     rows.forEach(row => addFile('selections', row.selection_file_id, row.selection_file_id + '.tsv', [row]));
     return {context, api: context.api, files, folders, reads, comments, rows, addFile};
 }
+test('existing summary-only assignments load as N/A and reject PI decisions', async () => {
+    const app = setup();
+    app.context.readDocFile = async () => 'Genotyping: Concept 1 GWAS Summary Results\nData Requested From: Females';
+    const rows = await app.api.loadStudyAccessAssignments();
+    assert.ok(rows.length);
+    assert.ok(rows.every(row => row.decision === 'not_applicable'));
+    assert.equal(rows[0].decision_reason, 'Summary Results Requested Only');
+    const original = app.files.get('s1');
+    const result = await app.api.saveOptInOutSelections([{selectionFileId:'s1', decision:'opt_in'}], {email:'admin@example.org'});
+    assert.equal(result.saved.length, 0);
+    assert.match(result.failed[0].error, /Summary Results Requested Only/);
+    assert.equal(app.files.get('s1'), original);
+});
+
+test('mixed selections and unreadable concepts never become summary-only exemptions', async () => {
+    for (const text of ['', 'Genotyping: Concept 1 GWAS Summary Results, Individual-level imputed data\nData Requested From: Females', null]) {
+        const app = setup();
+        app.context.readDocFile = async () => { if (text === null) throw new Error('Box unavailable'); return text; };
+        const rows = await app.api.loadStudyAccessAssignments();
+        assert.ok(rows.every(row => row.decision === 'pending'));
+    }
+});
+
+test('PI open-assignment loader applies the rule to older selection files', async () => {
+    const app = setup();
+    app.context.readDocFile = async () => 'Genotyping: Concept 1 GWAS Summary Results\nData Requested From: Females';
+    app.folders.set('root', [...app.folders.get('root'), {id:'consortium', name:'C-NCI', type:'folder'}]);
+    app.folders.set('consortium', [{id:'study-folder', name:'4-CBCS', type:'folder'}]);
+    app.addFile('study-folder', 'pi-manifest', '_study_manifest.tsv', [{...app.rows[0], round_status:'open'}]);
+    const updates = [];
+    app.context.reportProgress = (fraction, message) => updates.push({fraction, message});
+    const rows = await vm.runInContext('loadOptInOutAssignments([{acronym:"4-CBCS"}], reportProgress)', app.context);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].decision, 'not_applicable');
+    assert.equal(rows[0].selectionFileId, 's1');
+    assert.ok(updates.some(update => update.message.includes('Loading saved decisions (1/1)')));
+    assert.ok(updates.some(update => update.message.includes('Checking Genotyping selections (1/1)')));
+    assert.equal(updates.at(-1).fraction, 1);
+    assert.ok(updates.every((update, index) => index === 0 || update.fraction + 1e-10 >= updates[index - 1].fraction));
+});
+
+test('data managers automatically see the summary-only condition as N/A', () => {
+    const page = fs.readFileSync('src/pages/dataManagers.js', 'utf8');
+    const ctx = vm.createContext({DATA_MANAGER_STAGES:{}});
+    vm.runInContext(page.slice(page.indexOf('const getCollectionStatus ='), page.indexOf('export const dataManagersTemplate ='))
+        + '\nthis.status = getCollectionStatus;', ctx);
+    const status = ctx.status({decision:'not_applicable', submitted:'false'});
+    assert.equal(status.label, 'Summary Results Requested Only');
+    assert.match(status.detail, /N\/A/);
+});
+
+test('PI assignment loading selects the requested consortium when study acronyms overlap', async () => {
+    const app = setup();
+    app.folders.set('root', [...app.folders.get('root'),
+        {id:'cnci-consortium',name:'C-NCI',type:'folder'}, {id:'bcac-consortium',name:'BCAC',type:'folder'}]);
+    app.folders.set('cnci-consortium',[{id:'cnci-study',name:'SAME',type:'folder'}]);
+    app.folders.set('bcac-consortium',[{id:'bcac-study',name:'SAME',type:'folder'}]);
+    const bcac = {...selection('bcac-selection','SAME','BCAC'),round_status:'open'};
+    app.addFile('selections','bcac-selection','bcac-selection.tsv',[bcac]);
+    app.addFile('bcac-study','bcac-manifest','_study_manifest.tsv',[bcac]);
+    app.addFile('cnci-study','cnci-manifest','_study_manifest.tsv',[{...app.rows[0],round_status:'open'}]);
+    const rows = await vm.runInContext('loadOptInOutAssignments([{acronym:"SAME",consortium:"BCAC"}])',app.context);
+    assert.equal(rows.length,1);
+    assert.equal(rows[0].consortium_id,'BCAC');
+    assert.equal(rows[0].selectionFileId,'bcac-selection');
+});
+
+test('PI and manager selectors render N/A without editable controls for summary-only requests', () => {
+    const page = fs.readFileSync('src/pages/studyopt.js', 'utf8');
+    const ctx = vm.createContext({});
+    vm.runInContext(page.slice(page.indexOf('const getStudyAccessStatusSelect ='), page.indexOf('const confirmStudyAccessChange ='))
+        + page.slice(page.indexOf('const getSavedStudyStatusSelect ='), page.indexOf('const updateStudyStatusStyle ='))
+        + '\nthis.render = [getStudyAccessStatusSelect, getSavedStudyStatusSelect];', ctx);
+    for (const render of ctx.render) {
+        const html = render({decision:'not_applicable'});
+        assert.match(html, /N\/A/);
+        assert.match(html, /Summary Results Requested Only/);
+        assert.doesNotMatch(html, /<select/);
+    }
+});
+
 test('reply sources and published discussion remain readable from the consortium manager index', async () => {
     const app = setup();
     const snapshot = {comments:[{id:'r1',message:'Response ID: q1, Submitter explanation'}],response_lookup_complete:true,checked_at_utc:'2026-11-03T12:00:00Z'};
@@ -171,14 +253,19 @@ test('table keeps same-title rounds separate and renders pending and missing ass
     const page = fs.readFileSync('src/pages/studyopt.js', 'utf8');
     const slice = (start, end) => page.slice(page.indexOf(start), page.indexOf(end));
     const context = {console, dataManagersInfo: [], getTestDataManager: () => null, loadStudyAccessAssignments: async () => [selection('s1', '4-CBCS'), selection('s2', 'OTHER'), selection('s3', '4-CBCS', 'C-NCI', 'r2')],
-        loadOptInOutWorkbookRows: async () => [], getRoundNumberFromFileName: () => null, readDocFile: async () => '', extractContactInvestigators: () => ''};
+        loadStudyRosters: async () => ({managers:[
+            {name:'C-NCI contact',email:'contact@example.org',consortium:'C-NCI',studies:[{acronym:'4-CBCS'}]},
+            {name:'BCAC contact',email:'other@example.org',consortium:'BCAC',studies:[{acronym:'4-CBCS'}]}
+        ]}), getRoundNumberFromFileName: () => null, readDocFile: async () => '', extractContactInvestigators: () => ''};
     vm.createContext(context);
-    vm.runInContext(slice('const escapeHtml', 'const getConceptDisplayName') + slice('const normalizeStudyFilterValue', 'const loadOptInOutWorkbookRows')
+    vm.runInContext(slice('const escapeHtml', 'const getConceptDisplayName') + slice('const normalizeStudyFilterValue', 'const getSavedStudyStatusSelect')
         + '\nthis.api = {loadStudyAccessAdminRows, getStudyAccessStatusSelect};', context);
     const groups = await context.api.loadStudyAccessAdminRows(true);
     assert.equal(groups.length, 1);
     assert.equal(groups[0].concepts.length, 2);
     assert.equal(groups[0].studies.length, 2);
+    assert.equal(groups[0].users.length, 1);
+    assert.equal(groups[0].users[0].email, 'contact@example.org');
     assert(context.api.getStudyAccessStatusSelect(selection('s1', '4-CBCS')).includes('value="pending" selected'));
     assert(context.api.getStudyAccessStatusSelect(null).includes('Not assigned'));
     assert(context.api.getStudyAccessStatusSelect({load_error: 'Denied'}).includes('Unavailable'));

@@ -1,3 +1,4 @@
+import { loadStudyRoster, loadStudyRosters } from "../studyRoster.js";
 import { showPreview } from "../components/boxPreview.js";
 import { switchTabs, switchFiles } from "../event.js";
 import { showCommentsSub, showCommentsSub2, showAnimation, readDocFile, extractContactInvestigators, extractRequestedConsortia, getCollaboration, getFolderItems, getAllFilesRecursive, chairsInfo, getChairByEmail, studiesInfo, messagesForChair, getTaskList, createCompleteTask, assignTask, updateTaskAssignment, createComment, getFileInfo, getFolderInfo, moveFile, addNewCollaborator, copyFile, acceptedFolder, deniedFolder, submitterFolder, showCommentsDropDown, archivedFolder, deleteTask, showCommentsDCEG, hideAnimation, getFileURL, returnToSubmitterFolder, createFolder, completedFolder, listComments, getFile, addMetaData, DACCmembers, csv2Json, Confluence_Data_Platform_Metadata_Shared_with_Investigators, Confluence_Data_Platform_Events_Page_Shared_with_Investigators, showComments, showCommentsWithResponses, findResponseForComment, extractResponseText, getFileVersions, downloadFile, refreshToken, emailsAllowedToUpdateData, uploadFile, uploadFileVersion, addConceptIdSuffixToFileName, getConceptIdFromFileName, normalizeConceptFileNamePunctuation, removeRoundSuffixFromFileName, getRoundNumberFromFileName } from "../shared.js";
@@ -728,6 +729,70 @@ const DACC_EXPORT_FIELDS = [
     { key: "comments", label: "Comments", group: "table" }
 ];
 
+const REQUESTED_DATA_EXPORT_FIELDS = REQUESTED_DATA_GROUPS.map(group => ({
+    key: `requestedData-${group.key}`, label: group.label, selected: true, group: "requestedData"
+}));
+
+const ADMIN_EXPORT_FIELDS = [
+    ...DACC_EXPORT_FIELDS.filter(field => field.group === "table").map(field => ({ ...field, selected: true })),
+    { key: "returnedDate", label: "Returned Date", selected: true, group: "table" },
+    { key: "actionRequired", label: "Action Required", selected: true, group: "table" },
+    { key: "round", label: "Round", group: "table" },
+    { key: "boxId", label: "Box ID", group: "table" },
+    ...DACC_EXPORT_FIELDS.filter(field => field.group === "default").map(field => ({ ...field, selected: false })),
+    ...REQUESTED_DATA_EXPORT_FIELDS
+];
+
+const ADMIN_EXPORT_OPTIONS = {
+    fields: ADMIN_EXPORT_FIELDS,
+    defaultGroupLabel: "DACC Chair Data Points",
+    tableGroupLabel: "Other Table Data",
+    statusId: "adminDecisionDownloadStatus",
+    filenamePrefix: "dacc_admin_table"
+};
+
+const getVisibleAdminExportFiles = (files) => {
+    const filesById = new Map(files.map(file => [String(file.fileId), file]));
+    return Array.from(document.querySelectorAll("#adminAccordian > .admin-table-row:not(.d-none)"))
+        .flatMap(row => {
+            const file = filesById.get(String(row.querySelector(".admin-checkbox")?.id));
+            if (!file) return [];
+            const exportValues = {
+                conceptName: file.titlename,
+                conceptId: getConceptId(file) || "--",
+                boxId: getConceptBoxId(file, file.fileId),
+                round: getConceptRoundLabel(file),
+                submissionDate: file.submissionDate ? new Date(file.submissionDate).toDateString().substring(4) : "--",
+                returnedDate: file.returnedDate ? new Date(file.returnedDate).toDateString().substring(4) : "--",
+                state: row.querySelector(".badge")?.textContent?.trim() || getDaccExportState(file.fileInfo),
+                actionRequired: row.querySelector(".action-required-dropdown")?.value || "--"
+            };
+            if (file.documentDataLoaded) exportValues.investigators = file.contacts || "Not provided";
+            DACC_TABLE_CONSORTIA.forEach(consortium => {
+                const select = row.querySelector(`[data-value="${consortium}"] select`);
+                if (select && !select.hasAttribute("aria-busy")) exportValues[`score-${consortium}`] = select.value;
+            });
+            return [{ ...file.fileInfo, ...file, id: file.fileId, exportValues }];
+        });
+};
+
+const setupAdminTableDownload = (files) => {
+    const button = document.getElementById("downloadAdminDecisionTable");
+    if (!button) return;
+    button.addEventListener("click", () => {
+        const visibleFiles = getVisibleAdminExportFiles(files);
+        if (!visibleFiles.length) {
+            const status = document.getElementById(ADMIN_EXPORT_OPTIONS.statusId);
+            if (status) {
+                status.className = "small text-muted";
+                status.textContent = "There are no visible concepts to download for the current round, search, and data filters.";
+            }
+            return;
+        }
+        showDaccExportFieldSelection(visibleFiles, button, ADMIN_EXPORT_OPTIONS);
+    });
+};
+
 const parseRequestedConsortiaValues = (text) => {
     const section = extractRequestedConsortia(text || "");
     if (!section) return [];
@@ -824,9 +889,11 @@ const getDaccExportScores = (comments) => {
 const getDaccExportConceptData = async (file, selectedFieldKeys) => {
     const selectedKeys = new Set(selectedFieldKeys);
     const needsDocument = ["requestedConsortia", "study", "submitter", "email", "title", "notes", "investigators"]
-        .some(key => selectedKeys.has(key));
+        .some(key => selectedKeys.has(key) && !Object.prototype.hasOwnProperty.call(file.exportValues || {}, key))
+        || REQUESTED_DATA_EXPORT_FIELDS.some(field => selectedKeys.has(field.key) && !file.documentDataLoaded);
     const needsComments = selectedKeys.has("comments")
-        || DACC_TABLE_CONSORTIA.some(consortium => selectedKeys.has(`score-${consortium}`));
+        || DACC_TABLE_CONSORTIA.some(consortium => selectedKeys.has(`score-${consortium}`)
+            && !Object.prototype.hasOwnProperty.call(file.exportValues || {}, `score-${consortium}`));
     const commentsFileId = getChairCommentSourceId(file, file.id);
     const responseFileId = file.responseFileId;
     const commentRequests = needsComments ? [listComments(commentsFileId || file.id)] : [];
@@ -836,7 +903,7 @@ const getDaccExportConceptData = async (file, selectedFieldKeys) => {
 
     const [documentResult, commentResults] = await Promise.all([
         needsDocument ? readDocFile(file.id)
-            .then(content => extractDaccExportWordFields(content))
+            .then(content => ({ ...extractDaccExportWordFields(content), requestedData: extractAdminRequestedData(content) }))
             .catch(error => {
                 console.warn(`Unable to read concept fields for ${file.id}:`, error);
                 return { documentError: true };
@@ -855,7 +922,13 @@ const getDaccExportConceptData = async (file, selectedFieldKeys) => {
 };
 
 const getDaccExportValue = (fieldKey, file, detail) => {
+    if (Object.prototype.hasOwnProperty.call(file.exportValues || {}, fieldKey)) return file.exportValues[fieldKey];
     const wordFields = detail.wordFields || {};
+    if (fieldKey.startsWith("requestedData-")) {
+        if (!file.documentDataLoaded && wordFields.documentError) return "Unable to load";
+        const requestedData = file.documentDataLoaded ? file.requestedData : wordFields.requestedData;
+        return (requestedData?.[fieldKey.slice(14)] || []).join(", ") || "Not selected / not provided";
+    }
     const wordFieldKeys = new Set(["requestedConsortia", "study", "submitter", "email", "title", "notes"]);
     if (wordFields.documentError && wordFieldKeys.has(fieldKey)) return "Unable to load";
     if (Object.prototype.hasOwnProperty.call(wordFields, fieldKey)) {
@@ -876,12 +949,12 @@ const getDaccExportValue = (fieldKey, file, detail) => {
     return values[fieldKey] ?? "";
 };
 
-const exportDaccDecisionTable = async (files, button, selectedFieldKeys) => {
+const exportDaccDecisionTable = async (files, button, selectedFieldKeys, options = {}) => {
     if (!Array.isArray(files) || !files.length) return;
-    const selectedFields = DACC_EXPORT_FIELDS.filter(field => selectedFieldKeys.includes(field.key));
+    const selectedFields = (options.fields || DACC_EXPORT_FIELDS).filter(field => selectedFieldKeys.includes(field.key));
     if (!selectedFields.length) return;
     const originalButtonHtml = button.innerHTML;
-    const status = document.getElementById("daccDecisionDownloadStatus");
+    const status = document.getElementById(options.statusId || "daccDecisionDownloadStatus");
     button.disabled = true;
     button.setAttribute("aria-busy", "true");
     if (status) {
@@ -903,7 +976,7 @@ const exportDaccDecisionTable = async (files, button, selectedFieldKeys) => {
             });
         }
 
-        downloadCsvFile(rows, `dacc_menu_table_${new Date().toISOString().slice(0, 10)}.csv`);
+        downloadCsvFile(rows, `${options.filenamePrefix || "dacc_menu_table"}_${new Date().toISOString().slice(0, 10)}.csv`);
         if (status) {
             status.className = "small text-success";
             status.textContent = `Downloaded ${files.length} concept${files.length === 1 ? "" : "s"}.`;
@@ -921,13 +994,14 @@ const exportDaccDecisionTable = async (files, button, selectedFieldKeys) => {
     }
 };
 
-const showDaccExportFieldSelection = (files, button) => {
+const showDaccExportFieldSelection = (files, button, options = {}) => {
     const modalElement = document.getElementById("confluenceMainModal");
     const header = document.getElementById("confluenceModalHeader");
     const body = document.getElementById("confluenceModalBody");
     if (!modalElement || !header || !body) return;
 
-    const renderFields = group => DACC_EXPORT_FIELDS
+    const fields = options.fields || DACC_EXPORT_FIELDS;
+    const renderFields = group => fields
         .filter(field => field.group === group)
         .map(field => `
             <div class="form-check mb-2">
@@ -941,16 +1015,17 @@ const showDaccExportFieldSelection = (files, button) => {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`;
     body.innerHTML = `
         <form id="daccExportFieldForm">
-            <p class="small text-muted">Choose the columns to include for the ${files.length} visible concept${files.length === 1 ? "" : "s"}. The standard data points are selected by default.</p>
+            <p class="small text-muted">Choose the columns to include for the ${files.length} visible concept${files.length === 1 ? "" : "s"}.</p>
             <div class="row">
                 <fieldset class="col-md-6">
-                    <legend class="h6">Standard data points</legend>
+                    <legend class="h6">${escapeHtml(options.defaultGroupLabel || "Standard data points")}</legend>
                     ${renderFields("default")}
                 </fieldset>
                 <fieldset class="col-md-6">
-                    <legend class="h6">Additional table data</legend>
+                    <legend class="h6">${escapeHtml(options.tableGroupLabel || "Additional table data")}</legend>
                     ${renderFields("table")}
                 </fieldset>
+                ${fields.some(field => field.group === "requestedData") ? `<fieldset class="col-md-6 mt-2"><legend class="h6">Data requested</legend>${renderFields("requestedData")}</fieldset>` : ""}
             </div>
             <div id="daccExportFieldError" class="text-danger small mt-2" aria-live="polite"></div>
             <div class="modal-footer px-0 pb-0">
@@ -969,7 +1044,7 @@ const showDaccExportFieldSelection = (files, button) => {
             return;
         }
         modal.hide();
-        void exportDaccDecisionTable(files, button, selectedFieldKeys);
+        void exportDaccDecisionTable(files, button, selectedFieldKeys, options);
     });
 };
 
@@ -2506,7 +2581,7 @@ export const createAllRoundFolders = async () => {
                                         addStatus(`${consortium}: copied to New/${selectedRound.folderName}.`, 'text-success');
                                     }
 
-                                    if (!testMode && studiesInfo.some(study => String(study.consortium).toLowerCase() === String(consortium).toLowerCase())) {
+                                    if (!testMode && dataManagersInfo.some(manager => String(manager.consortium).toLowerCase() === String(consortium).toLowerCase())) {
                                         dataManagerChairReviews.push({
                                             sourceFileId: review.file.id,
                                             chairFileId: copiedFile.id,
@@ -2550,7 +2625,7 @@ export const createAllRoundFolders = async () => {
                             await publishDataManagerChairRequests({
                                 round: { id: roundFolder.id, name: selectedRound.folderName },
                                 reviews: dataManagerChairReviews,
-                                studies: studiesInfo,
+                                studies: (await loadStudyRosters(dataManagerChairReviews.map(review => review.consortium))).studies,
                                 initiatedBy: String(JSON.parse(localStorage.parms || "{}").login || "")
                             });
                             addStatus(`Published ${dataManagerChairReviews.length} chair-review concept route(s) to Data Managers.`, 'text-success');
@@ -2722,6 +2797,7 @@ export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", 
     const consortiumId = String(consortium || "C-NCI").trim().toUpperCase();
     const chair = chairsInfo.find(item => String(item.consortium).trim().toUpperCase() === consortiumId);
     if (!chair) throw new Error(`The ${consortiumId} chair configuration was not found.`);
+    const roster = await loadStudyRoster(consortiumId);
     const [newFiles, clarificationFiles, completeFiles, submitterItems, submitterFiles, completedFiles, responseFiles] = await Promise.all([
         getAllFilesRecursive(chair.boxIdNew, "name,type,id,description,parent,parent.name,created_at"),
         getAllFilesRecursive(chair.boxIdClara, "name,type,id,description,parent,parent.name,created_at"),
@@ -2820,7 +2896,7 @@ export const syncCurrentDataManagerChairRequests = async (consortium = "C-NCI", 
         await publishDataManagerChairRequests({
             round: { id: roundId, name: group.name },
             reviews: group.reviews,
-            studies: studiesInfo,
+            studies: roster.studies,
             initiatedBy: String(JSON.parse(localStorage.parms || "{}").login || "")
         });
     }
@@ -3292,7 +3368,8 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
     const filteredSub = processedSub.filter(file => !resFileNames.includes(file.name));
     if (filteredSub.length > 0 || processedCom.length > 0 || processedRes.length > 0) {
         template += `<div id='decidedFiles'><div class='row'><div class="col-xl-12 filter-column" id="summaryFilterSiderBar"><div class="div-border white-bg align-left p-2"><div class="main-summary-row"><div class="col-xl-12 pl-1 pr-0"><span class="font-size-10"><h6 class="badge badge-pill badge-1">1</h6>: Approved as submitted<h6 class="badge badge-pill badge-2">2</h6>: Approved, pending conditions <h6 class="badge badge-pill badge-3">3</h6>: Approved, but data release delayed <h6 class="badge badge-pill badge-4">4</h6>: Not Approved <h6 class="badge badge-pill badge-5">5</h6>: Decision requires clarification <h6 class="badge badge-pill badge-777">777</h6>: Duplicate<h6 class="badge badge-pill badge-NA">NA</h6>: Not Applicable</span></div></div></div></div></div><div class='col-xl-12 pr-0'>`;
-        template += renderConceptSearch("adminConceptSearch", "adminConceptSearchStatus");
+        template += renderConceptSearch("adminConceptSearch", "adminConceptSearchStatus",
+            `<div class="d-flex flex-wrap align-items-center gap-2 ms-auto"><span id="adminDecisionDownloadStatus" class="small text-muted" aria-live="polite"></span><button type="button" id="downloadAdminDecisionTable" class="btn btn-dark dacc-download-button"><i class="fas fa-download me-1" aria-hidden="true"></i> Download Current Table</button></div>`);
         template += renderAdminRequestedDataFilters();
         template += `<div id="adminHydrationStatus" class="small text-muted mb-2" aria-live="polite">Preparing background data...</div>`;
         template += viewAuthFinalDecisionFilesColumns();
@@ -3333,6 +3410,7 @@ export async function viewAuthFinalDecisionFilesTemplate(processedSub, processed
             });
         }
         const allDisplayedFiles = [...filteredSub, ...processedCom, ...processedRes];
+        setupAdminTableDownload(allDisplayedFiles);
         void hydrateAdminComments(allDisplayedFiles).catch(error => console.error("Error hydrating admin comments:", error));
         void hydrateAdminDocumentData({ sub: filteredSub, com: processedCom, res: processedRes })
             .catch(error => console.error("Error hydrating admin document data:", error));

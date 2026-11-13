@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const { test } = require('node:test');
-const source = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/export /g, '');
+const source = fs.readFileSync('src/optInOutStore.js', 'utf8').replace(/^import\s*\{[\s\S]*?\}\s*from\s*"\.\/shared.js";/, '').replace(/^import .*adminRequestedData.*$/m, '').replace(/export /g, '') + '\n' + fs.readFileSync('src/pages/adminRequestedData.js', 'utf8').replace(/export /g, '');
 const progressSource = fs.readFileSync('src/components/optInOutProgress.js', 'utf8').replace(/^import .*$/gm, '').replace(/export /g, '');
 const manager = { email: 'manager@example.org', name: 'Manager', consortium: 'C-NCI', collectionFolderId: 'collection' };
 const args = () => ({ round: {id: 'r1', name: 'Round_1'}, concepts: [{fileId: 'c1', title: 'Test concept', fileName: 'Test_R1_1.docx'}],
@@ -20,7 +20,8 @@ function setup(login = manager.email) {
             reads.push(id);
             if (JSON.parse(context.localStorage.parms).login !== 'admin@example.org' && ['central', 'root'].includes(id)) throw new Error('Central access denied');
             return {entries: folders.get(id) || []};
-        }, getFile: async id => files.get(id),
+        }, readDocFile: async () => '',
+        getFile: async id => files.get(id),
         createFolder: async (parent, name) => {
             const id = parent + '/' + name;
             const folder = {id, name, type: 'folder'};
@@ -158,6 +159,22 @@ test('response statistics distinguish pending, unavailable and submitted study/c
     assert.equal(summary.overdue, 1);
     assert.equal(summary.responseRate, 50);
     assert.equal(summary.studies, 4);
+});
+
+test('summary-only assignments are excluded from required decisions and overdue counts', () => {
+    const now = Date.parse('2026-12-01T00:00:00Z');
+    const exempt = progressRow({decision:'not_applicable'});
+    const [onlySummary] = summarize([exempt], now);
+    assert.equal(onlySummary.notApplicable, 1);
+    assert.equal(onlySummary.total, 0);
+    assert.equal(onlySummary.pending, 0);
+    assert.equal(onlySummary.overdue, 0);
+    assert.equal(onlySummary.status, 'Completed');
+    const [mixed] = summarize([exempt, progressRow({study_id:'S2', decision:'opt_in', submitted:'true'})], now);
+    assert.equal(mixed.total, 1);
+    assert.equal(mixed.responseRate, 100);
+    assert.equal(mixed.pending, 0);
+    assert.equal(mixed.optedIn, 1);
 });
 
 test('email drafts include round counts and use a mailto link without sending', () => {

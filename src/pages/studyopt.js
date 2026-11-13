@@ -1,3 +1,5 @@
+import { loadStudyRoster, loadStudyRosters } from "../studyRoster.js";
+import { studyManagerRosterFiles } from "../studyRosterConfig.js";
 import { showPreview } from "../components/boxPreview.js";
 import { renderAdminPageTabs } from "../components/adminNavigation.js";
 import { dataManagersInfo, emailsAllowedToUpdateData, extractContactInvestigators, readDocFile, getConceptIdFromFileName, getRoundNumberFromFileName, removeRoundSuffixFromFileName, studiesInfo, getFile, studyDescriptions } from "../shared.js";
@@ -20,31 +22,11 @@ const getConceptDisplayName = (value) => removeRoundSuffixFromFileName(value)
 const getAssignedConceptId = (value) => getConceptIdFromFileName(value) || "--";
 const compareConceptIds = (left, right) => new Intl.Collator(undefined, { numeric: true, sensitivity: "base" }).compare(left, right);
 
-const OPT_IN_OUT_DATA_PATH = "./src/data/DataPlatform-Out-in-out.xlsx";
-
-
-const normalizeHeaderValue = (value) => String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-
-const getCellValue = (row, aliases = []) => {
-    if (!row) return "";
-
-    for (const alias of aliases) {
-        const normalizedAlias = normalizeHeaderValue(alias);
-        const match = Object.entries(row).find(([key]) => normalizeHeaderValue(key) === normalizedAlias);
-        if (match) return match[1];
-    }
-
-    return "";
-};
-
 const normalizeStudyFilterValue = (value) => String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 
 const getStudyAccessStatusSelect = assignment => {
     if (!assignment) return '<span class="text-muted">Not assigned</span>';
+    if (assignment.decision === "not_applicable") return '<span class="badge bg-secondary">N/A</span><div class="small text-muted">Summary Results Requested Only</div>';
     if (assignment.load_error || !assignment.selection_file_id) return `<span class="text-danger" title="${escapeHtml(assignment.load_error || "No selection file")}">Unavailable</span>`;
     const value = assignment.decision;
     const color = value === "opt_out" ? "danger" : value === "opt_in" ? "success" : "secondary";
@@ -155,16 +137,14 @@ const loadStudyAccessAdminRows = async (managerView = false, onProgress = () => 
     });
     let users = [];
     try {
-        users = (managerView && getTestDataManager() ? [] : await loadOptInOutWorkbookRows()).map(row => ({
-            name: String(getCellValue(row, ["Name"]) || "Unnamed user"),
-            email: String(getCellValue(row, ["Email"]) || ""), studies: getWorkbookStudyEntries(row)
-        }));
+        users = managerView && getTestDataManager() ? []
+            : (await loadStudyRosters(Array.from(requests.values(), request => request.label).filter(label => label !== "TEST"))).managers;
     } catch (error) {
-        console.warn("Unable to load optional study contact roster:", error);
+        throw new Error(`Unable to load study contacts: ${error.message}`);
     }
     const conceptsById = new Map();
     requests.forEach(request => {
-        request.users = users.map(user => ({ ...user, studies: user.studies.filter(study => request.studies.has(studyAccessStudyKey(study))) })).filter(user => user.studies.length);
+        request.users = users.filter(user => user.consortium === request.label).map(user => ({ ...user, studies: user.studies.filter(study => request.studies.has(studyAccessStudyKey(study))) })).filter(user => user.studies.length);
         const testManager = dataManagersInfo.find(manager => manager.isTest && manager.consortium === request.label);
         if (testManager) request.users = [{ name: testManager.name, email: testManager.email, studies: Array.from(request.studies.values()) }];
         request.concepts.forEach(concept => {
@@ -193,39 +173,8 @@ const loadStudyAccessAdminRows = async (managerView = false, onProgress = () => 
     }));
 };
 
-const loadOptInOutWorkbookRows = async () => {
-    if (typeof XLSX === "undefined") {
-        throw new Error("XLSX library not loaded");
-    }
-
-    const response = await fetch(OPT_IN_OUT_DATA_PATH);
-    if (!response.ok) throw new Error(`Unable to load ${OPT_IN_OUT_DATA_PATH}`);
-
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-};
-
-const getWorkbookStudyEntries = (row) => {
-    const studies = [];
-    for (let index = 1; index <= 3; index += 1) {
-        const name = getCellValue(row, [`Study_${index}`, `study ${index}`]);
-        const acronym = getCellValue(row, [`Study_${index} Acronym`, `study ${index} acronym`]);
-        const studyName = String(name ?? "").trim();
-        const studyAcronym = String(acronym ?? "").trim();
-        if (studyName || studyAcronym) {
-            studies.push({
-                label: `Study ${index}`,
-                name: studyName,
-                acronym: studyAcronym
-            });
-        }
-    }
-    return studies;
-};
-
 const getSavedStudyStatusSelect = (assignment) => {
+    if (assignment.decision === "not_applicable") return '<span class="badge bg-secondary">N/A</span><div class="small text-muted">Summary Results Requested Only</div>';
     const decision = ["opt_in", "opt_out"].includes(assignment.decision) ? assignment.decision : "pending";
     return `
         <select class="form-select form-select-sm saved-study-status-select" data-selection-file-id="${escapeHtml(assignment.selectionFileId)}" data-original-value="${decision}" aria-label="Opt-In or Opt-Out selection">
@@ -333,17 +282,29 @@ export const loadOptInOutTable = async () => {
         const isAdmin = emailsAllowedToUpdateData.includes(userEmail);
         const testManager = getTestDataManager();
         updateProgress(20, testManager ? "Loading the TEST study roster..." : "Loading the study access roster...");
-        const workbookRows = testManager ? [] : await loadOptInOutWorkbookRows();
-        const userRow = workbookRows.find(row => String(getCellValue(row, ["Email", "email"])).trim().toLowerCase() === userEmail.toLowerCase());
-        if (!userRow && !isAdmin && !testManager) {
+        const roster = testManager ? await loadStudyRoster(testManager.consortium) : await loadStudyRosters();
+        const userManagers = roster.managers.filter(manager => manager.email.toLowerCase() === userEmail.toLowerCase());
+        if (!userManagers.length && !isAdmin && !testManager) {
             container.innerHTML = "<p class='text-warning'>Your email was not found in the study access roster.</p>";
             return;
         }
-        const studies = testManager ? studiesInfo.filter(study => study.consortium === testManager.consortium) : userRow ? getWorkbookStudyEntries(userRow) : [];
+        const studies = testManager ? roster.studies : roster.studies.filter(study =>
+            study.studyManagerEmails.some(email => email.toLowerCase() === userEmail.toLowerCase()));
         updateProgress(40, "Loading open assignments and saved decisions from Box...");
+        const loadProgress = [
+            { enabled: studies.length > 0, fraction: 0, message: "Loading study assignments..." },
+            { enabled: isAdmin && !testManager, fraction: 0, message: "Loading demo assignments..." }
+        ];
+        const reportLoadProgress = index => (fraction, message) => {
+            loadProgress[index] = { ...loadProgress[index], fraction, message };
+            const sources = loadProgress.filter(item => item.enabled);
+            const active = fraction < 1 ? loadProgress[index] : sources.find(item => item.fraction < 1);
+            updateProgress(40 + 45 * sources.reduce((sum, item) => sum + item.fraction, 0) / sources.length,
+                active?.message || "Study assignments and saved decisions loaded.");
+        };
         const [productionAssignments, demoAssignments] = await Promise.all([
-            studies.length ? loadOptInOutAssignments(studies) : Promise.resolve([]),
-            isAdmin && !testManager ? loadDemoOptInOutAssignments() : Promise.resolve([])
+            studies.length ? loadOptInOutAssignments(studies, reportLoadProgress(0)) : Promise.resolve([]),
+            isAdmin && !testManager ? loadDemoOptInOutAssignments(reportLoadProgress(1)) : Promise.resolve([])
         ]);
         updateProgress(85, "Organizing concepts, studies, and saved selections...");
         const assignments = [...demoAssignments, ...productionAssignments];
@@ -364,7 +325,7 @@ export const loadOptInOutTable = async () => {
                 </td>
                 <td><div class="fw-semibold">${escapeHtml(assignment.study_acronym || assignment.study_id)}</div><div class="small text-muted">${escapeHtml(assignment.study_name)}</div></td>
                 <td style="min-width: 130px;">${getSavedStudyStatusSelect(assignment)}</td>
-                <td><span class="small text-muted saved-selection-status">${assignment.submitted === "true" ? `Saved by ${escapeHtml(assignment.submitted_by_email || assignment.submitted_by_name)}` : "Not submitted"}</span></td>
+                <td><span class="small text-muted saved-selection-status">${assignment.decision === "not_applicable" ? "No PI opt-in/out required" : assignment.submitted === "true" ? `Saved by ${escapeHtml(assignment.submitted_by_email || assignment.submitted_by_name)}` : "Not submitted"}</span></td>
             </tr>
         `).join("");
 
@@ -499,18 +460,6 @@ export const studyAccessAdminTemplate = (managerView = false) => {
     `;
 };
 
-const getCnciWorkbookStudies = async () => {
-    const workbookRows = await loadOptInOutWorkbookRows();
-    const studiesById = new Map();
-    workbookRows.forEach(row => {
-        getWorkbookStudyEntries(row).forEach(study => {
-            const studyId = String(study.acronym || study.name).trim().toLowerCase();
-            if (studyId && !studiesById.has(studyId)) studiesById.set(studyId, study);
-        });
-    });
-    return Array.from(studiesById.values()).sort((a, b) => String(a.acronym || a.name).localeCompare(String(b.acronym || b.name), undefined, { sensitivity: "base" }));
-};
-
 const getDataManagerConsortia = (includeTest = false) => Array.from(dataManagersInfo.reduce((consortia, manager) => {
     if (manager.isTest && !includeTest) return consortia;
     const consortium = String(manager.consortium || "").trim().toUpperCase();
@@ -536,14 +485,15 @@ const getConsortiumStudies = async consortium => {
     if (dataManagersInfo.some(manager => manager.isTest && manager.consortium === consortiumId)) {
         return studiesInfo.filter(study => study.consortium === consortiumId);
     }
+    const roster = await loadStudyRoster(consortiumId);
+    if (studyManagerRosterFiles[consortiumId]) return roster.studies;
     const catalog = JSON.parse(await getFile(studyDescriptions));
     const catalogStudies = catalog.filter(row => {
         const id = String(row.Consortium || "").trim().toUpperCase();
         return (id === "NCI" ? "C-NCI" : id) === consortiumId;
     }).map(row => ({ acronym: String(row["Study Acronym"] || "").trim(), name: String(row["Study Name"] || "").trim(), consortium: consortiumId }))
         .filter(study => study.acronym || study.name);
-    const configured = consortiumId === "C-NCI" ? await getCnciWorkbookStudies()
-        : studiesInfo.filter(study => String(study.consortium || "").toUpperCase() === consortiumId);
+    const configured = roster.studies;
     const byId = new Map([...configured, ...catalogStudies].map(study => [normalizeStudyFilterValue(study.acronym || study.name), { ...study, consortium: consortiumId }]));
     return Array.from(byId.values()).sort((a, b) => (a.acronym || a.name).localeCompare(b.acronym || b.name));
 };

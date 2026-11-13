@@ -1,5 +1,6 @@
 import { showLoadingProgress } from "../components/loadingProgress.js";
 import { showPreview } from "../components/boxPreview.js";
+import { extractAdminRequestedData, isSummaryResultsOnly } from "./adminRequestedData.js";
 import { Confluence_Opt_In_Out, createComment, createFolder, dataManagersInfo, emailsAllowedToUpdateData, getConceptIdFromFileName, getFolderItems, readDocFile, removeRoundSuffixFromFileName, uploadBinaryFile } from "../shared.js";
 import { loadDataManagerRequests, saveDataManagerAccessDetails, saveDataManagerStage, DATA_MANAGER_STAGES } from "../optInOutStore.js";
 import { prepareTestDataManagerWorkspace } from "./chairmenu.js";
@@ -82,7 +83,11 @@ const loadInvestigatorDetails = async (requests, onProgress = () => {}) => {
     for (let index = 0; index < conceptIds.length; index += chunkSize) {
         await Promise.all(conceptIds.slice(index, index + chunkSize).map(async conceptId => {
             try {
-                detailsByConceptId.set(conceptId, extractDataManagerInvestigatorDetails(await readDocFile(conceptId)));
+                const text = await readDocFile(conceptId);
+                detailsByConceptId.set(conceptId, {
+                    ...extractDataManagerInvestigatorDetails(text),
+                    requestedData: extractAdminRequestedData(text)
+                });
             } catch (error) {
                 console.warn(`Unable to load investigator details for Concept ID ${conceptId}:`, error);
                 detailsByConceptId.set(conceptId, {});
@@ -269,6 +274,7 @@ const openDtaUploadModal = async ({ assignmentElement, uploadedBy, collectionFol
 };
 
 const getCollectionStatus = request => {
+    if (request.decision === "not_applicable") return { label: "Summary Results Requested Only", className: "bg-secondary", detail: "PI opt-in/out: N/A. No study decision is required." };
     if (Object.hasOwn(DATA_MANAGER_STAGES, request.manager_stage || "")) return {
         label: DATA_MANAGER_STAGES[request.manager_stage], className: "bg-primary",
         detail: `Set by ${request.stage_updated_by || "data manager"}${request.stage_updated_at_utc ? ` on ${formatDateTime(request.stage_updated_at_utc)}` : ""}.`
@@ -359,22 +365,24 @@ export const loadDataManagerRequestsTable = async () => {
         const rows = requests.map((request, index) => {
             const roundLabel = getDataManagerRoundLabel(request);
             const score = normalizeDataManagerScore(request.chair_score);
-            const status = getCollectionStatus(request);
             const details = investigatorDetails.get(String(request.concept_box_id || "")) || {};
+            const summaryOnly = isSummaryResultsOnly(details.requestedData);
+            if (summaryOnly) request.decision = "not_applicable";
+            const status = getCollectionStatus(request);
             const assignments = parseDtaAssignments(request.dta_assignments);
             const rowId = `dataManagerRequest${index}`;
             const isPreOptInStage = ["chair_review", "chair_clarification", "chair_complete", "admin_clarification", "admin_accepted", "admin_denied"].includes(request.workflow_stage);
-            const availability = isPreOptInStage
+            const availability = summaryOnly ? "N/A — Summary Results Requested Only" : isPreOptInStage
                 ? (request.workflow_stage === "admin_denied" ? "Not applicable" : request.workflow_stage === "chair_complete" ? "Pending final approval" : "Not yet scheduled")
                 : request.submitted === "true" && request.decision === "opt_in"
                 ? "Available now"
                 : request.submitted === "true" && request.decision === "opt_out"
                     ? "Not applicable"
                     : `After ${formatDateTime(request.closes_at_utc)}`;
-            const baseSearchText = [getConceptName(request), getConceptId(request), roundLabel, request.consortium_id, score, details.contactInvestigator, details.email, details.institution, details.allInvestigators].join(" ").toLowerCase();
+            const baseSearchText = [getConceptName(request), getConceptId(request), roundLabel, request.consortium_id, score, details.contactInvestigator, details.email, details.institution, details.allInvestigators, ...(details.requestedData?.genotyping || []), summaryOnly ? "Summary Results Requested Only N/A" : ""].join(" ").toLowerCase();
             const searchText = `${baseSearchText} ${request.access_notes || ""} ${assignments.flatMap(assignment => [assignment.dta, assignment.people, ...parseDtaFiles(assignment.files).map(file => file.fileName)]).join(" ")}`.toLowerCase();
             return `
-                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(roundLabel)}" data-score="${escapeHtml(score)}" data-sort-concept="${escapeHtml(getConceptName(request))}" data-sort-round="${getDataManagerRoundNumber(request) ?? ""}" data-sort-score="${escapeHtml(score)}" data-sort-stage="${escapeHtml(status.label)}" data-sort-availability="${!isPreOptInStage && request.submitted === "true" && request.decision === "opt_in" ? "0" : !isPreOptInStage && request.submitted !== "true" && Number.isFinite(Date.parse(request.closes_at_utc)) ? Date.parse(request.closes_at_utc) : escapeHtml(availability)}" data-stage-search="${escapeHtml(status.label.toLowerCase())}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
+                <tr class="data-manager-request-row" data-detail-row="${rowId}Details" data-round="${escapeHtml(roundLabel)}" data-score="${escapeHtml(score)}" data-sort-concept="${escapeHtml(getConceptName(request))}" data-sort-round="${getDataManagerRoundNumber(request) ?? ""}" data-sort-score="${escapeHtml(score)}" data-sort-stage="${escapeHtml(status.label)}" data-sort-availability="${!summaryOnly && !isPreOptInStage && request.submitted === "true" && request.decision === "opt_in" ? "0" : !summaryOnly && !isPreOptInStage && request.submitted !== "true" && Number.isFinite(Date.parse(request.closes_at_utc)) ? Date.parse(request.closes_at_utc) : escapeHtml(availability)}" data-stage-search="${escapeHtml(status.label.toLowerCase())}" data-base-search="${escapeHtml(baseSearchText)}" data-search="${escapeHtml(searchText)}">
                     <td class="data-manager-concept-cell" data-label="Concept"><div class="d-flex align-items-start gap-2"><span class="flex-grow-1 text-wrap">${escapeHtml(getConceptName(request))}</span>${request.concept_box_id ? `<button class="btn btn-sm custom-btn data-manager-concept-preview flex-shrink-0" type="button" data-file-id="${escapeHtml(request.concept_box_id)}" title="Preview concept" aria-label="Preview ${escapeHtml(getConceptName(request))}"><i class="fas fa-external-link-alt"></i></button>` : ""}</div><div class="small text-muted">ID: ${escapeHtml(getConceptId(request))}</div></td>
                     <td data-label="Round">${escapeHtml(roundLabel)}</td>
                     <td data-label="Score"><span class="fw-semibold">${escapeHtml(score)}</span><div class="small text-muted">${escapeHtml(request.consortium_id || "--")}</div></td>
@@ -386,13 +394,14 @@ export const loadDataManagerRequestsTable = async () => {
                         <div class="small text-muted mt-1 data-manager-stage-detail">${escapeHtml(status.detail)}</div>
                         <div class="small data-manager-stage-status" role="status"></div>
                     </td>
-                    <td data-label="Expected availability">${escapeHtml(availability)}${request.closes_at_utc ? `<div class="small text-muted">Decision deadline: ${escapeHtml(formatDateTime(request.closes_at_utc))}</div>` : ""}</td>
+                    <td data-label="Expected availability">${escapeHtml(availability)}${!summaryOnly && request.closes_at_utc ? `<div class="small text-muted">Decision deadline: ${escapeHtml(formatDateTime(request.closes_at_utc))}</div>` : ""}</td>
                     <td class="data-manager-toggle-cell" data-label="Details"><button class="accordion-toggle-btn data-manager-accordion-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${rowId}Collapse" aria-expanded="false" aria-controls="${rowId}Collapse" title="Show investigator and access details" aria-label="Show investigator and access details"><i class="fas fa-chevron-down"></i></button></td>
                 </tr>
                 <tr id="${rowId}Details" class="data-manager-detail-row">
                     <td colspan="6" class="p-0 border-0">
                         <div id="${rowId}Collapse" class="accordion-collapse collapse">
                             <div class="accordion-body border-bottom bg-light" data-request-index="${index}" data-round-id="${escapeHtml(request.round_id)}" data-concept-box-id="${escapeHtml(request.concept_box_id)}" data-consortium-id="${escapeHtml(request.consortium_id)}">
+                                <div class="mb-3"><div class="small fw-bold text-muted">Genotyping requested</div><div>${escapeHtml(details.requestedData?.genotyping?.join(", ") || "Unable to read selections; see concept for details")}</div>${summaryOnly ? '<span class="badge bg-secondary mt-1">Summary Results Requested Only — PI opt-in/out: N/A</span>' : ""}</div>
                                 ${details.readableFormat ? `<div class="data-manager-contact-details mb-3">
                                     <div><div class="small fw-bold text-muted">Contact Investigator / PI</div><div>${escapeHtml(details.contactInvestigator || "Not provided")}</div></div>
                                     <div><div class="small fw-bold text-muted">Email</div><div>${details.email ? getEmailLinks(details.email) : '<span class="text-muted">Not provided</span>'}</div></div>

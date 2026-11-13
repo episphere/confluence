@@ -6,9 +6,43 @@ import {
     createComment,
     getFile,
     getFolderItems,
+    readDocFile,
     uploadFile,
     uploadFileVersion
 } from "./shared.js";
+import { extractAdminRequestedData, isSummaryResultsOnly } from "./pages/adminRequestedData.js";
+
+// Resolve the exemption from the current concept, including rounds created before this rule.
+const applyGenotypingRequirements = async (rows, onProgress = () => {}) => {
+    const concepts = new Map();
+    const total = new Set(rows.map(row => String(row.concept_box_id || "")).filter(Boolean)).size;
+    let completed = 0;
+    onProgress(total ? 0 : 1, `Checking Genotyping selections (0/${total})...`);
+    return Promise.all(rows.map(async row => {
+        const id = String(row.concept_box_id || "");
+        if (!id) return row;
+        if (!concepts.has(id)) concepts.set(id, (async () => {
+            try { return extractAdminRequestedData(await readDocFile(id)); }
+            catch (error) {
+                console.warn(`Unable to read Genotyping selections for ${id}:`, error);
+                return null;
+            }
+            finally {
+                completed += 1;
+                onProgress(completed / total, `Checking Genotyping selections (${completed}/${total})...`);
+            }
+        })());
+        const requestedData = await concepts.get(id);
+        if (!requestedData) return row;
+        return {
+            ...row,
+            requestedData,
+            ...(isSummaryResultsOnly(requestedData) ? {
+                decision: "not_applicable", decision_reason: "Summary Results Requested Only"
+            } : {})
+        };
+    }));
+};
 
 const TSV_MIME_TYPE = "text/tab-separated-values";
 const CONFIG_FOLDER_NAME = "_config";
@@ -398,13 +432,14 @@ export const provisionDemoOptInOutRound = async ({ demoName, sourceRound, concep
 
 const resolveStudyFolder = async (study) => {
     const studyId = getStudyId(study);
+    const consortiumId = study.consortium || CONSORTIUM_ID;
     const testWorkspace = dataManagersInfo.find(manager => manager.isTest && normalizeStudyId(manager.consortium) === normalizeStudyId(study.consortium));
     if (testWorkspace) {
         const studies = await findFolder(testWorkspace.collectionFolderId, "studies");
         return studies ? findFolder(studies.id, studyId) : null;
     }
     try {
-        const consortiumFolder = await findFolder(Confluence_Opt_In_Out, CONSORTIUM_ID);
+        const consortiumFolder = await findFolder(Confluence_Opt_In_Out, consortiumId);
         if (consortiumFolder) {
             const nestedStudy = await findFolder(consortiumFolder.id, studyId);
             if (nestedStudy) return nestedStudy;
@@ -414,11 +449,16 @@ const resolveStudyFolder = async (study) => {
     }
 
     const collaborationRoots = await getFolderItems("0", "name,type,id,parent", 1000);
-    return boxEntries(collaborationRoots).find(item => item.type === "folder" && normalizeName(item.name) === normalizeName(studyId)) || null;
+    const sharedConsortium = boxEntries(collaborationRoots).find(item => item.type === "folder" && normalizeName(item.name) === normalizeName(consortiumId));
+    if (sharedConsortium) return findFolder(sharedConsortium.id, studyId);
+    return boxEntries(collaborationRoots).find(item => item.type === "folder" && normalizeName(item.name) === normalizeName(studyId)
+        && (normalizeStudyId(consortiumId) === normalizeStudyId(CONSORTIUM_ID) && String(item.parent?.id) === String(Confluence_Opt_In_Out)
+            || normalizeName(item.parent?.name) === normalizeName(consortiumId))) || null;
 };
 
-const loadAssignmentsFromStudyFolder = async (studyFolder, now = Date.now()) => {
+const loadAssignmentsFromStudyFolder = async (studyFolder, now = Date.now(), onProgress = () => {}) => {
     const assignments = [];
+    onProgress(0, "Loading study assignments from Box...");
     const manifest = await readTsvInFolder(studyFolder.id, STUDY_MANIFEST_FILE_NAME);
     const openAssignments = manifest.rows.filter(row => {
         const opensAt = Date.parse(row.opens_at_utc);
@@ -428,8 +468,12 @@ const loadAssignmentsFromStudyFolder = async (studyFolder, now = Date.now()) => 
             && (!Number.isFinite(opensAt) || opensAt <= now)
             && (!Number.isFinite(closesAt) || closesAt >= now);
     });
+    onProgress(0.2, `Loading saved decisions (0/${openAssignments.length})...`);
+    let loaded = 0;
     for (const assignment of openAssignments) {
         const selectionRows = await readTsv(assignment.selection_file_id);
+        loaded += 1;
+        onProgress(0.2 + 0.4 * loaded / openAssignments.length, `Loading saved decisions (${loaded}/${openAssignments.length})...`);
         const selection = selectionRows[0];
         if (!selection) continue;
         assignments.push({
@@ -439,35 +483,46 @@ const loadAssignmentsFromStudyFolder = async (studyFolder, now = Date.now()) => 
             studyFolderId: studyFolder.id
         });
     }
-    return assignments;
+    return applyGenotypingRequirements(assignments, (fraction, message) => onProgress(0.6 + 0.4 * fraction, message));
 };
 
-export const loadOptInOutAssignments = async (studies) => {
+export const loadOptInOutAssignments = async (studies, onProgress = () => {}) => {
     const assignments = [];
     const now = Date.now();
-    for (const study of studies) {
+    for (const [index, study] of studies.entries()) {
+        const label = `Study ${index + 1}/${studies.length}: ${study.acronym || study.name}`;
+        onProgress(index / studies.length, `${label} — Locating study folder...`);
         const studyFolder = await resolveStudyFolder(study);
         if (!studyFolder) continue;
-        assignments.push(...await loadAssignmentsFromStudyFolder(studyFolder, now));
+        assignments.push(...await loadAssignmentsFromStudyFolder(studyFolder, now,
+            (fraction, message) => onProgress((index + 0.1 + 0.9 * fraction) / studies.length, `${label} — ${message}`)));
     }
+    onProgress(1, "Study assignments loaded.");
     return assignments;
 };
 
-export const loadDemoOptInOutAssignments = async () => {
+export const loadDemoOptInOutAssignments = async (onProgress = () => {}) => {
+    onProgress(0, "Locating demo assignments...");
     const demoRoot = await findFolder(Confluence_Opt_In_Out, DEMO_ROOT_FOLDER_NAME);
-    if (!demoRoot) return [];
+    if (!demoRoot) {
+        onProgress(1, "No demo assignments found.");
+        return [];
+    }
     const demoItems = await getFolderItems(demoRoot.id, "name,type,id,parent", 1000);
     const demoFolders = boxEntries(demoItems).filter(item => item.type === "folder");
     const assignments = [];
-    for (const demoFolder of demoFolders) {
+    for (const [index, demoFolder] of demoFolders.entries()) {
+        const report = (fraction, message) => onProgress((index + 0.1 + 0.9 * fraction) / demoFolders.length, `Demo ${index + 1}/${demoFolders.length} — ${message}`);
+        onProgress(index / demoFolders.length, `Locating demo ${index + 1}/${demoFolders.length}...`);
         const consortiumFolder = await findFolder(demoFolder.id, CONSORTIUM_ID);
         if (!consortiumFolder) continue;
         const studyFolder = await findFolder(consortiumFolder.id, DEMO_STUDY_ID);
         if (!studyFolder) continue;
-        const demoAssignments = await loadAssignmentsFromStudyFolder(studyFolder);
+        const demoAssignments = await loadAssignmentsFromStudyFolder(studyFolder, Date.now(), report);
         demoAssignments.forEach(assignment => { assignment.is_demo = "true"; });
         assignments.push(...demoAssignments);
     }
+    onProgress(1, "Demo assignments loaded.");
     return assignments;
 };
 
@@ -927,7 +982,7 @@ const hydrateStudyAccessSelections = async rows => {
             }
         })));
     }
-    return result;
+    return applyGenotypingRequirements(result);
 };
 
 const studyAccessLoads = new Map();
@@ -998,6 +1053,8 @@ export const saveOptInOutSelections = async (changes, user) => {
             if (!["opt_in", "opt_out"].includes(change.decision)) throw new Error("Invalid Opt-In/Opt-Out decision.");
             const rows = await readTsv(change.selectionFileId);
             if (!rows.length) throw new Error("The selection TSV is empty.");
+            const [current] = await applyGenotypingRequirements([rows[0]]);
+            if (current.decision === "not_applicable") throw new Error("Summary Results Requested Only: PI opt-in/out is not required.");
             if (scopedTest && !testAssignments.some(assignment => String(assignment.selection_file_id) === String(change.selectionFileId)
                 && ["round_id", "consortium_id", "study_id", "concept_box_id"].every(field => String(assignment[field]) === String(rows[0][field])))) {
                 throw new Error("Test mode can update only selections in the TEST workspace.");
